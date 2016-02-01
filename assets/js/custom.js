@@ -67,86 +67,17 @@ $(document).ready(function () {
 
     /************************************************************************
      * 
-     *                Show login after click
+     *                Show login form after click
      * 
      ************************************************************************/
 
-
     $("#login_link").click(function () {
-
-        /*
-         $("#search_div").hide();
-         $('#register_div').hide();
-         */
         console.log('Login link clicked ...');
         $.post("functionality/php/get_login_form.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
-
-        /*
-         if ($("#login_div").is(":visible")) {
-         $("#login_div").hide('slow');
-         } // end if $("#login_div").is(":visible") == true
-         else {
-         $("#login_div").show('slow');
-         } // end else 
-         */
-
-
     });
-
-    /************************************************************************
-     * 
-     *                Show search form after click
-     * 
-     ************************************************************************/
-
-    $('#search').on('submit', function () {
-        //$('#home-carousel').hide();
-        $("#login_div").hide();
-        $('#register_div').hide();
-        console.log('Search clicked ...');
-        if ($("#search_div").is(":visible")) {
-            $("#search_div").hide('slow');
-            return false;
-        } // end if $("#login_div").is(":visible") == true
-        else {
-            $("#search_div").show('slow');
-            return false;
-        } // end else 
-        return false;
-
-    }); // end '#search_box').on('submit', function ()
-
-    /************************************************************************
-     * 
-     *                Show register form after click
-     * 
-     ************************************************************************/
-
-    $('#register_item').click(function () {
-        $("#search_div").hide();
-        $("#login_div").hide();
-        //$('#register_div').html('This register form ....');
-        $('#register_div').show('slow');
-    });
-
-
-    /************************************************************************
-     * 
-     *                      Show search form
-     * 
-     ************************************************************************/
-
-    $('#search_item').click(function () {
-        console.log('Search clicked ...');
-        $.post("functionality/php/get_search_form.php", function (data) {
-            $('#instructions').hide();
-            $("#page").html(data);
-        });
-    });
-
 
     /************************************************************************
      * 
@@ -163,6 +94,33 @@ $(document).ready(function () {
             $('#login_form').submit();
         }
     }
+
+    /************************************************************************
+     * 
+     *                Show register form after click
+     * 
+     ************************************************************************/
+
+    $('#register_item').click(function () {
+        $("#search_div").hide();
+        $("#login_div").hide();
+        //$('#register_div').html('This register form ....');
+        $('#register_div').show('slow');
+    });
+
+    /************************************************************************
+     * 
+     *                      Show search form
+     * 
+     ************************************************************************/
+
+    $('#search_item').click(function () {
+        console.log('Search clicked ...');
+        $.post("functionality/php/get_search_form.php", function (data) {
+            $('#instructions').hide();
+            $("#page").html(data);
+        });
+    });
 
     /************************************************************************
      * 
