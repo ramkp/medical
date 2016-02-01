@@ -97,6 +97,20 @@ $(document).ready(function () {
 
     /************************************************************************
      * 
+     *                   Show program items
+     * 
+     ************************************************************************/
+    function show_program_items(cat_name) {
+        $.post("functionality/php/get_programs_list.php", {cat_name: cat_name})
+                .done(function (data) {
+                    $('#instructions').hide();
+                    $("#page").html(data);
+                });
+
+    }
+
+    /************************************************************************
+     * 
      *                Show register form after click
      * 
      ************************************************************************/
@@ -120,6 +134,52 @@ $(document).ready(function () {
             $('#instructions').hide();
             $("#page").html(data);
         });
+    });
+
+    /************************************************************************
+     * 
+     *                      Show workshops list after click
+     * 
+     ************************************************************************/
+    $('#ws').click(function () {
+        console.log('Workshops clicked ...');
+        show_program_items('Workshops');
+    });
+
+    /************************************************************************
+     * 
+     *                      Show courses list after click
+     * 
+     ************************************************************************/
+
+    $('#cs').click(function () {
+        console.log('Courses clicked ...');
+        show_program_items('Courses');
+
+    });
+
+    /************************************************************************
+     * 
+     *                      Show exams list after click
+     * 
+     ************************************************************************/
+
+    $('#exam').click(function () {
+        console.log('Exams clicked ...');
+        show_program_items('Exams');
+
+    });
+
+    /************************************************************************
+     * 
+     *                      Show school's list after click
+     * 
+     ************************************************************************/
+
+    $('#school').click(function () {
+        console.log('Schools clicked ...');
+        show_program_items('School');
+
     });
 
     /************************************************************************
