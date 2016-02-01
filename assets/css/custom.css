@@ -1,0 +1,28 @@
+/* 
+    Created on : Jan 29, 2016, 10:48:44 AM
+    Author     : sirromas
+*/
+
+
+@media (max-width: 320px) {	
+    #input_search_box, #login_div, #password_box  {        
+        width: 140px;
+    }
+    .search_container, #login_div {
+        margin-right: 125px;
+    }    
+    
+}
+
+@media (min-width: 320px) and (max-width: 480px) {
+    #input_search_box, #login_box, #password_box  {        
+        width: 140px;
+    }   
+    
+}
+
+@media (min-width: 768px) {
+    .search_container, #login_div {
+        width: 20%;
+    } 
+}

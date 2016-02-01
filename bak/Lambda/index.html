@@ -1,0 +1,453 @@
+
+<!DOCTYPE html>
+<html  dir="ltr" lang="en" xml:lang="en">
+    <head>
+        <title>Medical2 Institute</title>
+        <link rel="shortcut icon" href="http://cnausa.com/lms/theme/image.php/lambda/theme/1451892772/favicon" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="moodle, Medical2 Institute" />
+        <link rel="stylesheet" type="text/css" href="http://cnausa.com/lms/theme/yui_combo.php?rollup/3.17.2/yui-moodlesimple-min.css" /><script id="firstthemesheet" type="text/css">/** Required in order to fix style inclusion problems in IE with YUI **/</script><link rel="stylesheet" type="text/css" href="http://cnausa.com/lms/theme/styles.php/lambda/1451892772/all" />
+        <script type="text/javascript">
+            //<![CDATA[
+            var M = {};
+            M.yui = {};
+            M.pageloadstarttime = new Date();
+            M.cfg = {"wwwroot": "http:\/\/mycodebusters.com\/medical\/lms", "sesskey": "IwtRhLNoqd", "loadingicon": "http:\/\/mycodebusters.com\/medical\/lms\/theme\/image.php\/lambda\/core\/1451892772\/i\/loading_small", "themerev": "1451892772", "slasharguments": 1, "theme": "lambda", "jsrev": "1451892663", "admin": "admin", "svgicons": true};
+            var yui1ConfigFn = function (me) {
+                if (/-skin|reset|fonts|grids|base/.test(me.name)) {
+                    me.type = 'css';
+                    me.path = me.path.replace(/\.js/, '.css');
+                    me.path = me.path.replace(/\/yui2-skin/, '/assets/skins/sam/yui2-skin')
+                }
+            };
+            var yui2ConfigFn = function (me) {
+                var parts = me.name.replace(/^moodle-/, '').split('-'), component = parts.shift(), module = parts[0], min = '-min';
+                if (/-(skin|core)$/.test(me.name)) {
+                    parts.pop();
+                    me.type = 'css';
+                    min = ''
+                }
+                ;
+                if (module) {
+                    var filename = parts.join('-');
+                    me.path = component + '/' + module + '/' + filename + min + '.' + me.type
+                } else
+                    me.path = component + '/' + component + '.' + me.type
+            };
+            YUI_config = {"debug": false, "base": "http:\/\/mycodebusters.com\/medical\/lms\/lib\/yuilib\/3.17.2\/", "comboBase": "http:\/\/mycodebusters.com\/medical\/lms\/theme\/yui_combo.php?", "combine": true, "filter": null, "insertBefore": "firstthemesheet", "groups": {"yui2": {"base": "http:\/\/mycodebusters.com\/medical\/lms\/lib\/yuilib\/2in3\/2.9.0\/build\/", "comboBase": "http:\/\/mycodebusters.com\/medical\/lms\/theme\/yui_combo.php?", "combine": true, "ext": false, "root": "2in3\/2.9.0\/build\/", "patterns": {"yui2-": {"group": "yui2", "configFn": yui1ConfigFn}}}, "moodle": {"name": "moodle", "base": "http:\/\/mycodebusters.com\/medical\/lms\/theme\/yui_combo.php?m\/1451892663\/", "combine": true, "comboBase": "http:\/\/mycodebusters.com\/medical\/lms\/theme\/yui_combo.php?", "ext": false, "root": "m\/1451892663\/", "patterns": {"moodle-": {"group": "moodle", "configFn": yui2ConfigFn}}, "filter": null, "modules": {"moodle-core-actionmenu": {"requires": ["base", "event", "node-event-simulate"]}, "moodle-core-formchangechecker": {"requires": ["base", "event-focus"]}, "moodle-core-checknet": {"requires": ["base-base", "moodle-core-notification-alert", "io-base"]}, "moodle-core-event": {"requires": ["event-custom"]}, "moodle-core-chooserdialogue": {"requires": ["base", "panel", "moodle-core-notification"]}, "moodle-core-lockscroll": {"requires": ["plugin", "base-build"]}, "moodle-core-tooltip": {"requires": ["base", "node", "io-base", "moodle-core-notification-dialogue", "json-parse", "widget-position", "widget-position-align", "event-outside", "cache-base"]}, "moodle-core-languninstallconfirm": {"requires": ["base", "node", "moodle-core-notification-confirm", "moodle-core-notification-alert"]}, "moodle-core-dragdrop": {"requires": ["base", "node", "io", "dom", "dd", "event-key", "event-focus", "moodle-core-notification"]}, "moodle-core-popuphelp": {"requires": ["moodle-core-tooltip"]}, "moodle-core-dock": {"requires": ["base", "node", "event-custom", "event-mouseenter", "event-resize", "escape", "moodle-core-dock-loader"]}, "moodle-core-dock-loader": {"requires": ["escape"]}, "moodle-core-blocks": {"requires": ["base", "node", "io", "dom", "dd", "dd-scroll", "moodle-core-dragdrop", "moodle-core-notification"]}, "moodle-core-formautosubmit": {"requires": ["base", "event-key"]}, "moodle-core-maintenancemodetimer": {"requires": ["base", "node"]}, "moodle-core-notification": {"requires": ["moodle-core-notification-dialogue", "moodle-core-notification-alert", "moodle-core-notification-confirm", "moodle-core-notification-exception", "moodle-core-notification-ajaxexception"]}, "moodle-core-notification-dialogue": {"requires": ["base", "node", "panel", "escape", "event-key", "dd-plugin", "moodle-core-widget-focusafterclose", "moodle-core-lockscroll"]}, "moodle-core-notification-alert": {"requires": ["moodle-core-notification-dialogue"]}, "moodle-core-notification-confirm": {"requires": ["moodle-core-notification-dialogue"]}, "moodle-core-notification-exception": {"requires": ["moodle-core-notification-dialogue"]}, "moodle-core-notification-ajaxexception": {"requires": ["moodle-core-notification-dialogue"]}, "moodle-core-handlebars": {"condition": {"trigger": "handlebars", "when": "after"}}, "moodle-core_availability-form": {"requires": ["base", "node", "event", "panel", "moodle-core-notification-dialogue", "json"]}, "moodle-backup-confirmcancel": {"requires": ["node", "node-event-simulate", "moodle-core-notification-confirm"]}, "moodle-backup-backupselectall": {"requires": ["node", "event", "node-event-simulate", "anim"]}, "moodle-calendar-info": {"requires": ["base", "node", "event-mouseenter", "event-key", "overlay", "moodle-calendar-info-skin"]}, "moodle-course-categoryexpander": {"requires": ["node", "event-key"]}, "moodle-course-modchooser": {"requires": ["moodle-core-chooserdialogue", "moodle-course-coursebase"]}, "moodle-course-dragdrop": {"requires": ["base", "node", "io", "dom", "dd", "dd-scroll", "moodle-core-dragdrop", "moodle-core-notification", "moodle-course-coursebase", "moodle-course-util"]}, "moodle-course-formatchooser": {"requires": ["base", "node", "node-event-simulate"]}, "moodle-course-util": {"requires": ["node"], "use": ["moodle-course-util-base"], "submodules": {"moodle-course-util-base": {}, "moodle-course-util-section": {"requires": ["node", "moodle-course-util-base"]}, "moodle-course-util-cm": {"requires": ["node", "moodle-course-util-base"]}}}, "moodle-course-toolboxes": {"requires": ["node", "base", "event-key", "node", "io", "moodle-course-coursebase", "moodle-course-util"]}, "moodle-course-management": {"requires": ["base", "node", "io-base", "moodle-core-notification-exception", "json-parse", "dd-constrain", "dd-proxy", "dd-drop", "dd-delegate", "node-event-delegate"]}, "moodle-form-shortforms": {"requires": ["node", "base", "selector-css3", "moodle-core-event"]}, "moodle-form-passwordunmask": {"requires": ["node", "base"]}, "moodle-form-showadvanced": {"requires": ["node", "base", "selector-css3"]}, "moodle-form-dateselector": {"requires": ["base", "node", "overlay", "calendar"]}, "moodle-core_message-messenger": {"requires": ["escape", "handlebars", "io-base", "moodle-core-notification-ajaxexception", "moodle-core-notification-alert", "moodle-core-notification-dialogue", "moodle-core-notification-exception"]}, "moodle-core_message-deletemessage": {"requires": ["node", "event"]}, "moodle-question-preview": {"requires": ["base", "dom", "event-delegate", "event-key", "core_question_engine"]}, "moodle-question-searchform": {"requires": ["base", "node"]}, "moodle-question-chooser": {"requires": ["moodle-core-chooserdialogue"]}, "moodle-question-qbankmanager": {"requires": ["node", "selector-css3"]}, "moodle-availability_completion-form": {"requires": ["base", "node", "event", "moodle-core_availability-form"]}, "moodle-availability_date-form": {"requires": ["base", "node", "event", "io", "moodle-core_availability-form"]}, "moodle-availability_grade-form": {"requires": ["base", "node", "event", "moodle-core_availability-form"]}, "moodle-availability_group-form": {"requires": ["base", "node", "event", "moodle-core_availability-form"]}, "moodle-availability_grouping-form": {"requires": ["base", "node", "event", "moodle-core_availability-form"]}, "moodle-availability_profile-form": {"requires": ["base", "node", "event", "moodle-core_availability-form"]}, "moodle-qtype_ddimageortext-form": {"requires": ["moodle-qtype_ddimageortext-dd", "form_filepicker"]}, "moodle-qtype_ddimageortext-dd": {"requires": ["node", "dd", "dd-drop", "dd-constrain"]}, "moodle-qtype_ddmarker-form": {"requires": ["moodle-qtype_ddmarker-dd", "form_filepicker", "graphics", "escape"]}, "moodle-qtype_ddmarker-dd": {"requires": ["node", "event-resize", "dd", "dd-drop", "dd-constrain", "graphics"]}, "moodle-qtype_ddwtos-dd": {"requires": ["node", "dd", "dd-drop", "dd-constrain"]}, "moodle-mod_assign-history": {"requires": ["node", "transition"]}, "moodle-mod_forum-subscriptiontoggle": {"requires": ["base-base", "io-base"]}, "moodle-mod_quiz-quizquestionbank": {"requires": ["base", "event", "node", "io", "io-form", "yui-later", "moodle-question-qbankmanager", "moodle-core-notification-dialogue"]}, "moodle-mod_quiz-modform": {"requires": ["base", "node", "event"]}, "moodle-mod_quiz-quizbase": {"requires": ["base", "node"]}, "moodle-mod_quiz-repaginate": {"requires": ["base", "event", "node", "io", "moodle-core-notification-dialogue"]}, "moodle-mod_quiz-dragdrop": {"requires": ["base", "node", "io", "dom", "dd", "dd-scroll", "moodle-core-dragdrop", "moodle-core-notification", "moodle-mod_quiz-quizbase", "moodle-mod_quiz-util-base", "moodle-mod_quiz-util-page", "moodle-mod_quiz-util-slot", "moodle-course-util"]}, "moodle-mod_quiz-autosave": {"requires": ["base", "node", "event", "event-valuechange", "node-event-delegate", "io-form"]}, "moodle-mod_quiz-util": {"requires": ["node"], "use": ["moodle-mod_quiz-util-base"], "submodules": {"moodle-mod_quiz-util-base": {}, "moodle-mod_quiz-util-slot": {"requires": ["node", "moodle-mod_quiz-util-base"]}, "moodle-mod_quiz-util-page": {"requires": ["node", "moodle-mod_quiz-util-base"]}}}, "moodle-mod_quiz-toolboxes": {"requires": ["base", "node", "event", "event-key", "io", "moodle-mod_quiz-quizbase", "moodle-mod_quiz-util-slot", "moodle-core-notification-ajaxexception"]}, "moodle-mod_quiz-randomquestion": {"requires": ["base", "event", "node", "io", "moodle-core-notification-dialogue"]}, "moodle-mod_quiz-questionchooser": {"requires": ["moodle-core-chooserdialogue", "moodle-mod_quiz-util", "querystring-parse"]}, "moodle-message_airnotifier-toolboxes": {"requires": ["base", "node", "io"]}, "moodle-block_navigation-navigation": {"requires": ["base", "io-base", "node", "event-synthetic", "event-delegate", "json-parse"]}, "moodle-filter_glossary-autolinker": {"requires": ["base", "node", "io-base", "json-parse", "event-delegate", "overlay", "moodle-core-event", "moodle-core-notification-alert", "moodle-core-notification-exception", "moodle-core-notification-ajaxexception"]}, "moodle-filter_mathjaxloader-loader": {"requires": ["moodle-core-event"]}, "moodle-editor_atto-rangy": {"requires": []}, "moodle-editor_atto-editor": {"requires": ["node", "transition", "io", "overlay", "escape", "event", "event-simulate", "event-custom", "node-event-html5", "yui-throttle", "moodle-core-notification-dialogue", "moodle-core-notification-confirm", "moodle-editor_atto-rangy", "handlebars", "timers"]}, "moodle-editor_atto-plugin": {"requires": ["node", "base", "escape", "event", "event-outside", "handlebars", "event-custom", "timers", "moodle-editor_atto-menu"]}, "moodle-editor_atto-menu": {"requires": ["moodle-core-notification-dialogue", "node", "event", "event-custom"]}, "moodle-report_eventlist-eventfilter": {"requires": ["base", "event", "node", "node-event-delegate", "datatable", "autocomplete", "autocomplete-filters"]}, "moodle-report_loglive-fetchlogs": {"requires": ["base", "event", "node", "io", "node-event-delegate"]}, "moodle-gradereport_grader-gradereporttable": {"requires": ["base", "node", "event", "handlebars", "overlay", "event-hover"]}, "moodle-gradereport_history-userselector": {"requires": ["escape", "event-delegate", "event-key", "handlebars", "io-base", "json-parse", "moodle-core-notification-dialogue"]}, "moodle-tool_capability-search": {"requires": ["base", "node"]}, "moodle-tool_monitor-dropdown": {"requires": ["base", "event", "node"]}, "moodle-assignfeedback_editpdf-editor": {"requires": ["base", "event", "node", "io", "graphics", "json", "event-move", "event-resize", "querystring-stringify-simple", "moodle-core-notification-dialog", "moodle-core-notification-exception", "moodle-core-notification-ajaxexception"]}, "moodle-atto_accessibilitychecker-button": {"requires": ["color-base", "moodle-editor_atto-plugin"]}, "moodle-atto_accessibilityhelper-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_align-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_bold-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_charmap-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_clear-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_collapse-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_emoticon-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_equation-button": {"requires": ["moodle-editor_atto-plugin", "moodle-core-event", "io", "event-valuechange", "tabview", "array-extras"]}, "moodle-atto_html-button": {"requires": ["moodle-editor_atto-plugin", "event-valuechange"]}, "moodle-atto_image-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_indent-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_italic-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_link-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_managefiles-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_managefiles-usedfiles": {"requires": ["node", "escape"]}, "moodle-atto_media-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_noautolink-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_orderedlist-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_rtl-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_strike-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_subscript-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_superscript-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_table-button": {"requires": ["moodle-editor_atto-plugin", "moodle-editor_atto-menu", "event", "event-valuechange"]}, "moodle-atto_title-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_underline-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_undo-button": {"requires": ["moodle-editor_atto-plugin"]}, "moodle-atto_unorderedlist-button": {"requires": ["moodle-editor_atto-plugin"]}}}, "gallery": {"name": "gallery", "base": "http:\/\/mycodebusters.com\/medical\/lms\/lib\/yuilib\/gallery\/", "combine": true, "comboBase": "http:\/\/mycodebusters.com\/medical\/lms\/theme\/yui_combo.php?", "ext": false, "root": "gallery\/1451892663\/", "patterns": {"gallery-": {"group": "gallery"}}}}, "modules": {"core_filepicker": {"name": "core_filepicker", "fullpath": "http:\/\/mycodebusters.com\/medical\/lms\/lib\/javascript.php\/1451892663\/repository\/filepicker.js", "requires": ["base", "node", "node-event-simulate", "json", "async-queue", "io-base", "io-upload-iframe", "io-form", "yui2-treeview", "panel", "cookie", "datatable", "datatable-sort", "resize-plugin", "dd-plugin", "escape", "moodle-core_filepicker"]}}};
+            M.yui.loader = {modules: {}};
+
+            //]]>
+        </script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <noscript>
+        <link rel="stylesheet" type="text/css" href="http://cnausa.com/lms/theme/lambda/style/nojs.css" />
+        </noscript>
+        <!-- Google web fonts -->
+    </head>
+
+    <body  id="page-site-index" class="format-site course path-site safari dir-ltr lang-en yui-skin-sam yui3-skin-sam mycodebusters-com--medical-lms pagelayout-frontpage course-1 context-2 notloggedin two-column has-region-side-pre used-region-side-pre has-region-side-post used-region-side-post has-region-footer-left empty-region-footer-left has-region-footer-middle empty-region-footer-middle has-region-footer-right empty-region-footer-right has-region-hidden-dock empty-region-hidden-dock layout-option-nonavbar">
+
+        <div class="skiplinks"><a class="skip" href="#maincontent">Skip to main content</a></div>
+        <script type="text/javascript" src="http://cnausa.com/lms/theme/yui_combo.php?rollup/3.17.2/yui-moodlesimple-min.js&amp;rollup/1451892663/mcore-min.js"></script><script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/core/jquery-1.11.3.min.js"></script>
+        <script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/theme_lambda/jquery.easing.1.3.js"></script>
+        <script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/theme_lambda/camera.min.1.11.js"></script>
+        <script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/theme_lambda/jquery.bxslider.js"></script>
+        <!--<script type="text/javascript" src="http://cnausa.com/lms/lib/javascript.php/1451892663/lib/javascript-static.js"></script>-->
+        <script type="text/javascript" src="assets/js/custom.js"></script>
+        <script type="text/javascript">
+            //<![CDATA[
+            document.body.className += ' jsenabled';
+            //]]>
+        </script>
+
+
+        <div id="wrapper">
+
+
+            <header id="page-header" class="clearfix">
+
+                <div class="container-fluid">    
+
+                </div>
+
+            </header>
+
+            <header role="banner" class="navbar">
+                <nav role="navigation" class="navbar-inner">
+                    <div class="container-fluid">
+                        <a class="brand" href="#"><img src="assets/icons/home2.png" width="20" height="20">&nbsp; Medical2 Training Institute</a>
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+                        <div class="nav-collapse collapse">
+                            <div class="nav-divider-right"></div>
+                            <ul class="nav pull-right">
+                                <li></li>
+                            </ul>
+
+                            <div class="nav-collapse collapse">
+                                <ul class="nav"><li class="dropdown"><a title="Programs" class="dropdown-toggle" href="#">Programs<b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#" title="Workshops">Workshops</a></li>
+                                            <li><a href="#" title="Online & CEU’s Courses">Online & CEU’s Courses</a></li>
+                                            <li><a href="#" title="Online Exams">Online Exams</a></li>
+                                            <li><a href="#" title="MS Medical School">Nursing School</a></li>                                     
+                                        </ul>
+                                    </li>                                    
+                                    <li><a href="#" id="register_item" title="Register">Register</a></li>
+                                    <li><a href="#" id="faq_item" title="FAQ’s">FAQ’s</a></li>
+
+                                    <li id='login_link'><a href="#"  title="Login">Login</a></li>                                    
+                                    <li class="dropdown"><a title="Courses" class="dropdown-toggle" href="#cm_submenu_2">More<b class="caret"></b></a>
+                                        <ul class="dropdown-menu">                                            
+                                            <li><a href="#" title="Verify Certification">Verify Certification</a></li>
+                                            <li><a href="#" title="Testimonial">Testimonial</a></li>
+                                            <li><a href="#" title="Photo Gallery">Photo Gallery</a></li>                                            
+                                        </ul>
+                                    </li>
+
+                                </ul>
+                                <div class="nav-divider-right"></div>
+                                <ul class="nav pull-right">
+                                    <li></li>
+                                </ul>
+                            </div>
+                            <div class="nav-divider-left"></div>                           
+
+                            <form method="GET" action="" id="search">
+                                <div class="nav-divider-left"></div>							
+                                <ul class="nav pull-right">
+                                    <li class="dropdown"><a href="#">Select Language<span style="color: rgb(155, 155, 155);">▼</span></a></b></a></li>                               
+                                </ul>
+                                <input type="submit" id='search' value="">							
+                            </form>                
+
+                        </div>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Instruction box -->
+            <div  style="z-index: 675;position:absolute;left:135px;top:395px;display:inline;">
+                <div id="centered" style="margin: 0 auto;width:375px; ">
+                    <div> 
+                        <div>
+                            <h3 class="panel-title" 
+                                style="background: #e2a500 none repeat scroll 0 0;
+                                color: #fff;display: block;font-size: 2.2em;
+                                line-height: 1.5em;margin-right: 5%;
+                                padding-left: 10px;
+                                text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);">
+                                Easy Steps</h3>
+                        </div>
+                        <div>
+                            <span style="background: rgba(0, 0, 0, 0.5) none repeat scroll 0 0;
+                                border-left: 4px solid #e2a500;
+                                color: #fff;
+                                display: block;
+                                font-size: 14px;
+                                line-height: 24px;
+                                margin-left: 5%;
+                                padding: 15px 20px;
+                                text-shadow: 0 0 1px rgba(0, 0, 0, 0.5)">
+                                The important thing is not so much that every 
+                                child should be taught, as that every child should
+                                be given the wish to learn.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--  -->
+
+            
+
+            <!-- Place login form here -->
+            <div id="login_div" style="z-index: 675;position:absolute;right:535px;top:195px;display:none;">
+                <div id="centered" style="margin: 0 auto; width:235px;">
+                    <div class="panel panel-default"> 
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Login</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form  id="login_form" method='post' name="login_form" action="http://cnausa.com/lms/login/index.php">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="login_box" name='username' placeholder="Login"><br/>
+                                    <input type="password" class="form-control" id="password_box" name="password" placeholder="Password"><br/>
+                                </div>
+                                <div id="login_err" style="color:red;"></div>
+                                <br/><button class="btn btn-primary">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Place register form here -->
+            <div id="register_div" style="z-index: 675;position:absolute;right:535px;top:195px;display:none;">
+                <div id="centered" style="margin: 0 auto; width:235px;">
+                    <div class="panel panel-default"> 
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Register</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover">
+                                ...
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Place search form here -->
+            <div id="search_div" style="z-index: 675;position:absolute;right:535px;top:195px;display:none;">               
+                <div class="panel panel-default"> 
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Search</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form class="navbar-form navbar-left" role="search">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search">                    
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>                    
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div id="page" class="container-fluid">
+                <!-- Slider -->
+                <div class="text-center">
+                    <div class="carousel slide" id="home-carousel" data-ride="carousel">
+                        <div class="carousel-inner">                                                
+                            <div class="item active">                            
+                                <h1>
+                                    <p><img src="assets/img/3_shot.png" alt="Third slide" height="400" /></p></h1>
+                            </div>
+
+                            <div class="item">                            
+                                <h1>
+                                    <p><img src="assets/img/4_shot.jpg" alt="Second slide" height="400" /></p></h1>
+                            </div>
+
+                        </div> 
+                        <a class="carousel-control left" href="#home-carousel" data-slide="prev">&lsaquo;</a>
+                        <a class="carousel-control right" href="#home-carousel" data-slide="next">&rsaquo;</a>
+                    </div>
+                </div>
+
+
+
+
+                <a href="#top" class="back-to-top"><i class="fa fa-chevron-circle-up fa-3x"></i><p></p></a>
+
+            </div>
+
+
+            <footer id="page-footer" class="container-fluid">
+                <div class="row-fluid">
+
+                    <aside id="block-region-footer-left" 
+                           class="span4 block-region" 
+                           data-blockregion="footer-left" 
+                           data-droptarget="1">
+
+                        <div aria-labelledby="instance-66-header"
+                             data-instanceid="66" 
+                             data-block="html" 
+                             role="complementary" 
+                             class="block_html  block" 
+                             id="inst66">
+                            <div class="header" id="yui_3_13_0_2_1451898324435_15">
+                                <div class="title" id="yui_3_13_0_3_1451898324435_77">
+                                    <div class="block_action"><img 
+                                            title="Hide About block" 
+                                            alt="Hide About block" 
+                                            tabindex="0" class="block-hider-hide" 
+                                            src="http://lambda.redpithemes.com/theme/image.php/lambda/core/1444287898/t/switch_minus"><img title="Show About block" alt="Show About block" tabindex="0" class="block-hider-show" src="http://lambda.redpithemes.com/theme/image.php/lambda/core/1444287898/t/switch_plus"></div>
+                                    <h2 id="instance-66-header">About</h2></div></div><div class="content">
+                                <div class="no-overflow"><p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.</p>
+                                    <p><button class="btn btn-primary" type="button">Read more...</button></p></div></div></div>
+                    </aside>
+
+                    <aside id="block-region-footer-middle" 
+                           class="span4 block-region" 
+                           data-blockregion="footer-middle" 
+                           data-droptarget="1">
+                        <div aria-labelledby="instance-66-header"
+                             data-instanceid="66" 
+                             data-block="html" 
+                             role="complementary" 
+                             class="block_html  block" 
+                             id="inst66">
+                            <div class="header" id="yui_3_13_0_2_1451898324435_15">
+                                <div class="title" id="yui_3_13_0_3_1451898324435_77">
+                                    <div class="block_action"><img 
+                                            title="Hide About block" 
+                                            alt="Hide About block" 
+                                            tabindex="0" class="block-hider-hide" 
+                                            src="http://lambda.redpithemes.com/theme/image.php/lambda/core/1444287898/t/switch_minus"><img title="Show About block" alt="Show About block" tabindex="0" class="block-hider-show" src="http://lambda.redpithemes.com/theme/image.php/lambda/core/1444287898/t/switch_plus"></div>
+                                    <h2 id="instance-66-header">Copyright</h2></div></div><div class="content">
+                                <div class="no-overflow"><p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.</p>
+                                    <p><button class="btn btn-primary" type="button">Read more...</button></p></div></div></div>    
+
+                    </aside>
+
+                    <aside id="block-region-footer-right" 
+                           class="span4 block-region" 
+                           data-blockregion="footer-right"
+                           data-droptarget="1">
+
+                        <div aria-labelledby="instance-67-header" data-instanceid="67" 
+                             data-block="html" role="complementary" class="block_html  block"
+                             id="inst67"><div class="header" id="yui_3_13_0_2_1451898324435_16">
+                                <div class="title" id="yui_3_13_0_3_1451898324435_95">
+                                    <div class="block_action">
+                                        <img title="" alt="" tabindex="0" 
+                                             class="block-hider-hide" 
+                                             src="http://lambda.redpithemes.com/theme/image.php/lambda/core/1444287898/t/switch_minus"><img title="Show Lambda School block" alt="Show Lambda School block" tabindex="0" class="block-hider-show" src="http://lambda.redpithemes.com/theme/image.php/lambda/core/1444287898/t/switch_plus"></div><h2 id="instance-67-header">Contact us </h2></div></div><div class="content"><div class="no-overflow"><address>308 Negra Arroyo Lane, Albuquerque, New Mexico, 87104</address>
+                                    <i class="fa fa-mobile fa-lg"></i>&nbsp; Phone: (007) 123-456 <br>
+                                    <i class="fa fa-envelope-o"></i>&nbsp; E-mail: <a href="mailto:info@medical-training.com">info@medical-training.com</a>
+                                    <h6><a href="">Chat now!</a></h6>
+                                    <h6>Connect with us:</h6>
+                                    <div class="social_icons pull-right">
+                                        <a href="#" target="_blank" ><img src="assets/icons/fb.png"> </a>
+                                        <a href="#" target="_blank" ><img src="assets/icons/twt.png">  </a>
+                                        <a href="#" target="_blank" ><img src="assets/icons/in.png">  </a>                                        
+                                    </div></div></div></div>
+
+                    </aside>
+
+                </div>
+
+                <div class="footerlinks">
+                    <div class="row-fluid">
+                        <p class="helplink"></p><br/>
+                        <div class="footnote" id="yui_3_13_0_2_1451898324435_26"><p id="yui_3_13_0_2_1451898324435_25">(c) 2016 | <a href="#" target="_blank"><img src="assets/icons/heart.gif" width="15" height="15"></a> Powered  By Z&S </p></div>
+                    </div>
+
+
+
+                </div>
+
+
+            </footer>
+
+            <script type="text/javascript">
+                //<![CDATA[
+                var require = {
+                    baseUrl: 'http://cnausa.com/lms/lib/requirejs.php/1451892663/',
+                    // We only support AMD modules with an explicit define() statement.
+                    enforceDefine: true,
+                    skipDataMain: true,
+                    paths: {
+                        jquery: 'http://cnausa.com/lms/lib/javascript.php/1451892663/lib/jquery/jquery-1.11.3.min',
+                        jqueryui: 'http://cnausa.com/lms/lib/javascript.php/1451892663/lib/jquery/ui-1.11.4/jquery-ui.min',
+                        jqueryprivate: 'http://cnausa.com/lms/lib/javascript.php/1451892663/lib/requirejs/jquery-private'
+                    },
+                    // Custom jquery config map.
+                    map: {
+                        // '*' means all modules will get 'jqueryprivate'
+                        // for their 'jquery' dependency.
+                        '*': {jquery: 'jqueryprivate'},
+                        // 'jquery-private' wants the real jQuery module
+                        // though. If this line was not here, there would
+                        // be an unresolvable cyclic dependency.
+                        jqueryprivate: {jquery: 'jquery'}
+                    }
+                };
+
+                //]]>
+            </script>
+            <script type="text/javascript" src="http://cnausa.com/lms/lib/javascript.php/1451892663/lib/requirejs/require.min.js"></script>
+            <script type="text/javascript">
+                //<![CDATA[
+                require(['core/first'], function () {
+                    ;
+                    require(["core/log"], function (amd) {
+                        amd.setConfig({"level": "warn"});
+                    });
+                });
+                //]]>
+            </script>
+            <script type="text/javascript" src="http://cnausa.com/lms/theme/javascript.php/lambda/1451892772/footer"></script>
+            <script type="text/javascript">
+                //<![CDATA[
+                M.str = {"moodle": {"lastmodified": "Last modified", "name": "Name", "error": "Error", "info": "Information", "viewallcourses": "View all courses", "morehelp": "More help", "loadinghelp": "Loading...", "cancel": "Cancel", "yes": "Yes", "confirm": "Confirm", "no": "No", "areyousure": "Are you sure?", "closebuttontitle": "Close", "unknownerror": "Unknown error"}, "repository": {"type": "Type", "size": "Size", "invalidjson": "Invalid JSON string", "nofilesattached": "No files attached", "filepicker": "File picker", "logout": "Logout", "nofilesavailable": "No files available", "norepositoriesavailable": "Sorry, none of your current repositories can return files in the required format.", "fileexistsdialogheader": "File exists", "fileexistsdialog_editor": "A file with that name has already been attached to the text you are editing.", "fileexistsdialog_filemanager": "A file with that name has already been attached", "renameto": "Rename to \"{$a}\"", "referencesexist": "There are {$a} alias\/shortcut files that use this file as their source", "select": "Select"}, "block": {"addtodock": "Move this to the dock", "undockitem": "Undock this item", "dockblock": "Dock {$a} block", "undockblock": "Undock {$a} block", "undockall": "Undock all", "hidedockpanel": "Hide the dock panel", "hidepanel": "Hide panel"}, "langconfig": {"thisdirectionvertical": "btt"}, "admin": {"confirmation": "Confirmation"}};
+                //]]>
+            </script>
+            <script type="text/javascript">
+                //<![CDATA[
+                var navtreeexpansions4 = [{"id": "expandable_branch_0_courses", "key": "courses", "type": 0}];
+                //]]>
+            </script>
+            <script type="text/javascript">
+                //<![CDATA[
+                (function () {
+
+                    Y.use("moodle-block_navigation-navigation", function () {
+                        M.block_navigation.init_add_tree({"id": "4", "instance": "4", "candock": true, "courselimit": "20", "expansionlimit": 0});
+                    });
+                    Y.use("moodle-block_navigation-navigation", function () {
+                        M.block_navigation.init_add_tree({"id": "5", "instance": "5", "candock": true});
+                    });
+                    Y.use("moodle-calendar-info", function () {
+                        Y.M.core_calendar.info.init();
+                    });
+
+
+                    Y.on('domready', function () {
+
+                    });
+                })();
+                //]]>
+            </script>
+
+
+            <!--[if lte IE 9]>
+            <script src="http://cnausa.com/lms/theme/lambda/javascript/ie/iefix.js"></script>
+            <![endif]-->
+
+
+            <script>
+                jQuery(document).ready(function ($) {
+                    $('.navbar .dropdown').hover(function () {
+                        $(this).addClass('extra-nav-class').find('.dropdown-menu').first().stop(true, true).delay(250).slideDown();
+                    }, function () {
+                        var na = $(this)
+                        na.find('.dropdown-menu').first().stop(true, true).delay(100).slideUp('fast', function () {
+                            na.removeClass('extra-nav-class')
+                        })
+                    });
+
+                });
+
+                jQuery(document).ready(function () {
+                    var offset = 220;
+                    var duration = 500;
+                    jQuery(window).scroll(function () {
+                        if (jQuery(this).scrollTop() > offset) {
+                            jQuery('.back-to-top').fadeIn(duration);
+                        } else {
+                            jQuery('.back-to-top').fadeOut(duration);
+                        }
+                    });
+
+                    jQuery('.back-to-top').click(function (event) {
+                        event.preventDefault();
+                        jQuery('html, body').animate({scrollTop: 0}, duration);
+                        return false;
+                    })
+                });
+
+
+
+            </script>
+
+    </body>
+</html>
