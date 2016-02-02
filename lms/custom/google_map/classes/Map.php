@@ -105,6 +105,9 @@ class Map extends Util {
         $list.= "<span class='span4'><a href='#' id=program_$item->id onClick='return false;'>Register</a></span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
+        $list.= "<span class='span3'>$item->summary</span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
         $list.= "<span class='span3'>Start date <strong>" . date('Y-m-d', $item->startdate) . "</strong></span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";

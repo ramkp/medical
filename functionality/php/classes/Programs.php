@@ -82,30 +82,7 @@ class Programs {
         $blocks = array('item_cost' => $cost_block, 'item_group_cost' => $cost_group_block);
         return $blocks;
     }
-
-    function get_nursing_info_block($courseid) {
-        $list = "";
-        $list.="<!-- Modal -->
-                <div id='myModal' class='modal fade' role='dialog'>
-                     <div class='modal-dialog'>
-                        <!-- Modal content-->
-                        <div class='modal-content'>
-                        <div class='modal-header'>
-                        <button type='button' class='close' data-dismiss='modal'>&times;</button>
-                        <h4 class='modal-title'>Modal Header</h4>
-                      </div>
-                                <div class='modal-body'>
-                                     <p>Some text in the modal.</p>
-                                </div>
-                      <div class='modal-footer'>
-                        <button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>
-                       </div>
-                       </div>
-                       </div>
-                   </div>";
-        return $list;
-    }
-
+    
     function get_school_page($cat_name) {
         $list = "";
         $list.="<div class='container-fluid'>";
@@ -113,33 +90,16 @@ class Programs {
                 . "institution, or part thereof, providing education and "
                 . "training to become a fully qualified nurse. The nature of "
                 . "nursing education and nursing qualifications varies "
-                . "considerably across the world.</span>";
+                . "considerably across the world. Please select on the map your closest location.</span>";
         $list.="</div>";
-        $list.="<br/><div class='container-fluid'>";
-        $list.= "<span class='span9'>Please select on the map closest location</span>";
+        $list.="<div class='container-fluid'>";
+        $list.= "<span class='span9'><hr></span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";        
-        $list.= "<span class='span9' id='map' style='position: relative;height:375px;'></span>";
+        $list.= "<span class='span9' id='map' style='position: relative;height:675px;'></span>";
         $list.="</div>";
         return $list;
-    }
-
-    function get_locations_list() {
-        $location_objects = array();
-        $query = "select * from mdl_nursing_school_map";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $location_object = new stdClass();
-                foreach ($row as $key => $value) {
-                    $location_object->$key = $value;
-                }
-                $location_objects[] = $location_object;
-            } // end while
-        } // end if $num > 0
-        return json_encode($location_objects);
-    }
+    }    
 
     function create_items_block($items) {
         $list = "";
