@@ -108,15 +108,7 @@ $(document).ready(function () {
                 });
 
     }
-
-    function get_school_info_block(courseid) {
-        $.post("functionality/php/get_school_detailes.php", {courseid: courseid})
-                .done(function (data) {
-
-                });
-
-    }
-
+    
     function refresh_map() {
         var url = "/lms/custom/google_map/refresh.php";
         var category_id = 5; // Nursing school category id
