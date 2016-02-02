@@ -49,6 +49,76 @@ class Map extends Util {
         return $course_objects;
     }
 
+    function get_group_discount($id) {
+        $query = "select group_discount_size "
+                . "from mdl_group_discount "
+                . "where courseid=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $discount = $row['group_discount_size'];
+        }
+        return $discount;
+    }
+
+    function calculate_item_cost($id, $item_cost, $item_discount) {
+        $group_discount = $this->get_group_discount($id);
+        $clean_item_cost = $item_cost - round(($item_cost * $item_discount) / 100, 2);
+        $group_cost = $item_cost - round(($item_cost * $group_discount) / 100, 2);
+        $cost = array('item_cost' => $clean_item_cost, 'group_cost' => $group_cost);
+        return $cost;
+    }
+
+    function get_item_cost_blocks($item) {
+        $cost_block = "";
+        $cost_group_block = "";
+        $item_costs = $this->calculate_item_cost($item->id, $item->cost, $item->discount_size);
+        if ($item->discount_size > 0) {
+            $cost_block.="Regular cost <strong>$$item->cost .</strong> Your personal cost <strong>$" . $item_costs['item_cost'] . "</strong>";
+        } // end if $item->discount_size > 0
+        else {
+            $cost_block.="Cost <strong>$$item->cost</strong>";
+        }
+        $group_discount = $this->get_group_discount($item->id);
+        if ($group_discount > 0) {
+            $cost_group_block.="Want to register group? Get additional discount of <strong>$group_discount%</strong>";
+        }  // end if $group_discount > 0        
+        $blocks = array('item_cost' => $cost_block, 'item_group_cost' => $cost_group_block);
+        return $blocks;
+    }
+
+    function get_school_detailes($courseid) {
+        $list = "";
+        $query = "select id,fullname,summary,startdate,cost,discount_size "
+                . "from mdl_course where id=$courseid and cost>0";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $item = new stdClass();
+            foreach ($row as $key => $value) {
+                $item->$key = $value;
+            } // end foreach
+        } // end while
+        $blocks = $this->get_item_cost_blocks($item);
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span4'><h5>$item->fullname</h5>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.= "<span class='span4'><a href='#' id=program_$item->id onClick='return false;'>Register</a></span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.= "<span class='span3'>Start date <strong>" . date('Y-m-d', $item->startdate) . "</strong></span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.= "<span class='span3'>" . $blocks['item_cost'] . "</span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.= "<span class='span4'>" . $blocks['item_group_cost'] . "</span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.= "<span class='span4'><hr></span>";
+        $list.="</div>";
+        return $list;
+    }
+
     function get_locations_list() {
         $location_objects = array();
         $query = "select * from mdl_nursing_school_map";
@@ -56,10 +126,12 @@ class Map extends Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $detailes = $this->get_school_detailes($row['courseid']);
                 $location_object = new stdClass();
                 foreach ($row as $key => $value) {
                     $location_object->$key = $value;
                 }
+                $location_object->info = $detailes;
                 $location_objects[] = $location_object;
             } // end while
         } // end if $num > 0
@@ -92,7 +164,7 @@ class Map extends Util {
         $list = $this->render_index_page($map_objects);
         return $list;
     }
-    
+
     function render_index_page($map_objects) {
         $list = "";
         $list.= "<div class='container-fluid'><span class='span9' style='font-weight:strong;'>Nursing School - Map Locations</span></div>";

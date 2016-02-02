@@ -195,31 +195,6 @@ $(document).ready(function () {
                 })(marker, i));
             }) // end each            
             map.fitBounds(bounds);
-
-
-
-
-
-
-
-
-
-
-
-            /*
-             var map = new google.maps.Map(document.getElementById('map'), {
-             center: new google.maps.LatLng(3.171368,101.653404),
-             scrollwheel: false,
-             zoom: 8
-             }); // end var map
-             var marker;
-             $.each($obj_data, function (obj) {
-             marker = new google.maps.Marker({
-             position: new google.maps.LatLng(obj.lat, obj.lng),
-             map: map
-             }); // end marker
-             }); // end each
-             */
         }); // post(url, request).done(function (data)
     }
 
