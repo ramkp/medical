@@ -109,6 +109,60 @@ $(document).ready(function () {
 
     }
 
+    function get_school_info_block(courseid) {
+        $.post("functionality/php/get_school_detailes.php", {courseid: courseid})
+                .done(function (data) {
+
+                });
+
+    }
+
+    function refresh_map() {
+        var url = "/lms/custom/google_map/refresh.php";
+        var category_id = 5; // Nursing school category id
+        var request = {category_id: category_id};
+        $.post(url, request).done(function (data) {
+            var $obj_data = $.parseJSON(data);
+            // Create a map object and specify the DOM element for display.
+            var map = new google.maps.Map(document.getElementById('map'), {
+                scrollwheel: false,
+                zoom: 8
+            }); // end var map            
+            var latLngs = [];
+            var bounds = new google.maps.LatLngBounds();
+            $.each($obj_data, function (i, m) {
+                var myLatLng = new google.maps.LatLng(m.lat, m.lng);
+                latLngs[i] = myLatLng
+                var marker = new google.maps.Marker({
+                    position: myLatLng,
+                    map: map,
+                    title: m.marker_text,
+                    zIndex: i
+                }); // end marker                
+                bounds.extend(marker.position);
+                google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                    return function () {
+                        var infowindow = new google.maps.InfoWindow();
+                        var iWC = infowindow.getContent();
+                        iWC = m.info;
+                        infowindow.setContent(iWC);
+                        infowindow.open(map, marker);
+                    }
+                })(marker, i));
+            }) // end each            
+            map.fitBounds(bounds);
+        }); // post(url, request).done(function (data)
+    }
+
+    function show_school_page(cat_name) {
+        $.post("functionality/php/get_school_page.php", {cat_name: cat_name})
+                .done(function (data) {
+                    $('#instructions').hide();
+                    $("#page").html(data);
+                    refresh_map();
+                });
+    }
+
     /************************************************************************
      * 
      *                Show register form after click
@@ -116,10 +170,10 @@ $(document).ready(function () {
      ************************************************************************/
 
     $('#register_item').click(function () {
-        $("#search_div").hide();
-        $("#login_div").hide();
+        //$("#search_div").hide();
+        //$("#login_div").hide();
         //$('#register_div').html('This register form ....');
-        $('#register_div').show('slow');
+        //$('#register_div').show('slow');
     });
 
     /************************************************************************
@@ -178,7 +232,7 @@ $(document).ready(function () {
 
     $('#school').click(function () {
         console.log('Schools clicked ...');
-        show_program_items('School');
+        show_school_page('School');
 
     });
 
