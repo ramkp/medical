@@ -65,19 +65,17 @@ $(document).ready(function () {
 
     });
 
-    /************************************************************************
-     * 
-     *                Show login form after click
-     * 
-     ************************************************************************/
 
-    $("#login_link").click(function () {
-        console.log('Login link clicked ...');
-        $.post("functionality/php/get_login_form.php", function (data) {
-            $('#instructions').hide();
-            $("#page").html(data);
-        });
-    });
+    /**************************************************************************
+     * 
+     * 
+     *                  Service & rendeting functions
+     *      
+     * 
+     * 
+     **************************************************************************/
+
+
 
     /************************************************************************
      * 
@@ -108,7 +106,28 @@ $(document).ready(function () {
                 });
 
     }
-    
+
+    /************************************************************************
+     * 
+     *                Show school page and Google Map
+     * 
+     ************************************************************************/
+
+    function show_school_page(cat_name) {
+        $.post("functionality/php/get_school_page.php", {cat_name: cat_name})
+                .done(function (data) {
+                    $('#instructions').hide();
+                    $("#page").html(data);
+                    refresh_map();
+                });
+    }
+
+    /************************************************************************
+     * 
+     *                   Show Google Map
+     * 
+     ************************************************************************/
+
     function refresh_map() {
         var url = "/lms/custom/google_map/refresh.php";
         var category_id = 5; // Nursing school category id
@@ -146,14 +165,53 @@ $(document).ready(function () {
         }); // post(url, request).done(function (data)
     }
 
-    function show_school_page(cat_name) {
-        $.post("functionality/php/get_school_page.php", {cat_name: cat_name})
-                .done(function (data) {
-                    $('#instructions').hide();
-                    $("#page").html(data);
-                    refresh_map();
-                });
+    /************************************************************************
+     * 
+     *                        Show FAQ page
+     * 
+     ************************************************************************/
+    function get_faq_page() {
+        $.post("functionality/php/get_faq_page.php", function (data) {
+            $('#instructions').hide();
+            $("#page").html(data);
+        });
     }
+    
+    /************************************************************************
+     * 
+     *                        Show Testimonial page
+     * 
+     ************************************************************************/    
+
+    function get_testimonial_page() {
+        $.post("functionality/php/get_testimonial_page.php", function (data) {
+            $('#instructions').hide();
+            $("#page").html(data);
+        });
+    }
+
+    /**************************************************************************
+     * 
+     * 
+     *                  Top menu items processing           
+     * 
+     * 
+     **************************************************************************/
+
+
+    /************************************************************************
+     * 
+     *                Show login form after click
+     * 
+     ************************************************************************/
+
+    $("#login_link").click(function () {
+        console.log('Login link clicked ...');
+        $.post("functionality/php/get_login_form.php", function (data) {
+            $('#instructions').hide();
+            $("#page").html(data);
+        });
+    });
 
     /************************************************************************
      * 
@@ -230,8 +288,30 @@ $(document).ready(function () {
 
     /************************************************************************
      * 
-     *                Events processing block
+     *                      Show FAQ page after click
      * 
+     ************************************************************************/
+    $('#faq_item').click(function () {
+        console.log('FAQ clicked ...');
+        get_faq_page();
+    });
+
+    /************************************************************************
+     * 
+     *                      Show Testimonial page after click
+     * 
+     ************************************************************************/
+    $('#testimonial').click(function () {
+        console.log('Testimonial clicked ...');
+        get_testimonial_page();
+    });
+
+    /************************************************************************
+     * 
+     *
+     *                   Events processing block
+     *
+     *  
      ************************************************************************/
 
     $('#page').on('click', 'button', function (event) {
@@ -240,6 +320,7 @@ $(document).ready(function () {
             event.preventDefault();
             check_login_form();
         }
+
 
 
 
