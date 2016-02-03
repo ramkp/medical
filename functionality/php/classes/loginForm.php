@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Description of loginForm
  *
@@ -8,24 +7,25 @@
  */
 class loginForm {
 
-    function get_login_form () {
-        $list="";
-        $list.="<div id='login_div' style='z-index: 675;margin: auto;'>     
-                        <div class='panel-heading'>
-                            <h4 class='panel-title'>Login</h4>
-                        </div>
-                        <div class='panel-body' style=''>
-                            <form  id='login_form' method='post' name='login_form' action='http://cnausa.com/lms/login/index.php'>
-                                <div class='form-group'>
-                                    <input type='text' class='form-control' id='login_box' name='username' placeholder='Login' ><br/>
-                                    <input type='password' class='form-control' id='password_box' name='password' placeholder='Password' ><br/>
-                                </div>
-                                <div id='login_err' style='color:red;'></div>
-                                <br/><button class='btn btn-primary' id='login_button'>Submit</button>
-                            </form>
-                        </div>
-                    </div>";
+    function get_login_form() {
+        $list = "";
+        $list.="<div  class='form_div'>"
+                . "<table align='center'>"
+                . "<tr>"
+                . "<th align='left'><h4 class='panel-title'>Login</h4></th>"
+                . "</tr>"
+                . "<tr>"
+                . "<td align='left'><input type='text' class='form-control' id='login_box' name='username' placeholder='Login' ><br/></td>"
+                . "</tr>"
+                . "<td align='left'><input type='password' class='form-control' id='password_box' name='password' placeholder='Password' ><br/></td>"
+                . "<tr>"
+                . "</tr>"
+                . "<td  align='left'><div id='login_err' style='color:red;'></div></td>"
+                . "<tr>"
+                . "<td align='left'><button class='btn btn-primary' id='login_button'>Submit</button></td>"
+                . "</tr>"
+                . "</div>";
         return $list;
     }
-    
+
 }
