@@ -10,7 +10,10 @@
     }
     .search_container, #login_div, .register_container {
         margin-right: 125px;
-    }    
+    }
+    #register_table {
+        width: 75%;
+    }
 
 }
 
@@ -29,8 +32,8 @@
 
 .form_div {
     margin: 0 auto; 
-    width:60%;    
-    text-align:center;
-    text-align: center;
+    width:80%;    
+    text-align:center;    
     vertical-align: middle;
 }
+
