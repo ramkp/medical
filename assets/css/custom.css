@@ -4,10 +4,8 @@
 */
 
 
-@media (max-width: 320px) {	
-    #input_search_box, #login_div, #password_box  {        
-        width: 140px;
-    }
+@media (max-width: 320px) {    
+
     .search_container, #login_div, .register_container {
         margin-right: 125px;
     }
@@ -18,16 +16,15 @@
 }
 
 @media (min-width: 320px) and (max-width: 480px) {
-    #input_search_box, #login_box, #password_box  {        
-        width: 140px;
-    }   
+
 
 }
 
 @media (min-width: 768px) {
     .search_container, #login_div {
         width: 20%;
-    } 
+    }
+
 }
 
 .form_div {
@@ -37,3 +34,17 @@
     vertical-align: middle;
 }
 
+.form_div input[type=text] {
+    width: 140px;
+}
+
+@media (max-width: 768px) {
+
+    .form_div input[type=text] {
+        width: 75px;
+    }
+    .span2 {
+        margin-left: 3px;
+    }
+
+}

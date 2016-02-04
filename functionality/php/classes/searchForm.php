@@ -15,7 +15,7 @@ class searchForm {
                 . "<th align='left'><h4 class='panel-title'>Search</h4></th>"
                 . "</tr>"
                 . "<tr>"
-                . "<td><input type='text' class='input_search_box' id='input_search_box' placeholder='Search' ></td>"
+                . "<td><input type='text' class='input_search_box' id='input_search_box' placeholder='Search' style='width:208px;'></td>"
                 . "</tr>"
                 . "<tr>"
                 . "<td align='left'><button type='submit' class='btn btn-primary'>Submit</button></td>"

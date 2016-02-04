@@ -37,7 +37,7 @@ class Register {
 
         // ****************** Program information **************************
         $list.="<br/><div  class='form_div'>";
-        $list.="<div class='panel panel-default' id='program_section'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
         $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program information</h5></div>";
         $list.="<div class='panel-body'>";
 
@@ -69,38 +69,38 @@ class Register {
         $list.="<div class='panel-body'>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>First name*</span>";
-        $list.="<span class='span2'><input type='text' id='first_name' name='first_name' style='width:140px;'></span>";
-        $list.="<span class='span2'>Last name*</span>";
-        $list.="<span class='span2'><input type='text' id='last_name' name='last_name'  style='width:140px;'></span>";
+        $list.="<span class='span2' >First name*</span>";
+        $list.="<span class='span2' ><input type='text' id='first_name' name='first_name' ></span>";
+        $list.="<span class='span2' >Last name*</span>";
+        $list.="<span class='span2' ><input type='text' id='last_name' name='last_name'  ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Email*</span>";
-        $list.="<span class='span2'><input type='text' id='email' name='email' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
         $list.="<span class='span2'>Phone*</span>";
-        $list.="<span class='span2'><input type='text' id='phone' name='phone'  style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='phone' name='phone'  ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
-        $list.="<span class='span2'><input type='text' id='addr' name='addr' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
         $list.="<span class='span2'>Business Or Institution*</span>";
-        $list.="<span class='span2'><input type='text' id='inst' name='inst' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='inst' name='inst' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>ZIP Code*</span>";
-        $list.="<span class='span2'><input type='text' id='zip' name='zip' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='zip' name='zip' ></span>";
         $list.="<span class='span2'>City*</span>";
-        $list.="<span class='span2'><input type='text' id='city' name='city' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='city' name='city' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>State*</span>";
-        $list.="<span class='span2'><input type='text' id='state' name='state' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='state' name='state' ></span>";
         $list.="<span class='span2'>Country*</span>";
-        $list.="<span class='span2'><input type='text' id='country' name='country' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='country' name='country' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -161,23 +161,23 @@ class Register {
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
-        $list.="<span class='span2'><input type='text' id='addr' name='addr' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
         $list.="<span class='span2'>Business Or Institution*</span>";
-        $list.="<span class='span2'><input type='text' id='inst' name='inst' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='inst' name='inst' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>ZIP Code*</span>";
-        $list.="<span class='span2'><input type='text' id='zip' name='zip' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='zip' name='zip' ></span>";
         $list.="<span class='span2'>City*</span>";
-        $list.="<span class='span2'><input type='text' id='city' name='city' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='city' name='city' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>State*</span>";
-        $list.="<span class='span2'><input type='text' id='state' name='state' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='state' name='state' ></span>";
         $list.="<span class='span2'>Group name*</span>";
-        $list.="<span class='span2'><input type='text' id='group_name' name='group_name' style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='group_name' name='group_name' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -203,16 +203,16 @@ class Register {
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>First name*</span>";
-            $list.="<span class='span2'><input type='text' id='first_name_$i' name='first_name_$i' style='width:140px;'></span>";
+            $list.="<span class='span2'><input type='text' id='first_name_$i' name='first_name_$i' ></span>";
             $list.="<span class='span2'>Last name*</span>";
-            $list.="<span class='span2'><input type='text' id='last_name_$i' name='last_name_$i'  style='width:140px;'></span>";
+            $list.="<span class='span2'><input type='text' id='last_name_$i' name='last_name_$i'  ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Email*</span>";
-            $list.="<span class='span2'><input type='text' id='email_$i' name='email_$i' style='width:140px;'></span>";
+            $list.="<span class='span2'><input type='text' id='email_$i' name='email_$i' ></span>";
             $list.="<span class='span2'>Phone*</span>";
-            $list.="<span class='span2'><input type='text' id='phone_$i' name='phone_$i'  style='width:140px;'></span>";
+            $list.="<span class='span2'><input type='text' id='phone_$i' name='phone_$i'  ></span>";
             $list.="</div>";
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span8'><hr/></span>";
@@ -230,15 +230,13 @@ class Register {
 
     function is_email_exists($email) {
         $query = "select email, deleted from mdl_user "
-                . "where email='$email' and deleted=0";        
+                . "where email='$email' and deleted=0";
         return $num = $this->db->numrows($query);
     }
 
     function get_course_id($course_name) {
-        //echo "Course name: ".$course_name;
         $query = "select id, fullname from mdl_course "
                 . "where fullname='$course_name'";
-        //echo $query;
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $id = $row['id'];
