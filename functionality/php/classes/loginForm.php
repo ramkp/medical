@@ -5,10 +5,14 @@
  *
  * @author sirromas
  */
+
+
 class loginForm {
 
     function get_login_form() {
+        $url="http://".$_SERVER['SERVER_NAME']."/lms/login/index.php";
         $list = "";
+        $list.="<form method='post' action=$url id='login_form'>";
         $list.="<div  class='form_div'>"
                 . "<table align='center'>"
                 . "<tr>"
@@ -24,7 +28,8 @@ class loginForm {
                 . "<tr>"
                 . "<td align='left'><button class='btn btn-primary' id='login_button'>Submit</button></td>"
                 . "</tr>"
-                . "</div>";
+                ."</table>"
+                . "</div></form>";
         return $list;
     }
 
