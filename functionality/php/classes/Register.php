@@ -63,6 +63,7 @@ class Register {
         $list.="</div>"; // end of container-fluid
         $list.="</div>"; // end of panel-body
         $list.="</div>"; // end of panel panel-default
+        //
         // ********************  Individual registration form **************************        
         $list.="<div class='panel panel-default' id='personal_section'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>User details </h5></div>";
@@ -161,32 +162,28 @@ class Register {
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
-        $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
+        $list.="<span class='span2'><input type='text' id='group_addr' name='group_addr' ></span>";
         $list.="<span class='span2'>Business Or Institution*</span>";
-        $list.="<span class='span2'><input type='text' id='inst' name='inst' ></span>";
+        $list.="<span class='span2'><input type='text' id='group_inst' name='group_inst' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>ZIP Code*</span>";
-        $list.="<span class='span2'><input type='text' id='zip' name='zip' ></span>";
+        $list.="<span class='span2'><input type='text' id='group_zip' name='group_zip' ></span>";
         $list.="<span class='span2'>City*</span>";
-        $list.="<span class='span2'><input type='text' id='city' name='city' ></span>";
+        $list.="<span class='span2'><input type='text' id='group_city' name='group_city' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>State*</span>";
-        $list.="<span class='span2'><input type='text' id='state' name='state' ></span>";
+        $list.="<span class='span2'><input type='text' id='group_state' name='group_state' ></span>";
         $list.="<span class='span2'>Group name*</span>";
         $list.="<span class='span2'><input type='text' id='group_name' name='group_name' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'><a href='#' id='manual_group_registration' onClick='return false;'>Proceed to participants</a></span>";
-        $list.="<span class='span6'>Have a lot of group participants? <a href='#' id='upload_group_file'>Upload users file</a></span>";
-        $list.="</div>";
-
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='color:red;' id='group_common_errors'></span>";
+        $list.="<span class='span4'>Have a lot of group participants? <a href='#' id='upload_group_file'>Upload users file</a></span><span class='span2' style='color:red;' id='group_common_errors'></span>";
         $list.="</div>";
 
         $list.="</div>";

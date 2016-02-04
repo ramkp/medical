@@ -96,14 +96,49 @@ class Signup {
         return $drop_down;
     }
 
-    function get_payment_section_personal($user) {
+    function get_course_group_discount($courseid) {
+
+        // 1. Get course cost
+        $query = "select id, cost from mdl_course "
+                . "where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cost = $row['cost'];
+        }
+
+        // 2. Get course group discount
+        $query = "select courseid, group_discount_size "
+                . "from mdl_group_discount "
+                . "where courseid=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $discount = $row['group_discount_size'];
+        }
+
+        if ($discount > 0) {
+            $final_cost = $cost - round(($cost * $discount) / 100, 2);
+        } // end if $discount>0
+        else {
+            $final_cost = $cost;
+        }
+        $course_cost = array('cost' => $final_cost, 'discount' => $discount);
+        return $course_cost;
+    }
+
+    function get_payment_section_personal($user, $group = null) {
         $list = "";
         $cost_block = "";
-        $course_cost = $this->get_personal_course_cost($user->courseid);
         $course_name = $this->get_course_name($user->courseid);
         $card_types = $this->get_card_types_dropbox();
         $card_year = $this->get_year_drop_box();
         $card_month = $this->get_month_drop_box();
+        if ($group == NULL) {
+            $course_cost = $this->get_personal_course_cost($user->courseid);
+        } // end if $group==NULL 
+        else {
+            $course_cost = $this->get_course_group_discount($user->courseid);
+        } // end else
+
         if ($course_cost['discount'] == 0) {
             $cost_block.="$" . $course_cost['cost'];
         } // end if $course_cost['discount']==0
@@ -159,10 +194,20 @@ class Signup {
         $list.="</div>";
         return $list;
     }
-    
-    function make_stub_payment ($card) {
+
+    function get_payment_section_group($user) {
+        $list = $this->get_payment_section_personal($user, 1);
+        return $list;
+    }
+
+    function is_group_exist($group_name) {
+        $query="select id, name from mdl_groups where name='$group_name'";        
+        return $num = $this->db->numrows($query);
+    }
+
+    function make_stub_payment($card) {
         //print_r($card);
-        $list="<p align='center'>Payment is successfull (this is fake payment, no real card charging :) ). Confirmation email is sent to $card->email.</p>";
+        $list = "<p align='center'>Payment is successfull (this is fake payment, no real card charging :) ). Confirmation email is sent to $card->email.</p>";
         return $list;
     }
 
