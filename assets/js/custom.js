@@ -216,6 +216,85 @@ $(document).ready(function () {
         });
     }
 
+    function verify_personal_payment_section() {
+        var card = $('#card_type').text();
+        var card_type = card.trim();
+        var sum = $('#payment_sum').val();
+        var email = $('#email').val();
+        var card_no = $('#card_no').val();
+        var card_holder = $('#card_holder').val();
+        var card_year = $('#card_year').val();
+        var card_month = $('#card_month').val();
+        var bill_addr = $('#bill_addr').val();
+        var bill_city = $('#bill_city').val();
+        var bill_zip = $('#bill_zip').val();
+        var bill_state = $('#bill_state').val();
+
+        if (card_type == 'Card type') {
+            $('#personal_payment_err').html('Please select card type');
+            return false;
+        }
+
+        if (card_no == '') {
+            $('#personal_payment_err').html('Please provide card number');
+            return false;
+        }
+
+        if (card_holder == '') {
+            $('#personal_payment_err').html('Please provide card holder name');
+            return false;
+        }
+
+        if (card_year == '--') {
+            $('#personal_payment_err').html('Please select card expiration year');
+            return false;
+        }
+
+        if (card_month == '--') {
+            $('#personal_payment_err').html('Please select card expiration month');
+            return false;
+        }
+
+        if (bill_addr == '') {
+            $('#personal_payment_err').html('Please provide billing address');
+            return false;
+        }
+
+        if (bill_city == '') {
+            $('#personal_payment_err').html('Please provide billing city');
+            return false;
+        }
+
+        if (bill_zip == '') {
+            $('#personal_payment_err').html('Please provide billing zip code');
+            return false;
+        }
+
+        if (bill_state == '') {
+            $('#personal_payment_err').html('Please provide billing state');
+        }
+
+        if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_state != '') {
+            $('#personal_payment_err').html('');
+            var card = {sum: sum,
+                email: email,
+                card_type: card_type,
+                card_no: card_no,
+                card_holder: card_holder,
+                card_year: card_year,
+                card_month: card_month,
+                bill_addr: bill_addr,
+                bill_city: bill_city,
+                bill_zip: bill_zip,
+                bill_state: bill_state};
+            var url = "functionality/php/make_stub_payment.php";
+            var request = {card: JSON.stringify(card)};
+            $.post(url, request).done(function (data) {
+                $('#page').html(data);
+            }); // end of post
+        } // end if card_type != 'Card type' && card_no!='' ...
+    }
+
     /************************************************************************
      * 
      *                  Group registration block
@@ -383,8 +462,10 @@ $(document).ready(function () {
                             $.post(signup_url, signup_request).done(function (data) {
                                 console.log(data);
                                 // Show payment section
-
-
+                                var el = $('#personal_payment_details').length;
+                                if (el == 0) {
+                                    $('#personal_section').append(data);
+                                }
 
                             }).fail(function (data) {
                                 console.log(data);
@@ -555,8 +636,11 @@ $(document).ready(function () {
             check_login_form();
         }
 
+        if (event.target.id == 'make_payment_personal') {
+            verify_personal_payment_section();
+        }
 
-
+        //make_payment_personal   
 
     });
 
@@ -598,6 +682,28 @@ $(document).ready(function () {
                 get_group_registration_block();
             });
         }
+
+        if (event.target.id == 'card_type') {
+            $(".dropdown li a").click(function () {
+                $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
+                $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
+            });
+        }
+
+        if (event.target.id == 'card_year') {
+            $(".dropdown li a").click(function () {
+                $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
+                $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
+            });
+        }
+
+        if (event.target.id == 'card_month') {
+            $(".dropdown li a").click(function () {
+                $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
+                $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
+            });
+        }
+
 
         if (event.target.id == 'manual_group_registration') {
             console.log('Manual registration ...');
