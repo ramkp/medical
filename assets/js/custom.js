@@ -280,84 +280,125 @@ $(document).ready(function () {
      * 
      ************************************************************************/
 
-    function verify_personal_manual_registration_form() {
-        var course = $('#cat_course li a').attr('id');
-        if (course !== undefined) {
-            var courseid=course.replace("course_", "");
-            console.log('Course id: ' + courseid);
-            $('#personal_err').html('');
-            var first_name = $('#first_name').val();
-            var last_name = $('#last_name').val();
-            var email = $('#email').val();
-            var phone = $('#phone').val();
-            var addr = $('#addr').val();
-            var inst = $('#inst').val();
-            var zip = $('#zip').val();
-            var city = $('#city').val();
-            var state = $('#state').val();
-            var country = $('#country').val();
-            
-            if (first_name=='') {
-                $('#personal_err').html('Please provide firstname');
-                return false;
-            }
-            
-            if (last_name=='') {
-                $('#personal_err').html('Please provide lastname');
-                return false;
-            }
-            
-            if (email=='') {
-                $('#personal_err').html('Please provide email');
-                return false;
-            }
-            
-            if (phone=='') {
-                $('#personal_err').html('Please provide phone');
-                return false;
-            }
-            
-            if (addr=='') {
-                $('#personal_err').html('Please provide address');
-                return false;
-            }
-            
-            if (inst=='') {
-                $('#personal_err').html('Please provide Business or Institution');
-                return false;
-            }
-            
-            if (zip=='') {
-                $('#personal_err').html('Please provide zip');
-                return false;
-            }
-            
-            if (city=='') {
-                $('#personal_err').html('Please provide city');
-                return false;
-            }
-            
-            if (state=='') {
-                $('#personal_err').html('Please provide state');
-                return false;
-            }
-            
-            if (country=='') {
-                $('#personal_err').html('Please provide country');
-                return false;
-            }
-            
-            if (first_name!='' && last_name!='' && email!='' && phone!='' && addr!='' && inst!='' && zip!='' && city!='' && state!='' && country!='') {
-                // Everything is fine - show payment form
-                $('#personal_err').html('Form is valid :)');
-                
-            } // end if
-            
-        } // end if course !== undefined
-        else {
-            $('#personal_err').html('Please select program');
+    function validateEmail(email) {
+        var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+        return re.test(email);
+    }
 
-        }
+    function verify_personal_manual_registration_form() {
+        var selected_course = $('#courses').text();
+        var course_name = selected_course.trim();
+        console.log('Courses dropdown: ' + selected_course);
+        if (course_name != 'Program' && course_name != '' && course_name !== undefined) {
+            $('#program_err').html('');
+            $('#personal_err').html('');
+            var course_url = 'functionality/php/get_course_id.php';
+            var request = {course_name: course_name};
+            $.post(course_url, request).done(function (courseid) {
+                //console.log('Course id: ' + courseid);
+
+                var first_name = $('#first_name').val();
+                var last_name = $('#last_name').val();
+                var email = $('#email').val();
+                var phone = $('#phone').val();
+                var addr = $('#addr').val();
+                var inst = $('#inst').val();
+                var zip = $('#zip').val();
+                var city = $('#city').val();
+                var state = $('#state').val();
+                var country = $('#country').val();
+
+                if (first_name == '') {
+                    $('#personal_err').html('Please provide firstname');
+                    return false;
+                }
+                if (last_name == '') {
+                    $('#personal_err').html('Please provide lastname');
+                    return false;
+                }
+                if (email == '') {
+                    $('#personal_err').html('Please provide email');
+                    return false;
+                }
+                if (!validateEmail(email)) {
+                    $('#personal_err').html('Please provide valid email');
+                    return false;
+                }
+                if (phone == '') {
+                    $('#personal_err').html('Please provide phone');
+                    return false;
+                }
+                if (addr == '') {
+                    $('#personal_err').html('Please provide address');
+                    return false;
+                }
+                if (inst == '') {
+                    $('#personal_err').html('Please provide Business or Institution');
+                    return false;
+                }
+                if (zip == '') {
+                    $('#personal_err').html('Please provide zip');
+                    return false;
+                }
+                if (city == '') {
+                    $('#personal_err').html('Please provide city');
+                    return false;
+                }
+                if (state == '') {
+                    $('#personal_err').html('Please provide state');
+                    return false;
+                }
+                if (country == '') {
+                    $('#personal_err').html('Please provide country');
+                    return false;
+                }
+                if (first_name != '' && last_name != '' && email != '' && phone != '' && addr != '' && inst != '' && zip != '' && city != '' && state != '' && country != '') {
+
+                    // Check is email exists?
+                    var url = "functionality/php/is_email_exists.php";
+                    var request = {email: email};
+                    $.post(url, request).done(function (data) {
+                        console.log('Server response: ' + data);
+                        if (data > 0) {
+                            $('#personal_err').html('Email already in use');
+                        } // end if data>0
+                        else {
+                            // Everything is fine post data and show payment section
+                            $('#personal_err').html('');
+                            var user = {
+                                courseid: courseid,
+                                first_name: first_name,
+                                last_name: last_name,
+                                email: email,
+                                phone: phone,
+                                addr: addr,
+                                inst: inst,
+                                zip: zip,
+                                city: city,
+                                state: state,
+                                country: country};
+
+                            var signup_url = 'functionality/php/single_signup.php';
+                            var signup_request = {user: JSON.stringify(user)};
+                            $.post(signup_url, signup_request).done(function (data) {
+                                console.log(data);
+                                // Show payment section
+
+
+
+                            }).fail(function (data) {
+                                console.log(data);
+                                $('#personal_err').html('Ops something goes wrong ...');
+                            }); // end of fail(function (data)
+                        } // end else when email is not used 
+                    }); // end if $.post(url, request))  
+                } // end if first_name != '' && last_name != '' ...
+            }); // end of $.post(course_url, request)
+        } // end if course_name !='Program'        
+        else {
+            $('#program_err').html('Please select program');
+            $('#personal_err').html('Please select program');
+        } // end else
     }
 
     /************************************************************************
@@ -544,6 +585,8 @@ $(document).ready(function () {
             $(".dropdown li a").click(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
+                $('#program_err').html('');
+
             });
         }
 

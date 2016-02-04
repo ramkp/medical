@@ -49,6 +49,7 @@ class Register {
         $list.="</div>"; // end of container-fluid
         $list.="</div>"; // end of panel-body
         $list.="</div>"; // end of panel panel-default
+        //
         // ********************  Registration type **************************        
         $list.="<div class='panel panel-default' id='type_section'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Registration type</h5></div>";
@@ -62,7 +63,6 @@ class Register {
         $list.="</div>"; // end of container-fluid
         $list.="</div>"; // end of panel-body
         $list.="</div>"; // end of panel panel-default
-        
         // ********************  Individual registration form **************************        
         $list.="<div class='panel panel-default' id='personal_section'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>User details </h5></div>";
@@ -80,7 +80,7 @@ class Register {
         $list.="<span class='span2'><input type='text' id='email' name='email' style='width:140px;'></span>";
         $list.="<span class='span2'>Phone*</span>";
         $list.="<span class='span2'><input type='text' id='phone' name='phone'  style='width:140px;'></span>";
-        $list.="</div>";        
+        $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
@@ -102,10 +102,10 @@ class Register {
         $list.="<span class='span2'>Country*</span>";
         $list.="<span class='span2'><input type='text' id='country' name='country' style='width:140px;'></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'><a href='#' id='proceed_to_personal_payment' onClick='return false;'>Proceed to payment</a></span>&nbsp;<span style='color:red;' id='personal_err'></span";
-        $list.="</div>";        
+        $list.="</div>";
 
         $list.="</div>";
         $list.="</div>";
@@ -131,10 +131,11 @@ class Register {
 
     function get_courses_by_category($cat_id = null) {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
+        if ($cat_id != null) {
+            $drop_down.="<div class='dropdown'>
             <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
             <ul class='dropdown-menu'>";
-        if ($cat_id != null) {
+
             $query = "select id, fullname from mdl_course where category=$cat_id";
             $num = $this->db->numrows($query);
             if ($num > 0) {
@@ -144,7 +145,10 @@ class Register {
                 } // end while
             } // end if $num > 0
             $drop_down.="</ul></div>";
-        } // end if $num > 0        
+        } // end if $num > 0
+        else {
+            $drop_down.="<a href='#' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program </a>";
+        }
         return $drop_down;
     }
 
@@ -222,6 +226,24 @@ class Register {
         $list.="</div>";
         $list.="</div>";
         return $list;
+    }
+
+    function is_email_exists($email) {
+        $query = "select email, deleted from mdl_user "
+                . "where email='$email' and deleted=0";        
+        return $num = $this->db->numrows($query);
+    }
+
+    function get_course_id($course_name) {
+        //echo "Course name: ".$course_name;
+        $query = "select id, fullname from mdl_course "
+                . "where fullname='$course_name'";
+        //echo $query;
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
     }
 
 }
