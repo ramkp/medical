@@ -761,7 +761,10 @@ $(document).ready(function () {
             verify_personal_payment_section();
         }
 
-        //make_payment_personal   
+        if (event.target.id.indexOf("program_") >= 0) {
+            var courseid = event.target.id.replace("program_", "");
+            get_selected_program_register_form(courseid);
+        }
 
     });
 
