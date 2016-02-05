@@ -29,26 +29,64 @@ class Register {
         return $drop_down;
     }
 
-    function get_register_page() {
+    function get_coure_name_by_id($courseid) {
+        $query = "select id, fullname "
+                . "from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $name = $row['fullname'];
+        }
+        return $name;
+    }
+
+    function get_selected_program($courseid) {
+        $list = "";
+        $name = $this->get_coure_name_by_id($courseid);
+        $list.="<a id='courses' class='dropdown-toggle' 
+                onclick='return false;' data-toggle='dropdown' 
+            href='#'>$name</a>";
+        return $list;
+    }
+
+    function get_register_page($courseid = null) {
         $list = "";
         $cats = $this->get_course_categories();
         $courses = $this->get_courses_by_category();
         $participants = $this->get_participants_dropbox();
-
+        
         // ****************** Program information **************************
-        $list.="<br/><div  class='form_div'>";
-        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
-        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program information</h5></div>";
-        $list.="<div class='panel-body'>";
 
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>Program type*</span>";
-        $list.="<span class='span2'>$cats</span>";
-        $list.="<span class='span2' id='cat_course'>$courses</span>";
-        $list.="<span class='span2' id='program_err' style='color:red;'></span>";
-        $list.="</div>"; // end of container-fluid
-        $list.="</div>"; // end of panel-body
-        $list.="</div>"; // end of panel panel-default
+        if ($courseid == null) {
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program information</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Program type*</span>";
+            $list.="<span class='span2'>$cats</span>";
+            $list.="<span class='span2' id='cat_course'>$courses</span>";
+            $list.="<span class='span2' id='program_err' style='color:red;'></span>";
+            $list.="</div>"; // end of container-fluid
+            $list.="</div>"; // end of panel-body
+            $list.="</div>"; // end of panel panel-default
+        } // end if $courseid==null
+        else {
+            $selected_program = $this->get_selected_program($courseid);
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program information</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Selected program:</span>";
+            $list.="<span class='span2'>$selected_program</span>";
+
+            $list.="</div>"; // end of container-fluid
+            $list.="</div>"; // end of panel-body
+            $list.="</div>"; // end of panel panel-default
+        }
+        //
         //
         // ********************  Registration type **************************        
         $list.="<div class='panel panel-default' id='type_section'>";

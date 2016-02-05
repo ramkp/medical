@@ -459,8 +459,19 @@ $(document).ready(function () {
         }
     }
 
-    function verify_group_manual_registration_form() {
+    /************************************************************************
+     * 
+     *               Show register form with selected program
+     * 
+     ************************************************************************/
 
+    function get_selected_program_register_form(courseid) {
+        console.log('Course id: ' + courseid);
+        var url = "functionality/php/get_selected_program_register_form.php";
+        var request = {courseid: courseid};
+        $.post(url, request).done(function (data) {
+            $('#page').html(data);
+        });
     }
 
     /************************************************************************
@@ -835,6 +846,10 @@ $(document).ready(function () {
             verify_personal_manual_registration_form();
         }
 
+        if (event.target.id.indexOf("program_") >= 0) {
+            var courseid = event.target.id.replace("program_", "");
+            get_selected_program_register_form(courseid);
+        }
 
 
     }); // end of $('#page').on('click', 'a', function (event)
