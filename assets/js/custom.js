@@ -461,6 +461,19 @@ $(document).ready(function () {
 
     /************************************************************************
      * 
+     *                  Get private group form
+     * 
+     ************************************************************************/
+
+    function get_private_group_form() {
+        $.post("functionality/php/get_private_groups_form.php", function (data) {
+            $('#instructions').hide();
+            $("#page").html(data);
+        });
+    }
+
+    /************************************************************************
+     * 
      *               Show register form with selected program
      * 
      ************************************************************************/
@@ -740,6 +753,16 @@ $(document).ready(function () {
         get_testimonial_page();
     });
 
+    /************************************************************************
+     * 
+     *                     Show proviate group page after click
+     * 
+     ************************************************************************/
+    $('#group').click(function () {
+        console.log('Private group clicked ...');
+        get_private_group_form();
+    });
+
 
     /************************************************************************
      * 
@@ -869,7 +892,7 @@ $(document).ready(function () {
         }
 
 
-    }) // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
+    }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
 
 
 
