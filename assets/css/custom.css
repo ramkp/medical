@@ -34,13 +34,13 @@
     vertical-align: middle;
 }
 
-.form_div input[type=text] {
+.form_div input[type=text], textarea {
     width: 140px;
 }
 
 @media (max-width: 768px) {
 
-    .form_div input[type=text] {
+    .form_div input[type=text], textarea {
         width: 75px;
     }
     .span2 {

@@ -189,6 +189,91 @@ $(document).ready(function () {
             $("#page").html(data);
         });
     }
+    
+    /************************************************************************
+     * 
+     *                 Certificate verification form
+     * 
+     ************************************************************************/
+    
+    function get_certificate_verification_form() {
+        
+        
+    }
+
+    /************************************************************************
+     * 
+     *               Private group request form verification
+     * 
+     ************************************************************************/
+
+    function submit_private_group() {
+
+        var group_fio = $('#group_fio').val();
+        var group_city = $('#group_city').val();
+        var group_phone = $('#group_phone').val();
+        var group_budget = $('#group_budget').val();
+        var group_company = $('#group_company').val();
+        var group_state = $('#group_state').val();
+        var courses = $('#courses').val();
+        var group_request = $('#group_request').val();
+
+        if (group_fio == '') {
+            $('#private_err').html('Please provide firstname and lastname');
+            return false;
+        }
+
+        if (group_city == '') {
+            $('#private_err').html('Please provide city ');
+            return false;
+        }
+
+        if (group_phone == '') {
+            $('#private_err').html('Please provide phone ');
+            return false;
+        }
+
+        if (group_budget == '') {
+            $('#private_err').html('Please provide estimate budget ');
+            return false;
+        }
+
+        if (group_company == '') {
+            $('#private_err').html('Please provide company ');
+            return false;
+        }
+
+        if (group_state == '') {
+            $('#private_err').html('Please provide state ');
+            return false;
+        }
+
+        if (courses == '') {
+            $('#private_err').html('Please select program ');
+            return false;
+        }
+
+        if (group_request == '') {
+            $('#private_err').html('Please provide request ');
+            return false;
+        }
+
+        var url = "functionality/php/submit_private_group_request.php";
+        var group_request = {group_fio: group_fio,
+            group_city: group_city,
+            group_phone: group_phone,
+            group_budget: group_budget,
+            group_company: group_company,
+            group_state: group_state,
+            courses: courses,
+            group_request: group_request};
+        var request = {request: JSON.stringify(group_request)};
+        $.post(url, request).done(function (data) {
+            $("#page").html(data);
+        });
+
+
+    }
 
     /************************************************************************
      * 
@@ -755,7 +840,7 @@ $(document).ready(function () {
 
     /************************************************************************
      * 
-     *                     Show proviate group page after click
+     *                     Show priviate group page after click
      * 
      ************************************************************************/
     $('#group').click(function () {
@@ -763,6 +848,16 @@ $(document).ready(function () {
         get_private_group_form();
     });
 
+    /************************************************************************
+     * 
+     *                   Show certificate verification form
+     * 
+     ************************************************************************/
+    $('#cert').click(function () {
+        console.log('Verify certificate clicked ...');
+        get_certificate_verification_form();
+    });
+    
 
     /************************************************************************
      * 
@@ -788,6 +883,14 @@ $(document).ready(function () {
             var courseid = event.target.id.replace("program_", "");
             get_selected_program_register_form(courseid);
         }
+
+        //submit_private_group
+        if (event.target.id == 'submit_private_group') {
+            event.preventDefault();
+            submit_private_group();
+        }
+        
+        
 
     });
 
