@@ -189,16 +189,18 @@ $(document).ready(function () {
             $("#page").html(data);
         });
     }
-    
+
     /************************************************************************
      * 
      *                 Certificate verification form
      * 
      ************************************************************************/
-    
+
     function get_certificate_verification_form() {
-        
-        
+        $.post("functionality/php/get_certificate_verification_form.php", function (data) {
+            $('#instructions').hide();
+            $("#page").html(data);
+        });
     }
 
     /************************************************************************
@@ -273,6 +275,34 @@ $(document).ready(function () {
         });
 
 
+    }
+
+    /************************************************************************
+     * 
+     *                    Submit verify certification form
+     * 
+     ************************************************************************/
+    function submit_verify_cert_from() {
+        var cert_fio = $('#cert_fio').val();
+        var cert_no = $('#cert_no').val();
+
+        if (cert_fio == '') {
+            $('#cert_err').html('Please provide Firstname and Lastname');
+            return false;
+        }
+
+        if (cert_no == '') {
+            $('#cert_err').html('Please provide Certificate No');
+            return false;
+        }
+
+        if (cert_fio != '' && cert_no != '') {
+            var url = "functionality/php/verify_cert.php";
+            var request = {user_fio: cert_fio, user_cert_no:cert_no};
+            $.post(url, request).done(function (data) {
+                $("#cert_err").html("<span style='color:#444'>"+data+"</span>");
+            });
+        }
     }
 
     /************************************************************************
@@ -857,7 +887,7 @@ $(document).ready(function () {
         console.log('Verify certificate clicked ...');
         get_certificate_verification_form();
     });
-    
+
 
     /************************************************************************
      * 
@@ -884,13 +914,15 @@ $(document).ready(function () {
             get_selected_program_register_form(courseid);
         }
 
-        //submit_private_group
         if (event.target.id == 'submit_private_group') {
             event.preventDefault();
             submit_private_group();
         }
-        
-        
+
+        if (event.target.id == 'verify_cert') {
+            event.preventDefault();
+            submit_verify_cert_from();
+        }
 
     });
 
