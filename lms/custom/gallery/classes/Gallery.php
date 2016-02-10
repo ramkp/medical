@@ -57,10 +57,43 @@ class Gallery extends Util {
                 $new_file_name = $stamp . $rand . "." . $ext;
                 $destination = $this->upload_dir . "/" . $new_file_name;
                 if (move_uploaded_file($tmp_name, $destination)) {
-                    echo "Ok <br/>";
+                    $this->create_image_thumb($new_file_name);
                 }
             }
         }
+    }
+
+    function create_image_thumb($filename) {
+        
+        $final_width_of_image=300;
+        $path_to_image_directory=$_SERVER['DOCUMENT_ROOT'] . "/lms/custom/gallery/files/";
+        $path_to_thumbs_directory=$_SERVER['DOCUMENT_ROOT'] . "/lms/custom/gallery/files/thumbs/";
+                
+        if (preg_match('/[.](jpg)$/', $filename)) {
+            $im = imagecreatefromjpeg($path_to_image_directory . $filename);
+        } else if (preg_match('/[.](gif)$/', $filename)) {
+            $im = imagecreatefromgif($path_to_image_directory . $filename);
+        } else if (preg_match('/[.](png)$/', $filename)) {
+            $im = imagecreatefrompng($path_to_image_directory . $filename);
+        }
+
+        $ox = imagesx($im);
+        $oy = imagesy($im);
+
+        $nx = $final_width_of_image;
+        $ny = floor($oy * ($final_width_of_image / $ox));
+
+        $nm = imagecreatetruecolor($nx, $ny);
+
+        imagecopyresized($nm, $im, 0, 0, 0, 0, $nx, $ny, $ox, $oy);
+
+        if (!file_exists($path_to_thumbs_directory)) {
+            if (!mkdir($path_to_thumbs_directory)) {
+                die("There was a problem. Please try again!");
+            }
+        }
+
+        imagejpeg($nm, $path_to_thumbs_directory . $filename);
     }
 
     function get_galllery_thumbs() {
@@ -69,7 +102,7 @@ class Gallery extends Util {
         $files = scandir($this->upload_dir);
         for ($i = 0; $i <= count($files) - 2; $i++) {
             if ($files[$i] != '.' && $files[$i] != '..') {
-                $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/" . $files[$i];
+                $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/thumbs/" . $files[$i];
                 if ($i % 2 == 0) {
                     $list = $list . "<ul class='thumbnails'>";
                     $list = $list . "<li class='span5'>
@@ -99,8 +132,12 @@ class Gallery extends Util {
 
     function delete_gallery_thumbs($items) {
         foreach ($items as $item) {
+            // Delete original file
             $filepath = $this->upload_dir . "/" . $item;
             unlink($filepath);
+            // Delete thummb
+            $filepath = $this->upload_dir . "/thumbs/" . $item;
+            unlink($filepath);            
         }
     }
 
