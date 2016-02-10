@@ -92,6 +92,19 @@ $(document).ready(function () {
             $('#login_form').submit();
         }
     }
+    
+    /************************************************************************
+     * 
+     *                     Show Gallery page
+     * 
+     ************************************************************************/
+    
+    function get_gallery_page() {
+         $.post("functionality/php/gallery.php", function (data) {
+            $('#instructions').hide();
+            $("#page").html(data);
+        });
+    }
 
     /************************************************************************
      * 
@@ -886,6 +899,17 @@ $(document).ready(function () {
     $('#cert').click(function () {
         console.log('Verify certificate clicked ...');
         get_certificate_verification_form();
+    });
+    
+    /************************************************************************
+     * 
+     *                   Show Gallery page
+     * 
+     ************************************************************************/
+    
+    $('#gallery').click(function () {
+        console.log('Gallery page clicked ...');
+        get_gallery_page();
     });
 
 
