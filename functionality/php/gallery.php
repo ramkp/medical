@@ -10,4 +10,4 @@ $list = $gal->get_images_list();
 <script src="http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script> <!-- 16 KB -->
 
 <!-- 2. Add images to <div class="fotorama"></div>. -->
-<?php echo $list; ?>
+<?php echo "<br/>".$list; ?>
