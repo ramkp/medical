@@ -42,6 +42,35 @@ if (!$authplugin->can_signup()) {
     print_error('notlocalisederrormessage', 'error', '', 'Sorry, you may not use this page.');
 }
 
+/******************************************************************************
+ * 
+ *              Custom signup process for enrolled students 
+ * 
+ *****************************************************************************/
+
+if ($_GET) {
+    
+    print_r($_GET);
+    
+    $user = new stdClass();
+    die ('Stopped');    
+    
+    // Initialize alternate name fields to empty strings.
+    $namefields = array_diff(get_all_user_name_fields(), useredit_get_required_name_fields());
+    foreach ($namefields as $namefield) {
+        $user->$namefield = '';
+    }
+    
+    // Peform signup 
+    $authplugin->user_signup($user, false);
+    
+    die ('Stopped');    
+} // end if $_GET
+
+
+
+
+
 //HTTPS is required in this page when $CFG->loginhttps enabled
 $PAGE->https_required();
 
