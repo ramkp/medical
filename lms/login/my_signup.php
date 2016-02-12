@@ -43,18 +43,18 @@ if ($_POST) {
     $user->secret = random_string(15);
     $user->auth = $CFG->registerauth;
 
+    /*
     echo "<br><pre>";
     print_r($user);
     echo "<br><pre>";
-
     die('Stopped');
-
+     */
     // Initialize alternate name fields to empty strings.
     $namefields = array_diff(get_all_user_name_fields(), useredit_get_required_name_fields());
     foreach ($namefields as $namefield) {
         $user->$namefield = '';
     }
-
+    
     // Perform signup process
     $authplugin->user_signup($user, false);
 } // end if $_POST
