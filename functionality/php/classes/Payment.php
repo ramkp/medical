@@ -18,7 +18,7 @@ class Payment {
 
     function enroll_user($user) {
         $enroll = new Enroll();
-        $enroll->single_signup($user);
+        $enroll->single_signup($user);        
         $list = $this->get_payment_section_personal($user);
         return $list;
     }
