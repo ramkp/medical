@@ -118,9 +118,42 @@ $(document).ready(function () {
                 contentType: false,
                 type: 'POST',
                 success: function (data) {
-                    $('#upload_err').html(data);
-                }
-            });
+                    if (data > 0) {
+                        $('#upload_err').html('');
+                        var selected_course = $('#courses').text();
+                        var course_name = selected_course.trim();
+                        var course_url = 'functionality/php/get_course_id.php';
+                        var request = {course_name: course_name};
+                        $.post(course_url, request).done(function (courseid) {
+                            var addr = $('#group_addr').val();
+                            var inst = $('#group_inst').val();
+                            var zip = $('#group_zip').val();
+                            var city = $('#group_city').val();
+                            var state = $('#group_state').val();
+                            var group_name = $('#group_name').val();
+                            var grpoup_data = {courseid: courseid,
+                                addr: addr,
+                                inst: inst,
+                                zip: zip,
+                                city: city,
+                                state: state,
+                                tot_participants: data,
+                                group_name: group_name};
+                            var group_url = 'functionality/php/group_signup_by_file.php';
+                            var request = {group_common_section: JSON.stringify(grpoup_data)};
+                            $.post(group_url, request).done(function (data) {
+                                var el = $('#personal_payment_details').length;
+                                if (el == 0) {
+                                    $('#group_common_section').append(data);
+                                }
+                            });
+                        }); // end of $.post(course_url, request)
+                    } // end if data > 0
+                    else {
+                        $('#upload_err').html(data);
+                    } // end else
+                } // end of success
+            }); // end of $.ajax ..
         } // end else
     }
 
@@ -590,9 +623,19 @@ $(document).ready(function () {
     function very_participants_form(tot_participants) {
 
         var err = 0;
+        var users = new Array();
+
         var selected_course = $('#courses').text();
         var course_name = selected_course.trim();
+        var addr = $('#group_addr').val();
+        var inst = $('#group_inst').val();
+        var zip = $('#group_zip').val();
+        var city = $('#group_city').val();
+        var state = $('#group_state').val();
+        var group_name = $('#group_name').val();
+
         for (i = 0; i <= tot_participants; i++) {
+
             var first_name_id = '#first_name_' + i;
             var last_name_id = '#last_name_' + i
             var email_id = '#email_' + i;
@@ -605,7 +648,11 @@ $(document).ready(function () {
 
             if (first_name == '' || last_name == '' || email == '' || validateEmail(email) == false || phone == '') {
                 err++;
-            } // end if first_name=='' || last_name==''            
+            } // end if first_name=='' || last_name==''
+            if (first_name != '' && last_name != '' && email != '' && validateEmail(email) == true && phone != '') {
+                var user = {first_name: first_name, last_name: last_name, email: email, phone: phone};
+                users.push(user);
+            } // end if first_name != '' && last_name != ''
         } // end for
         console.log('Errors counter: ' + err);
         if (err > 1) {
@@ -618,9 +665,20 @@ $(document).ready(function () {
             var request = {course_name: course_name};
             $.post(course_url, request).done(function (courseid) {
                 console.log('Course id: ' + courseid);
-                var user = {courseid: courseid};
+
+                var group_common_section = {
+                    courseid: courseid,
+                    addr: addr,
+                    inst: inst,
+                    zip: zip,
+                    city: city,
+                    state: state,
+                    group_name: group_name};
+
                 var signup_url = 'functionality/php/group_signup.php';
-                var signup_request = {user: JSON.stringify(user)};
+                var signup_request = {group_common_section: JSON.stringify(group_common_section),
+                    users: JSON.stringify(users),
+                    tot_participants: tot_participants};
                 $.post(signup_url, signup_request).done(function (data) {
                     console.log(data);
                     // Show payment section
@@ -694,7 +752,7 @@ $(document).ready(function () {
                         }
                         else {
                             // Everything is fine - show participants section
-                            get_manual_group_registration_form(tot_participants);
+                            get_manual_group_registration_form(tot_participants, courseid);
                         }
                     });
                 } // end if addr!='' && inst!=''
@@ -1109,9 +1167,9 @@ $(document).ready(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
                 $('#type_err').html('');
                 // Verify is group registration selected?
-                if ($('#group').is(':checked')) {
-                    get_group_registration_block();
-                }
+                //if ($('#group').is(':checked')) {
+                get_group_registration_block();
+                //}
             });
         }
 
@@ -1141,11 +1199,6 @@ $(document).ready(function () {
             var tot_participants = $('#participants').val();
             $('#upload_section').hide();
             verify_group_common_section();
-        }
-
-        if (event.target.id == 'upload_group_file') {
-            console.log('File upload registration ...');
-            get_file_upload_group_registration_form();
         }
 
         if (event.target.id == 'proceed_to_group_payment') {

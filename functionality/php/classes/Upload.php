@@ -5,7 +5,6 @@
  *
  * @author sirromas
  */
-
 session_start();
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Enroll.php';
@@ -65,13 +64,12 @@ class Upload {
         $file = $files[0];
         if ($file['error'] == 0 && $file['size'] > 0) {
             $status = $this->check_file_structure($file);
-            echo "Status: " . $status . "<br/>";
-            if ($status === true) {
+            if ($status > 0) {
                 // File structure is ok we can move it to safe place
                 $filename = time() . rand(10, 175);
-                $full_file_path = $this->dir_path . '/' . $filename . '.csv';
+                $full_file_path = $this->dir_path . '/' . $filename . '.csv';                
                 move_uploaded_file($file['tmp_name'], $full_file_path);
-                $_SESSION["file_path"]=$full_file_path;
+                $_SESSION["file_path"] = $full_file_path;
             } // end if $status
         } // end if $file['error'] == 0 && $file['size'] > 0        
         else {
@@ -86,17 +84,16 @@ class Upload {
 
     function check_file_structure($file) {
         $status = NULL;
+        $counter = 0;
         $handle = fopen($file['tmp_name'], "r");
         if ($handle) {
             while (($line = fgets($handle)) !== false) {
                 $items = explode(",", $line);
-                if ($items[0] != '' && $items[1] != '' && $this->check_email($items[2]) === true && $items[2] != '') {
-                    $status = true;
-                } // end if $items[0]!='' && $items[1]!=''
-                else {
-                    $status = 'Incorrect file structure';
-                } // end else
-            } // end while
+                if ($items[0] != '' && $items[1] != '' && $this->check_email($items[2]) == true && $items[2] != '') {
+                    $counter++;
+                } // end if $items[0]!='' && $items[1]!=''                
+            } // end while            
+            $status = ($counter > 0) ? $counter : "Incorrect file structure";
         } // end if $handle
         else {
             $status = 'Error reading file';

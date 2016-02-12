@@ -5,7 +5,7 @@
  *
  * @author sirromas
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Enroll.php';
 
 class Payment {
@@ -17,7 +17,7 @@ class Payment {
     }
 
     function enroll_user($user) {
-        $enroll=new Enroll();
+        $enroll = new Enroll();
         $enroll->single_signup($user);
         $list = $this->get_payment_section_personal($user);
         return $list;
@@ -99,7 +99,7 @@ class Payment {
         return $drop_down;
     }
 
-    function get_course_group_discount($courseid) {
+    function get_course_group_discount($courseid, $tot_participants) {
 
         // 1. Get course cost
         $query = "select id, cost from mdl_course "
@@ -118,17 +118,18 @@ class Payment {
             $discount = $row['group_discount_size'];
         }
 
+        $group_cost = $cost * $tot_participants;
         if ($discount > 0) {
-            $final_cost = $cost - round(($cost * $discount) / 100, 2);
+            $final_cost = $group_cost - round(($group_cost * $discount) / 100, 2);
         } // end if $discount>0
         else {
-            $final_cost = $cost;
+            $final_cost = round($group_cost, 2);
         }
         $course_cost = array('cost' => $final_cost, 'discount' => $discount);
         return $course_cost;
     }
 
-    function get_payment_section_personal($user, $group = null) {
+    function get_payment_section_personal($user, $group = null, $tot_participants = null) {
         $list = "";
         $cost_block = "";
         $course_name = $this->get_course_name($user->courseid);
@@ -139,7 +140,7 @@ class Payment {
             $course_cost = $this->get_personal_course_cost($user->courseid);
         } // end if $group==NULL 
         else {
-            $course_cost = $this->get_course_group_discount($user->courseid);
+            $course_cost = $this->get_course_group_discount($user->courseid, $tot_participants);
         } // end else
 
         if ($course_cost['discount'] == 0) {
@@ -198,13 +199,35 @@ class Payment {
         return $list;
     }
 
-    function get_payment_section_group($user) {
-        $list = $this->get_payment_section_personal($user, 1);
+    function get_payment_section_group($user, $tot_participants) {
+        $list = $this->get_payment_section_personal($user, 1, $tot_participants);
+        return $list;
+    }
+
+    function get_group_payment_section_file($group_common_section) {
+        $tot_participants=$group_common_section->tot_participants;
+        $list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
+        return $list;
+    }
+
+    function get_group_payment_section($group_common_section, $users, $tot_participants) {
+
+        /*
+          echo "<br/>------------------------------------------------------<br/>";
+          print_r($group_common_section);
+          echo "<br/>------------------------------------------------------<br/>";
+          print_r($users);
+          echo "<br/>------------------------------------------------------<br/>";
+          echo "Number of participants: ".$tot_participants;
+          echo "<br/>------------------------------------------------------<br/>";
+         */
+
+        $list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
         return $list;
     }
 
     function is_group_exist($group_name) {
-        $query="select id, name from mdl_groups where name='$group_name'";        
+        $query = "select id, name from mdl_groups where name='$group_name'";
         return $num = $this->db->numrows($query);
     }
 
