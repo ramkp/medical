@@ -6,9 +6,17 @@
  * @author sirromas
  */
 
-require_once './Enroll.php';
+session_start();
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Enroll.php';
 
 class Upload {
+
+    public $dir_path;
+
+    function __construct() {
+        $this->dir_path = $_SERVER['DOCUMENT_ROOT'] . '/upload';
+    }
 
     function get_upload_block() {
         $list = "";
@@ -29,7 +37,7 @@ class Upload {
     function get_users_upload_form() {
         $list = "";
         $upload_block = $this->get_upload_block();
-        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel panel-default' id='upload_section' style='margin-bottom:0px;'>";
         $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Upload Users File</h5></div>";
         $list.="<div class='panel-body'>";
 
@@ -47,15 +55,23 @@ class Upload {
         return $list;
     }
 
+    function group_signup($group_common, $file) {
+        $users = $this->prepare_users_data($group_common, $file);
+        $enroll = new Enroll();
+        $enroll->group_signup($users);
+    }
+
     function upload_users_file($files) {
         $file = $files[0];
-        //print_r($file);
         if ($file['error'] == 0 && $file['size'] > 0) {
             $status = $this->check_file_structure($file);
-            echo "Status: ".$status."<br/>";
-            if ($status===true) {
-                // File structure is ok we can start enroll process
-                
+            echo "Status: " . $status . "<br/>";
+            if ($status === true) {
+                // File structure is ok we can move it to safe place
+                $filename = time() . rand(10, 175);
+                $full_file_path = $this->dir_path . '/' . $filename . '.csv';
+                move_uploaded_file($file['tmp_name'], $full_file_path);
+                $_SESSION["file_path"]=$full_file_path;
             } // end if $status
         } // end if $file['error'] == 0 && $file['size'] > 0        
         else {

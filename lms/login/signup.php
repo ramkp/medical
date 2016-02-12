@@ -23,7 +23,6 @@
  * @copyright  1999 onwards Martin Dougiamas  http://dougiamas.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 require('../config.php');
 require_once($CFG->dirroot . '/user/editlib.php');
 
@@ -42,33 +41,33 @@ if (!$authplugin->can_signup()) {
     print_error('notlocalisederrormessage', 'error', '', 'Sorry, you may not use this page.');
 }
 
-/******************************************************************************
+/* * ****************************************************************************
  * 
  *              Custom signup process for enrolled students 
  * 
- *****************************************************************************/
+ * *************************************************************************** */
 
 if ($_GET) {
-    
-    print_r($_GET);
-    
-    $user = new stdClass();
-    die ('Stopped');    
-    
+
+    $user = $_GET['user'];
+
+    echo "<pre>";
+    print_r($user);
+    echo "</pre>";
+
+    die('Stopped');
+
     // Initialize alternate name fields to empty strings.
     $namefields = array_diff(get_all_user_name_fields(), useredit_get_required_name_fields());
     foreach ($namefields as $namefield) {
         $user->$namefield = '';
     }
-    
+
     // Peform signup 
     $authplugin->user_signup($user, false);
-    
-    die ('Stopped');    
+
+    die('Stopped');
 } // end if $_GET
-
-
-
 
 
 //HTTPS is required in this page when $CFG->loginhttps enabled
@@ -80,12 +79,11 @@ $PAGE->set_context(context_system::instance());
 // Override wanted URL, we do not want to end up here again if user clicks "Login".
 $SESSION->wantsurl = $CFG->wwwroot . '/';
 
-if (isloggedin() and !isguestuser()) {
+if (isloggedin() and ! isguestuser()) {
     // Prevent signing up when already logged in.
     echo $OUTPUT->header();
     echo $OUTPUT->box_start();
-    $logout = new single_button(new moodle_url($CFG->httpswwwroot . '/login/logout.php',
-        array('sesskey' => sesskey(), 'loginpage' => 1)), get_string('logout'), 'post');
+    $logout = new single_button(new moodle_url($CFG->httpswwwroot . '/login/logout.php', array('sesskey' => sesskey(), 'loginpage' => 1)), get_string('logout'), 'post');
     $continue = new single_button(new moodle_url('/'), get_string('cancel'), 'get');
     echo $OUTPUT->confirm(get_string('cannotsignup', 'error', fullname($USER)), $logout, $continue);
     echo $OUTPUT->box_end();
@@ -97,15 +95,14 @@ $mform_signup = $authplugin->signup_form();
 
 if ($mform_signup->is_cancelled()) {
     redirect(get_login_url());
-
 } else if ($user = $mform_signup->get_data()) {
-    $user->confirmed   = 0;
-    $user->lang        = current_language();
+    $user->confirmed = 0;
+    $user->lang = current_language();
     $user->firstaccess = 0;
     $user->timecreated = time();
-    $user->mnethostid  = $CFG->mnet_localhost_id;
-    $user->secret      = random_string(15);
-    $user->auth        = $CFG->registerauth;
+    $user->mnethostid = $CFG->mnet_localhost_id;
+    $user->secret = random_string(15);
+    $user->auth = $CFG->registerauth;
     // Initialize alternate name fields to empty strings.
     $namefields = array_diff(get_all_user_name_fields(), useredit_get_required_name_fields());
     foreach ($namefields as $namefield) {
@@ -121,7 +118,7 @@ $PAGE->verify_https_required();
 
 
 $newaccount = get_string('newaccount');
-$login      = get_string('login');
+$login = get_string('login');
 
 $PAGE->navbar->add($login);
 $PAGE->navbar->add($newaccount);

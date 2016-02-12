@@ -6,8 +6,9 @@
  * @author sirromas
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Enroll.php';
 
-class Signup {
+class Payment {
 
     public $db;
 
@@ -16,6 +17,8 @@ class Signup {
     }
 
     function enroll_user($user) {
+        $enroll=new Enroll();
+        $enroll->single_signup($user);
         $list = $this->get_payment_section_personal($user);
         return $list;
     }

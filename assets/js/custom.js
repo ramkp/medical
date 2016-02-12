@@ -1108,7 +1108,10 @@ $(document).ready(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
                 $('#type_err').html('');
-                get_group_registration_block();
+                // Verify is group registration selected?
+                if ($('#group').is(':checked')) {
+                    get_group_registration_block();
+                }
             });
         }
 
@@ -1136,7 +1139,7 @@ $(document).ready(function () {
         if (event.target.id == 'manual_group_registration') {
             console.log('Manual registration ...');
             var tot_participants = $('#participants').val();
-            //get_manual_group_registration_form(tot_participants);
+            $('#upload_section').hide();
             verify_group_common_section();
         }
 
