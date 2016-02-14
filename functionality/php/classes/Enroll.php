@@ -6,6 +6,7 @@
  * @author sirromas
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
 class Enroll {
 
@@ -123,15 +124,16 @@ class Enroll {
         $this->db->query($query);
     }
 
-    function send_confirmation_email($userid, $user) {
-        
+    function send_confirmation_email($user) {
+        $mailer = new Mailer();
+        $mailer->send_account_confirmation_message($user);
     }
 
     function enroll_user_to_course($user) {
         $userid = $this->getUserId($user->email);
         $this->assign_roles($userid, $user->courseid);
         $this->update_user_data($userid, $user);
-        $this->send_confirmation_email($userid, $user);
+        $this->send_confirmation_email($user);
     }
 
     function group_signup($users) {
