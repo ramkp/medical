@@ -29,8 +29,15 @@ class Mailer {
         return $list;
     }
 
-    function get_payment_confirmation_message($user) {
+    function get_payment_confirmation_message($payment) {
         $list = "";
+        $list.="<html><body>";
+        $list.="<br/><p>Dear $payment->card_holder!</p>";
+        $list.="<p>Payment of $$payment->sum has been received. Thank you. Your account now active.</p>";        
+        $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
+        $list.="<p>Best regards,</p>";
+        $list.="<p>Support team.</p>";
+        $list.="</body></html>";
         return $list;
     }
 
@@ -41,9 +48,9 @@ class Mailer {
         $this->send_email($subject, $message, $recipient);
     }
 
-    function send_payment_confirmation_message($user) {
+    function send_payment_confirmation_message($payment) {
         $subject = "Medical2 Institute - payment confirmation";
-        $message = $this->get_payment_confirmation_message($user);
+        $message = $this->get_payment_confirmation_message($payment);
         $recipient = $user->email;
         $this->send_email($subject, $message, $recipient);
     }
@@ -76,7 +83,7 @@ class Mailer {
             echo 'Mailer Error: ' . $mail->ErrorInfo;
         } // end if !$mail->send()        
         else {
-            echo 'Message has been sent to ' . $recipient;
+            //echo 'Message has been sent to ' . $recipient;
         }
     }
 

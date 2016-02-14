@@ -5,20 +5,22 @@
  *
  * @author sirromas
  */
-
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Enroll.php';
 
 class Payment {
 
     public $db;
+    public $enroll;
+    public $user;
 
     function __construct() {
         $this->db = new pdo_db();
+        $this->enroll = new Enroll();
     }
 
     function enroll_user($user) {
-        $enroll = new Enroll();
-        $enroll->single_signup($user);        
+        $this->user = $user;
+        $this->enroll->single_signup($user);
         $list = $this->get_payment_section_personal($user);
         return $list;
     }
@@ -158,7 +160,8 @@ class Payment {
         $list.="<span class='span2'>Selected program</span>";
         $list.="<span class='span2'>$course_name</span>";
         $list.="<span class='span2'>Sum to be charged</span>";
-        $list.="<span class='span2'>$cost_block<input type='hidden' value='" . $course_cost['cost'] . "' id='payment_sum' /></span>";
+        $list.="<span class='span2'>$cost_block</span>";
+        $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='payment_sum' />";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -190,7 +193,6 @@ class Payment {
         $list.="</div>";
 
         $list.= "<div class='container-fluid' style='text-align:left;'>";
-        //$list.= "<span class='span2'><a href='#' id='personal_payment' onClick='return false;'>Make a payment</a></span>";
         $list.= "<span class='span2'><button class='btn btn-primary' id='make_payment_personal'>Make payment</button></span>";
         $list.= "&nbsp <span style='color:red;' id='personal_payment_err'></span>";
         $list.= "</div>";
@@ -205,7 +207,7 @@ class Payment {
     }
 
     function get_group_payment_section_file($group_common_section) {
-        $tot_participants=$group_common_section->tot_participants;
+        $tot_participants = $group_common_section->tot_participants;
         $list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
         return $list;
     }
@@ -231,9 +233,25 @@ class Payment {
         return $num = $this->db->numrows($query);
     }
 
+    function confirm_user($email) {
+        $userid = $this->enroll->getUserId($email);
+        $query = "update mdl_user set confirmed=1 where id=$userid";
+        $this->db->query($query);
+    }
+
     function make_stub_payment($card) {
-        //print_r($card);
-        $list = "<p align='center'>Payment is successfull (this is fake payment, no real card charging :) ). Confirmation email is sent to $card->email.</p>";
+        $mailer = new Mailer();
+        $mailer->send_payment_confirmation_message($card);
+        $this->confirm_user($card->email);
+        $list = "";
+        $list.="<div class='panel panel-default' id='personal_payment_details'>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+        $list.="<div class='panel-body'>";
+        $list.= "<div class='container-fluid' style='text-align:left;'>";
+        $list.= "<span class='span8'>Payment is successfull (this is fake payment, no real card charging :) ). Confirmation email is sent to $card->email.</span>";
+        $list.="</div>";
+        $list.="</div>";
+        $list.="</div>";
         return $list;
     }
 
