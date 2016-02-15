@@ -33,7 +33,7 @@ class Mailer {
         $list = "";
         $list.="<html><body>";
         $list.="<br/><p>Dear $payment->card_holder!</p>";
-        $list.="<p>Payment of $$payment->sum has been received. Thank you. Your account now active.</p>";        
+        $list.="<p>Payment of $$payment->sum has been received. Thank you. Your account is active now.</p>";        
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
         $list.="<p>Best regards,</p>";
         $list.="<p>Support team.</p>";

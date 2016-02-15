@@ -119,7 +119,7 @@ class Enroll {
                 . "zip='$user->zip', "
                 . "city='$user->city', "
                 . "state='$user->state', "
-                . "country='$user->country' "
+                . "country='US' "
                 . "where id=$userid";
         $this->db->query($query);
     }
@@ -156,6 +156,26 @@ class Enroll {
                 $user->phone = $items[3];
             } // end while
         } // end if $handle
+    }
+
+    function create_course_group($courseid, $groupname) {
+        $query = "insert into mdl_groups
+                     (courseid,
+                      idnumber,
+                      name,  
+                      description,
+                      descriptionformat,  
+                      timecreated,
+                      timemodified)
+                      values ('" . $courseid . "',
+                              'GP',
+                              '" . $groupname . "',
+                              '" . $groupname . "',
+                              '1',    
+                              '" . time() . "',
+                              '" . time() . "')";
+        $this->db->query($query);
+        return mysql_insert_id();
     }
 
 }
