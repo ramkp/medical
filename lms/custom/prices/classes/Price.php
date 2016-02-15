@@ -150,7 +150,7 @@ class Price extends Util {
                 . "where courseid=$course_id";
         //echo "Query: ".$query;
         $result = $this->db->query($query);
-        return "<p align='center'>Item successfully updated.</p>";
+        return "Item successfully updated.";
     }
 
 }

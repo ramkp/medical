@@ -230,7 +230,7 @@ $(document).ready(function () {
                     course_discount: course_discount,
                     course_group_discount: course_group_discount};
                 $.post(url, request).done(function (data) {
-                    $('#region-main').html(data);
+                    $('#price_err').html(data);
                 });
             } // end if validateNum(course_cost
             else {
