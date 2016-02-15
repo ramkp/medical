@@ -93,6 +93,7 @@ class Enroll {
 
     function single_signup($user) {
         $user->pwd = $this->get_password();
+        $user->country='US';
         $encoded_user = base64_encode(json_encode($user));
         $data = array('user' => $encoded_user);
 

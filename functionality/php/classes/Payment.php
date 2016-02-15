@@ -140,9 +140,11 @@ class Payment {
         $card_month = $this->get_month_drop_box();
         if ($group == NULL) {
             $course_cost = $this->get_personal_course_cost($user->courseid);
+            $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
         } // end if $group==NULL 
         else {
             $course_cost = $this->get_course_group_discount($user->courseid, $tot_participants);
+            $list.= "<input type='hidden' value='$user->group_name' id='user_group' name='user_group' />";
         } // end else
 
         if ($course_cost['discount'] == 0) {
@@ -263,10 +265,54 @@ class Payment {
         $this->db->query($query);
     }
 
+    function get_group_users($group_name) {
+        //1. Get group id
+        $query = "select id, name from mdl_groups where name='$group_name'";        
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $groupid = $row['id'];
+        } // end while
+        //2. Get group users
+        $query = "select groupid, userid from mdl_groups_members where groupid=$groupid";        
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $users[] = $row['userid'];
+        }
+        return $users;
+    }
+
+    function get_user_detailes($userid) {
+        $query = "select id, username, firstname, lastname from mdl_user "
+                . "where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $user = new stdClass();
+            foreach ($row as $key => $value) {
+                $user->$key = $value;
+            } // end foreach
+        } // end while 
+        return $user;
+    }
+
     function make_stub_payment($card) {
         $mailer = new Mailer();
-        $mailer->send_payment_confirmation_message($card);
-        $this->confirm_user($card->email);
+        $user_group = $card->user_group;
+        //echo "User group: " . $user_group . "<br/>";
+        if ($user_group == '') {
+            $this->confirm_user($card->email);
+            $mailer->send_payment_confirmation_message($card);
+        } // end if $user_group==''
+        else {
+            $group_users = $this->get_group_users($user_group);
+           // echo "Group users: <pre>";
+           // print_r($group_users);
+           // echo "<pre>";
+            foreach ($group_users as $userid) {
+                $user = $this->get_user_detailes($userid);
+                $this->confirm_user($user->username);
+                $mailer->send_group_payment_confirmation_message($user);
+            } // end foreach
+        } // end else
         $list = "";
         $list.="<div class='panel panel-default' id='personal_payment_details'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";

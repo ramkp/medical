@@ -33,7 +33,7 @@ class Mailer {
         $list = "";
         $list.="<html><body>";
         $list.="<br/><p>Dear $payment->card_holder!</p>";
-        $list.="<p>Payment of $$payment->sum has been received. Thank you. Your account is active now.</p>";        
+        $list.="<p>Payment of $$payment->sum has been received. Thank you. Your account is active now.</p>";
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
         $list.="<p>Best regards,</p>";
         $list.="<p>Support team.</p>";
@@ -51,7 +51,26 @@ class Mailer {
     function send_payment_confirmation_message($payment) {
         $subject = "Medical2 Institute - payment confirmation";
         $message = $this->get_payment_confirmation_message($payment);
-        $recipient = $user->email;
+        $recipient = $payment->email;
+        $this->send_email($subject, $message, $recipient);
+    }
+
+    function get_payment_group_confirmation_message($user) {
+        $list = "";
+        $list.="<html><body>";
+        $list.="<br/><p>Dear $user->firstname $user->lastname!</p>";
+        $list.="<p>Payment for your group membership has been received. Thank you. Your account is active now.</p>";
+        $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
+        $list.="<p>Best regards,</p>";
+        $list.="<p>Support team.</p>";
+        $list.="</body></html>";
+        return $list;
+    }
+
+    function send_group_payment_confirmation_message($user) {
+        $subject = "Medical2 Institute - payment confirmation";
+        $message = $this->get_payment_group_confirmation_message($user);
+        $recipient = $user->username;
         $this->send_email($subject, $message, $recipient);
     }
 

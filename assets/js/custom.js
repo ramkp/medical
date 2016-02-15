@@ -553,6 +553,8 @@ $(document).ready(function () {
         if (bill_state == '') {
             $('#personal_payment_err').html('Please provide billing state');
         }
+        
+        var user_group=$('#user_group').val();
 
         if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_state != '') {
             $('#personal_payment_err').html('');
@@ -566,6 +568,7 @@ $(document).ready(function () {
                 bill_addr: bill_addr,
                 bill_city: bill_city,
                 bill_zip: bill_zip,
+                user_group:user_group,
                 bill_state: bill_state};
             var url = "functionality/php/make_stub_payment.php";
             var request = {card: JSON.stringify(card)};
