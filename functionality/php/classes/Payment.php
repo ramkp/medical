@@ -224,6 +224,30 @@ class Payment {
           echo "<br/>------------------------------------------------------<br/>";
          */
 
+        // Create required group on the course
+        $groupid = $this->enroll->create_course_group($group_common_section->courseid, $group_common_section->group_name);
+
+
+        foreach ($users as $group_participant) {
+            $user = new stdClass();
+            $user->email = $group_participant->email;
+            $user->first_name = $group_participant->first_name;
+            $user->last_name = $group_participant->last_name;
+            $user->courseid = $group_common_section->courseid;
+            $user->addr = $group_common_section->addr;
+            $user->inst = $group_common_section->inst;
+            $user->zip = $group_common_section->zip;
+            $user->city = $group_common_section->city;
+            $user->state = $group_common_section->state;
+            $user->country = 'US';
+            $email_exists = $this->enroll->is_email_exists($group_participant->email);
+            if ($email_exists == 0) {
+                $this->enroll->single_signup($user);
+                $userid = $this->enroll->getUserId($group_participant->email);
+                $this->enroll->add_user_to_group($groupid, $userid);
+            } // end if $email_exists==0
+        } // end foreach
+
         $list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
         return $list;
     }

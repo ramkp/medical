@@ -105,7 +105,7 @@ class Enroll {
             ),
         );
         $context = stream_context_create($options);
-        file_get_contents($this->signup_url, false, $context);
+        file_get_contents($this->signup_url, false, $context);     
 
         // 2. Enroll user into course
         $this->enroll_user_to_course($user);
@@ -142,7 +142,7 @@ class Enroll {
         }
     }
 
-    function prepare_users_data() {
+    function prepare_users_data_from_file() {
         $file = $_SESSION['file_path'];
         $users = array();
         $handle = fopen($file, "r");
@@ -175,7 +175,25 @@ class Enroll {
                               '" . time() . "',
                               '" . time() . "')";
         $this->db->query($query);
-        return mysql_insert_id();
+
+        $query = "select id, name from mdl_groups where name='$groupname'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $groupid = $row['id'];
+        } // end while
+        return $groupid;
+    }
+
+    function add_user_to_group($groupid, $userid) {
+        $query = "insert into mdl_groups_members  (groupid,userid,timeadded)"
+                . " values ('" . $groupid . "' , '" . $userid . "' ,'" . time() . "')";
+        $this->db->query($query);
+    }
+
+    function is_email_exists($email) {
+        $query = "select id, username, deleted "
+                . "from mdl_user where username='$email' and deleted=0";
+        return $this->db->numrows($query);
     }
 
 }

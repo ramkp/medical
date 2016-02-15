@@ -35,7 +35,7 @@ if ($_POST) {
     $user->timecreated = time();
     $user->mnethostid = $CFG->mnet_localhost_id;
     $user->secret = random_string(15);
-    $user->auth = $CFG->registerauth;    
+    $user->auth = $CFG->registerauth;      
     
     // Initialize alternate name fields to empty strings.
     $namefields = array_diff(get_all_user_name_fields(), useredit_get_required_name_fields());

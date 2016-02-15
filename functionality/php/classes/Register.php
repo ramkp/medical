@@ -264,9 +264,9 @@ class Register {
     }
 
     function is_email_exists($email) {
-        $query = "select email, deleted from mdl_user "
-                . "where email='$email' and deleted=0";
-        return $num = $this->db->numrows($query);
+        $query = "select username, deleted from mdl_user "
+                . "where username='$email' and deleted=0";
+        return $this->db->numrows($query);
     }
 
     function get_course_id($course_name) {
