@@ -17,6 +17,12 @@ class navClass extends Util {
         }// end if $userid==2 || $USER->id == 3
         else {
             $roleid = $this->get_user_role($userid);
+            if ($roleid == 3 || $roleid == 4) {
+                $top_menu = $this->get_tutors_menu_items();
+            } // end if $roleid == 3 || $roleid == 4            
+            if ($roleid == 5) {
+                $top_menu = $this->get_students_menu_items();
+            } // end if $roleid == 5
         }
         return $top_menu;
     }
@@ -101,5 +107,86 @@ class navClass extends Util {
         return $list;
     }
 
-}
+    function get_students_menu_items() {
+        $userid = $this->user->id;
+        $list = "";
+        $list = $list . "<header role='banner' class='navbar'>
+        <nav role='navigation' class='navbar-inner'>
+            <div class='container-fluid'>
+                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
+                <a class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                </a>
+                <div class='nav-collapse collapse'>
+                    <div class='nav-divider-right'></div>
+                    <ul class='nav pull-right'>
+                        <li></li>
+                    </ul>
+                    <div class='nav-collapse collapse'>
+                        <ul class='nav pull-right'>                   
+                            <li class='dropdown'><a title='Account' class='dropdown-toggle' href='#cm_submenu_2'>Account<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>                                
+                                    <li><a href='/lms/user/profile.php?id=$userid' title='Profile'>Profile</a></li>                                    
+                                    <li><a href='/lms/user/preferences.php' title='Preferences'>Preferences</a></li>
+                                    <li><a href='/lms/message/index.php' title='Preferences'>Messages</a></li>
+                                    <li><a href='/lms/login/logout.php?seskey='gqe32fe3' title='Logout'>Logout</a></li>                                            
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class='nav-divider-right'></div>
+                        <ul class='nav pull-right'>
+                            <li></li>
+                        </ul>
+                    </div>
+                    <div class='nav-divider-left'></div>
+                </div>
+            </div>
+        </nav>
+    </header>";
+        return $list;
+    }
 
+    function get_tutors_menu_items() {
+        $userid = $this->user->id;
+        $list = "";
+        $list = $list . "<header role='banner' class='navbar'>
+        <nav role='navigation' class='navbar-inner'>
+            <div class='container-fluid'>
+                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
+                <a class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                </a>
+                <div class='nav-collapse collapse'>
+                    <div class='nav-divider-right'></div>
+                    <ul class='nav pull-right'>
+                        <li></li>
+                    </ul>
+                    <div class='nav-collapse collapse'>
+                        <ul class='nav pull-right'>                   
+                            <li class='dropdown'><a title='Account' class='dropdown-toggle' href='#cm_submenu_2'>Account<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>                                
+                                    <li><a href='/lms/user/profile.php?id=$userid' title='Profile'>Profile</a></li>                                    
+                                    <li><a href='/lms/user/preferences.php' title='Preferences'>Preferences</a></li>
+                                    <li><a href='/lms/message/index.php' title='Preferences'>Messages</a></li>
+                                    <li><a href='/lms/login/logout.php?seskey='gqe32fe3' title='Logout'>Logout</a></li>                                            
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class='nav-divider-right'></div>
+                        <ul class='nav pull-right'>
+                            <li></li>
+                        </ul>
+                    </div>
+                    <div class='nav-divider-left'></div>
+                </div>
+            </div>
+        </nav>
+    </header>";
+        return $list;
+    }
+
+}
