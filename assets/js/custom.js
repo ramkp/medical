@@ -508,7 +508,7 @@ $(document).ready(function () {
         var bill_addr = $('#bill_addr').val();
         var bill_city = $('#bill_city').val();
         var bill_zip = $('#bill_zip').val();
-        var bill_state = $('#bill_state').val();
+        var bill_email = $('#bill_email').val();
 
         if (card_type == 'Card type') {
             $('#personal_payment_err').html('Please select card type');
@@ -550,13 +550,19 @@ $(document).ready(function () {
             return false;
         }
 
-        if (bill_state == '') {
-            $('#personal_payment_err').html('Please provide billing state');
+        if (bill_email == '') {
+            $('#personal_payment_err').html('Please provide contact email');
+            return false;
         }
-        
-        var user_group=$('#user_group').val();
 
-        if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_state != '') {
+        if (validateEmail(bill_email) != true) {
+            $('#personal_payment_err').html('Please provide correct contact email');
+            return false;
+        }
+
+        var user_group = $('#user_group').val();
+
+        if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_email != '' && validateEmail(bill_email) == true) {
             $('#personal_payment_err').html('');
             var card = {sum: sum,
                 email: email,
@@ -568,8 +574,8 @@ $(document).ready(function () {
                 bill_addr: bill_addr,
                 bill_city: bill_city,
                 bill_zip: bill_zip,
-                user_group:user_group,
-                bill_state: bill_state};
+                user_group: user_group,
+                bill_email: bill_email};
             var url = "functionality/php/make_stub_payment.php";
             var request = {card: JSON.stringify(card)};
             $.post(url, request).done(function (data) {

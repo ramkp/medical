@@ -67,7 +67,7 @@ class Upload {
             if ($status > 0) {
                 // File structure is ok we can move it to safe place
                 $filename = time() . rand(10, 175);
-                $full_file_path = $this->dir_path . '/' . $filename . '.csv';                
+                $full_file_path = $this->dir_path . '/' . $filename . '.csv';
                 move_uploaded_file($file['tmp_name'], $full_file_path);
                 $_SESSION["file_path"] = $full_file_path;
             } // end if $status
@@ -89,7 +89,7 @@ class Upload {
         if ($handle) {
             while (($line = fgets($handle)) !== false) {
                 $items = explode(",", $line);
-                if ($items[0] != '' && $items[1] != '' && $this->check_email($items[2]) == true && $items[2] != '') {
+                if ($items[0] != '' && $items[1] != '' && $this->check_email($items[2]) == true && $items[3] != '') {
                     $counter++;
                 } // end if $items[0]!='' && $items[1]!=''                
             } // end while            
@@ -98,7 +98,29 @@ class Upload {
         else {
             $status = 'Error reading file';
         }
+        fclose($handle);
         return $status;
+    }
+
+    function get_users_file_data() {
+        $filepath = $_SESSION["file_path"];
+        $users = array();
+        $handle = fopen($filepath, "r");
+        if ($handle) {
+            while (($line = fgets($handle)) !== false) {
+                $items = explode(",", $line);
+                if ($items[0] != '' && $items[1] != '' && $this->check_email($items[2]) == true && $items[3] != '') {
+                    $user = new stdClass();
+                    $user->first_name = $items[0];
+                    $user->last_name = $items[1];
+                    $user->email = $items[2];
+                    $user->phone = $items[3];
+                    $users[] = $user;
+                } // end if $items[0]!='' && $items[1]!=''                
+            } // end while            
+        } // end if $handle
+        fclose($handle);
+        return $users;
     }
 
 }

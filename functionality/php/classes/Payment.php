@@ -5,7 +5,7 @@
  *
  * @author sirromas
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Enroll.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Upload.php';
 
 class Payment {
 
@@ -190,8 +190,8 @@ class Payment {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Zip code*</span>";
         $list.="<span class='span2'><input type='text' id='bill_zip' name='bill_zip'  ></span>";
-        $list.="<span class='span2'>State*</span>";
-        $list.="<span class='span2'><input type='text' id='bill_state' name='bill_state'  ></span>";
+        $list.="<span class='span2'>Contact email*</span>";
+        $list.="<span class='span2'><input type='text' id='bill_email' name='bill_email'  ></span>";
         $list.="</div>";
 
         $list.= "<div class='container-fluid' style='text-align:left;'>";
@@ -209,26 +209,38 @@ class Payment {
     }
 
     function get_group_payment_section_file($group_common_section) {
-        $tot_participants = $group_common_section->tot_participants;
+
+        $upload = new Upload();
+        $users = $upload->get_users_file_data();
+        $tot_participants = count($users);
+        $groupid = $this->enroll->create_course_group($group_common_section->courseid, $group_common_section->group_name);
+
+        foreach ($users as $group_participant) {
+            $user = new stdClass();
+            $user->email = $group_participant->email;
+            $user->first_name = $group_participant->first_name;
+            $user->last_name = $group_participant->last_name;
+            $user->courseid = $group_common_section->courseid;
+            $user->addr = $group_common_section->addr;
+            $user->inst = $group_common_section->inst;
+            $user->zip = $group_common_section->zip;
+            $user->city = $group_common_section->city;
+            $user->state = $group_common_section->state;
+            $user->country = 'US';
+            $email_exists = $this->enroll->is_email_exists($group_participant->email);
+            if ($email_exists == 0) {
+                $this->enroll->single_signup($user);
+                $userid = $this->enroll->getUserId($group_participant->email);
+                $this->enroll->add_user_to_group($groupid, $userid);
+            } // end if $email_exists==0
+        } // end foreach
+
         $list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
         return $list;
     }
 
     function get_group_payment_section($group_common_section, $users, $tot_participants) {
-
-        /*
-          echo "<br/>------------------------------------------------------<br/>";
-          print_r($group_common_section);
-          echo "<br/>------------------------------------------------------<br/>";
-          print_r($users);
-          echo "<br/>------------------------------------------------------<br/>";
-          echo "Number of participants: ".$tot_participants;
-          echo "<br/>------------------------------------------------------<br/>";
-         */
-
-        // Create required group on the course
         $groupid = $this->enroll->create_course_group($group_common_section->courseid, $group_common_section->group_name);
-
 
         foreach ($users as $group_participant) {
             $user = new stdClass();
@@ -267,13 +279,13 @@ class Payment {
 
     function get_group_users($group_name) {
         //1. Get group id
-        $query = "select id, name from mdl_groups where name='$group_name'";        
+        $query = "select id, name from mdl_groups where name='$group_name'";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $groupid = $row['id'];
         } // end while
         //2. Get group users
-        $query = "select groupid, userid from mdl_groups_members where groupid=$groupid";        
+        $query = "select groupid, userid from mdl_groups_members where groupid=$groupid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $users[] = $row['userid'];
@@ -297,16 +309,14 @@ class Payment {
     function make_stub_payment($card) {
         $mailer = new Mailer();
         $user_group = $card->user_group;
-        //echo "User group: " . $user_group . "<br/>";
+        
         if ($user_group == '') {
             $this->confirm_user($card->email);
             $mailer->send_payment_confirmation_message($card);
         } // end if $user_group==''
         else {
             $group_users = $this->get_group_users($user_group);
-           // echo "Group users: <pre>";
-           // print_r($group_users);
-           // echo "<pre>";
+            $mailer->send_payment_confirmation_message($card, 1);
             foreach ($group_users as $userid) {
                 $user = $this->get_user_detailes($userid);
                 $this->confirm_user($user->username);
