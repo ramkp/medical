@@ -60,11 +60,12 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
-                                    <li><a href='#' title='Report' id='FAQ'>FAQ’s</a></li>                                    
-                                    <li><a href='#' title='Report' id='Google_Map'>Google Map</a></li>                                   
-                                    <li><a href='#' title='Report' id='Certificates'>Certificates</a></li>                                     
-                                    <li><a href='#' title='Report' id='Testimonial'>Testimonial</a></li>                                     
-                                    <li><a href='#' title='Report' id='Photo_Gallery'>Photo Gallery</a></li>                                     
+                                    <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
+                                    <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>
+                                    <li><a href='#' title='Google Map' id='Google_Map'>Google Map</a></li>                                   
+                                    <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                     
+                                    <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li>                                     
+                                    <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>                                     
                                 </ul>
                             </li>
                             <li class='dropdown'><a title='Account' class='dropdown-toggle' href='#cm_submenu_2'>Account<b class='caret'></b></a>
