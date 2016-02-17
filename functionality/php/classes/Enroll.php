@@ -119,6 +119,7 @@ class Enroll {
                 . "business='$user->inst', "
                 . "zip='$user->zip', "
                 . "city='$user->city', "
+                . "phone1='$user->phone', "    
                 . "state='$user->state', "
                 . "country='US' "
                 . "where id=$userid";
