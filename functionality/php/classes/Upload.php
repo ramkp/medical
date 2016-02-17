@@ -48,6 +48,10 @@ class Upload {
         $list.="<span class='span8'>$upload_block</span>";
         $list.="<span class='span5' id='upload_err' style='color:red;>'></span>";
         $list.="</div>"; // end of container-fluid
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group_file'><img src='http://cnausa.com/assets/img/ajax.gif' /></span";
+        $list.="</div>";
 
         $list.="</div>"; // end of panel-body
         $list.="</div>"; // end of panel panel-default

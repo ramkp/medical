@@ -111,6 +111,7 @@ $(document).ready(function () {
             $.each(file_data, function (key, value) {
                 form_data.append(key, value);
             });
+            $('#ajax_loading_group_file').show();
             $.ajax({
                 url: url,
                 data: form_data,
@@ -142,6 +143,7 @@ $(document).ready(function () {
                             var group_url = 'functionality/php/group_signup_by_file.php';
                             var request = {group_common_section: JSON.stringify(grpoup_data)};
                             $.post(group_url, request).done(function (data) {
+                                $('#ajax_loading_group_file').hide();
                                 var el = $('#personal_payment_details').length;
                                 if (el == 0) {
                                     $('#group_common_section').append(data);
@@ -672,6 +674,7 @@ $(document).ready(function () {
             $('#group_manual_form_err').html('');
             var course_url = 'functionality/php/get_course_id.php';
             var request = {course_name: course_name};
+            $('#ajax_loading_group').show();
             $.post(course_url, request).done(function (courseid) {
                 console.log('Course id: ' + courseid);
 
@@ -691,10 +694,14 @@ $(document).ready(function () {
                 $.post(signup_url, signup_request).done(function (data) {
                     console.log(data);
                     // Show payment section
+                    $('#ajax_loading_group').hide();
+                    /*
                     var el = $('#personal_payment_details').length;
                     if (el == 0) {
                         $('#participants_details').append(data);
                     }
+                    */
+                    $('#participants_details').append(data);
                 }).fail(function (data) {
                     console.log(data);
                     $('#personal_err').html('Ops something goes wrong ...');
@@ -892,6 +899,7 @@ $(document).ready(function () {
                         else {
                             // Everything is fine post data and show payment section
                             $('#personal_err').html('');
+                            $('#ajax_loading_personal').show();
                             var user = {
                                 courseid: courseid,
                                 first_name: first_name,
@@ -906,15 +914,15 @@ $(document).ready(function () {
                                 country: country};
 
                             var signup_url = 'functionality/php/single_signup.php';
-                            var signup_request = {user: JSON.stringify(user)};
+                            var signup_request = {user: JSON.stringify(user)};                            
                             $.post(signup_url, signup_request).done(function (data) {
                                 console.log(data);
                                 // Show payment section
+                                $('#ajax_loading_personal').hide();
                                 var el = $('#personal_payment_details').length;
                                 if (el == 0) {
                                     $('#personal_section').append(data);
                                 }
-
                             }).fail(function (data) {
                                 console.log(data);
                                 $('#personal_err').html('Ops something goes wrong ...');

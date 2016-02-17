@@ -143,7 +143,11 @@ class Register {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'><a href='#' id='proceed_to_personal_payment' onClick='return false;'>Proceed to payment</a></span>&nbsp;<span style='color:red;' id='personal_err'></span";
+        $list.="<span class='span2'><a href='#' id='proceed_to_personal_payment' onClick='return false;'>Proceed to payment</a></span>&nbsp;<span style='color:red;' id='personal_err'></span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_personal'><img src='http://cnausa.com/assets/img/ajax.gif' /></span";
         $list.="</div>";
 
         $list.="</div>";
@@ -222,7 +226,7 @@ class Register {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'><a href='#' id='manual_group_registration' onClick='return false;'>Proceed to participants</a></span>";
         $list.="<span class='span4'>Have a lot of group participants? <a href='#' id='upload_group_file'>Upload users file</a></span><span class='span2' style='color:red;' id='group_common_errors'></span>";
-        $list.="</div>";
+        $list.="</div>";        
 
         $list.="</div>";
         $list.="</div>";
@@ -258,6 +262,11 @@ class Register {
         $list.= "<span class='span2'><a href='#' id='proceed_to_group_payment' onClick='return false;'>Proceed to payment</a></span>";
         $list.= "&nbsp <span style='color:red;' id='group_manual_form_err'></span>";
         $list.= "</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+        
         $list.="</div>";
         $list.="</div>";
         return $list;
