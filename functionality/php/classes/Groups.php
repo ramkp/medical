@@ -78,10 +78,57 @@ class Groups {
         return $list;
     }
 
+    function get_course_id($coursename) {
+        $query = "select id, fullname from mdl_course "
+                . "where fullname='$coursename'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
+    }
+
     function submit_private_group_request($request) {
-        echo "<pre>";
-        print_r($request);
-        echo "</pre>";
+        $list = "";
+        $courseid = $this->get_course_id($request->courses);
+        $query = "insert into mdl_private_groups "
+                . "(group_fio,"
+                . "group_city,"
+                . "group_phone,"
+                . "group_email,"
+                . "group_budget,"
+                . "group_company,"
+                . "courseid,"
+                . "group_request,"
+                . "request_date,"
+                . "status,"
+                . "group_reply) "
+                . "values ('$request->group_fio' ,"
+                . "'$request->group_city', "
+                . "'$request->group_phone', "
+                . "'$request->group_email', "
+                . "'$request->group_budget', "
+                . "'$request->group_company', "
+                . "'$courseid', "
+                . "'$request->group_request', "
+                . "'" . time() . "', "
+                . "'0',"
+                . "'')";
+        $this->db->query($query);
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Private Groups</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span6'>Request successfully submitted. We get back to you within 24h.</span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="</div>"; // end of panel-body
+        $list.="</div>"; // end of panel panel-default
+
+        return $list;
     }
 
 }
