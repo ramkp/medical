@@ -383,7 +383,7 @@ $(document).ready(function () {
         var group_phone = $('#group_phone').val();
         var group_budget = $('#group_budget').val();
         var group_company = $('#group_company').val();
-        var group_state = $('#group_state').val();
+        var group_email = $('#group_email').val();
         var courses = $('#courses').val();
         var group_request = $('#group_request').val();
 
@@ -412,9 +412,13 @@ $(document).ready(function () {
             return false;
         }
 
-        if (group_state == '') {
-            $('#private_err').html('Please provide state ');
+        if (group_email == '') {
+            $('#private_err').html('Please provide email ');
             return false;
+        }
+        
+        if (validateEmail(group_email)!=true) {
+            $('#private_err').html('Please provide valid email ');
         }
 
         if (courses == '') {
@@ -433,7 +437,7 @@ $(document).ready(function () {
             group_phone: group_phone,
             group_budget: group_budget,
             group_company: group_company,
-            group_state: group_state,
+            group_email: group_email,
             courses: courses,
             group_request: group_request};
         var request = {request: JSON.stringify(group_request)};

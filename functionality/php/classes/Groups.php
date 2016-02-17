@@ -56,8 +56,8 @@ class Groups {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Company*</span>";
         $list.="<span class='span2'><input type='text' id='group_company' name='group_company'></span>";
-        $list.="<span class='span2' >State*</span>";
-        $list.="<span class='span2'><input type='text' id='group_state' name='group_state'></span>";
+        $list.="<span class='span2' >Contact email*</span>";
+        $list.="<span class='span2'><input type='text' id='group_email' name='group_email'></span>";
         $list.="</div>"; // end of container-fluid
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
