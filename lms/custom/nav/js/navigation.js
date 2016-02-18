@@ -247,6 +247,18 @@ $(document).ready(function () {
 
     }
 
+    function show_private_group_request_detailes(id) {
+        var container_id = '#det_' + id;
+        var status = $(container_id).is(":visible");
+        console.log(status);
+        if (status == false) {
+            $(container_id).show();
+        }
+        else {
+            $(container_id).hide();
+        }
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -284,6 +296,13 @@ $(document).ready(function () {
         }
 
     }); // end of #region-main
+
+    $('#region-main').on('click', 'a', function (event) {
+        if (event.target.id.indexOf("group_") >= 0) {
+            var id = event.target.id.replace("group_", "");
+            show_private_group_request_detailes(id);
+        }
+    }); // end of $('#region-main').on('click', 'a'
 
     // Show price items
     $("#prices").click(function (event) {

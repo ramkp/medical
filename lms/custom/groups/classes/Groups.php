@@ -34,11 +34,12 @@ class Groups extends Util {
         if (count($requests) > 0) {
             foreach ($requests as $request) {
                 $status = ($request->status == 0) ? "Not replied" : "Replied";
+                $group_detailes=$this->get_request_detailed_view($request->id);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span6'>$request->group_request</span><span class='span2'>$status</span><span class='span2'>" . date('Y-m-d', $request->request_date) . "</span><span class='span1'><a  id='group_$request->id' href='#' onClick='return fasle;'>Detailes</a></span>";
+                $list.="<span class='span9'>$request->group_request</span><span class='span2'>" . date('Y-m-d', $request->request_date) . "</span><span class='span1'><a  id='group_$request->id' href='#' onClick='return false;'>Detailes</a></span>";
                 $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span10' id='det_$request->id'></span>";
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span12' id='det_$request->id' style='text-align:center;display:none;'>$group_detailes</span>";
                 $list.="</div>";
             } // end foreach
         } // end if count($requests)>0
@@ -50,8 +51,51 @@ class Groups extends Util {
         return $list;
     }
 
+    function get_request_detailes($id) {
+        $query = "select * from mdl_private_groups where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $request = new stdClass();
+            foreach ($row as $key => $value) {
+                $request->$key = $value;
+            }
+        } // end while 
+        return $request;
+    }
+
+    function get_course_name_by_id($id) {
+        $query = "select id, fullname from mdl_course where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $name = $row['fullname'];
+        }
+        return $name;
+    }
+
     function get_request_detailed_view($id) {
-        $list="";
+        $request = $this->get_request_detailes($id);
+        $coursename = $this->get_course_name_by_id($request->courseid);
+        $list = "";
+        $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
+        $list.="<span class='span1'>Contact</span>";
+        $list.="<span class='span2'>Course</span>";
+        $list.="<span class='span2'>Phone</span>";
+        $list.="<span class='span2'>Email</span>";
+        $list.="<span class='span2'>Company</span>";
+        $list.="<span class='span2'>City</span>";
+        $list.="<span class='span1'>Budget</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span1'>$request->group_fio</span>";
+        $list.="<span class='span2'>$coursename</span>";
+        $list.="<span class='span2'>$request->group_phone</span>";
+        $list.="<span class='span2'>$request->group_email</span>";
+        $list.="<span class='span2'>$request->group_company</span>";
+        $list.="<span class='span2'>$request->group_city</span>";
+        $list.="<span class='span1'>$$request->group_budget</span>";
+        $list.="</div>";
+        return $list;
     }
 
     function get_group_recipient($id) {
