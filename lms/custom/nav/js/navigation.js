@@ -239,6 +239,14 @@ $(document).ready(function () {
         }
     }
 
+    function get_private_groups_requests_list() {
+        var url = "/lms/custom/groups/index.php";
+        $.post(url, function (data) {
+            $('#region-main').html(data);
+        });
+
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -306,7 +314,10 @@ $(document).ready(function () {
         get_gallery_index_page();
     });
 
-
+    $("#Groups").click(function (event) {
+        update_navigation_status__menu('Private Groups');
+        get_private_groups_requests_list();
+    });
 
 
 }); // end of $(document).ready(function()

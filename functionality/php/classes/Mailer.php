@@ -79,6 +79,11 @@ class Mailer {
         $this->send_email($subject, $message, $recipient);
     }
 
+    function send_group_reply_message($reply, $recipient) {
+        $subject = "Medical2 Institute - Private Group Request";
+        $this->send_email($subject, $reply, $recipient);
+    }
+
     function send_email($subject, $message, $recipient) {
 
         $mail = new PHPMailer;
