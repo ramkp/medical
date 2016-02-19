@@ -17,7 +17,7 @@
 
 @media (min-width: 320px) and (max-width: 480px) {
     #home-carousel {
-        
+
     }
 
 }
@@ -26,7 +26,6 @@
     .search_container, #login_div {
         width: 20%;
     }
-
 }
 
 .form_div {
@@ -62,3 +61,22 @@
     height: 375px;
 }
 
+#instructions {
+    z-index: 675;
+    position:absolute;
+    left:7%;
+    top:45%;
+    display:inline;   
+
+}    
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    #instructions {
+        z-index: 675;
+        position:absolute;
+        left:7%;
+        top:37%;
+        display:inline;   
+    }    
+
+}    
