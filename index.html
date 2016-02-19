@@ -7,6 +7,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="keywords" content="moodle, Medical2 Institute" />
         <link rel="stylesheet" type="text/css" href="http://cnausa.com/lms/theme/yui_combo.php?rollup/3.17.2/yui-moodlesimple-min.css" /><script id="firstthemesheet" type="text/css">/** Required in order to fix style inclusion problems in IE with YUI **/</script><link rel="stylesheet" type="text/css" href="http://cnausa.com/lms/theme/styles.php/lambda/1451892772/all" />
+        <link href="assets/css/full-slider.css" rel="stylesheet">
         <script type="text/javascript">
             //<![CDATA[
             var M = {};
@@ -120,7 +121,7 @@
             </header>
 
             <!-- Instruction box -->
-            <div  style="z-index: 675;position:absolute;left:6%;top:55%;display:inline;" id='instructions'>
+            <div  style="z-index: 675;position:absolute;left:7%;top:49%;display:inline;" id='instructions'>
                 <div id="centered" style="margin: 0 auto;width:275px; ">
                     <div> 
                         <div>
@@ -186,10 +187,32 @@
                 </div>
             </div>
 
+            <div id="page" class="container-fluid">     
+                <header id="myCarousel" class="carousel slide">
+                    <!-- Wrapper for Slides -->
+                    <div class="carousel-inner">
+                        <div class="item active">
+                            <!-- Set the first background image using inline CSS below. -->
+                            <div class="fill" style="background-image:url('assets/img/image.png');height:375px;"></div>                        
+                        </div>
+                        <div class="item">
+                            <!-- Set the second background image using inline CSS below. -->
+                            <div class="fill" style="background-image:url('assets/img/16.jpg');height:375px;"></div>                        
+                        </div>                    
+                    </div>
+                    <!-- Controls -->
+                    <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                        <span class="icon-prev"></span>
+                    </a>
+                    <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                        <span class="icon-next"></span>
+                    </a>
+                </header>
+            </div>
 
 
-            <div id="page" class="container-fluid">
-                <!-- Slider -->
+            <!--
+            <div id="page" class="container-fluid">               
                 <div class="text-center">
                     <div class="carousel slide" id="home-carousel" data-ride="carousel">
                         <div class="carousel-inner">                                                
@@ -209,7 +232,7 @@
                     </div>
                 </div>
             </div>
-
+            -->
 
             <footer id="page-footer" class="container-fluid">
 

@@ -16,7 +16,9 @@
 }
 
 @media (min-width: 320px) and (max-width: 480px) {
-
+    #home-carousel {
+        
+    }
 
 }
 
@@ -44,9 +46,19 @@
     .form_div input[type=text], textarea {
         width: 75px;
     }
-    
+
     .span2 {
         margin-left: 3px;
     }
-
 }
+
+.carousel-img1 {
+    background-image: url(http://cnausa.com/assets/img/image.png);
+    height: 375px;
+}
+
+.carousel-img2 {
+    background-image: url(http://cnausa.com/assets/img/16.jpg);
+    height: 375px;
+}
+
