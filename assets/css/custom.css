@@ -64,9 +64,9 @@
 #instructions {
     z-index: 675;
     position:absolute;
-    left:7%;
-    top:45%;
-    display:inline;   
+    left:0%;
+    top:55%;
+    display:block;   
 
 }    
 
@@ -74,9 +74,9 @@
     #instructions {
         z-index: 675;
         position:absolute;
-        left:7%;
-        top:37%;
-        display:inline;   
+        left:0%;
+        top:55%;
+        display:block;   
     }    
 
 }    
