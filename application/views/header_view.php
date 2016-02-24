@@ -87,22 +87,22 @@
                             <div class="nav-collapse collapse">
                                 <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Programs<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
-                                            <li><a href="#" id="ws"  title="Workshops">Workshops</a></li>
-                                            <li><a href="#" id="cs" title="Online & CEU’s Courses">Online & CEU’s Courses</a></li>
-                                            <li><a href="#" id="exam" title="Online Exams">Online Exams</a></li>
-                                            <li><a href="#" id="school" title="MS Medical School">Nursing School</a></li>                                     
+                                            <li><a class="dropdown-toggle" href="http://cnausa.com/index.php/programs/workshops" id="ws"  title="Workshops">Workshops</a></li>
+                                            <li><a href="http://cnausa.com/index.php/programs/courses" id="cs" title="Online & CEU’s Courses">Online & CEU’s Courses</a></li>
+                                            <li><a href="http://cnausa.com/index.php/programs/exams/" id="exam" title="Online Exams">Online Exams</a></li>
+                                            <li><a href="http://cnausa.com/index.php/programs/school" id="school" title="MS Medical School">Nursing School</a></li>                                     
                                         </ul>
                                     </li>                                    
-                                    <li><a href="#"  id="register_item" title="Register">Register</a></li>
-                                    <li><a href="#"  id="faq_item" title="FAQ’s">FAQ’s</a></li>
+                                    <li><a href="http://cnausa.com/index.php/register"  id="register_item" title="Register">Register</a></li>
+                                    <li><a href="http://cnausa.com/index.php/faq"  id="faq_item" title="FAQ’s">FAQ’s</a></li>
 
                                     <li id='login_link'><a href="http://cnausa.com/index.php/login" title="Login">Login</a></li>                                    
                                     <li class="dropdown"><a title="More" class="dropdown-toggle" href="#cm_submenu_2">More<b class="caret"></b></a>
                                         <ul class="dropdown-menu">                                            
-                                            <li><a href="#"  id="cert" title="Verify Certification">Verify Certification</a></li>
-                                            <li><a href="#"  id="group" title="Private Groups">Private Groups</a></li>
-                                            <li><a href="#"  id="testimonial" title="Testimonial">Testimonial</a></li>
-                                            <li><a href="#"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>                                            
+                                            <li><a href="http://cnausa.com/index.php/certs"  id="cert" title="Verify Certification">Verify Certification</a></li>
+                                            <li><a href="http://cnausa.com/index.php/groups"  id="group" title="Private Groups">Private Groups</a></li>
+                                            <li><a href="http://cnausa.com/index.php/testimonial"  id="testimonial" title="Testimonial">Testimonial</a></li>
+                                            <li><a href="http://cnausa.com/index.php/gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>                                            
                                         </ul>
                                     </li>
 

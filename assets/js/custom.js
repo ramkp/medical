@@ -100,7 +100,7 @@ $(document).ready(function () {
      ************************************************************************/
 
     function verify_users_upload_form() {
-        var url = "functionality/php/upload_users_file.php";
+        var url = "http://cnausa.com/functionality/php/upload_users_file.php";
         var file_data = $('#files').prop('files');
         console.log('File: ' + file_data);
         if (file_data == '' || file_data.length == 0) {
@@ -123,7 +123,7 @@ $(document).ready(function () {
                         $('#upload_err').html('');
                         var selected_course = $('#courses').text();
                         var course_name = selected_course.trim();
-                        var course_url = 'functionality/php/get_course_id.php';
+                        var course_url = 'http://cnausa.com/functionality/php/get_course_id.php';
                         var request = {course_name: course_name};
                         $.post(course_url, request).done(function (courseid) {
                             var addr = $('#group_addr').val();
@@ -140,7 +140,7 @@ $(document).ready(function () {
                                 state: state,
                                 tot_participants: data,
                                 group_name: group_name};
-                            var group_url = 'functionality/php/group_signup_by_file.php';
+                            var group_url = 'http://cnausa.com/functionality/php/group_signup_by_file.php';
                             var request = {group_common_section: JSON.stringify(grpoup_data)};
                             $.post(group_url, request).done(function (data) {
                                 $('#ajax_loading_group_file').hide();
@@ -166,7 +166,7 @@ $(document).ready(function () {
      ************************************************************************/
 
     function get_gallery_page() {
-        $.post("functionality/php/gallery.php", function (data) {
+        $.post("http://cnausa.com/functionality/php/gallery.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -178,7 +178,7 @@ $(document).ready(function () {
      * 
      ************************************************************************/
     function show_program_items(cat_name) {
-        $.post("functionality/php/get_programs_list.php", {cat_name: cat_name})
+        $.post("http://cnausa.com/functionality/php/get_programs_list.php", {cat_name: cat_name})
                 .done(function (data) {
                     $('#instructions').hide();
                     $("#page").html(data);
@@ -194,7 +194,7 @@ $(document).ready(function () {
      ************************************************************************/
 
     function show_school_page(cat_name) {
-        $.post("functionality/php/get_school_page.php", {cat_name: cat_name})
+        $.post("http://cnausa.com/functionality/php/get_school_page.php", {cat_name: cat_name})
                 .done(function (data) {
                     $('#instructions').hide();
                     $("#page").html(data);
@@ -251,7 +251,7 @@ $(document).ready(function () {
      * 
      ************************************************************************/
     function get_faq_page() {
-        $.post("functionality/php/get_faq_page.php", function (data) {
+        $.post("http://cnausa.com/functionality/php/get_faq_page.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -264,7 +264,7 @@ $(document).ready(function () {
      ************************************************************************/
 
     function get_testimonial_page() {
-        $.post("functionality/php/get_testimonial_page.php", function (data) {
+        $.post("http://cnausa.com/functionality/php/get_testimonial_page.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -277,7 +277,7 @@ $(document).ready(function () {
      ************************************************************************/
 
     function get_certificate_verification_form() {
-        $.post("functionality/php/get_certificate_verification_form.php", function (data) {
+        $.post("http://cnausa.com/functionality/php/get_certificate_verification_form.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -290,7 +290,7 @@ $(document).ready(function () {
      ************************************************************************/
 
     function get_users_upload_form() {
-        $.post("functionality/php/get_users_upload_form.php", function (data) {
+        $.post("http://cnausa.com/functionality/php/get_users_upload_form.php", function (data) {
             $('#participants_details').remove();
             $('#group_common_section').append(data);
         });
@@ -308,7 +308,7 @@ $(document).ready(function () {
         if (course_name != 'Program' && course_name != '' && course_name !== undefined) {
             $('#program_err').html('');
             $('#group_common_errors').html('');
-            var course_url = 'functionality/php/get_course_id.php';
+            var course_url = 'http://cnausa.com/functionality/php/get_course_id.php';
             var request = {course_name: course_name};
             $.post(course_url, request).done(function (courseid) {
                 console.log('Course id: ' + courseid);
@@ -351,7 +351,7 @@ $(document).ready(function () {
 
                 if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '') {
                     // Check is group name exist?
-                    var course_url = 'functionality/php/is_group_exist.php';
+                    var course_url = 'http://cnausa.com/functionality/php/is_group_exist.php';
                     var request = {group_name: group_name};
                     $.post(course_url, request).done(function (data) {
                         if (data > 0) {
@@ -432,7 +432,7 @@ $(document).ready(function () {
             return false;
         }
 
-        var url = "functionality/php/submit_private_group_request.php";
+        var url = "http://cnausa.com/functionality/php/submit_private_group_request.php";
         var group_request = {group_fio: group_fio,
             group_city: group_city,
             group_phone: group_phone,
@@ -469,7 +469,7 @@ $(document).ready(function () {
         }
 
         if (cert_fio != '' && cert_no != '') {
-            var url = "functionality/php/verify_cert.php";
+            var url = "http://cnausa.com/functionality/php/verify_cert.php";
             var request = {user_fio: cert_fio, user_cert_no: cert_no};
             $.post(url, request).done(function (data) {
                 $("#cert_err").html("<span style='color:#444'>" + data + "</span>");
@@ -483,7 +483,7 @@ $(document).ready(function () {
      * 
      ************************************************************************/
     function get_category_course(category_id) {
-        var url = "functionality/php/get_selected_course.php";
+        var url = "http://cnausa.com/functionality/php/get_selected_course.php";
         var request = {cat_id: category_id};
         $.post(url, request).done(function (data) {
             $("#cat_course").html(data);
@@ -497,7 +497,7 @@ $(document).ready(function () {
      * 
      ************************************************************************/
     function get_register_page() {
-        $.post("functionality/php/get_register_page.php", function (data) {
+        $.post("http://cnausa.com/functionality/php/get_register_page.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -583,10 +583,10 @@ $(document).ready(function () {
                 bill_zip: bill_zip,
                 user_group: user_group,
                 bill_email: bill_email};
-            var url = "functionality/php/make_stub_payment.php";
+            var url = "http://cnausa.com/functionality/php/make_stub_payment.php";
             var request = {card: JSON.stringify(card)};
             $.post(url, request).done(function (data) {
-                $('#page').html(data);
+                $('.form_div').html(data);
             }); // end of post
         } // end if card_type != 'Card type' && card_no!='' ...
     }
@@ -603,7 +603,7 @@ $(document).ready(function () {
             $('#type_err').html('Please select number of group participants');
         }
         else {
-            var url = "functionality/php/get_group_registration_form.php";
+            var url = "http://cnausa.com/functionality/php/get_group_registration_form.php";
             var request = {tot_participants: tot_participants};
             $.post(url, request).done(function (data) {
                 var el = $("#group_common_section").length;
@@ -621,7 +621,7 @@ $(document).ready(function () {
      ************************************************************************/
 
     function get_manual_group_registration_form(tot_participants) {
-        var url = "functionality/php/get_group_manual_registration_form.php";
+        var url = "http://cnausa.com/functionality/php/get_group_manual_registration_form.php";
         var request = {tot_participants: tot_participants};
         $.post(url, request).done(function (data) {
             $('#participants_details').remove();
@@ -677,7 +677,7 @@ $(document).ready(function () {
         else {
             // Everything is fine  - show payment form
             $('#group_manual_form_err').html('');
-            var course_url = 'functionality/php/get_course_id.php';
+            var course_url = 'http://cnausa.com/functionality/php/get_course_id.php';
             var request = {course_name: course_name};
             $('#ajax_loading_group').show();
             $.post(course_url, request).done(function (courseid) {
@@ -692,7 +692,7 @@ $(document).ready(function () {
                     state: state,
                     group_name: group_name};
 
-                var signup_url = 'functionality/php/group_signup.php';
+                var signup_url = 'http://cnausa.com/functionality/php/group_signup.php';
                 var signup_request = {group_common_section: JSON.stringify(group_common_section),
                     users: JSON.stringify(users),
                     tot_participants: tot_participants};
@@ -722,7 +722,7 @@ $(document).ready(function () {
         if (course_name != 'Program' && course_name != '' && course_name !== undefined) {
             $('#program_err').html('');
             $('#group_common_errors').html('');
-            var course_url = 'functionality/php/get_course_id.php';
+            var course_url = 'http://cnausa.com/functionality/php/get_course_id.php';
             var request = {course_name: course_name};
             $.post(course_url, request).done(function (courseid) {
                 console.log('Course id: ' + courseid);
@@ -765,7 +765,7 @@ $(document).ready(function () {
 
                 if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '') {
                     // Check is group name exist?
-                    var course_url = 'functionality/php/is_group_exist.php';
+                    var course_url = 'http://cnausa.com/functionality/php/is_group_exist.php';
                     var request = {group_name: group_name};
                     $.post(course_url, request).done(function (data) {
                         if (data > 0) {
@@ -792,7 +792,7 @@ $(document).ready(function () {
      ************************************************************************/
 
     function get_private_group_form() {
-        $.post("functionality/php/get_private_groups_form.php", function (data) {
+        $.post("http://cnausa.com/functionality/php/get_private_groups_form.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -806,7 +806,7 @@ $(document).ready(function () {
 
     function get_selected_program_register_form(courseid) {
         console.log('Course id: ' + courseid);
-        var url = "functionality/php/get_selected_program_register_form.php";
+        var url = "http://cnausa.com/functionality/php/get_selected_program_register_form.php";
         var request = {courseid: courseid};
         $.post(url, request).done(function (data) {
             $('#page').html(data);
@@ -831,7 +831,7 @@ $(document).ready(function () {
         if (course_name != 'Program' && course_name != '' && course_name !== undefined) {
             $('#program_err').html('');
             $('#personal_err').html('');
-            var course_url = 'functionality/php/get_course_id.php';
+            var course_url = 'http://cnausa.com/functionality/php/get_course_id.php';
             var request = {course_name: course_name};
             $.post(course_url, request).done(function (courseid) {
                 //console.log('Course id: ' + courseid);
@@ -894,7 +894,7 @@ $(document).ready(function () {
                 if (first_name != '' && last_name != '' && email != '' && phone != '' && addr != '' && inst != '' && zip != '' && city != '' && state != '' && country != '') {
 
                     // Check is email exists?
-                    var url = "functionality/php/is_email_exists.php";
+                    var url = "http://cnausa.com/functionality/php/is_email_exists.php";
                     var request = {email: email};
                     $.post(url, request).done(function (data) {
                         console.log('Server response: ' + data);
@@ -918,7 +918,7 @@ $(document).ready(function () {
                                 state: state,
                                 country: country};
 
-                            var signup_url = 'functionality/php/single_signup.php';
+                            var signup_url = 'http://cnausa.com/functionality/php/single_signup.php';
                             var signup_request = {user: JSON.stringify(user)};
                             $.post(signup_url, signup_request).done(function (data) {
                                 console.log(data);
@@ -973,58 +973,14 @@ $(document).ready(function () {
      * 
      **************************************************************************/
 
-
-    /************************************************************************
-     * 
-     *                Show login form after click
-     * 
-     ************************************************************************/
-
-    /*
-     $("#login_link").click(function () {
-     console.log('Login link clicked ...');
-     $.post("functionality/php/get_login_form.php", function (data) {
-     $('#instructions').hide();
-     $("#page").html(data);
-     });
-     });
-     */
-
-    /************************************************************************
-     * 
-     *                Show register form after click
-     * 
-     ************************************************************************/
-
-    $('#register_item').click(function () {
-        console.log('Register clicked ...');
-        get_register_page();
-    });
-
-
-    /************************************************************************
-     * 
-     *                      Show search form
-     * 
-     ************************************************************************/
-
-    /* 
-     $('#search_item').click(function () {
-     console.log('Search clicked ...');
-     $.post("functionality/php/get_search_form.php", function (data) {
-     $('#instructions').hide();
-     $("#page").html(data);
-     });
-     });
-     */
     /************************************************************************
      * 
      *                      Show workshops list after click
      * 
      ************************************************************************/
+
     $('#ws').click(function () {
-        //console.log('Workshops clicked ...');
-        show_program_items('Workshops');
+        self.location = $('#ws').attr('href');
     });
 
     /************************************************************************
@@ -1033,11 +989,11 @@ $(document).ready(function () {
      * 
      ************************************************************************/
 
-    $('#cs').click(function () {
-        console.log('Courses clicked ...');
-        show_program_items('Courses');
 
+    $('#cs').click(function () {
+        self.location = $('#cs').attr('href');
     });
+
 
     /************************************************************************
      * 
@@ -1045,10 +1001,9 @@ $(document).ready(function () {
      * 
      ************************************************************************/
 
-    $('#exam').click(function () {
-        console.log('Exams clicked ...');
-        show_program_items('Exams');
 
+    $('#exam').click(function () {
+        self.location = $('#exam').attr('href');
     });
 
     /************************************************************************
@@ -1058,19 +1013,7 @@ $(document).ready(function () {
      ************************************************************************/
 
     $('#school').click(function () {
-        console.log('Schools clicked ...');
-        show_school_page('School');
-
-    });
-
-    /************************************************************************
-     * 
-     *                      Show FAQ page after click
-     * 
-     ************************************************************************/
-    $('#faq_item').click(function () {
-        console.log('FAQ clicked ...');
-        get_faq_page();
+        self.location = $('#school').attr('href');
     });
 
     /************************************************************************
@@ -1078,9 +1021,9 @@ $(document).ready(function () {
      *                      Show Testimonial page after click
      * 
      ************************************************************************/
+
     $('#testimonial').click(function () {
-        console.log('Testimonial clicked ...');
-        get_testimonial_page();
+        self.location = $('#testimonial').attr('href');
     });
 
     /************************************************************************
@@ -1088,9 +1031,9 @@ $(document).ready(function () {
      *                     Show priviate group page after click
      * 
      ************************************************************************/
+
     $('#group').click(function () {
-        console.log('Private group clicked ...');
-        get_private_group_form();
+        self.location = $('#group').attr('href');
     });
 
     /************************************************************************
@@ -1098,9 +1041,9 @@ $(document).ready(function () {
      *                   Show certificate verification form
      * 
      ************************************************************************/
+
     $('#cert').click(function () {
-        console.log('Verify certificate clicked ...');
-        get_certificate_verification_form();
+        self.location = $('#cert').attr('href');
     });
 
     /************************************************************************
@@ -1110,10 +1053,8 @@ $(document).ready(function () {
      ************************************************************************/
 
     $('#gallery').click(function () {
-        console.log('Gallery page clicked ...');
-        get_gallery_page();
+        self.location = $('#gallery').attr('href');
     });
-
 
     /************************************************************************
      * 
@@ -1128,8 +1069,14 @@ $(document).ready(function () {
         check_login_form();
     });
 
-    // Buttons processing events
-    $('#page').on('click', 'button', function (event) {
+    /********************************************************************
+     * 
+     *         Section for dynamically created elements
+     * 
+     *******************************************************************/
+
+    // **************** Buttons processing events ***********************
+    $('.form_div').on('click', 'button', function (event) {
         //alert(event.target.id);
         if (event.target.id == 'login_button') {
             event.preventDefault();
@@ -1160,11 +1107,10 @@ $(document).ready(function () {
             verify_users_upload_form();
         }
 
-    }); // end of $('#page').on('click', 'button', function (event)
+    }); // end of $('.form_div').on('click', 'button', function (event)
 
-    // Links processing events
-    $('#page').on('click', 'a', function (event) {
-        //alert(event.target.id);
+    // ***********************Links processing events **********************
+    $('.form_div').on('click', 'a', function (event) {
         if (event.target.id.indexOf("cat_") >= 0) {
             var category_id = event.target.id.replace("cat_", "");
             $(".dropdown li a").click(function () {
@@ -1174,7 +1120,6 @@ $(document).ready(function () {
             get_category_course(category_id);
         }
 
-        // Remember Boostrap3 dropdon values
         if (event.target.id == 'categories') {
             $(".dropdown li a").click(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
@@ -1182,7 +1127,6 @@ $(document).ready(function () {
             });
         }
 
-        // Remember Boostrap3 dropdon values
         if (event.target.id == 'courses') {
             $(".dropdown li a").click(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
@@ -1198,9 +1142,11 @@ $(document).ready(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
                 $('#type_err').html('');
                 // Verify is group registration selected?
-                //if ($('#group').is(':checked')) {
-                get_group_registration_block();
-                //}
+                var group_status = $('#group').is(':checked');
+                console.log(group_status);
+                if ($('#group').is(':checked')) {
+                    get_group_registration_block();
+                }
             });
         }
 
@@ -1250,10 +1196,9 @@ $(document).ready(function () {
             verify_group_general_part();
         }
 
+    }); // end of .form_div links processing events
 
-    }); // end of $('#page').on('click', 'a', function (event)
-
-    $('#page').on('change', 'input[type=radio][name=type]', function (event) {
+    $('.form_div').on('change', 'input[type=radio][name=type]', function (event) {
         //alert(event.target.id);
         if (event.target.id == 'group') {
             get_group_registration_block();
@@ -1267,7 +1212,43 @@ $(document).ready(function () {
 
     }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
 
-
-
+    var url = window.location.href;
+    if (url.indexOf("school") >= 0) {
+        // Map related code
+        var url = "/lms/custom/google_map/refresh.php";
+        var category_id = 5; // Nursing school category id
+        var request = {category_id: category_id};
+        $.post(url, request).done(function (data) {
+            var $obj_data = $.parseJSON(data);
+            // Create a map object and specify the DOM element for display.
+            var map = new google.maps.Map(document.getElementById('map'), {
+                scrollwheel: false,
+                zoom: 8
+            }); // end var map            
+            var latLngs = [];
+            var bounds = new google.maps.LatLngBounds();
+            $.each($obj_data, function (i, m) {
+                var myLatLng = new google.maps.LatLng(m.lat, m.lng);
+                latLngs[i] = myLatLng
+                var marker = new google.maps.Marker({
+                    position: myLatLng,
+                    map: map,
+                    title: m.marker_text,
+                    zIndex: i
+                }); // end marker                
+                bounds.extend(marker.position);
+                google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                    return function () {
+                        var infowindow = new google.maps.InfoWindow();
+                        var iWC = infowindow.getContent();
+                        iWC = m.info;
+                        infowindow.setContent(iWC);
+                        infowindow.open(map, marker);
+                    }
+                })(marker, i));
+            }) // end each            
+            map.fitBounds(bounds);
+        }); // post(url, request).done(function (data)
+    } // end if url.indexOf("school") >= 0
 
 }); // end of (document).ready(function ()
