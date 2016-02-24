@@ -7,6 +7,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="keywords" content="moodle, Medical2 Institute" />
         <link rel="stylesheet" type="text/css" href="http://cnausa.com/lms/theme/yui_combo.php?rollup/3.17.2/yui-moodlesimple-min.css" /><script id="firstthemesheet" type="text/css">/** Required in order to fix style inclusion problems in IE with YUI **/</script><link rel="stylesheet" type="text/css" href="http://cnausa.com/lms/theme/styles.php/lambda/1451892772/all" />
+        <link href="assets/css/full-slider.css" rel="stylesheet">
         <script type="text/javascript">
             //<![CDATA[
             var M = {};
@@ -87,7 +88,7 @@
 
                             <div class="nav-collapse collapse">
                                 <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Programs<b class="caret"></b></a>
-                                        <ul class="dropdown-menu">
+                                        <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
                                             <li><a href="#" id="ws"  title="Workshops">Workshops</a></li>
                                             <li><a href="#" id="cs" title="Online & CEU’s Courses">Online & CEU’s Courses</a></li>
                                             <li><a href="#" id="exam" title="Online Exams">Online Exams</a></li>
@@ -117,99 +118,63 @@
                         </div>
                     </div>
                 </nav>
-            </header>
-
-            <!-- Instruction box -->
-            <div  style="z-index: 675;position:absolute;left:6%;top:55%;display:inline;" id='instructions'>
-                <div id="centered" style="margin: 0 auto;width:275px; ">
-                    <div> 
-                        <div>
-                            <h3 class="panel-title" 
-                                style="background: #e2a500 none repeat scroll 0 0;
-                                color: #fff;display: block;font-size: 2.2em;
-                                line-height: 1.5em;margin-right: 5%;
-                                padding-left: 10px;
-                                text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);">
-                                Easy Steps</h3>
-                        </div>
-                        <div>
-                            <span style="background: rgba(0, 0, 0, 0.5) none repeat scroll 0 0;
-                                  border-left: 4px solid #e2a500;
-                                  color: #fff;
-                                  display: block;
-                                  font-size: 14px;
-                                  line-height: 24px;
-                                  margin-left: 5%;
-                                  padding: 15px 20px;
-                                  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5)">
-                                The important thing is not so much that every 
-                                child should be taught, as that every child should
-                                be given the wish to learn.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--  -->
-
-
-
-            <!-- Place register form here -->
-            <div id="register_div" style="z-index: 675;position:absolute;right:535px;top:195px;display:none;">
-                <div style="margin: 0 auto; width:235px;">
-                    <div class="panel panel-default"> 
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Register</h3>
-                        </div>
-                        <div class="panel-body">
-                            <table class="table table-hover">
-
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Place search form here -->
-            <div id="search_div" style="z-index: 675;position:absolute;right:535px;top:195px;display:none;">               
-                <div class="panel panel-default"> 
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Search</h3>
-                    </div>
-                    <div class="panel-body">
-                        <form class="navbar-form navbar-left" >
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Search">                    
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>                    
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-
+            </header>        
 
             <div id="page" class="container-fluid">
-                <!-- Slider -->
-                <div class="text-center">
-                    <div class="carousel slide" id="home-carousel" data-ride="carousel">
-                        <div class="carousel-inner">                                                
-                            <div class="item active">                            
-                                <h1>
-                                    <img src="assets/img/3_shot.png" alt="Third slide" height="400" /></h1>
-                            </div>
+                <header id="myCarousel" class="carousel slide">
 
-                            <div class="item">                            
-                                <h1>
-                                    <img src="assets/img/4_shot.jpg" alt="Second slide" height="400" /></h1>
+                    <!-- Instruction box -->            
+                    <div id='instructions'>
+                        <div id="centered" style="margin: 0 auto; width:275px;">
+                            <div> 
+                                <div>
+                                    <h3 class="panel-title" 
+                                        style="background: #e2a500 none repeat scroll 0 0;
+                                        color: #fff;display: block;font-size: 2.2em;
+                                        line-height: 1.5em;margin-right: 5%;
+                                        padding-left: 10px;
+                                        text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);">
+                                        Easy Steps</h3>
+                                </div>
+                                <div>
+                                    <span style="background: rgba(0, 0, 0, 0.5) none repeat scroll 0 0;
+                                          border-left: 4px solid #e2a500;
+                                          color: #fff;
+                                          display: block;
+                                          font-size: 14px;
+                                          line-height: 24px;
+                                          margin-left: 5%;
+                                          padding: 15px 20px;
+                                          text-shadow: 0 0 1px rgba(0, 0, 0, 0.5)">
+                                        The important thing is not so much that every 
+                                        child should be taught, as that every child should
+                                        be given the wish to learn.</span>
+                                </div>
                             </div>
+                        </div>
+                    </div>            
+                    <!--  -->
 
-                        </div> 
-                        <a class="carousel-control left" href="#home-carousel" data-slide="prev">&lsaquo;</a>
-                        <a class="carousel-control right" href="#home-carousel" data-slide="next">&rsaquo;</a>
+                    <!-- Wrapper for Slides -->
+                    <div class="carousel-inner">
+                        <div class="item active">
+                            <!-- Set the first background image using inline CSS below. -->
+                            <div class="fill" style="background-image:url('assets/img/image.png');height:375px;"></div>                        
+                        </div>
+                        <div class="item">
+                            <!-- Set the second background image using inline CSS below. -->
+                            <div class="fill" style="background-image:url('assets/img/16.jpg');height:375px;"></div>                        
+                        </div>                    
                     </div>
-                </div>
+                    <!-- Controls -->
+                    <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                        <span class="icon-prev"></span>
+                    </a>
+                    <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                        <span class="icon-next"></span>
+                    </a>
+                </header>
             </div>
-
 
             <footer id="page-footer" class="container-fluid">
 
@@ -288,35 +253,12 @@
             //<![CDATA[
             var navtreeexpansions4 = [{"id": "expandable_branch_0_courses", "key": "courses", "type": 0}];
             //]]>
-        </script>
-        <script type="text/javascript">
-            //<![CDATA[
-            //(function () {
-
-            //Y.use("moodle-block_navigation-navigation", function () {
-            //M.block_navigation.init_add_tree({"id": "4", "instance": "4", "candock": true, "courselimit": "20", "expansionlimit": 0});
-            //});
-            //Y.use("moodle-block_navigation-navigation", function () {
-            //M.block_navigation.init_add_tree({"id": "5", "instance": "5", "candock": true});
-            //});
-            //Y.use("moodle-calendar-info", function () {
-            //  Y.M.core_calendar.info.init();
-            //});
-
-
-            //Y.on('domready', function () {
-
-            //});
-            //})();
-            //]]>
-        </script>
+        </script>       
 
 
         <!--[if lte IE 9]>
         <script src="http://cnausa.com/lms/theme/lambda/javascript/ie/iefix.js"></script>
         <![endif]-->
-
-
 
         <script>
             jQuery(document).ready(function ($) {
@@ -349,9 +291,6 @@
                 })
             });
 
-
-
         </script>
-
     </body>
 </html>

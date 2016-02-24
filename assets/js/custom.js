@@ -183,7 +183,8 @@ $(document).ready(function () {
                     $('#instructions').hide();
                     $("#page").html(data);
                 });
-
+        console.log('Triggered click on btn-navbar');
+        $(".btn-navbar").trigger("click");
     }
 
     /************************************************************************
@@ -416,8 +417,8 @@ $(document).ready(function () {
             $('#private_err').html('Please provide email ');
             return false;
         }
-        
-        if (validateEmail(group_email)!=true) {
+
+        if (validateEmail(group_email) != true) {
             $('#private_err').html('Please provide valid email ');
         }
 
@@ -700,11 +701,11 @@ $(document).ready(function () {
                     // Show payment section
                     $('#ajax_loading_group').hide();
                     /*
-                    var el = $('#personal_payment_details').length;
-                    if (el == 0) {
-                        $('#participants_details').append(data);
-                    }
-                    */
+                     var el = $('#personal_payment_details').length;
+                     if (el == 0) {
+                     $('#participants_details').append(data);
+                     }
+                     */
                     $('#participants_details').append(data);
                 }).fail(function (data) {
                     console.log(data);
@@ -918,7 +919,7 @@ $(document).ready(function () {
                                 country: country};
 
                             var signup_url = 'functionality/php/single_signup.php';
-                            var signup_request = {user: JSON.stringify(user)};                            
+                            var signup_request = {user: JSON.stringify(user)};
                             $.post(signup_url, signup_request).done(function (data) {
                                 console.log(data);
                                 // Show payment section
@@ -979,13 +980,15 @@ $(document).ready(function () {
      * 
      ************************************************************************/
 
-    $("#login_link").click(function () {
-        console.log('Login link clicked ...');
-        $.post("functionality/php/get_login_form.php", function (data) {
-            $('#instructions').hide();
-            $("#page").html(data);
-        });
-    });
+    /*
+     $("#login_link").click(function () {
+     console.log('Login link clicked ...');
+     $.post("functionality/php/get_login_form.php", function (data) {
+     $('#instructions').hide();
+     $("#page").html(data);
+     });
+     });
+     */
 
     /************************************************************************
      * 
@@ -1005,21 +1008,22 @@ $(document).ready(function () {
      * 
      ************************************************************************/
 
-    $('#search_item').click(function () {
-        console.log('Search clicked ...');
-        $.post("functionality/php/get_search_form.php", function (data) {
-            $('#instructions').hide();
-            $("#page").html(data);
-        });
-    });
-
+    /* 
+     $('#search_item').click(function () {
+     console.log('Search clicked ...');
+     $.post("functionality/php/get_search_form.php", function (data) {
+     $('#instructions').hide();
+     $("#page").html(data);
+     });
+     });
+     */
     /************************************************************************
      * 
      *                      Show workshops list after click
      * 
      ************************************************************************/
     $('#ws').click(function () {
-        console.log('Workshops clicked ...');
+        //console.log('Workshops clicked ...');
         show_program_items('Workshops');
     });
 
@@ -1119,6 +1123,11 @@ $(document).ready(function () {
      *  
      ************************************************************************/
 
+    $('#login_button').click(function (event) {
+        event.preventDefault();
+        check_login_form();
+    });
+
     // Buttons processing events
     $('#page').on('click', 'button', function (event) {
         //alert(event.target.id);
@@ -1134,6 +1143,7 @@ $(document).ready(function () {
         if (event.target.id.indexOf("program_") >= 0) {
             var courseid = event.target.id.replace("program_", "");
             get_selected_program_register_form(courseid);
+            $("body").trigger("click");
         }
 
         if (event.target.id == 'submit_private_group') {
