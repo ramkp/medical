@@ -88,7 +88,7 @@
 
                             <div class="nav-collapse collapse">
                                 <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Programs<b class="caret"></b></a>
-                                        <ul class="dropdown-menu">
+                                        <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
                                             <li><a href="#" id="ws"  title="Workshops">Workshops</a></li>
                                             <li><a href="#" id="cs" title="Online & CEU’s Courses">Online & CEU’s Courses</a></li>
                                             <li><a href="#" id="exam" title="Online Exams">Online Exams</a></li>
@@ -118,50 +118,9 @@
                         </div>
                     </div>
                 </nav>
-            </header>
+            </header>        
 
-
-
-
-
-            <!-- Place register form here -->
-            <div id="register_div" style="z-index: 675;position:absolute;right:535px;top:195px;display:none;">
-                <div style="margin: 0 auto; width:235px;">
-                    <div class="panel panel-default"> 
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Register</h3>
-                        </div>
-                        <div class="panel-body">
-                            <table class="table table-hover">
-
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Place search form here -->
-            <div id="search_div" style="z-index: 675;position:absolute;right:535px;top:195px;display:none;">               
-                <div class="panel panel-default"> 
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Search</h3>
-                    </div>
-                    <div class="panel-body">
-                        <form class="navbar-form navbar-left" >
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Search">                    
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>                    
-                        </form>
-                    </div>
-                </div>
-            </div>           
-
-
-            <div id="page" class="container-fluid">              
-
-
-
+            <div id="page" class="container-fluid">
                 <header id="myCarousel" class="carousel slide">
 
                     <!-- Instruction box -->            
@@ -215,11 +174,7 @@
                         <span class="icon-next"></span>
                     </a>
                 </header>
-
             </div>
-
-
-
 
             <footer id="page-footer" class="container-fluid">
 
@@ -298,35 +253,12 @@
             //<![CDATA[
             var navtreeexpansions4 = [{"id": "expandable_branch_0_courses", "key": "courses", "type": 0}];
             //]]>
-        </script>
-        <script type="text/javascript">
-            //<![CDATA[
-            //(function () {
-
-            //Y.use("moodle-block_navigation-navigation", function () {
-            //M.block_navigation.init_add_tree({"id": "4", "instance": "4", "candock": true, "courselimit": "20", "expansionlimit": 0});
-            //});
-            //Y.use("moodle-block_navigation-navigation", function () {
-            //M.block_navigation.init_add_tree({"id": "5", "instance": "5", "candock": true});
-            //});
-            //Y.use("moodle-calendar-info", function () {
-            //  Y.M.core_calendar.info.init();
-            //});
-
-
-            //Y.on('domready', function () {
-
-            //});
-            //})();
-            //]]>
-        </script>
+        </script>       
 
 
         <!--[if lte IE 9]>
         <script src="http://cnausa.com/lms/theme/lambda/javascript/ie/iefix.js"></script>
         <![endif]-->
-
-
 
         <script>
             jQuery(document).ready(function ($) {
@@ -359,9 +291,6 @@
                 })
             });
 
-
-
         </script>
-
     </body>
 </html>
