@@ -15,7 +15,7 @@ class Index extends CI_Controller {
         $this->load->view('header_view');
         $this->load->view('index_view');
         $this->load->view('footer_view');
-        $this->output->enable_profiler(TRUE);
+        //$this->output->enable_profiler(TRUE);
     }
 
 }

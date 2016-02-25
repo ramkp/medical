@@ -198,6 +198,11 @@ class Payment {
         $list.= "<span class='span2'><button class='btn btn-primary' id='make_payment_personal'>Make payment</button></span>";
         $list.= "&nbsp <span style='color:red;' id='personal_payment_err'></span>";
         $list.= "</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+        
         $list.="</div>";
         $list.="</div>";
         return $list;

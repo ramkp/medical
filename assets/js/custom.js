@@ -585,7 +585,9 @@ $(document).ready(function () {
                 bill_email: bill_email};
             var url = "http://cnausa.com/functionality/php/make_stub_payment.php";
             var request = {card: JSON.stringify(card)};
+            $('#ajax_loading_payment').show();
             $.post(url, request).done(function (data) {
+                $('#ajax_loading_payment').hide();
                 $('.form_div').html(data);
             }); // end of post
         } // end if card_type != 'Card type' && card_no!='' ...
