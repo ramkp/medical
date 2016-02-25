@@ -132,12 +132,14 @@ $(document).ready(function () {
                             var city = $('#group_city').val();
                             var state = $('#group_state').val();
                             var group_name = $('#group_name').val();
+                            var come_from=$('#come_from').val();
                             var grpoup_data = {courseid: courseid,
                                 addr: addr,
                                 inst: inst,
                                 zip: zip,
                                 city: city,
                                 state: state,
+                                come_from:come_from,
                                 tot_participants: data,
                                 group_name: group_name};
                             var group_url = 'http://cnausa.com/functionality/php/group_signup_by_file.php';
@@ -303,6 +305,14 @@ $(document).ready(function () {
      ************************************************************************/
 
     function verify_group_general_part() {
+
+        var come_from = $('#come_from').val();
+        if (come_from == '' || come_from == 'undefined') {
+            $('#group_common_errors').html('');
+            $('#program_err').html('How did you hear about us?');
+            return false;
+        }
+
         var selected_course = $('#courses').text();
         var course_name = selected_course.trim();
         if (course_name != 'Program' && course_name != '' && course_name !== undefined) {
@@ -349,7 +359,7 @@ $(document).ready(function () {
                     return false;
                 }
 
-                if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '') {
+                if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '' && come_from!='') {
                     // Check is group name exist?
                     var course_url = 'http://cnausa.com/functionality/php/is_group_exist.php';
                     var request = {group_name: group_name};
@@ -598,11 +608,13 @@ $(document).ready(function () {
      *                  Group registration block
      * 
      ************************************************************************/
+    var group_selected;
     function get_group_registration_block() {
         var tot_participants = $('#participants').val();
         $('#personal_section').hide();
         if (tot_participants == 0) {
             $('#type_err').html('Please select number of group participants');
+            group_selected = true;
         }
         else {
             var url = "http://cnausa.com/functionality/php/get_group_registration_form.php";
@@ -651,6 +663,7 @@ $(document).ready(function () {
         var city = $('#group_city').val();
         var state = $('#group_state').val();
         var group_name = $('#group_name').val();
+        var come_from = $('#come_from').val();
 
         for (i = 0; i <= tot_participants; i++) {
 
@@ -668,7 +681,7 @@ $(document).ready(function () {
                 err++;
             } // end if first_name=='' || last_name==''
             if (first_name != '' && last_name != '' && email != '' && validateEmail(email) == true && phone != '') {
-                var user = {first_name: first_name, last_name: last_name, email: email, phone: phone};
+                var user = {first_name: first_name, last_name: last_name, email: email, phone: phone, come_from: come_from};
                 users.push(user);
             } // end if first_name != '' && last_name != ''
         } // end for
@@ -692,6 +705,7 @@ $(document).ready(function () {
                     zip: zip,
                     city: city,
                     state: state,
+                    come_from:come_from,
                     group_name: group_name};
 
                 var signup_url = 'http://cnausa.com/functionality/php/group_signup.php';
@@ -718,6 +732,13 @@ $(document).ready(function () {
     }
 
     function verify_group_common_section() {
+
+        var come_from = $('#come_from').val();
+        if (come_from == '' || come_from == 'undefined') {
+            $('#program_err').html('How did you hear about us?');
+            return false;
+        }
+
         var tot_participants = $('#participants').val();
         var selected_course = $('#courses').text();
         var course_name = selected_course.trim();
@@ -765,7 +786,7 @@ $(document).ready(function () {
                     return false;
                 }
 
-                if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '') {
+                if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '' && come_from != '') {
                     // Check is group name exist?
                     var course_url = 'http://cnausa.com/functionality/php/is_group_exist.php';
                     var request = {group_name: group_name};
@@ -827,6 +848,15 @@ $(document).ready(function () {
     }
 
     function verify_personal_manual_registration_form() {
+
+        var come_from = $('#come_from').val();
+        console.log('Come from: ' + come_from);
+
+        if (come_from == '' || come_from == 'undefined') {
+            $('#program_err').html('How did you hear about us?');
+            return false;
+        }
+
         var selected_course = $('#courses').text();
         var course_name = selected_course.trim();
         console.log('Courses dropdown: ' + selected_course);
@@ -853,6 +883,7 @@ $(document).ready(function () {
                     $('#personal_err').html('Please provide firstname');
                     return false;
                 }
+
                 if (last_name == '') {
                     $('#personal_err').html('Please provide lastname');
                     return false;
@@ -909,6 +940,7 @@ $(document).ready(function () {
                             $('#ajax_loading_personal').show();
                             var user = {
                                 courseid: courseid,
+                                come_from: come_from,
                                 first_name: first_name,
                                 last_name: last_name,
                                 email: email,
@@ -981,7 +1013,7 @@ $(document).ready(function () {
      * 
      ************************************************************************/
 
-    $('#ws').click(function () {        
+    $('#ws').click(function () {
         self.location = $('#ws').attr('href');
     });
 
@@ -1138,6 +1170,15 @@ $(document).ready(function () {
             });
         }
 
+        if (event.target.id == 'come_from') {
+            $(".dropdown li a").click(function () {
+                $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
+                $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
+                $('#program_err').html('');
+
+            });
+        }
+
         if (event.target.id == 'participants') {
             $(".dropdown li a").click(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
@@ -1145,8 +1186,9 @@ $(document).ready(function () {
                 $('#type_err').html('');
                 // Verify is group registration selected?
                 var group_status = $('#group').is(':checked');
-                console.log(group_status);
-                if ($('#group').is(':checked')) {
+
+                console.log('Group status:' + group_status);
+                if (group_status != false || group_selected == true) {
                     get_group_registration_block();
                 }
             });

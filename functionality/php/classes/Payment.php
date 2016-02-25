@@ -58,11 +58,11 @@ class Payment {
         $drop_down.="<div class='dropdown'>
         <a href='#' id='card_type' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Card type<b class='caret'></b></a>
         <ul class='dropdown-menu'>";
-        $drop_down.="<li><a href='#' id='Visa'>Visa</a></li>";
-        $drop_down.="<li><a href='#' id='Discover'>Discover</a></li>";
-        $drop_down.="<li><a href='#' id='Master'>Master</a></li>";
-        $drop_down.="<li><a href='#' id='American Express'>American Express</a></li>";
-        $drop_down.="<li><a href='#' id='Diner Club'>Diner Club</a></li>";
+        $drop_down.="<li><a href='#' id='Visa' onClick='return false;'>Visa</a></li>";
+        $drop_down.="<li><a href='#' id='Discover' onClick='return false;'>Discover</a></li>";
+        $drop_down.="<li><a href='#' id='Master' onClick='return false;'>Master</a></li>";
+        $drop_down.="<li><a href='#' id='American Express' onClick='return false;'>American Express</a></li>";
+        $drop_down.="<li><a href='#' id='Diner Club' onClick='return false;'>Diner Club</a></li>";
         $drop_down.="</ul></div>";
         return $drop_down;
     }
@@ -232,6 +232,7 @@ class Payment {
             $user->city = $group_common_section->city;
             $user->state = $group_common_section->state;
             $user->country = 'US';
+            $user->come_from=$group_common_section->come_from;
             $email_exists = $this->enroll->is_email_exists($group_participant->email);
             if ($email_exists == 0) {
                 $this->enroll->single_signup($user);
@@ -259,6 +260,7 @@ class Payment {
             $user->city = $group_common_section->city;
             $user->state = $group_common_section->state;
             $user->country = 'US';
+            $user->come_from=$group_common_section->come_from;
             $email_exists = $this->enroll->is_email_exists($group_participant->email);
             if ($email_exists == 0) {
                 $this->enroll->single_signup($user);

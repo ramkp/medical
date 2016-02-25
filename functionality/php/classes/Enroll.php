@@ -121,6 +121,7 @@ class Enroll {
                 . "city='$user->city', "
                 . "phone1='$user->phone', "    
                 . "state='$user->state', "
+                . "come_from='$user->come_from', "
                 . "country='US' "
                 . "where id=$userid";
         $this->db->query($query);

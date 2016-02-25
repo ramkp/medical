@@ -177,11 +177,31 @@ class register_model extends CI_Model {
         return $id;
     }
 
+    public function come_from() {
+        $drop_down = "";
+        $drop_down.="<div class='dropdown'>
+        <a href='#' id='come_from' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Select <b class='caret'></b></a>
+        <ul class='dropdown-menu'>";
+        $drop_down.="<li><a href='#' id='Newspaper'>Newspaper</a></li>";
+        $drop_down.="<li><a href='#' id='Magazine'>Magazine</a></li>";
+        $drop_down.="<li><a href='#' id='Radio'>Radio</a></li>";
+        $drop_down.="<li><a href='#' id='TV'>TV</a></li>";
+        $drop_down.="<li><a href='#' id='Google'>Google</a></li>";
+        $drop_down.="<li><a href='#' id='Microsoft'>Microsoft</a></li>";
+        $drop_down.="<li><a href='#' id='Yahoo'>Yahoo</a></li>";
+        $drop_down.="<li><a href='#' id='Twitter'>Twitter</a></li>";
+        $drop_down.="<li><a href='#' id='Instagram'>Instagram</a></li>";
+        $drop_down.="<li><a href='#' id='Other'>Other</a></li>";
+        $drop_down.="</ul></div>";
+        return $drop_down;
+    }
+
     public function get_register_form($courseid = null) {
         $list = "";
         $cats = $this->get_course_categories();
         $courses = $this->get_courses_by_category();
         $participants = $this->get_participants_dropbox();
+        $come_from = $this->come_from();
 
         // ****************** Program information **************************
 
@@ -197,9 +217,13 @@ class register_model extends CI_Model {
             $list.="<span class='span2' id='cat_course'>$courses</span>";
             $list.="<span class='span2' id='program_err' style='color:red;'></span>";
             $list.="</div>"; // end of container-fluid
+            
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span>";            
+            $list.="</div>"; // end of container-fluid
+
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default
-            //$list.="</div>"; // end of form
         } // end if $courseid==null
         else {
             $selected_program = $this->get_selected_program($courseid);
