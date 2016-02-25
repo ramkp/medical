@@ -80,7 +80,26 @@ class program_model extends CI_Model {
         return $blocks;
     }
 
-    function get_school_page() {
+    function get_school_items($cat_id) {
+        $query = "select id,fullname,summary,startdate,cost,discount_size "
+                . "from mdl_course where category=$cat_id and cost>0";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $item = new stdClass();
+                foreach ($row as $key => $value) {
+                    $item->$key = $value;
+                }
+                $items[] = $item;
+            } // end foreach
+        } // end if $num>0
+        return $items;
+    }
+
+    function get_school_page($cat_name) {
+
+        $cat_id = $this->get_category_id($cat_name);
         $list = "";
 
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
@@ -91,11 +110,15 @@ class program_model extends CI_Model {
                 . "considerably across the world. Please select on the map your closest location.</span>";
         $list.="</div>";
 
-        
+        $list.="<br/><div class='container-fluid' style='text-align:left;'>";
+        $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
+        $list.="</div>";
+
+
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.= "<span class='span9'><hr/></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.= "<span class='span9' id='map' style='position: relative;height:675px;'></span>";
         $list.="</div>";
@@ -131,7 +154,7 @@ class program_model extends CI_Model {
                 $list.="</div>";
 
                 $list.="<br/><div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span2'><button id='program_$item->id' class='btn btn-primary'>Register</button></span>";
+                $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
                 $list.="</div>";
 
                 $list.="</div>"; // end of panel-body

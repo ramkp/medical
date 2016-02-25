@@ -981,7 +981,7 @@ $(document).ready(function () {
      * 
      ************************************************************************/
 
-    $('#ws').click(function () {
+    $('#ws').click(function () {        
         self.location = $('#ws').attr('href');
     });
 

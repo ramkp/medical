@@ -19,7 +19,7 @@ class register_model extends CI_Model {
         class='dropdown-toggle'>Participants 
         <b class='caret'></b></a>
         <ul class='dropdown-menu'>";
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 50; $i++) {
             $drop_down.="<li><a href='#' id='tot_" . $i . "'>" . $i . "</a></li>";
         }
         $drop_down.="</ul></div>";

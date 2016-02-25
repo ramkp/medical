@@ -100,10 +100,10 @@ class Map extends Util {
         $blocks = $this->get_item_cost_blocks($item);
         $list.="<div class='container-fluid'>";
         $list.="<span class='span4'><h5>$item->fullname</h5>";
-        $list.="</div>";
+        $list.="</div>";        
         $list.="<div class='container-fluid'>";
-        $list.= "<span class='span4'><a href='#' id=program_$item->id onClick='return false;'>Register</a></span>";
-        $list.="</div>";
+        $list.= "<span class='span4'><a href='http://".$_SERVER['SERVER_NAME']."/index.php/register/index/$item->id' id=program_$item->id>Register</a></span>";
+        $list.="</div>";        
         $list.="<div class='container-fluid'>";
         $list.= "<span class='span3'>$item->summary</span>";
         $list.="</div>";

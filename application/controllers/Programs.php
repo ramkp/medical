@@ -46,7 +46,8 @@ class Programs extends CI_Controller {
     }
 
     public function school() {
-        $program_items = $this->program_model->get_school_page();
+        $cat_name = 'school';
+        $program_items = $this->program_model->get_school_page($cat_name);
         $data = array('items' => $program_items);
         $this->load->view('header_view');
         $this->load->view('program_view', $data);
