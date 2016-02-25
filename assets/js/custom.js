@@ -451,9 +451,10 @@ $(document).ready(function () {
             group_email: group_email,
             courses: courses,
             group_request: group_request};
+        $('#private_err').html('');
         var request = {request: JSON.stringify(group_request)};
         $.post(url, request).done(function (data) {
-            $("#page").html(data);
+            $(".form_div").html(data);
         });
 
 
