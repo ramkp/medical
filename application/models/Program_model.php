@@ -287,7 +287,7 @@ class program_model extends CI_Model {
         $query = "select * from mdl_states order by state";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $drop_down.="<li><a href='#' id='$row->id' onClick='return false;'>$row->state</a></li>";
+            $drop_down.="<li><a href='#' id='state_$row->id' onClick='return false;'>$row->state</a></li>";
         }
         $drop_down.="</ul></div>";
         return $drop_down;
@@ -295,7 +295,7 @@ class program_model extends CI_Model {
 
     public function get_courses_list() {
         $items = array();
-        $query = "select id, fullname from mdl_course where cost>0";
+        $query = "select id, fullname from mdl_course where cost>0 order by fullname";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
             $item = new stdClass();
@@ -311,7 +311,7 @@ class program_model extends CI_Model {
         <b class='caret'></b></a>
         <ul class='dropdown-menu'>";
         foreach ($items as $item) {
-            $drop_down.="<li><a href='$item->id' id='$item->id'>$item->fullname</a></li>";
+            $drop_down.="<li><a href='#' id='course_$item->id' onClick='return false;'>$item->fullname</a></li>";
         } // end foreach
         $drop_down.="</ul></div>";
         return $drop_down;
@@ -328,20 +328,16 @@ class program_model extends CI_Model {
         $list.="<div class='panel-body'>";
         
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.= "<span class='span3'>Please select state*:</span><span class='span3'>$states</span>";
+        $list.= "<span class='span3'>Please select state:</span><span class='span3'>$states</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.= "<span class='span3'>Please select program*:</span><span class='span3'>$courses</span>";
+        $list.= "<span class='span3'>Please select program:</span><span class='span3'>$courses</span>";
         $list.="</div>";       
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.= "<span class='span6' style='colore:red;' id='schedule_err'></span>";
-        $list.="</div>";
-        
-        $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.= "<span class='span6' style='colore:red;' id='schedule_err'></span>";
-        $list.="</div>";
+        $list.="</div>";      
         
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_schedule'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
@@ -352,8 +348,6 @@ class program_model extends CI_Model {
         $list.= $item; // add detailes about selected item
 
         $list.= "</div>"; // end of form div
-
-
         return $list;
     }
 
