@@ -132,14 +132,14 @@ $(document).ready(function () {
                             var city = $('#group_city').val();
                             var state = $('#group_state').val();
                             var group_name = $('#group_name').val();
-                            var come_from=$('#come_from').val();
+                            var come_from = $('#come_from').val();
                             var grpoup_data = {courseid: courseid,
                                 addr: addr,
                                 inst: inst,
                                 zip: zip,
                                 city: city,
                                 state: state,
-                                come_from:come_from,
+                                come_from: come_from,
                                 tot_participants: data,
                                 group_name: group_name};
                             var group_url = 'http://cnausa.com/functionality/php/group_signup_by_file.php';
@@ -359,7 +359,7 @@ $(document).ready(function () {
                     return false;
                 }
 
-                if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '' && come_from!='') {
+                if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '' && come_from != '') {
                     // Check is group name exist?
                     var course_url = 'http://cnausa.com/functionality/php/is_group_exist.php';
                     var request = {group_name: group_name};
@@ -706,7 +706,7 @@ $(document).ready(function () {
                     zip: zip,
                     city: city,
                     state: state,
-                    come_from:come_from,
+                    come_from: come_from,
                     group_name: group_name};
 
                 var signup_url = 'http://cnausa.com/functionality/php/group_signup.php';
@@ -1167,7 +1167,11 @@ $(document).ready(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
                 $('#program_err').html('');
-
+                var url = window.location.href;                
+                if (url.indexOf("schedule") >= 0) {
+                    var courseid=$('#courses').attr('href');
+                    console.log('CourseID: '+courseid);                    
+                }
             });
         }
 

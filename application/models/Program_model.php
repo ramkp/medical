@@ -311,7 +311,7 @@ class program_model extends CI_Model {
         <b class='caret'></b></a>
         <ul class='dropdown-menu'>";
         foreach ($items as $item) {
-            $drop_down.="<li><a href='#' id='$item->id'>$item->fullname</a></li>";
+            $drop_down.="<li><a href='$item->id' id='$item->id'>$item->fullname</a></li>";
         } // end foreach
         $drop_down.="</ul></div>";
         return $drop_down;
@@ -326,17 +326,25 @@ class program_model extends CI_Model {
         $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
         $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program Schedule</h5></div>";
         $list.="<div class='panel-body'>";
-
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.= "<span class='span3'>Please select program*:</span><span class='span3'>$courses</span>";
-        $list.="</div>";
-
+        
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.= "<span class='span3'>Please select state*:</span><span class='span3'>$states</span>";
         $list.="</div>";
 
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.= "<span class='span3'>Please select program*:</span><span class='span3'>$courses</span>";
+        $list.="</div>";       
+
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.= "<span class='span6' style='colore:red;' id='schedule_err'></span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.= "<span class='span6' style='colore:red;' id='schedule_err'></span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_schedule'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>"; // end of panel-body
