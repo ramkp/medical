@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of Programs
  *
@@ -27,6 +21,24 @@ class Programs extends CI_Controller {
             $program_items = $this->program_model->get_school_page($cat_name);
         } // end else        
         $data = array('items' => $program_items);
+        $this->load->view('header_view');
+        $this->load->view('program_view', $data);
+        $this->load->view('footer_view');
+    }
+
+    public function schedule() {
+        $courseid = $this->uri->segment(3);
+        $program_items = $this->program_model->get_schedule_page($courseid);
+        $data = array('items' => $program_items);
+        $this->load->view('header_view');
+        $this->load->view('program_view', $data);
+        $this->load->view('footer_view');
+    }
+
+    public function detailes() {
+        $courseid = $this->uri->segment(3);
+        $course = $this->program_model->get_item_detail_page($courseid);
+        $data = array('items' => $course);
         $this->load->view('header_view');
         $this->load->view('program_view', $data);
         $this->load->view('footer_view');
