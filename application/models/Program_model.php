@@ -111,7 +111,7 @@ class program_model extends CI_Model {
         $list.="</div>";
 
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
-        $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
+        $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$cat_id'><button id='program_$cat_id' class='btn btn-primary'>Register</button></a></span>";
         $list.="</div>";
 
 

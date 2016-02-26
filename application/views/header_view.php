@@ -87,10 +87,10 @@
                             <div class="nav-collapse collapse">
                                 <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Programs<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
-                                            <li><a class="dropdown-toggle" href="http://cnausa.com/index.php/programs/workshops" id="ws"  title="Workshops">Workshops</a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/courses" id="cs" title="Online & CEU’s Courses">Online & CEU’s Courses</a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/exams/" id="exam" title="Online Exams">Online Exams</a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/school" id="school" title="MS Medical School">Nursing School</a></li>                                     
+                                            <li><a class="dropdown-toggle" href="http://cnausa.com/index.php/programs/program/workshops" id="ws"  title="Workshops">Workshops</a></li>
+                                            <li><a href="http://cnausa.com/index.php/programs/program/courses" id="cs" title="Online & CEU’s Courses">Online & CEU’s Courses</a></li>
+                                            <li><a href="http://cnausa.com/index.php/programs/program/exams/" id="exam" title="Online Exams">Online Exams</a></li>
+                                            <li><a href="http://cnausa.com/index.php/programs/program/school" id="school" title="MS Medical School">Nursing School</a></li>                                     
                                         </ul>
                                     </li>                                    
                                     <li><a href="http://cnausa.com/index.php/register"  id="register_item" title="Register">Register</a></li>
