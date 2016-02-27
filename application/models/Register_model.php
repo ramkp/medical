@@ -235,8 +235,12 @@ class register_model extends CI_Model {
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Selected program:</span>";
             $list.="<span class='span2'>$selected_program</span>";
-
             $list.="</div>"; // end of container-fluid
+            
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span><span style='color:red;' id='program_err' class='span2'></span>";            
+            $list.="</div>"; // end of container-fluid
+            
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default
         }
