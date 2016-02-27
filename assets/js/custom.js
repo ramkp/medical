@@ -1161,6 +1161,7 @@ $(document).ready(function () {
 
     // ***********************Links processing events **********************
     $('.form_div').on('click', 'a', function (event) {
+        console.log(event.target.id);
         if (event.target.id.indexOf("cat_") >= 0) {
             var category_id = event.target.id.replace("cat_", "");
             $(".dropdown li a").click(function () {
@@ -1186,14 +1187,18 @@ $(document).ready(function () {
             console.log('State ID: ' + stateid);
         }
 
-        if (event.target.id.indexOf("course_") >= 0) {
+        if (event.target.id.indexOf('course_')>=0) {            
             $(".dropdown li a").click(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
             });
-            var courseid = event.target.id.replace('course_', '');
-            console.log('Course ID: ' + courseid);
-            show_scheduled_course(courseid);
+            var url = window.location.href;
+            console.log('Url: '+url);
+            if (url.indexOf('schedule') >= 0) {
+                var courseid = event.target.id.replace('course_', '');
+                console.log('Course ID: ' + courseid);
+                show_scheduled_course(courseid);
+            } // end if url.indexOf('schedule') > 0
         }
 
         if (event.target.id == 'courses') {
