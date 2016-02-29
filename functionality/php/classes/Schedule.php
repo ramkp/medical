@@ -67,4 +67,26 @@ class Schedule extends Programs {
         return $list;
     }
 
+    public function get_state_programs($stateid) {
+        $list = "";
+        $courses = array();
+        $query = "select * from mdl_course_to_state where stateid=$stateid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courses[] = $row['courseid'];
+            } // end while
+            foreach ($courses as $courseid) {
+                $list.=$this->get_item_detail_page($courseid, false, true);
+            } // end foreach
+        } // end if $num>0
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.= "<span class='span9'>There are no programs found in selected state</span>";
+            $list.="</div>";
+        } // end else 
+        return $list;
+    }
+
 }

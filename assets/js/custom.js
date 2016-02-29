@@ -837,6 +837,16 @@ $(document).ready(function () {
         });
     }
 
+    function show_state_programs(stateid) {
+        var url = "http://cnausa.com/functionality/php/show_state_programs.php";
+        var request = {stateid: stateid};
+        $('#ajax_loading_schedule').show();
+        $.post(url, request).done(function (data) {
+            $('#ajax_loading_schedule').hide();
+            $('#program_section').html(data);
+        });
+    }
+
     /************************************************************************
      * 
      *               Verify Manual Group registration form
@@ -1185,15 +1195,16 @@ $(document).ready(function () {
             });
             var stateid = event.target.id.replace('state_', '');
             console.log('State ID: ' + stateid);
+            show_state_programs(stateid);
         }
 
-        if (event.target.id.indexOf('course_')>=0) {            
+        if (event.target.id.indexOf('course_') >= 0) {
             $(".dropdown li a").click(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
             });
             var url = window.location.href;
-            console.log('Url: '+url);
+            console.log('Url: ' + url);
             if (url.indexOf('schedule') >= 0) {
                 var courseid = event.target.id.replace('course_', '');
                 console.log('Course ID: ' + courseid);
