@@ -50,9 +50,47 @@ class Price extends Util {
         return $name;
     }
 
+    function get_state_name_by_id($id) {
+        $query = "select * from mdl_states where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        } // end while
+        return $state;
+    }
+
+    function get_course_states($courseid) {
+        $list = "";
+        $states = array();
+        $query = "select * from mdl_course_to_state "
+                . "where courseid=$courseid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $states[] = $row['stateid'];
+            } // end while            
+        } // end if $num>0
+        $query = "select * from mdl_states";
+        $result = $this->db->query($query);
+        $list.="<select multiple id='states_$courseid' class='dropdown'>";
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+            $state = $row['state'];
+            if (in_array($id, $states)) {
+                $list.= "<option value='$id' selected>$state</option>";
+            } // end if in_array($id, $states)
+            else {
+                $list.= "<option value='$id' >$state</option>";
+            } // end else
+        } // end while
+        $list.="</select>";
+        return $list;
+    }
+
     function get_items_from_category($id) {
         $price_items = array();
-        $query = "select id, fullname, cost, discount_status, discount_size "
+        $query = "select id, fullname, installment, num_payments, cost, discount_status, discount_size "
                 . "from mdl_course "
                 . "where category=$id";
         $num = $this->db->numrows($query);
@@ -69,7 +107,7 @@ class Price extends Util {
             } // end while
         } // end if $num                
         $category_name = $this->get_category_name($id);
-        $list = $this->create_price_item_block($price_items, $category_name);
+        $list = $this->create_item_block2($price_items, $category_name);
         $course_price_item_block = json_encode(array('item_title' => $category_name, 'item_data' => $list));
         return $course_price_item_block;
     }
@@ -111,7 +149,38 @@ class Price extends Util {
         } // end for
         $list = $list . "</select>";
         return $list;
-    }    
+    }
+
+    function get_installment_checkbox($courseid, $installment) {
+        $list = "";
+        if ($installment == 1) {
+            $list.="<input type='checkbox' name='installment_$courseid', id='installment_$courseid' value='$installment' checked>";
+        } // end if $installment==1
+        else {
+            $list.="<input type='checkbox' name='installment_$courseid' id='installment_$courseid' value='$installment' >";
+        } // end else
+        return $list;
+    }
+
+    function get_installment_num_payments($courseid, $installment, $num_payments) {
+        $list = "";
+        if ($installment == 0) {
+            $list.="<select id='num_payments_$courseid' class='dropdown' disabled>";
+        } // end if $installment==0
+        else {
+            $list.="<select id='num_payments_$courseid' class='dropdown'>";
+        } // end else 
+        for ($i = 0; $i <= 10; $i++) {
+            if ($i == $num_payments) {
+                $list .= "<option value='$i' selected>$i</option>";
+            } // end if $i==$num_payments
+            else {
+                $list .= "<option value='$i' >$i</option>";
+            } // end else
+        } // end for
+        $list.="</select>";
+        return $list;
+    }
 
     function create_price_item_block($price_items, $category_name) {
         $list = "";
@@ -136,20 +205,128 @@ class Price extends Util {
         return $list;
     }
 
-    function update_item_price($course_id, $course_cost, $course_discount, $course_group_discount) {
+    function create_item_block2($price_items, $category_name) {
+
+        $list = "";
+        $list.= "<div class='container-fluid'><span class='span9' style='font-weight:strong;'>Prices - $category_name</span></div>";
+        $list.= "<div class='container-fluid style='color:red' id='price_err'></div>";
+        if (count($price_items) > 0) {
+            foreach ($price_items as $item) {
+                $course_discount = $this->get_discount_dropdown('course', $item->id);
+                $group_discount = $this->get_discount_dropdown('group', $item->id);
+                $states = $this->get_course_states($item->id);
+                $installment_checkbox = $this->get_installment_checkbox($item->id, $item->installment);
+                $installment_payments = $this->get_installment_num_payments($item->id, $item->installment, $item->num_payments);
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span6' style='color:red;' id='price_err_$item->id'></span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'>Item name</span><span class='span6'>$item->fullname</span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'>Item cost</span><span class='span3'><input type=text class='form-control' id='cost_$item->id' value='$item->cost' style='width:45px;'></span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'>Item discount %</span><span class='span1'>$course_discount</span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'>Item group discount %</span><span class='span1'>$group_discount</span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'>Installment payment</span><span class='span1'>$installment_checkbox</span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'>Num of payments</span><span class='span1'>$installment_payments</span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'>Item states</span><span class='span1'>$states</span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'><button type='button' id=price_$item->id class='btn btn-primary'>Save</button></span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span9'><hr/></span>";
+                $list.= "</div>";
+            } // end foreach
+        } // end if count($price_items) > 0
+        else {
+            $list.= "<p align='center'>No items found</p>";
+        }
+
+
+        return $list;
+    }
+
+    function is_state_exists($courseid, $stateid) {
+        $query = "select courseid, stateid "
+                . "from mdl_course_to_state "
+                . "where courseid=$courseid "
+                . "and stateid=$stateid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function update_course_state($course_id, $states) {
+        //print_r($states);
+        // 1. First delete unchecked states
+        $query = "select * from mdl_course_to_state where courseid=$course_id";
+        //echo "<br/>Query: " . $query . "<br/>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $id = $row['id'];
+                //echo "Id: ".$id."<br/>";
+                $stateid = $row['stateid'];
+                if (in_array($stateid, $states) == false) {
+                    $query2 = "delete from mdl_course_to_state where id=$id";
+                    //echo "<br/>Query: " . $query2 . "<br/>";
+                    $this->db->query($query2);
+                } // end if in_array($stateid, $states)==false
+            } // end while
+        } // end if $num>0
+        // 2. Insert checked states
+        //echo "Count of states: ".count($states)."<br/>";
+        if (count($states) > 0) {
+            for ($i = 0; $i < count($states); $i++) {
+                $is_exists = $this->is_state_exists($course_id, $states[$i]);
+                if ($is_exists == 0) {
+                    $query = "insert into mdl_course_to_state (courseid, stateid) "
+                            . "values ($course_id, $states[$i])";
+                    //echo "<br/>Query: " . $query . "<br/>";
+                    $this->db->query($query);
+                } // end if $is_exists==0
+            } // end foreach
+        } // end if count($states)>0
+    }
+
+    function update_item_price($course_id, $course_cost, $course_discount, $course_group_discount, $installment, $num_payments, $states) {
         // Update mdl_course table
         $query = "update mdl_course "
                 . "set cost=$course_cost ,"
-                . "discount_size=$course_discount "
+                . "discount_size=$course_discount , "
+                . "installment=$installment, "
+                . "num_payments=$num_payments "
                 . "where id=$course_id";
-        $result = $this->db->query($query);
+        $this->db->query($query);
 
         // Update mdl_group_discount table
         $query = "update mdl_group_discount "
                 . "set group_discount_size=$course_group_discount "
                 . "where courseid=$course_id";
-        //echo "Query: ".$query;
-        $result = $this->db->query($query);
+        $this->db->query($query);
+
+        // Update course states        
+        $this->update_course_state($course_id, $states);
         return "Item successfully updated.";
     }
 

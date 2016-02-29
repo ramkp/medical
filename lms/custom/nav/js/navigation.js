@@ -1,7 +1,7 @@
 
 $(document).ready(function () {
     console.log("ready!");
-
+    var courseid;
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
         $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='http://cnausa.com/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
@@ -10,6 +10,7 @@ $(document).ready(function () {
     function get_price_items_from_category(id) {
         var url = "/lms/custom/prices/list.php";
         $.post(url, {id: id}).done(function (data) {
+            console.log(data);
             var price_obj = $.parseJSON(data);
             update_navigation_status__menu(price_obj.item_title);
             $('#region-main').html(price_obj.item_data);
@@ -207,19 +208,55 @@ $(document).ready(function () {
         return patForReqdFld.test(str);
     }
 
+
     function update_item_price(id) {
+        var installment;
+        var states = [];
         var courseid = id.replace("price_", "");
         var course_cost_id = '#cost_' + courseid;
         var course_discount_id = '#item_' + courseid;
         var course_group_discount_id = '#group_' + courseid;
+        var price_id_err = '#price_err_' + courseid;
+        var states_id = '#states_' + courseid;
+        var installment_id = '#installment_' + courseid;
+        var num_payments_id = '#num_payments_' + courseid;
+        var num_payments = $(num_payments_id).val();
+
+        if ($(installment_id).is(':checked')) {
+            installment = 1;
+            if (num_payments < 2) {
+                $(price_id_err).html('Please select num of installment payments');
+                return false;
+            }
+        } // end if $('#installment').is(':checked')
+        else {
+            installment = 0;
+        }
+
+        //var states_ident = $(states_id + ':selected');       
+        console.log(states_id);
+
+        $(states_id).each(function (i, selected) {
+            states[i] = $(selected).val();
+        });
+        console.log(states);
+
+        if (states.length == 0 || states[0] == null) {
+            $(price_id_err).html('Please select item states');
+            return false;
+        }
 
         var course_cost = $(course_cost_id).val();
         var course_discount = $(course_discount_id).val();
         var course_group_discount = $(course_group_discount_id).val();
+
         if (course_cost == '' || course_cost == 0) {
-            $('#price_err').html('Please provide item cost');
+            $(price_id_err).html('Please provide item cost');
+            return false;
         }
-        else {
+
+        if (course_cost != 0 && states.length > 0) {
+            $(price_id_err).html('');
             if (validateNum(course_cost)) {
                 // Prepare and send AJAX request ...
                 $('#price_err').html('');
@@ -228,15 +265,19 @@ $(document).ready(function () {
                     course_id: courseid,
                     course_cost: course_cost,
                     course_discount: course_discount,
-                    course_group_discount: course_group_discount};
+                    course_group_discount: course_group_discount,
+                    installment: installment,
+                    num_payments: num_payments,
+                    states: JSON.stringify(states)};
                 $.post(url, request).done(function (data) {
-                    $('#price_err').html(data);
+                    //alert ('Server response: '+data);
+                    $(price_id_err).html("<span style='color:green;'>"+data+"</span>");
                 });
             } // end if validateNum(course_cost
             else {
-                $('#price_err').html('Invalid item cost');
+                $(price_id_err).html('Invalid item cost');
             }
-        }
+        } // end if course_cost != 0 && states.length > 0        
     }
 
     function get_private_groups_requests_list() {
@@ -303,6 +344,24 @@ $(document).ready(function () {
             show_private_group_request_detailes(id);
         }
     }); // end of $('#region-main').on('click', 'a'
+
+    $(document).on('change', '[type=checkbox]', function (event) {
+        console.log('Event id: ' + event.target.id);
+        var courseid = event.target.id.replace('installment_', '');
+        var installment_el = '#installment_' + courseid;
+        console.log('Installment: ' + installment_el);
+        var num_payments_el = '#num_payments_' + courseid;
+        console.log('Num payments: ' + num_payments_el);
+        var installment_status = $(installment_el).is(':checked');
+        console.log('Installment status: ' + installment_status);
+        if (installment_status == true) {
+            $(num_payments_el).prop("disabled", false);
+        }
+        else {
+            $(num_payments_el).prop("disabled", true);
+        }
+
+    });
 
     // Show price items
     $("#prices").click(function (event) {
