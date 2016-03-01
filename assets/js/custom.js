@@ -326,7 +326,7 @@ $(document).ready(function () {
                 var inst = $('#group_inst').val();
                 var zip = $('#group_zip').val();
                 var city = $('#group_city').val();
-                var state = $('#group_state').val();
+                var state = $('#group_state').text();
                 var group_name = $('#group_name').val();
 
                 if (addr == '') {
@@ -349,8 +349,9 @@ $(document).ready(function () {
                     return false;
                 }
 
-                if (state == '') {
-                    $('#group_common_errors').html('Please provide state');
+                console.log('State: ' + state);
+                if (state.indexOf('State')>=0) {
+                    $('#group_common_errors').html('Please select state');
                     return false;
                 }
 
@@ -743,6 +744,7 @@ $(document).ready(function () {
         var tot_participants = $('#participants').val();
         var selected_course = $('#courses').text();
         var course_name = selected_course.trim();
+        
         if (course_name != 'Program' && course_name != '' && course_name !== undefined) {
             $('#program_err').html('');
             $('#group_common_errors').html('');
@@ -754,7 +756,7 @@ $(document).ready(function () {
                 var inst = $('#group_inst').val();
                 var zip = $('#group_zip').val();
                 var city = $('#group_city').val();
-                var state = $('#group_state').val();
+                var state = $('#group_state').text();
                 var group_name = $('#group_name').val();
 
                 if (addr == '') {
@@ -776,9 +778,11 @@ $(document).ready(function () {
                     $('#group_common_errors').html('Please provide city');
                     return false;
                 }
-
-                if (state == '') {
-                    $('#group_common_errors').html('Please provide state');
+                
+                
+                console.log('State: ' + state);
+                if (state.indexOf('State')>=0) {
+                    $('#group_common_errors').html('Please select state');
                     return false;
                 }
 
@@ -838,13 +842,16 @@ $(document).ready(function () {
     }
 
     function show_state_programs(stateid) {
-        var url = "http://cnausa.com/functionality/php/show_state_programs.php";
-        var request = {stateid: stateid};
-        $('#ajax_loading_schedule').show();
-        $.post(url, request).done(function (data) {
-            $('#ajax_loading_schedule').hide();
-            $('#program_section').html(data);
-        });
+        var page = window.location.href;
+        if (page.indexOf("schedule") > 0) {
+            var url = "http://cnausa.com/functionality/php/show_state_programs.php";
+            var request = {stateid: stateid};
+            $('#ajax_loading_schedule').show();
+            $.post(url, request).done(function (data) {
+                $('#ajax_loading_schedule').hide();
+                $('#program_section').html(data);
+            });
+        } // end if page.indexOf("schedule") > 0
     }
 
     /************************************************************************
@@ -887,8 +894,8 @@ $(document).ready(function () {
                 var inst = $('#inst').val();
                 var zip = $('#zip').val();
                 var city = $('#city').val();
-                var state = $('#state').val();
-                var country = $('#country').val();
+                var state = $('#state').text();
+                var country = $('#country').text();                
 
                 if (first_name == '') {
                     $('#personal_err').html('Please provide firstname');
@@ -927,15 +934,21 @@ $(document).ready(function () {
                     $('#personal_err').html('Please provide city');
                     return false;
                 }
-                if (state == '') {
-                    $('#personal_err').html('Please provide state');
+                
+                
+                console.log('State: ' + state);
+                if (state.indexOf('State') >= 0) {
+                    console.log('Inside state failure');
+                    $('#personal_err').html('Please select state');
                     return false;
                 }
-                if (country == '') {
-                    $('#personal_err').html('Please provide country');
+                console.log('Country: ' + country);
+                if (country.indexOf('Country') >= 0) {
+                    console.log('Inside country failure');
+                    $('#personal_err').html('Please select country');
                     return false;
                 }
-                if (first_name != '' && last_name != '' && email != '' && phone != '' && addr != '' && inst != '' && zip != '' && city != '' && state != '' && country != '') {
+                if (first_name != '' && last_name != '' && email != '' && phone != '' && addr != '' && inst != '' && zip != '' && city != '') {
 
                     // Check is email exists?
                     var url = "http://cnausa.com/functionality/php/is_email_exists.php";
@@ -962,6 +975,9 @@ $(document).ready(function () {
                                 city: city,
                                 state: state,
                                 country: country};
+
+
+                            console.log("User: " + JSON.stringify(user));
 
                             var signup_url = 'http://cnausa.com/functionality/php/single_signup.php';
                             var signup_request = {user: JSON.stringify(user)};
@@ -1217,6 +1233,13 @@ $(document).ready(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
                 $('#program_err').html('');
+            });
+        }
+
+        if (event.target.id == 'states') {
+            $(".dropdown li a").click(function () {
+                $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
+                $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
             });
         }
 

@@ -196,12 +196,42 @@ class register_model extends CI_Model {
         return $drop_down;
     }
 
+    public function get_states_list() {
+        $drop_down = "";
+        $drop_down.="<div class='dropdown'>
+        <a href='#' id='state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
+        <ul class='dropdown-menu'>";
+        $query = "select * from mdl_states";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $drop_down.="<li><a href='#' id='state_" . $row->id . "' onClick='return false;'>" . $row->state . "</a></li>";
+        } // end while
+        $drop_down.="</ul></div>";
+        return $drop_down;
+    }
+
+    public function get_countries_list() {
+        $drop_down = "";
+        $drop_down.="<div class='dropdown'>
+        <a href='#' id='country' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Country <b class='caret'></b></a>
+        <ul class='dropdown-menu'>";
+        $query = "select * from mdl_countries";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $drop_down.="<li><a href='#' id='country_" . $row->id . "' onClick='return false;'>" . $row->name . "</a></li>";
+        }
+        $drop_down.="</ul></div>";
+        return $drop_down;
+    }
+
     public function get_register_form($courseid = null) {
         $list = "";
         $cats = $this->get_course_categories();
         $courses = $this->get_courses_by_category();
         $participants = $this->get_participants_dropbox();
         $come_from = $this->come_from();
+        $states = $this->get_states_list();
+        $countries = $this->get_countries_list();
 
         // ****************** Program information **************************
 
@@ -217,9 +247,9 @@ class register_model extends CI_Model {
             $list.="<span class='span2' id='cat_course'>$courses</span>";
             $list.="<span class='span2' id='program_err' style='color:red;'></span>";
             $list.="</div>"; // end of container-fluid
-            
+
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span>";            
+            $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span>";
             $list.="</div>"; // end of container-fluid
 
             $list.="</div>"; // end of panel-body
@@ -236,11 +266,11 @@ class register_model extends CI_Model {
             $list.="<span class='span2'>Selected program:</span>";
             $list.="<span class='span2'>$selected_program</span>";
             $list.="</div>"; // end of container-fluid
-            
+
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span><span style='color:red;' id='program_err' class='span2'></span>";            
+            $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span><span style='color:red;' id='program_err' class='span2'></span>";
             $list.="</div>"; // end of container-fluid
-            
+
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default
         }
@@ -294,9 +324,9 @@ class register_model extends CI_Model {
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>State*</span>";
-        $list.="<span class='span2'><input type='text' id='state' name='state' ></span>";
+        $list.="<span class='span2'>$states</span>";
         $list.="<span class='span2'>Country*</span>";
-        $list.="<span class='span2'><input type='text' id='country' name='country' ></span>";
+        $list.="<span class='span2'>$countries</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";

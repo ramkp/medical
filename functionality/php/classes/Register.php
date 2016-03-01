@@ -48,12 +48,33 @@ class Register {
         return $list;
     }
 
+    function get_states_list($group = false) {
+        $drop_down = "";
+        if ($group == false) {
+            $drop_down.="<div class='dropdown'>
+        <a href='#' id='state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
+        <ul class='dropdown-menu'>";
+        } // end if $group==false
+        else {
+            $drop_down.="<div class='dropdown'>
+        <a href='#' id='group_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
+        <ul class='dropdown-menu'>";
+        }
+        $query = "select * from mdl_states";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $drop_down.="<li><a href='#' id='state_" . $row['id'] . "' onClick='return false;'>" . $row['state'] . "</a></li>";
+        } // end while
+        $drop_down.="</ul></div>";
+        return $drop_down;
+    }
+
     function get_register_page($courseid = null) {
         $list = "";
         $cats = $this->get_course_categories();
         $courses = $this->get_courses_by_category();
         $participants = $this->get_participants_dropbox();
-        
+
         // ****************** Program information **************************
 
         if ($courseid == null) {
@@ -145,7 +166,7 @@ class Register {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'><a href='#' id='proceed_to_personal_payment' onClick='return false;'>Proceed to payment</a></span>&nbsp;<span style='color:red;' id='personal_err'></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_personal'><img src='http://cnausa.com/assets/img/ajax.gif' /></span";
         $list.="</div>";
@@ -196,6 +217,8 @@ class Register {
     }
 
     function get_group_registration_form($tot_participants) {
+
+        $states = $this->get_states_list(true);
         $list = "";
         $list.="<div class='panel panel-default' id='group_common_section'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Group Registration </h5></div>";
@@ -218,15 +241,15 @@ class Register {
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>State*</span>";
-        $list.="<span class='span2'><input type='text' id='group_state' name='group_state' ></span>";
+        $list.="<span class='span2'>$states</span>";
         $list.="<span class='span2'>Group name*</span>";
         $list.="<span class='span2'><input type='text' id='group_name' name='group_name' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'><a href='#' id='manual_group_registration' onClick='return false;'>Proceed to participants</a></span>";
-        $list.="<span class='span4'>Have a lot of group participants? <a href='#' id='upload_group_file'>Upload users file</a></span><span class='span2' style='color:red;' id='group_common_errors'></span>";
-        $list.="</div>";        
+        $list.="<span class='span4'>Have a lot of group participants? <a href='#' id='upload_group_file' onClick='return false;'>Upload users file</a></span><span class='span2' style='color:red;' id='group_common_errors'></span>";
+        $list.="</div>";
 
         $list.="</div>";
         $list.="</div>";
@@ -262,11 +285,11 @@ class Register {
         $list.= "<span class='span2'><a href='#' id='proceed_to_group_payment' onClick='return false;'>Proceed to payment</a></span>";
         $list.= "&nbsp <span style='color:red;' id='group_manual_form_err'></span>";
         $list.= "</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
         $list.="</div>";
-        
+
         $list.="</div>";
         $list.="</div>";
         return $list;
