@@ -335,8 +335,7 @@ $(document).ready(function () {
                 }
 
                 if (inst == '') {
-                    $('#group_common_errors').html('Please provide Business or Institution');
-                    return false;
+                    inst='---';
                 }
 
                 if (zip == '') {
@@ -765,8 +764,7 @@ $(document).ready(function () {
                 }
 
                 if (inst == '') {
-                    $('#group_common_errors').html('Please provide Business or Institution');
-                    return false;
+                    inst='---';
                 }
 
                 if (zip == '') {
@@ -923,8 +921,7 @@ $(document).ready(function () {
                     return false;
                 }
                 if (inst == '') {
-                    $('#personal_err').html('Please provide Business or Institution');
-                    return false;
+                    inst='---';
                 }
                 if (zip == '') {
                     $('#personal_err').html('Please provide zip');

@@ -102,12 +102,14 @@ class Enroll {
 
     function single_signup($user) {
         $user->pwd = $this->get_password();
-        if ($user->country != '') {
+        //echo "Provided country: " . $user->country . "<br/>";
+        if ($user->country != '' && $user->country != 'US') {
             $user->country = $this->get_country_code($user->country);
         } // end if $user->country!=''
         else {
             $user->country = 'US';
         } // end else
+        //echo "<br/>User country:" . $user->country . "<br/>";
         $encoded_user = base64_encode(json_encode($user));
         $data = array('user' => $encoded_user);
 
@@ -120,7 +122,14 @@ class Enroll {
             ),
         );
         $context = stream_context_create($options);
-        file_get_contents($this->signup_url, false, $context);
+        $response = file_get_contents($this->signup_url, false, $context);
+        
+        /*
+        echo "<pre>";
+        print_r($response);
+        echo "<pre>";
+         * 
+         */
 
         // 2. Enroll user into course
         $this->enroll_user_to_course($user);

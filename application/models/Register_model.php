@@ -213,7 +213,7 @@ class register_model extends CI_Model {
     public function get_countries_list() {
         $drop_down = "";
         $drop_down.="<div class='dropdown'>
-        <a href='#' id='country' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Country <b class='caret'></b></a>
+        <a href='#' id='country' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>United States <b class='caret'></b></a>
         <ul class='dropdown-menu'>";
         $query = "select * from mdl_countries";
         $result = $this->db->query($query);
@@ -280,8 +280,8 @@ class register_model extends CI_Model {
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Registration type</h5></div>";
         $list.="<div class='panel-body'>";
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'><input type='radio' name='type' id='me' value='me' checked>I want to register myself </span>";
-        $list.="<span class='span2'><input type='radio' name='type' id='group' value='group' >I want to register group </span>";
+        $list.="<span class='span2'><input type='radio' name='type' id='me' value='me' checked>Register Myself</span>";
+        $list.="<span class='span2'><input type='radio' name='type' id='group' value='group' >Register Group</span>";
         $list.="<span class='span2' id='gr_num'>$participants</span>";
         $list.="<span class='span2' id='type_err' style='color:red;'></span>";
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -311,7 +311,7 @@ class register_model extends CI_Model {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
         $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
-        $list.="<span class='span2'>Business Or Institution*</span>";
+        $list.="<span class='span2'>Business Or Institution</span>";
         $list.="<span class='span2'><input type='text' id='inst' name='inst' ></span>";
         $list.="</div>";
 

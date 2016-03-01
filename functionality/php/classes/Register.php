@@ -145,7 +145,7 @@ class Register {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
         $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
-        $list.="<span class='span2'>Business Or Institution*</span>";
+        $list.="<span class='span2'>Business Or Institution</span>";
         $list.="<span class='span2'><input type='text' id='inst' name='inst' ></span>";
         $list.="</div>";
 
@@ -228,7 +228,7 @@ class Register {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
         $list.="<span class='span2'><input type='text' id='group_addr' name='group_addr' ></span>";
-        $list.="<span class='span2'>Business Or Institution*</span>";
+        $list.="<span class='span2'>Business Or Institution</span>";
         $list.="<span class='span2'><input type='text' id='group_inst' name='group_inst' ></span>";
         $list.="</div>";
 
