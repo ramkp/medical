@@ -33,12 +33,14 @@ class pdo_db {
     }
 
     public function numrows($query) {
+        //echo "Query: ".$query."<br/>";
         $result = $this->db->query($query); 
         return $result->rowCount();
     }
 
     public function query($query) {
-       return $this->db->query($query);      
+       //echo "Query: ".$query."<br/>";
+        return $this->db->query($query);      
     }
 
 }

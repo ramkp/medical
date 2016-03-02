@@ -12,7 +12,7 @@ class register_model extends CI_Model {
         $this->load->database();
     }
 
-    function get_participants_dropbox() {
+    public function get_participants_dropbox() {
         $drop_down = "";
         $drop_down.="<div class='dropdown'>
         <a href='#' id='participants' data-toggle='dropdown' 
@@ -26,7 +26,7 @@ class register_model extends CI_Model {
         return $drop_down;
     }
 
-    function get_coure_name_by_id($courseid) {
+    public function get_coure_name_by_id($courseid) {
         $query = "select id, fullname "
                 . "from mdl_course where id=$courseid";
         $result = $this->db->query($query);
@@ -36,7 +36,7 @@ class register_model extends CI_Model {
         return $name;
     }
 
-    function get_selected_program($courseid) {
+    public function get_selected_program($courseid) {
         $list = "";
         $name = $this->get_coure_name_by_id($courseid);
         $list.="<a id='courses' class='dropdown-toggle' 
@@ -45,7 +45,7 @@ class register_model extends CI_Model {
         return $list;
     }
 
-    function get_course_categories() {
+    public function get_course_categories() {
         $drop_down = "";
         $drop_down.="<div class='dropdown'>
         <a href='#' id='categories' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program type<b class='caret'></b></a>
@@ -59,7 +59,7 @@ class register_model extends CI_Model {
         return $drop_down;
     }
 
-    function get_courses_by_category($cat_id = null) {
+    public function get_courses_by_category($cat_id = null) {
         $drop_down = "";
         if ($cat_id != null) {
             $drop_down.="<div class='dropdown'>
@@ -82,7 +82,7 @@ class register_model extends CI_Model {
         return $drop_down;
     }
 
-    function get_group_registration_form($tot_participants) {
+    public function get_group_registration_form($tot_participants) {
         $list = "";
         $list.="<div class='panel panel-default' id='group_common_section'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Group Registration </h5></div>";
@@ -120,7 +120,7 @@ class register_model extends CI_Model {
         return $list;
     }
 
-    function get_group_manual_registration_form($tot_participants) {
+    public function get_group_manual_registration_form($tot_participants) {
         $list = "";
         $list.="<div class='panel panel-default' id='participants_details'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Participants Detailes</h5></div>";
@@ -159,7 +159,7 @@ class register_model extends CI_Model {
         return $list;
     }
 
-    function is_email_exists($email) {
+    public function is_email_exists($email) {
         $query = "select username, deleted from mdl_user "
                 . "where username='$email' and deleted=0";
         $result = $this->db->query($query);
@@ -167,7 +167,7 @@ class register_model extends CI_Model {
         return $num;
     }
 
-    function get_course_id($course_name) {
+    public function get_course_id($course_name) {
         $query = "select id, fullname from mdl_course "
                 . "where fullname='$course_name'";
         $result = $this->db->query($query);
@@ -329,8 +329,14 @@ class register_model extends CI_Model {
         $list.="<span class='span2'>$countries</span>";
         $list.="</div>";
 
+        /*
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'><a href='#' id='proceed_to_personal_payment' onClick='return false;'>Proceed to payment</a></span>&nbsp;<span style='color:red;' id='personal_err'></span>";
+        $list.="</div>";
+        */
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'><a href='#' id='p_options_p' onClick='return false;'>Payment options</a></span>&nbsp;<span style='color:red;' id='personal_err'></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";

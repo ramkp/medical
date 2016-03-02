@@ -282,7 +282,7 @@ class Register {
         } // end for
 
         $list.= "<div class='container-fluid' style='text-align:left;'";
-        $list.= "<span class='span2'><a href='#' id='proceed_to_group_payment' onClick='return false;'>Proceed to payment</a></span>";
+        $list.= "<span class='span2'><a href='#' id='proceed_to_group_payment' onClick='return false;'>Payment options</a></span>";
         $list.= "&nbsp <span style='color:red;' id='group_manual_form_err'></span>";
         $list.= "</div>";
 

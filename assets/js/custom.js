@@ -1000,6 +1000,10 @@ $(document).ready(function () {
             $('#personal_err').html('Please select program');
         } // end else
     }
+    
+    function get_option_payment_personal() {
+        
+    }
 
     /************************************************************************
      * 
@@ -1299,6 +1303,16 @@ $(document).ready(function () {
 
         if (event.target.id == 'proceed_to_personal_payment') {
             verify_personal_manual_registration_form();
+        }
+        
+        //option_personal_payment
+        
+        if (event.target.id == 'p_options_p') {
+            verify_personal_manual_registration_form();
+        }
+        
+        if (event.target.id == 'proceed_to_payment') {
+            get_option_payment_personal();
         }
 
         if (event.target.id.indexOf("program_") >= 0) {
