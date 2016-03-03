@@ -1005,6 +1005,15 @@ $(document).ready(function () {
          var options = $('#payment_options input:radio:checked');
          var payment_option=options.attr('value');
          console.log('Payment option: '+payment_option);
+         var url = "http://cnausa.com/functionality/php/get_option_payment_section.php";
+         var request = {option: payment_option};
+         $('#ajax_loading_schedule').show();
+         $.post(url, request).done(function (data) {
+             $('#ajax_loading_schedule').hide();
+             //$('#program_section').html(data);
+             console.log(data);
+         });
+         
     }
 
     /************************************************************************

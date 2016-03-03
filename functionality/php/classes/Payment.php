@@ -337,6 +337,17 @@ class Payment {
         $group_data=$_SESSION['group_common_section'];
         $users=$_SESSION['users'];
         $participants=$_SESSION['tot_participants'];
+        
+        /*
+        echo "<br/>";
+        echo "Option: ".$payment_option;
+        echo "<br/>";
+        
+        echo "<br/><pre>";
+        print_r($_SESSION);
+        echo "<pre>";
+        */
+        
         if ($participants==1 && $group_data=='') {
             // Single registration
             if ($payment_option=='online_personal') {
