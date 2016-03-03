@@ -182,16 +182,16 @@ class register_model extends CI_Model {
         $drop_down.="<div class='dropdown'>
         <a href='#' id='come_from' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Select <b class='caret'></b></a>
         <ul class='dropdown-menu'>";
-        $drop_down.="<li><a href='#' id='Newspaper'>Newspaper</a></li>";
-        $drop_down.="<li><a href='#' id='Magazine'>Magazine</a></li>";
-        $drop_down.="<li><a href='#' id='Radio'>Radio</a></li>";
-        $drop_down.="<li><a href='#' id='TV'>TV</a></li>";
-        $drop_down.="<li><a href='#' id='Google'>Google</a></li>";
-        $drop_down.="<li><a href='#' id='Microsoft'>Microsoft</a></li>";
-        $drop_down.="<li><a href='#' id='Yahoo'>Yahoo</a></li>";
-        $drop_down.="<li><a href='#' id='Twitter'>Twitter</a></li>";
-        $drop_down.="<li><a href='#' id='Instagram'>Instagram</a></li>";
-        $drop_down.="<li><a href='#' id='Other'>Other</a></li>";
+        $drop_down.="<li><a href='#' id='Newspaper' onClick='return false;'>Newspaper</a></li>";
+        $drop_down.="<li><a href='#' id='Magazine' onClick='return false;'>Magazine</a></li>";
+        $drop_down.="<li><a href='#' id='Radio' onClick='return false;'>Radio</a></li>";
+        $drop_down.="<li><a href='#' id='TV' onClick='return false;'>TV</a></li>";
+        $drop_down.="<li><a href='#' id='Google' onClick='return false;'>Google</a></li>";
+        $drop_down.="<li><a href='#' id='Microsoft' onClick='return false;'>Microsoft</a></li>";
+        $drop_down.="<li><a href='#' id='Yahoo' onClick='return false;'>Yahoo</a></li>";
+        $drop_down.="<li><a href='#' id='Twitter' onClick='return false;'>Twitter</a></li>";
+        $drop_down.="<li><a href='#' id='Instagram' onClick='return false;'>Instagram</a></li>";
+        $drop_down.="<li><a href='#' id='Other' onClick='return false;'>Other</a></li>";
         $drop_down.="</ul></div>";
         return $drop_down;
     }

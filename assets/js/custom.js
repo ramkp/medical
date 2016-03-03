@@ -185,7 +185,7 @@ $(document).ready(function () {
                     $('#instructions').hide();
                     $("#page").html(data);
                 });
-        console.log('Triggered click on btn-navbar');
+        //console.log('Triggered click on btn-navbar');
         $(".btn-navbar").trigger("click");
     }
 
@@ -714,7 +714,7 @@ $(document).ready(function () {
                     users: JSON.stringify(users),
                     tot_participants: tot_participants};
                 $.post(signup_url, signup_request).done(function (data) {
-                    console.log(data);
+                    //console.log(data);
                     // Show payment section
                     $('#ajax_loading_group').hide();
                     /*
@@ -1002,7 +1002,9 @@ $(document).ready(function () {
     }
     
     function get_option_payment_personal() {
-        
+         var options = $('#payment_options input:radio:checked');
+         var payment_option=options.attr('value');
+         console.log('Payment option: '+payment_option);
     }
 
     /************************************************************************
@@ -1188,7 +1190,7 @@ $(document).ready(function () {
 
     // ***********************Links processing events **********************
     $('.form_div').on('click', 'a', function (event) {
-        console.log(event.target.id);
+        //console.log(event.target.id);
         if (event.target.id.indexOf("cat_") >= 0) {
             var category_id = event.target.id.replace("cat_", "");
             $(".dropdown li a").click(function () {
@@ -1211,7 +1213,7 @@ $(document).ready(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
             });
             var stateid = event.target.id.replace('state_', '');
-            console.log('State ID: ' + stateid);
+            //console.log('State ID: ' + stateid);
             show_state_programs(stateid);
         }
 
@@ -1221,10 +1223,10 @@ $(document).ready(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
             });
             var url = window.location.href;
-            console.log('Url: ' + url);
+            //console.log('Url: ' + url);
             if (url.indexOf('schedule') >= 0) {
                 var courseid = event.target.id.replace('course_', '');
-                console.log('Course ID: ' + courseid);
+                //console.log('Course ID: ' + courseid);
                 show_scheduled_course(courseid);
             } // end if url.indexOf('schedule') > 0
         }
@@ -1261,7 +1263,7 @@ $(document).ready(function () {
                 // Verify is group registration selected?
                 var group_status = $('#group').is(':checked');
 
-                console.log('Group status:' + group_status);
+                //console.log('Group status:' + group_status);
                 if (group_status != false || group_selected == true) {
                     get_group_registration_block();
                 }
@@ -1290,7 +1292,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'manual_group_registration') {
-            console.log('Manual registration ...');
+            //console.log('Manual registration ...');
             var tot_participants = $('#participants').val();
             $('#upload_section').hide();
             verify_group_common_section();

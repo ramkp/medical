@@ -5,6 +5,7 @@
  *
  * @author sirromas
  */
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Upload.php';
 
 class Payment {
@@ -67,22 +68,22 @@ class Payment {
 
         if ($group == null) {
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'><input type='radio' name='online_personal' id='online_personal' value='online_personal' checked >Online payment</span>";
-            $list.="<span class='span2'><input type='radio' name='offline_personal' id='offline_personal' value='offline_personal'>Offline payment</span>";
+            $list.="<span class='span2'><input type='radio' name='payment_option' id='online_personal' value='online_personal' checked >Online payment</span>";
+            $list.="<span class='span2'><input type='radio' name='payment_option' id='offline_personal' value='offline_personal'>Offline payment</span>";
             if ($installment == 1) {
                 $enroll_period = $this->get_course_enrollment_period($courseid);
-                $list.="<span class='span2'><input type='radio' name='online_personal_installment' id='online_personal_installment' value='online_personal_installment'>Installment payments</span>";
+                $list.="<span class='span2'><input type='radio' name='payment_option' id='online_personal_installment' value='online_personal_installment'>Installment payments</span>";
             }
             $list.="</div>"; // end of container-fluid
         } // end if $group==null
         if ($group != null) {
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'><input type='radio'  id='online_whole_group_payment'   value='online_whole_group_payment' checked>Online payment</span>";
-            $list.="<span class='span2'><input type='radio'  id='offline_whole_group_payment'  value='offline_whole_group_payment'>Offline payment</span>";
-            $list.="<span class='span2'><input type='radio'  id='online_group_members_payment' value='online_group_members_payment'>Participants payments</span>";
+            $list.="<span class='span2'><input type='radio'  name='payment_option' id='online_whole_group_payment'   value='online_whole_group_payment' checked>Online payment</span>";
+            $list.="<span class='span2'><input type='radio'  name='payment_option' id='offline_whole_group_payment'  value='offline_whole_group_payment'>Offline payment</span>";
+            $list.="<span class='span2'><input type='radio'  name='payment_option' id='online_group_members_payment' value='online_group_members_payment'>Participants payments</span>";
             if ($installment == 1) {
                 $enroll_period = $this->get_course_enrollment_period($courseid);
-                $list.="<span class='span2'><input type='radio' name='online_group_installment' id='online_group_installment' value='online_group_installment'>Installment payments</span>";
+                $list.="<span class='span2'><input type='radio' name='payment_option' id='online_group_installment' value='online_group_installment'>Installment payments</span>";
             } // end if $installment == 1            
             $list.="</div>"; // end of container-fluid
         } // end if $group != null
@@ -100,7 +101,11 @@ class Payment {
         //print_r($user);
         $this->user = $user;
         $this->enroll->single_signup($user);
+        $_SESSION["single_user_data"] = $user;
         //$list = $this->get_payment_section_personal($user);
+        $_SESSION['group_common_section'] = '';
+        $_SESSION['users'] = $user;
+        $_SESSION['tot_participants'] = 1;
         $list = $this->get_payment_options($user->courseid);
         return $list;
     }
@@ -321,8 +326,49 @@ class Payment {
             } // end if $email_exists==0
         } // end foreach
         //$list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
+        $_SESSION['group_common_section'] = $group_common_section;
+        $_SESSION['users'] = $users;
+        $_SESSION['tot_participants'] = $tot_participants;
         $list = $this->get_payment_options($group_common_section->courseid, 1);
         return $list;
+    }
+    
+    function get_payment_with_options ($payment_option) {
+        $group_data=$_SESSION['group_common_section'];
+        $users=$_SESSION['users'];
+        $participants=$_SESSION['tot_participants'];
+        if ($participants==1 && $group_data=='') {
+            // Single registration
+            if ($payment_option=='online_personal') {
+                
+            }
+            
+            if ($payment_option=='offline_personal') {
+                
+            }
+            
+            if ($payment_option=='online_personal_installment') {
+                
+            }
+        } // end if $participants==1 && $group_data==''
+        else {
+            // Group registration
+            if ($payment_option=='online_whole_group_payment') {
+                
+            }
+            
+            if ($payment_option=='offline_whole_group_payment') {
+                
+            }
+            
+            if ($payment_option=='online_group_members_payment') {
+                
+            }
+            
+            if ($payment_option=='online_group_installment') {
+                
+            }         
+        } // end else
     }
 
     function get_group_payment_section($group_common_section, $users, $tot_participants) {
@@ -349,6 +395,9 @@ class Payment {
             } // end if $email_exists==0
         } // end foreach
         //$list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
+        $_SESSION['group_common_section'] = $group_common_section;
+        $_SESSION['users'] = $users;
+        $_SESSION['tot_participants'] = $tot_participants;
         $list = $this->get_payment_options($group_common_section->courseid, 1);
         return $list;
     }
