@@ -485,6 +485,15 @@ class Payment {
     }
 
     function get_payment_section($group_data, $users, $participants, $installment = null) {
+        
+        /*
+        print_r($group_data);
+        echo "<br/>";
+        print_r($users);
+        echo "<br/>";
+         * 
+         */
+        
         $list = "";
         $cost_block = "";
         $card_types = $this->get_card_types_dropbox();
@@ -495,13 +504,14 @@ class Payment {
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
         $list.="<div class='panel-body'>";
 
-        if ($installment == null) {
-            $course_name = $this->get_course_name($group_data->courseid);
+        if ($installment == null) {            
             if ($group_data == '') {
+                $course_name = $this->get_course_name($users->courseid);
                 $course_cost = $this->get_personal_course_cost($users->courseid);
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
             } // end if $group==NULL 
             else {
+                $course_name = $this->get_course_name($group_data->courseid);
                 $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 $list.= "<input type='hidden' value='$users->group_name' id='user_group' name='user_group' />";
             } // end else
@@ -519,13 +529,14 @@ class Payment {
             $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='payment_sum' />";
             $list.="</div>";
         } // end if $installment==null
-        else {
-            $course_name = $this->get_course_name($group_data->courseid);
+        else {            
             if ($group_data == '') {
-                $course_cost = $this->get_personal_course_cost($users->courseid);
+                $course_name = $this->get_course_name($users->courseid);
+                $course_cost = $this->get_personal_course_cost($users->courseid);                
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
             } // end if $group==NULL 
             else {
+                $course_name = $this->get_course_name($group_data->courseid);
                 $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 $list.= "<input type='hidden' value='$users->group_name' id='user_group' name='user_group' />";
             } // end else
