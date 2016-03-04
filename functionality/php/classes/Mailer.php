@@ -84,6 +84,27 @@ class Mailer {
         $this->send_email($subject, $reply, $recipient);
     }
 
+    function get_invoice_message($user) {
+        $list = "";
+        $list.="<html><body>";
+        $list.="<br/><p>Dear $user->first_name $user->last_name!</p>";
+        $list.="<p>Thank you for signup.</p>";        
+        $list.="<p>Please find out invoice attached to make a payment.</p>";
+        $list.="<p>Alternatively you can use this <a href='http://".$_SERVER['SERVER_NAME']."/index.php/payment/index.php/$user->id' target='_blank'>link</a> and make a payment.</p>";
+        $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
+        $list.="<p>Best regards,</p>";
+        $list.="<p>Support team.</p>";
+        $list.="</body></html>";
+        return $list;
+    }
+
+    function send_invoice($user) {
+        $subject = "Medical2 Institute - invoice";
+        $message = $this->get_invoice_message($user);
+        $recipient = $user->email;
+        $this->send_email($subject, $message, $recipient);
+    }
+
     function send_email($subject, $message, $recipient) {
 
         $mail = new PHPMailer;

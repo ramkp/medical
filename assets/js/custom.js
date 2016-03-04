@@ -335,7 +335,7 @@ $(document).ready(function () {
                 }
 
                 if (inst == '') {
-                    inst='---';
+                    inst = '---';
                 }
 
                 if (zip == '') {
@@ -349,7 +349,7 @@ $(document).ready(function () {
                 }
 
                 console.log('State: ' + state);
-                if (state.indexOf('State')>=0) {
+                if (state.indexOf('State') >= 0) {
                     $('#group_common_errors').html('Please select state');
                     return false;
                 }
@@ -743,7 +743,7 @@ $(document).ready(function () {
         var tot_participants = $('#participants').val();
         var selected_course = $('#courses').text();
         var course_name = selected_course.trim();
-        
+
         if (course_name != 'Program' && course_name != '' && course_name !== undefined) {
             $('#program_err').html('');
             $('#group_common_errors').html('');
@@ -764,7 +764,7 @@ $(document).ready(function () {
                 }
 
                 if (inst == '') {
-                    inst='---';
+                    inst = '---';
                 }
 
                 if (zip == '') {
@@ -776,10 +776,10 @@ $(document).ready(function () {
                     $('#group_common_errors').html('Please provide city');
                     return false;
                 }
-                
-                
+
+
                 console.log('State: ' + state);
-                if (state.indexOf('State')>=0) {
+                if (state.indexOf('State') >= 0) {
                     $('#group_common_errors').html('Please select state');
                     return false;
                 }
@@ -893,7 +893,7 @@ $(document).ready(function () {
                 var zip = $('#zip').val();
                 var city = $('#city').val();
                 var state = $('#state').text();
-                var country = $('#country').text();                
+                var country = $('#country').text();
 
                 if (first_name == '') {
                     $('#personal_err').html('Please provide firstname');
@@ -921,7 +921,7 @@ $(document).ready(function () {
                     return false;
                 }
                 if (inst == '') {
-                    inst='---';
+                    inst = '---';
                 }
                 if (zip == '') {
                     $('#personal_err').html('Please provide zip');
@@ -931,8 +931,8 @@ $(document).ready(function () {
                     $('#personal_err').html('Please provide city');
                     return false;
                 }
-                
-                
+
+
                 console.log('State: ' + state);
                 if (state.indexOf('State') >= 0) {
                     console.log('Inside state failure');
@@ -1000,20 +1000,72 @@ $(document).ready(function () {
             $('#personal_err').html('Please select program');
         } // end else
     }
-    
+
+    function verify_group_owner_detailes() {
+        var firstname = $('#group_owner_firstname').val();
+        var lastname = $('#group_owner_lastname').val();
+        var email = $('#group_owner_email').val();
+        var courseid = $('#course_id').val();
+
+        if (firstname == '') {
+            $('#offline_group_owner_error').html('Please provide firstname');
+            return false;
+        }
+
+        if (lastname == '') {
+            $('#offline_group_owner_error').html('Please provide lastname');
+            return false;
+        }
+
+        if (email == '') {
+            $('#offline_group_owner_error').html('Please provide email');
+            return false;
+        }
+
+        if (validateEmail(email) != true) {
+            $('#offline_group_owner_error').html('Please provide valid email');
+            return false;
+        }
+
+        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true) {
+            $('#offline_group_owner_error').html('');
+            var url = "http://cnausa.com/functionality/php/send_group_invoice.php";
+            var request = {firstname: firstname, lastname: lastname, email: email, courseid: courseid};
+            $.post(url, request).done(function (data) {
+                var el = $('#payment_detailes').length;
+                $('#invoice_detaills').remove();
+                if (el == 0) {
+                    $('#owner_detailes').append(data)
+                }
+                else {
+                    el = $('#payment_detailes').remove();
+                    $('#owner_detailes').append(data)
+                }
+            });
+        }
+    }
+
     function get_option_payment_personal() {
-         var options = $('#payment_options input:radio:checked');
-         var payment_option=options.attr('value');
-         console.log('Payment option: '+payment_option);
-         var url = "http://cnausa.com/functionality/php/get_option_payment_section.php";
-         var request = {option: payment_option};
-         $('#ajax_loading_schedule').show();
-         $.post(url, request).done(function (data) {
-             $('#ajax_loading_schedule').hide();
-             //$('#program_section').html(data);
-             console.log(data);
-         });
-         
+        var options = $('#payment_options input:radio:checked');
+        var payment_option = options.attr('value');
+        console.log('Payment option: ' + payment_option);
+        var url = "http://cnausa.com/functionality/php/get_option_payment_section.php";
+        var request = {option: payment_option};
+        $('#ajax_loading_schedule').show();
+        $.post(url, request).done(function (data) {
+            $('#ajax_loading_schedule').hide();
+            var el = $('#payment_detailes').length;
+            if (el == 0) {
+                $('#payment_options').append(data);
+            } // end if el>0
+            else {
+                $('#payment_detailes').remove();
+                $('#payment_options').append(data);
+            }
+            //$('#program_section').html(data);
+            //console.log(data);
+        });
+
     }
 
     /************************************************************************
@@ -1195,6 +1247,12 @@ $(document).ready(function () {
             verify_users_upload_form();
         }
 
+        if (event.target.id == 'send_group_invoice') {
+            verify_group_owner_detailes();
+        }
+
+
+
     }); // end of $('.form_div').on('click', 'button', function (event)
 
     // ***********************Links processing events **********************
@@ -1315,13 +1373,13 @@ $(document).ready(function () {
         if (event.target.id == 'proceed_to_personal_payment') {
             verify_personal_manual_registration_form();
         }
-        
+
         //option_personal_payment
-        
+
         if (event.target.id == 'p_options_p') {
             verify_personal_manual_registration_form();
         }
-        
+
         if (event.target.id == 'proceed_to_payment') {
             get_option_payment_personal();
         }
