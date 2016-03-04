@@ -90,7 +90,7 @@ class Mailer {
         $list.="<br/><p>Dear $user->first_name $user->last_name!</p>";
         $list.="<p>Thank you for signup.</p>";        
         $list.="<p>Please find out invoice attached to make a payment.</p>";
-        $list.="<p>Alternatively you can use this <a href='http://".$_SERVER['SERVER_NAME']."/index.php/payment/index.php/$user->id' target='_blank'>link</a> and make a payment.</p>";
+        $list.="<p>Alternatively you can use this <a href='http://".$_SERVER['SERVER_NAME']."/index.php/payment/index/$user->id' target='_blank'>link</a> and make a payment.</p>";
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
         $list.="<p>Best regards,</p>";
         $list.="<p>Support team.</p>";
