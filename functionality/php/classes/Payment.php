@@ -97,14 +97,14 @@ class Payment {
     }
 
     function enroll_user($user) {
-        //print_r($user);
-        $this->user = $user;
         $this->enroll->single_signup($user);
+        $userid = $this->enroll->getUserId($user->email);
+        $user->id = $userid;
         $_SESSION["single_user_data"] = $user;
-        //$list = $this->get_payment_section_personal($user);
         $_SESSION['group_common_section'] = '';
         $_SESSION['users'] = $user;
         $_SESSION['tot_participants'] = 1;
+        $this->user = $user;
         $list = $this->get_payment_options($user->courseid);
         return $list;
     }
@@ -322,6 +322,7 @@ class Payment {
                 $this->enroll->single_signup($user);
                 $userid = $this->enroll->getUserId($group_participant->email);
                 $this->enroll->add_user_to_group($groupid, $userid);
+                $user->id = $userid;
             } // end if $email_exists==0
         } // end foreach
         //$list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
@@ -375,7 +376,7 @@ class Payment {
 
         if ($participants == 1) {
             // Single registration
-            $users->id=$this->get_user_id_by_email($users->email);
+            $users->id = $this->get_user_id_by_email($users->email);
             if ($payment_option == 'online_personal') {
                 $list .= $this->get_payment_section($group_data, $users, $participants);
             }
@@ -412,7 +413,7 @@ class Payment {
             if ($payment_option == 'online_group_members_payment') {
                 $mailer = new Mailer();
                 foreach ($users as $user) {
-                    $user->id=$this->get_user_id_by_email($user->email);
+                    $user->id = $this->get_user_id_by_email($user->email);
                     $user->courseid = $group_data->courseid;
                     $mailer->send_invoice($user);
                 } // end foreach
@@ -446,7 +447,7 @@ class Payment {
         $list.="<span class='span2'>First name</span>";
         $list.="<span class='span2'><input type='text' id='group_owner_firstname'></span>";
         $list.="<span class='span2'>Last name</span>";
-        $list.="<span class='span2'><input type='hidden' id='course_id' value='$group_data->courseid'></span>";        
+        $list.="<span class='span2'><input type='hidden' id='course_id' value='$group_data->courseid'></span>";
         $list.="<span class='span2'><input type='text' id='group_owner_lastname'></span>";
         $list.="</div>";
 
@@ -468,52 +469,60 @@ class Payment {
     function send_group_invoice($group_owner) {
         $list = "";
         $mailer = new Mailer();
-        $mailer->send_invoice($group_owner);
-
+        $mailer->send_invoice($group_owner, 1);
+        
+        /*
         $list.="<div class='panel panel-default' id='invoice_detaills'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
         $list.="<div class='panel-body'>";
-
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span6'>Thank you! Invoice has been sent to $group_owner->email.</span>";
         $list.="</div>";
-
         $list.="</div>";
         $list.="</div>";
+        */
+        
+        
+        $list.="Thank you! Invoice has been sent to $group_owner->email.";
 
         return $list;
     }
 
-    function get_payment_section($group_data, $users, $participants, $installment = null) {
-        
+    function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null) {
+
         /*
-        print_r($group_data);
-        echo "<br/>";
-        print_r($users);
-        echo "<br/>";
+          print_r($group_data);
+          echo "<br/>";
+          print_r($users);
+          echo "<br/>";
          * 
          */
-        
+
         $list = "";
         $cost_block = "";
         $card_types = $this->get_card_types_dropbox();
         $card_year = $this->get_year_drop_box();
         $card_month = $this->get_month_drop_box();
 
+        if ($from_email != null) {
+            $list.="<br/><div  class='form_div'>";
+        }
         $list.="<div class='panel panel-default' id='payment_detailes'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
         $list.="<div class='panel-body'>";
 
-        if ($installment == null) {            
+        if ($installment == null) {
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
                 $course_cost = $this->get_personal_course_cost($users->courseid);
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
+                $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
             } // end if $group==NULL 
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
                 $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
-                $list.= "<input type='hidden' value='$users->group_name' id='user_group' name='user_group' />";
+                $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
+                $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
             } // end else
             if ($course_cost['discount'] == 0) {
                 $cost_block.="$" . $course_cost['cost'];
@@ -529,16 +538,18 @@ class Payment {
             $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='payment_sum' />";
             $list.="</div>";
         } // end if $installment==null
-        else {            
+        else {
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
-                $course_cost = $this->get_personal_course_cost($users->courseid);                
+                $course_cost = $this->get_personal_course_cost($users->courseid);
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
+                $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
             } // end if $group==NULL 
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
                 $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
-                $list.= "<input type='hidden' value='$users->group_name' id='user_group' name='user_group' />";
+                $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
+                $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
             } // end else
 
             $first_payment = round(($course_cost['cost'] / $installment['num_payments']));
@@ -597,6 +608,10 @@ class Payment {
 
         $list.="</div>";
         $list.="</div>";
+        
+        if ($from_email != null) {
+            $list.="</div>"; // form div
+        }
 
         return $list;
     }
@@ -622,6 +637,7 @@ class Payment {
                 $this->enroll->single_signup($user);
                 $userid = $this->enroll->getUserId($group_participant->email);
                 $this->enroll->add_user_to_group($groupid, $userid);
+                $user->id = $userid;
             } // end if $email_exists==0
         } // end foreach
         //$list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);

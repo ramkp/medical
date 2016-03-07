@@ -527,6 +527,7 @@ $(document).ready(function () {
         var bill_city = $('#bill_city').val();
         var bill_zip = $('#bill_zip').val();
         var bill_email = $('#bill_email').val();
+        var userid=$('#userid').val();        
 
         if (card_type == 'Card type') {
             $('#personal_payment_err').html('Please select card type');
@@ -584,6 +585,7 @@ $(document).ready(function () {
             $('#personal_payment_err').html('');
             var card = {sum: sum,
                 email: email,
+                userid:userid,                
                 card_type: card_type,
                 card_no: card_no,
                 card_holder: card_holder,
@@ -1034,19 +1036,14 @@ $(document).ready(function () {
             $.post(url, request).done(function (data) {
                 var el = $('#payment_detailes').length;
                 $('#invoice_detaills').remove();
-                if (el == 0) {
-                    $('#owner_detailes').append(data)
-                }
-                else {
-                    el = $('#payment_detailes').remove();
-                    $('#owner_detailes').append(data)
-                }
+                alert (data);
             });
         }
     }
 
     function get_option_payment_personal() {
         var options = $('#payment_options input:radio:checked');
+        console.log('Options: '+options);
         var payment_option = options.attr('value');
         console.log('Payment option: ' + payment_option);
         var url = "http://cnausa.com/functionality/php/get_option_payment_section.php";

@@ -84,13 +84,16 @@ class Mailer {
         $this->send_email($subject, $reply, $recipient);
     }
 
-    function get_invoice_message($user) {
+    function get_invoice_message($user, $gowner = null) {
         $list = "";
         $list.="<html><body>";
         $list.="<br/><p>Dear $user->first_name $user->last_name!</p>";
-        $list.="<p>Thank you for signup.</p>";        
+        $list.="<p>Thank you for signup.</p>";
         $list.="<p>Please find out invoice attached to make a payment.</p>";
-        $list.="<p>Alternatively you can use this <a href='http://".$_SERVER['SERVER_NAME']."/index.php/payment/index/$user->id' target='_blank'>link</a> and make a payment.</p>";
+        //$list.= "<p>User ID: $user->id</p>";
+        if ($user->id != '') {
+            $list.="<p>Alternatively you can use this <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$user->id' target='_blank'>link</a> and make a payment.</p>";
+        }
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
         $list.="<p>Best regards,</p>";
         $list.="<p>Support team.</p>";
@@ -98,9 +101,9 @@ class Mailer {
         return $list;
     }
 
-    function send_invoice($user) {
+    function send_invoice($user, $gowner = null) {
         $subject = "Medical2 Institute - invoice";
-        $message = $this->get_invoice_message($user);
+        $message = $this->get_invoice_message($user, $gowner);
         $recipient = $user->email;
         $this->send_email($subject, $message, $recipient);
     }
