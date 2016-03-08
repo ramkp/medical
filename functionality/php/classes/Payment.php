@@ -470,19 +470,19 @@ class Payment {
         $list = "";
         $mailer = new Mailer();
         $mailer->send_invoice($group_owner, 1);
-        
+
         /*
-        $list.="<div class='panel panel-default' id='invoice_detaills'>";
-        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
-        $list.="<div class='panel-body'>";
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span6'>Thank you! Invoice has been sent to $group_owner->email.</span>";
-        $list.="</div>";
-        $list.="</div>";
-        $list.="</div>";
-        */
-        
-        
+          $list.="<div class='panel panel-default' id='invoice_detaills'>";
+          $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+          $list.="<div class='panel-body'>";
+          $list.="<div class='container-fluid' style='text-align:left;'>";
+          $list.="<span class='span6'>Thank you! Invoice has been sent to $group_owner->email.</span>";
+          $list.="</div>";
+          $list.="</div>";
+          $list.="</div>";
+         */
+
+
         $list.="Thank you! Invoice has been sent to $group_owner->email.";
 
         return $list;
@@ -608,7 +608,7 @@ class Payment {
 
         $list.="</div>";
         $list.="</div>";
-        
+
         if ($from_email != null) {
             $list.="</div>"; // form div
         }
@@ -691,12 +691,17 @@ class Payment {
     function make_stub_payment($card) {
         $mailer = new Mailer();
         $user_group = $card->user_group;
+        $userid = $card->userid;
 
-        if ($user_group == '') {
+        if ($user_group == '' && $userid != '') {
             $this->confirm_user($card->email);
             $mailer->send_payment_confirmation_message($card);
         } // end if $user_group==''
-        else {
+        if ($user_group != '' && $userid != '') {
+            $this->confirm_user($card->email);
+            $mailer->send_payment_confirmation_message($card);
+        } // end if $user_group!='' && $userid!=''
+        if ($user_group != '' && $userid == '') {
             $group_users = $this->get_group_users($user_group);
             $mailer->send_payment_confirmation_message($card, 1);
             foreach ($group_users as $userid) {
@@ -704,7 +709,7 @@ class Payment {
                 $this->confirm_user($user->username);
                 $mailer->send_group_payment_confirmation_message($user);
             } // end foreach
-        } // end else
+        } // end if $user_group!='' && $userid==''
         $list = "";
         $list.="<div class='panel panel-default' id='personal_payment_details'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
