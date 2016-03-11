@@ -6,16 +6,19 @@
  * @author sirromas
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Upload.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 
 class Payment {
 
     public $db;
     public $enroll;
+    public $invoice;
     public $user;
 
     function __construct() {
         $this->db = new pdo_db();
         $this->enroll = new Enroll();
+        $this->invoice=new Invoice();
     }
 
     function get_payment_options($courseid, $group = null) {
@@ -363,24 +366,15 @@ class Payment {
         $group_data = $_SESSION['group_common_section'];
         $users = $_SESSION['users'];
         $participants = $_SESSION['tot_participants'];
-
-        /*
-          echo "<br/>";
-          echo "Option: " . $payment_option;
-          echo "<br/>";
-
-          echo "<br/><pre>";
-          print_r($_SESSION);
-          echo "<pre>";
-         */
-
         if ($participants == 1) {
             // Single registration
             $users->id = $this->get_user_id_by_email($users->email);
             if ($payment_option == 'online_personal') {
                 $list .= $this->get_payment_section($group_data, $users, $participants);
             }
-            if ($payment_option == 'offline_personal') {
+            if ($payment_option == 'offline_personal') {                                
+                $invoice_path=$this->invoice->get_personal_invoice($user);
+                $user->invoice=$invoice_path;
                 $mailer = new Mailer();
                 $mailer->send_invoice($users);
 

@@ -105,10 +105,10 @@ class Mailer {
         $subject = "Medical2 Institute - invoice";
         $message = $this->get_invoice_message($user, $gowner);
         $recipient = $user->email;
-        $this->send_email($subject, $message, $recipient);
+        $this->send_email($subject, $message, $recipient, $user->invoice);
     }
 
-    function send_email($subject, $message, $recipient) {
+    function send_email($subject, $message, $recipient, $attachment=null) {
 
         $mail = new PHPMailer;
         $recipient = 'sirromas@gmail.com'; // temp workaround
