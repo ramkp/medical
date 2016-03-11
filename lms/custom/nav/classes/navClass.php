@@ -50,12 +50,27 @@ class navClass extends Util {
                             <li class='dropdown'><a title='Programs' class='dropdown-toggle' href='#'>Programs<b class='caret'></b></a>                                
                                 $price_items
                             </li>                            
+                            <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Invoices<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Invoice'>Invoice</a></li>
+                                    <li><a href='#' title='Open invoices'>Open invoices</a></li>
+                                    <li><a href='#' title='Paid invoices'>Paid invoices</a></li>
+                                    <li><a href='#' title='Send invoice'>Send invoice</a></li>                                    
+                                </ul>
+                            </li>                            
+                            <li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Cash'>Cash payments</a></li>
+                                    <li><a href='#' title='Cheque'>Cheque payments</a></li>
+                                    <li><a href='#' title='Cards'>Credit cards payments</a></li>
+                                    <li><a href='#' title='Refund'>Refund</a></li>                                    
+                                    <li><a href='#' title='Free'>Free</a></li>                                    
+                                </ul>
+                            </li>
                             <li class='dropdown'><a title='Reports' class='dropdown-toggle' href='#'>Reports<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
-                                    <li><a href='#' title='Report'>Report#1</a></li>
-                                    <li><a href='#' title='Report'>Report#2</a></li>
-                                    <li><a href='#' title='Report'>Report#3</a></li>
-                                    <li><a href='#' title=''>Report#4</a></li>                                     
+                                    <li><a href='#' title='Report'>Users stats</a></li>
+                                    <li><a href='#' title='Report'>Payments log</a></li>                                    
                                 </ul>
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
@@ -63,7 +78,7 @@ class navClass extends Util {
                                     <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
                                     <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>
                                     <li><a href='#' title='Google Map' id='Google_Map'>Google Map</a></li>                                   
-                                    <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                     
+                                    <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
                                     <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li>                                     
                                     <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>                                     
                                 </ul>
