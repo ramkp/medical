@@ -221,6 +221,15 @@ $(document).ready(function () {
         var installment_id = '#installment_' + courseid;
         var num_payments_id = '#num_payments_' + courseid;
         var num_payments = $(num_payments_id).val();
+        var taxes_num='#taxes_'+ courseid;
+        var taxes;
+        
+        if ($(taxes_num).is(':checked')) {
+            taxes=1;
+        }
+        else {
+            taxes=0;
+        }
 
         if ($(installment_id).is(':checked')) {
             installment = 1;
@@ -268,6 +277,7 @@ $(document).ready(function () {
                     course_group_discount: course_group_discount,
                     installment: installment,
                     num_payments: num_payments,
+                    taxes:taxes,
                     states: JSON.stringify(states)};
                 $.post(url, request).done(function (data) {
                     //alert ('Server response: '+data);

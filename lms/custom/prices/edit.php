@@ -9,6 +9,7 @@ $installment=$_POST['installment'];
 $num_payments=$_POST['num_payments'];    
 $post_states=$_POST['states'];
 $states=json_decode($post_states)[0];
+$taxes=$_POST['taxes'];
 
 /*
 echo "<br/>--------------<br/>";
@@ -19,6 +20,6 @@ echo "<br/>--------------<br/>";
 */
 
 $pr = new Price();
-$list = $pr->update_item_price($course_id,$course_cost,$course_discount,$course_group_discount,$installment,$num_payments,$states);
+$list = $pr->update_item_price($course_id,$course_cost,$course_discount,$course_group_discount,$installment,$num_payments,$states,$taxes);
 echo $list;
 ?>

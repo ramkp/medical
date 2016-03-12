@@ -90,7 +90,14 @@ class Price extends Util {
 
     function get_items_from_category($id) {
         $price_items = array();
-        $query = "select id, fullname, installment, num_payments, cost, discount_status, discount_size "
+        $query = "select id, "
+                . "fullname, "
+                . "installment, "
+                . "num_payments, "
+                . "cost, "
+                . "discount_status, "
+                . "discount_size, "
+                . "taxes "
                 . "from mdl_course "
                 . "where category=$id";
         $num = $this->db->numrows($query);
@@ -205,6 +212,17 @@ class Price extends Util {
         return $list;
     }
 
+    function course_tax_status($id, $taxes) {
+        $list = "";
+        if ($taxes == 0) {
+            $list = "<input type='checkbox' name='taxes_$id' id='taxes_$id' value='$id'>";
+        } // end if $taxes_status==0
+        else {
+            $list = "<input type='checkbox' name='taxes_$id' id='taxes_$id' value='$id' checked>";
+        } // end else
+        return $list;
+    }
+
     function create_item_block2($price_items, $category_name) {
 
         $list = "";
@@ -217,6 +235,7 @@ class Price extends Util {
                 $states = $this->get_course_states($item->id);
                 $installment_checkbox = $this->get_installment_checkbox($item->id, $item->installment);
                 $installment_payments = $this->get_installment_num_payments($item->id, $item->installment, $item->num_payments);
+                $taxes = $this->course_tax_status($item->id, $item->taxes);
                 $list.= "<div class='container-fluid'>";
                 $list.="<span class='span6' style='color:red;' id='price_err_$item->id'></span>";
                 $list.= "</div>";
@@ -247,6 +266,10 @@ class Price extends Util {
 
                 $list.= "<div class='container-fluid'>";
                 $list.="<span class='span3'>Item states</span><span class='span1'>$states</span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'>Apply state taxes</span><span class='span1'>$taxes</span>";
                 $list.= "</div>";
 
                 $list.= "<div class='container-fluid'>";
@@ -309,13 +332,14 @@ class Price extends Util {
         } // end if count($states)>0
     }
 
-    function update_item_price($course_id, $course_cost, $course_discount, $course_group_discount, $installment, $num_payments, $states) {
+    function update_item_price($course_id, $course_cost, $course_discount, $course_group_discount, $installment, $num_payments, $states, $taxes) {
         // Update mdl_course table
         $query = "update mdl_course "
                 . "set cost=$course_cost ,"
                 . "discount_size=$course_discount , "
                 . "installment=$installment, "
-                . "num_payments=$num_payments "
+                . "num_payments=$num_payments, "
+                . "taxes=$taxes "
                 . "where id=$course_id";
         $this->db->query($query);
 
