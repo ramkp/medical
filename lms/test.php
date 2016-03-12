@@ -267,5 +267,7 @@ class Tester {
 
 }
 
-$tester = new Tester();
-$tester->insert_countries();
+//$tester = new Tester();
+//$tester->insert_countries();
+
+phpinfo();
