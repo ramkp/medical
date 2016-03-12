@@ -130,6 +130,23 @@ $(document).ready(function () {
         });
     }
 
+    function update_invoice_data() {
+        var phone = $('#phone').val();
+        var fax = $('#fax').val();
+        var email = $('#email').val();
+        var site = $('#site').val();
+        if (phone != '' && fax != '' && email != '' && site != '') {
+            $('#invoice_status').html('');
+            var url = "/lms/custom/invoices/update.php";
+            $.post(url, {phone: phone, fax: fax, email: email, site: site}).done(function (data) {
+                $('#invoice_status').html(data);
+            });
+        } // end if phone!='' && fax!='' && email!='' && site!=''
+        else {
+            $('#invoice_status').html("<span style='color:red'>Please provide all data</span>");
+        } // end else 
+    }
+
     function  update_map_item(item) {
         var category_id = 5; // Nursing school category id
         var courseid = item.replace("map_", "");
@@ -220,9 +237,9 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     }
-    
+
     function get_invoice_spec_page() {
-        var url = "/lms/custom/invoice/index.php";
+        var url = "/lms/custom/invoices/index.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
@@ -375,6 +392,12 @@ $(document).ready(function () {
             update_tax_item(event.target.id);
         }
 
+        if (event.target.id == 'invoice_data') {
+            update_invoice_data();
+        }
+
+
+
     }); // end of #region-main click', 'button',
 
     $('#region-main').on('click', 'a', function (event) {
@@ -440,7 +463,7 @@ $(document).ready(function () {
         update_navigation_status__menu('State taxes');
         get_state_taxes_list();
     });
-    
+
     $("#data_inv").click(function (event) {
         update_navigation_status__menu('Invoice');
         get_invoice_spec_page();
