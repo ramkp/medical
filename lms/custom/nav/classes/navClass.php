@@ -52,10 +52,10 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Invoices<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
-                                    <li><a href='#' title='Invoice'>Invoice</a></li>
-                                    <li><a href='#' title='Open invoices'>Open invoices</a></li>
-                                    <li><a href='#' title='Paid invoices'>Paid invoices</a></li>
-                                    <li><a href='#' title='Send invoice'>Send invoice</a></li>                                    
+                                    <li><a href='#' title='Invoice' id='data_inv'>Invoice</a></li>
+                                    <li><a href='#' title='Open invoices' id='opn_inv'>Open invoices</a></li>
+                                    <li><a href='#' title='Paid invoices' id='paid_inv'>Paid invoices</a></li>
+                                    <li><a href='#' title='Send invoice' id='send_inv'>Send invoice</a></li>                                    
                                 </ul>
                             </li>                            
                             <li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
@@ -79,7 +79,8 @@ class navClass extends Util {
                                     <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>
                                     <li><a href='#' title='Google Map' id='Google_Map'>Google Map</a></li>                                   
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
-                                    <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li>                                     
+                                    <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li> 
+                                    <li><a href='#' title='Taxes' id='taxes'>State taxes</a></li> 
                                     <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>                                     
                                 </ul>
                             </li>

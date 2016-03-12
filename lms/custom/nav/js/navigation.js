@@ -119,6 +119,17 @@ $(document).ready(function () {
         });
     }
 
+    function update_tax_item(item) {
+        var id = item.replace("tax_", "");
+        var taxid = "#tax_val" + id;
+        var status_box = "#tax_status_" + id;
+        var tax = $(taxid).val();
+        var url = "/lms/custom/taxes/update.php";
+        $.post(url, {id: id, tax: tax}).done(function (data) {
+            $(status_box).html(data);
+        });
+    }
+
     function  update_map_item(item) {
         var category_id = 5; // Nursing school category id
         var courseid = item.replace("map_", "");
@@ -203,6 +214,20 @@ $(document).ready(function () {
 
     }
 
+    function get_state_taxes_list() {
+        var url = "/lms/custom/taxes/index.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+    
+    function get_invoice_spec_page() {
+        var url = "/lms/custom/invoice/index.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     function validateNum(str) {
         var patForReqdFld = /^(\-)?([\d]+(?:\.\d{1,2})?)$/;
         return patForReqdFld.test(str);
@@ -221,14 +246,14 @@ $(document).ready(function () {
         var installment_id = '#installment_' + courseid;
         var num_payments_id = '#num_payments_' + courseid;
         var num_payments = $(num_payments_id).val();
-        var taxes_num='#taxes_'+ courseid;
+        var taxes_num = '#taxes_' + courseid;
         var taxes;
-        
+
         if ($(taxes_num).is(':checked')) {
-            taxes=1;
+            taxes = 1;
         }
         else {
-            taxes=0;
+            taxes = 0;
         }
 
         if ($(installment_id).is(':checked')) {
@@ -277,11 +302,11 @@ $(document).ready(function () {
                     course_group_discount: course_group_discount,
                     installment: installment,
                     num_payments: num_payments,
-                    taxes:taxes,
+                    taxes: taxes,
                     states: JSON.stringify(states)};
                 $.post(url, request).done(function (data) {
                     //alert ('Server response: '+data);
-                    $(price_id_err).html("<span style='color:green;'>"+data+"</span>");
+                    $(price_id_err).html("<span style='color:green;'>" + data + "</span>");
                 });
             } // end if validateNum(course_cost
             else {
@@ -346,7 +371,11 @@ $(document).ready(function () {
             update_map_item(event.target.id);
         }
 
-    }); // end of #region-main
+        if (event.target.id.indexOf("tax_") >= 0) {
+            update_tax_item(event.target.id);
+        }
+
+    }); // end of #region-main click', 'button',
 
     $('#region-main').on('click', 'a', function (event) {
         if (event.target.id.indexOf("group_") >= 0) {
@@ -406,6 +435,17 @@ $(document).ready(function () {
         update_navigation_status__menu('Private Groups');
         get_private_groups_requests_list();
     });
+
+    $("#taxes").click(function (event) {
+        update_navigation_status__menu('State taxes');
+        get_state_taxes_list();
+    });
+    
+    $("#data_inv").click(function (event) {
+        update_navigation_status__menu('Invoice');
+        get_invoice_spec_page();
+    });
+
 
 
 }); // end of $(document).ready(function()
