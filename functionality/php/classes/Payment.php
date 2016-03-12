@@ -18,7 +18,7 @@ class Payment {
     function __construct() {
         $this->db = new pdo_db();
         $this->enroll = new Enroll();
-        $this->invoice=new Invoice();
+        $this->invoice = new Invoice();
     }
 
     function get_payment_options($courseid, $group = null) {
@@ -372,9 +372,9 @@ class Payment {
             if ($payment_option == 'online_personal') {
                 $list .= $this->get_payment_section($group_data, $users, $participants);
             }
-            if ($payment_option == 'offline_personal') {                                
-                $invoice_path=$this->invoice->get_personal_invoice($user);
-                $user->invoice=$invoice_path;
+            if ($payment_option == 'offline_personal') {
+                $invoice_path = $this->invoice->get_personal_invoice($users);
+                $users->invoice = $invoice_path;
                 $mailer = new Mailer();
                 $mailer->send_invoice($users);
 
@@ -409,6 +409,7 @@ class Payment {
                 foreach ($users as $user) {
                     $user->id = $this->get_user_id_by_email($user->email);
                     $user->courseid = $group_data->courseid;
+                    $user->invoice=$this->invoice->get_personal_invoice($user, 1, 1);
                     $mailer->send_invoice($user);
                 } // end foreach
                 $list.="<div class='panel panel-default' id='payment_detailes'>";
@@ -462,23 +463,12 @@ class Payment {
 
     function send_group_invoice($group_owner) {
         $list = "";
+        $participants = $_SESSION['tot_participants'];
+        $invoice_path = $this->invoice->get_personal_invoice($group_owner, 1, $participants);
+        $group_owner->invoice = $invoice_path;
         $mailer = new Mailer();
         $mailer->send_invoice($group_owner, 1);
-
-        /*
-          $list.="<div class='panel panel-default' id='invoice_detaills'>";
-          $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
-          $list.="<div class='panel-body'>";
-          $list.="<div class='container-fluid' style='text-align:left;'>";
-          $list.="<span class='span6'>Thank you! Invoice has been sent to $group_owner->email.</span>";
-          $list.="</div>";
-          $list.="</div>";
-          $list.="</div>";
-         */
-
-
         $list.="Thank you! Invoice has been sent to $group_owner->email.";
-
         return $list;
     }
 

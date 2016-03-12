@@ -50,8 +50,38 @@ class Invoice {
         return $course_cost;
     }
 
-    function get_personal_invoice($user) {
-        $invoice_path = $this->create_user_invoice($user);
+    function get_course_group_discount($courseid, $tot_participants) {
+
+        // 1. Get course cost
+        $query = "select id, cost from mdl_course "
+                . "where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cost = $row['cost'];
+        }
+
+        // 2. Get course group discount
+        $query = "select courseid, group_discount_size "
+                . "from mdl_group_discount "
+                . "where courseid=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $discount = $row['group_discount_size'];
+        }
+
+        $group_cost = $cost * $tot_participants;
+        if ($discount > 0) {
+            $final_cost = $group_cost - round(($group_cost * $discount) / 100, 2);
+        } // end if $discount>0
+        else {
+            $final_cost = round($group_cost, 2);
+        }
+        $course_cost = array('cost' => $final_cost, 'discount' => $discount);
+        return $course_cost;
+    }
+
+    function get_personal_invoice($user, $group = null, $participants = null) {
+        $invoice_path = $this->create_user_invoice($user, $group, $participants);
         return $invoice_path;
     }
 
@@ -65,8 +95,17 @@ class Invoice {
         return $name;
     }
 
-    function create_user_invoice($user) {
-        $cost = $this->get_personal_course_cost($user->courseid);
+    function create_user_invoice($user, $group, $participants) {
+        if ($group == null) {
+            $cost = $this->get_personal_course_cost($user->courseid); // cost, discount
+            $item_name = $this->get_course_name($user->courseid);
+        } // end if $group==null
+        else {
+            $group_data = $_SESSION['group_common_section'];
+            $participants = ($participants == null) ? $_SESSION['tot_participants'] : $participants;
+            $cost = $this->get_course_group_discount($group_data->courseid, $participants); // cost, discount
+            $item_name = $this->get_course_name($group_data->courseid);
+        }
         if ($cost['discount'] > 0) {
             $amount = '$' . $cost['cost'] . '&nbsp;(discount is ' . $cost['discount'] . '%)';
         } // end if $cost['discount']>0
@@ -75,15 +114,13 @@ class Invoice {
         }
         $invoice_credentials = $this->get_invoice_credentials();
         $invoice_num = $this->get_invoice_num();
-        $item_name = $this->get_course_name($user->courseid);
-
         $list = "";
         $list.="<html>";
         $list.="<body>";
         $list.= "<p></p>";
         $list.="<br/><br/><table border='0' align='center'>";
         $list.="<tr>";
-        $list.="<td colspan='2' width='65%' style=''><img src='".$_SERVER['DOCUMENT_ROOT']."/assets/logo/logo_site.jpg' width='300' height=90></td><td width='35%' style='padding-left:10px;padding-right:10px;border-left:1px solid;'>Phone: $invoice_credentials->phone<br/>Fax: $invoice_credentials->fax</td>";
+        $list.="<td colspan='2' width='65%' style=''><img src='" . $_SERVER['DOCUMENT_ROOT'] . "/assets/logo/logo_site.jpg' width='300' height=90></td><td width='35%' style='padding-left:10px;padding-right:10px;border-left:1px solid;'>Phone: $invoice_credentials->phone<br/>Fax: $invoice_credentials->fax</td>";
         $list.="</tr>";
         $list.="<tr>";
         $list.="<td colspan='3' style='border-bottom:1px solid;padding-top:1px;height:10px;'></td>";
@@ -95,12 +132,6 @@ class Invoice {
         $list.="<td colspan='3' style='padding-top:1px;height:35px;'></td>";
         $list.="</tr>";
         $list.="<tr bgcolor='black'>";
-        /*$list.="<td  style='' colspan='3'><div style='width: 100%; height: 6px; border-bottom: 12px solid black;'>
-                <span style='font-size: 20px; background-color: white; padding: 0 10px;margin-left:75px;'>
-                <span style='color:#e2a500;font-weight:bold;'>INVOICE TO </span>
-                </span>
-                </div></td>";
-        */
         $list.="<td style='text-align:center;color:black;' width='15' height='15'>&nbsp;</td><td style='padding-left:15px;text-align:left;' width='10%' bgcolor='white'><span style='color:#ff8000;font-weight:bolder;'>INVOICE TO </span></td><td style='text-align:left;color:black;padding-left:15px;' width='70%'>&nbsp;</td>";
         $list.="</tr>";
         $list.="<tr>";
@@ -116,7 +147,7 @@ class Invoice {
         $list.="<td></td><td style='padding:10px;' align='right'>Subtotal</td><td bgcolor='black' style='color:white;padding-left:15px;'>$" . $cost['cost'] . "</td>";
         $list.="</tr>";
         $list.="<tr>";
-        $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>0</td>";
+        $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$0</td>";
         $list.="</tr>";
         $list.="<tr>";
         $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $cost['cost'] . "</td>";
@@ -144,7 +175,7 @@ class Invoice {
 
         $file_path = $this->invoice_path . "/$invoice_num.pdf";
         file_put_contents($file_path, $output);
-        
+        return $invoice_num;
     }
 
     function get_invoice_num() {

@@ -13,6 +13,11 @@ class Mailer {
     public $mail_smtp_port = 25;
     public $mail_smtp_user = 'support@cnausa.com';
     public $mail_smtp_pwd = 'aK6SKymc*';
+    public $invoice_path;
+
+    function __construct() {
+        $this->invoice_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices';
+    }
 
     function get_account_confirmation_message($user) {
         $list = "";
@@ -91,9 +96,9 @@ class Mailer {
         $list.="<p>Thank you for signup.</p>";
         $list.="<p>Please find out invoice attached to make a payment.</p>";
         //$list.= "<p>User ID: $user->id</p>";
-        if ($user->id != '') {
-            $list.="<p>Alternatively you can use this <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$user->id' target='_blank'>link</a> and make a payment.</p>";
-        }
+        //if ($user->id != '') {
+          //  $list.="<p>Alternatively you can use this <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$user->id' target='_blank'>link</a> and make a payment.</p>";
+        //}
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
         $list.="<p>Best regards,</p>";
         $list.="<p>Support team.</p>";
@@ -108,7 +113,7 @@ class Mailer {
         $this->send_email($subject, $message, $recipient, $user->invoice);
     }
 
-    function send_email($subject, $message, $recipient, $attachment=null) {
+    function send_email($subject, $message, $recipient, $attachment = null) {
 
         $mail = new PHPMailer;
         $recipient = 'sirromas@gmail.com'; // temp workaround
@@ -126,6 +131,10 @@ class Mailer {
         $mail->addAddress($recipient);
         $mail->addReplyTo($this->mail_smtp_user, 'Support team');
 
+        if ($attachment != null) {
+            $invoice = $this->invoice_path . "/$attachment.pdf";
+            $mail->addAttachment($invoice, "invoice.pdf");
+        } // end if $attachment != null
         $mail->isHTML(true);
 
         $mail->Subject = $subject;
