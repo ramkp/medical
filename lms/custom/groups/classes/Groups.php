@@ -17,31 +17,47 @@ class Groups extends Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+
                 $request = new stdClass();
                 foreach ($row as $key => $value) {
+
                     $request->$key = $value;
                 }
+
                 $requests[] = $request;
             } // end while 
         } // end if $num > 0
         $list = $this->render_requests_list($requests);
+        //echo "List: ".$list;
         return $list;
     }
 
-    function render_requests_list($requests) {
+    function render_requests_list($requests, $wrap = 1) {
         $list = "";
-        $list.= "<div class='container-fluid'><span class='span9' style='font-weight:strong;'>Private Groups Requests</span></div>";
+        $list.= "<div class='container-fluid' style='font-weight:bold;'>"
+                . "<span class='span3' style='font-weight:strong;'>Group Request</span>"
+                . "<span class='span3' style='font-weight:strong;'>Date</span>"
+                . "<span class='span3' style='font-weight:strong;'>Detailes</span>"
+                . "</div>";        
         if (count($requests) > 0) {
+            // echo "<br>Inside count>0 ...";
             foreach ($requests as $request) {
-                $status = ($request->status == 0) ? "Not replied" : "Replied";
-                $group_detailes=$this->get_request_detailed_view($request->id);
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span9'>$request->group_request</span><span class='span2'>" . date('Y-m-d', $request->request_date) . "</span><span class='span1'><a  id='group_$request->id' href='#' onClick='return false;'>Detailes</a></span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid' style='text-align:center;'>";
-                $list.="<span class='span12' id='det_$request->id' style='text-align:center;display:none;'>$group_detailes</span>";
-                $list.="</div>";
+                if ($request->group_request != '') {
+                    $group_detailes = $this->get_request_detailed_view($request->id);
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span3'>$request->group_request</span><span class='span3'>" . date('Y-m-d', $request->request_date) . "</span><span class='span3'><a  id='group_$request->id' href='#' onClick='return false;'>Detailes</a></span>";
+                    $list.="</div>";
+                    $list.="<div class='container-fluid' style='text-align:center;'>";
+                    $list.="<span class='span12' id='det_$request->id' style='text-align:center;display:none;'>$group_detailes</span>";
+                    $list.="</div>";
+                    $list.= "<div class='container-fluid'>";
+                    $list.="<span class='span9'><hr/></span>";
+                    $list.= "</div>";
+                } // end if $request->group_request != ''
             } // end foreach
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span12'><div id='pagination-demo' class='pagination'></div></span>";
+            $list.="</div>";
         } // end if count($requests)>0
         else {
             $list.="<div class='container-fluid'>";

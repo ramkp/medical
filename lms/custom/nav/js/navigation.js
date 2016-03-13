@@ -130,6 +130,13 @@ $(document).ready(function () {
         });
     }
 
+    function get_tax_item(id) {
+        var url = "/lms/custom/taxes/get_tax_item.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#state_taxes').html(data);
+        });
+    }
+
     function update_invoice_data() {
         var phone = $('#phone').val();
         var fax = $('#fax').val();
