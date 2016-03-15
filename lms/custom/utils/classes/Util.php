@@ -27,8 +27,9 @@ class Util {
         $query = "select id from mdl_context
                      where contextlevel=50
                      and instanceid='" . $courseid . "' ";
+        //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
-        while ($row = mysql_fetch_assoc($result)) {
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $contextid = $row['id'];
         }
         return $contextid;
@@ -68,9 +69,10 @@ class Util {
             $items[] = $item;
         } // end while
         if (count($items) > 0) {
-            $list.="<select id='course_categories' style='width:75px;'>";
+            $list.="<select id='course_categories'>";
+            $list.="<option value='0' selected>Program type</option>";
             foreach ($items as $item) {
-                $list.="<option vallue='$item->id'>$item->name</option>";
+                $list.="<option value='$item->id'>$item->name</option>";
             } // end foreach
             $list.="</select>";
         } // end if count($items)>0 
@@ -80,7 +82,7 @@ class Util {
     function get_course_by_category($id) {
         $list = "";
         $items = array();
-        $query = "id, fullname from mdl_course where category=$id";
+        $query = "select id, fullname from mdl_course where category=$id";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -91,23 +93,27 @@ class Util {
                 } // end foreach
                 $items[] = $item;
             } // end while
-            $list.="<select id='courses' style='width:75px;'>";
+            $list.="<span class='span3'>Programs:</span><span class='span4'><select id='courses' >";
+            $list.="<option value='0' selected>Program</option>";
             foreach ($items as $item) {
-                $list.="<option vallue='$item->id'>$item->fullname</option>";
+                $list.="<option value='$item->id'>$item->fullname</option>";
             } // end foreach
-            $list.="</select>";
+            $list.="</select></span>";
         } // end if $num>0
         return $list;
     }
 
     function get_user_details($id) {
         $query = "select firstname, lastname, email from mdl_user where id=$id";
+        //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $user = new stdClass();
-            $user->firstname = $row['firstname'];
-            $user->lastname = $row['lastname'];
-            $user->email = $row['email'];
+            if ($row['firstname'] != '' && $row['lastname'] != '') {
+                $user->firstname = $row['firstname'];
+                $user->lastname = $row['lastname'];
+                $user->email = $row['email'];
+            } // end if $row['firstname'] != '' && $row['lastname'] != ''
         } // end while
         return $user;
     }
@@ -122,6 +128,7 @@ class Util {
         $query = "select id, roleid, contextid, userid "
                 . "from mdl_role_assignments "
                 . "where roleid=$this->student_role and contextid=$instanceid";
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -134,12 +141,14 @@ class Util {
             } // end while
         } // end if $num > 0
         if (count($users) > 0) {
-            $list.="<select id='users' style='width:75px;'>";
+            $list.="<span class='span3'>Enrolled users:</span><span class='span4'><select id='users'>";
             foreach ($users as $user) {
                 $user_details = $this->get_user_details($user->userid);
-                $list.="<option vallue='$user->userid'>$user_details->$user_details->firstname &nbsp; $user_details->lastname </option>";
+                if ($user_details->firstname != '' && $user_details->lastname != '') {
+                    $list.="<option value='$user->userid'>$user_details->firstname &nbsp; $user_details->lastname </option>";
+                }
             } // end foreach            
-            $list.="</select>";
+            $list.="</select></span>";
         } // end if count($users)>0
         return $list;
     }

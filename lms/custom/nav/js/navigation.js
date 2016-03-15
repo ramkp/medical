@@ -235,7 +235,10 @@ $(document).ready(function () {
     }
 
     function get_certificates_page() {
-
+        var url = "/lms/custom/certificates/list.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
     }
 
     function get_state_taxes_list() {
@@ -344,7 +347,36 @@ $(document).ready(function () {
         $.post(url, function (data) {
             $('#region-main').html(data);
         });
+    }
 
+    function get_category_courses(id) {
+        var url = "/lms/custom/certificates/get_category_courses.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#category_courses').html(data);
+        });
+    }
+
+    function get_course_users(id) {
+        var url = "/lms/custom/certificates/get_course_users.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#enrolled_users').html(data);
+        });
+    }
+
+    function send_certicicate_to_user() {
+        var courseid = $('#courses').val();
+        var userid = $('#users').val();
+        if (userid > 0 && courseid > 0) {
+            var url = "/lms/custom/certificates/get_course_completion.php";
+            $.post(url, {userid: userid, courseid: courseid}).done(function (data) {
+                if (data==0) {
+                    
+                } 
+            });
+        } // end if userid>0 && courseid>0
+        else {
+            console.log('Incorrect data!');
+        }
     }
 
     function show_private_group_request_detailes(id) {
@@ -404,6 +436,11 @@ $(document).ready(function () {
         }
 
 
+        if (event.target.id == 'send_cert') {
+            send_certicicate_to_user();
+        }
+
+
 
     }); // end of #region-main click', 'button',
 
@@ -412,6 +449,16 @@ $(document).ready(function () {
             var id = event.target.id.replace("group_", "");
             show_private_group_request_detailes(id);
         }
+
+        if (event.target.id == 'cert_send_page') {
+            $('#send_cert_container').show();
+        }
+
+        if (event.target.id == 'send_cert') {
+            send_certicicate_to_user();
+        }
+
+
     }); // end of $('#region-main').on('click', 'a'
 
     $(document).on('change', '[type=checkbox]', function (event) {
@@ -432,6 +479,26 @@ $(document).ready(function () {
 
     });
 
+    $('#region-main').on('change', 'select', function (event) {
+        console.log(event.target.id);
+        if (event.target.id == 'course_categories') {
+            var id = $('#course_categories').val();
+            get_category_courses(id);
+        }
+
+        if (event.target.id == 'courses') {
+            var id = $('#courses').val();
+            get_course_users(id);
+        }
+
+    }); // end of $('#region-main').on('change', 'select',
+
+    /************************************************************************
+     * 
+     *                   Menu processing items
+     * 
+     ************************************************************************/
+
     // Show price items
     $("#prices").click(function (event) {
         get_price_items_from_category(event.target.id);
@@ -449,6 +516,7 @@ $(document).ready(function () {
 
     $("#Certificates").click(function (event) {
         update_navigation_status__menu('Certificates');
+        get_certificates_page();
     });
 
     $("#Testimonial").click(function (event) {
@@ -475,8 +543,6 @@ $(document).ready(function () {
         update_navigation_status__menu('Invoice');
         get_invoice_spec_page();
     });
-
-
 
 }); // end of $(document).ready(function()
 
