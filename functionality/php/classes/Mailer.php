@@ -97,7 +97,7 @@ class Mailer {
         $list.="<p>Please find out invoice attached to make a payment.</p>";
         //$list.= "<p>User ID: $user->id</p>";
         //if ($user->id != '') {
-          //  $list.="<p>Alternatively you can use this <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$user->id' target='_blank'>link</a> and make a payment.</p>";
+        //  $list.="<p>Alternatively you can use this <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$user->id' target='_blank'>link</a> and make a payment.</p>";
         //}
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
         $list.="<p>Best regards,</p>";
@@ -113,7 +113,26 @@ class Mailer {
         $this->send_email($subject, $message, $recipient, $user->invoice);
     }
 
-    function send_email($subject, $message, $recipient, $attachment = null) {
+    function send_certificate($user) {
+        /*
+        echo "<pre>";
+        print_r($user);
+        echo "<pre>";
+        */
+        $subject = "Medical2 Institute - Certificate";
+        $list = "";
+        $list.="<html><body>";
+        $list.="<br/><p>Dear $user->firstname $user->lastname!</p>";
+        $list.="<p>Congratulations! You successfully passed selected program!</p>";
+        $list.="<p>Please find out certificate attached.</p>";
+        $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
+        $list.="<p>Best regards,</p>";
+        $list.="<p>Support team.</p>";
+        $list.="</body></html>";
+        $this->send_email($subject, $list, $user->email, $user->path, 1);
+    }
+
+    function send_email($subject, $message, $recipient, $attachment = null, $certificate = null) {
 
         $mail = new PHPMailer;
         $recipient = 'sirromas@gmail.com'; // temp workaround
@@ -135,6 +154,10 @@ class Mailer {
             $invoice = $this->invoice_path . "/$attachment.pdf";
             $mail->addAttachment($invoice, "invoice.pdf");
         } // end if $attachment != null
+
+        if ($attachment != null && $certificate != null) {
+            $mail->addAttachment($attachment, "certificate.pdf");
+        } // end if $attachment != null && $certificate!=null
         $mail->isHTML(true);
 
         $mail->Subject = $subject;

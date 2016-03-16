@@ -5,8 +5,10 @@
  *
  * @author sirromas
  */
+session_start();
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
 class Certificates extends Util {
 
@@ -38,9 +40,15 @@ class Certificates extends Util {
         return $name;
     }
 
+    function get_total_certificates() {
+        $query = "select * from mdl_certificates order by issue_date";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
     function get_certificates_list() {
         $certificates = array();
-        $query = "select * from mdl_certificates order by issue_date";
+        $query = "select * from mdl_certificates order by issue_date limit 0,1";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -53,15 +61,39 @@ class Certificates extends Util {
             } // end while
         } // end if $num > 0
         $list = $this->create_certificates_list($certificates);
+        $_SESSION['total'] = $this->get_total_certificates();
         return $list;
     }
 
-    function create_certificates_list($certificates) {
+    function get_pagination_bar() {
+        $list = "";
+        $query = "select * from mdl_certificates order by issue_date";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $list.="<ul class='pagination'>";
+            $result = $this->db->query($query);
+            $i = 1;
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $list.="<li style='display:inline;margin-right:10px;'><a href='#' id='cert_page_" . $row['id'] . "' onClick='return false;'>$i</a></li>";
+                $i++;
+            } // end while
+            $list.="</ul>";
+        } // end if $num > 0
+        return $list;
+    }
+
+    function create_certificates_list($certificates, $toolbar = true) {
         $list = "";
         if (count($certificates) > 0) {
+            $pagination = $this->get_pagination_bar();
+            $list.="<div id='certificates_container'>";
             foreach ($certificates as $certificate) {
                 $user = $this->get_user_detailes($certificate->userid);
                 $coursename = $this->get_course_name($certificate->courseid);
+                $date = date('Y-m-d', $certificate->issue_date);
+                $exp_date = date('Y-m-d', $certificate->expiration_date);
+                $_exp_date = ($exp_date == '') ? "n/a" : $exp_date;
+                $link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $certificate->path));
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Firstname</span><span class='span2'>$user->firstname</span>";
                 $list.="</div>";
@@ -72,16 +104,33 @@ class Certificates extends Util {
                 $list.="<span class='span2'>Email</span><span class='span2'>$user->email</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Program name</span><span class='span2'>$coursename</span>";
+                $list.="<span class='span2'>Program name</span><span class='span6'>$coursename</span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Certificate link</span><span class='span6'><a href='$link' target='_blank'>link</a></span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Issue date</span><span class='span2'>$date</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Issue date</span><span class='span2'>$certificate->issue_date</span>";
+                $list.="<span class='span2'>Expiration date</span><span class='span2'>$_exp_date</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Expiration date</span><span class='span2'>$certificate->expiration_date</span>";
+                $list.="<span class='span4'><hr/></span>";
                 $list.="</div>";
-            } // end foreach
-            $list.=$this->get_send_certificate_page();
+            } // end foreach            
+            $list.="</div>";
+            if ($toolbar == true) {
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span9'  id='pagination'></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span6'><a href='#' onClick='return false;' id='cert_send_page'>Send Certificate</a></span>";
+                $list.="</div>";
+                $list.=$this->get_send_certificate_page();
+            } // end if $toolbar==true
         } // end if count($certificates)>0
         else {
             $list.="<div class='container-fluid'>";
@@ -99,6 +148,9 @@ class Certificates extends Util {
         $list = "";
         $programs_category = $this->get_course_categories();
         $list.="<div id='send_cert_container' style='display:none;'>";
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6' id='send_cert_err'></span>";
+        $list.="</div>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Program type</span><span class='span3'>$programs_category</span>";
         $list.="</div>";
@@ -128,18 +180,22 @@ class Certificates extends Util {
         return $date;
     }
 
-    function prepare_ceriticate($courseid, $userid, $date) {
+    function prepare_ceriticate($courseid, $userid, $date = 0) {
         $list = "";
         $coursename = $this->get_course_name($courseid); // string
-        $userdetails = $this->get_user_detailes($userid); // object
-        $userdetails->firstname = 'Teresa';     // temp workaround
-        $userdetails->lastname = 'Littleton';   // temp workaround
+        $userdetails = $this->get_user_detailes($userid); // object        
         $firstname = strtoupper($userdetails->firstname);
         $lastname = strtoupper($userdetails->lastname);
+        if ($date == 0) {
+            $date = time();
+        }
         $day = date('d', $date);
         $month = date('M', $date);
         $year = date('Y', $date);
-        $expiration_date_sec = $date + 31536000;
+        $renew_status = $this->get_course_category($courseid);
+        if ($renew_status == true) {
+            $expiration_date_sec = $date + 31536000;
+        }
         $expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
         $list.="<!DOCTYPE HTML SYSTEM>";
         $list.="<head>";
@@ -154,7 +210,9 @@ class Certificates extends Util {
         $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
         $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
         $list.="<br><br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION #: 010836-IV12<br>";
-        $list.="EXPIRATION DATE $expiration_date</p>";
+        if ($renew_status == true) {
+            $list.="EXPIRATION DATE $expiration_date</p>";
+        }
         $list.="<div align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Shahid Malik, President</span></div>";
         $list.="</div>";
         $list.="</body>";
@@ -188,12 +246,34 @@ class Certificates extends Util {
         return $date;
     }
 
-    function send_certificate($courseid, $userid, $date) {
-        if ($date == 0) {
+    function get_course_category($id) {
+        $query = "select category from mdl_course where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $categoryid = $row['category'];
+        } // end while
+        if ($categoryid == 2 || $categoryid == 4) {
+            return true;
+        } // end if $categoryid==2 || $categoryid==4
+        else {
+            return false;
+        } // end else 
+    }
+
+    function send_certificate($courseid, $userid, $date = 0) {
+        if ($date == 0) { // course is not yet completed 
             $date = $this->get_user_course_entollment_date($courseid, $userid);
-        }
-        $expiration_date_sec = $date + 31536000;
+        } // end if $date == 0         
+        $renew_status = $this->get_course_category($courseid);
+        if ($renew_status) {
+            $expiration_date_sec = $date + 31536000;
+        } // end if $renew_status
+        else {
+            $expiration_date_sec = 'n/a';
+        } // end else
         $path = $this->prepare_ceriticate($courseid, $userid, $date);
+        $user = $this->get_user_detailes($userid);
+        $user->path=$path;
         $query = "insert into mdl_certificates (courseid,"
                 . "userid,"
                 . "path,"
@@ -205,7 +285,27 @@ class Certificates extends Util {
                 . " '$date',"
                 . " '$expiration_date_sec')";
         $this->db->query($query);
+        $mailer=new Mailer();
+        $mailer->send_certificate($user);
         $list = "Certificate has been sent";
+        return $list;
+    }
+
+    function get_certificate_item($page) {
+        $certificates = array();
+        $rec_limit = 1;
+        $page = $page - 1;
+        $offset = $rec_limit * $page;
+        $query = "select * from mdl_certificates LIMIT $offset, $rec_limit";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $certificate = new stdClass();
+            foreach ($row as $key => $value) {
+                $certificate->$key = $value;
+            } // end foreach      
+            $certificates[] = $certificate;
+        } // end while
+        $list = $this->create_certificates_list($certificates, false);
         return $list;
     }
 

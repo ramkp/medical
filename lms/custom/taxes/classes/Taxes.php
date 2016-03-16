@@ -1,16 +1,16 @@
 
 <style>
-   ul.hr {
-    margin: 0; /* Обнуляем значение отступов */
-    padding: 4px; /* Значение полей */
-   }
-   ul.hr li {
-    display: inline; /* Отображать как строчный элемент */
-    margin-right: 5px; /* Отступ слева */
-    border: 1px solid #000; /* Рамка вокруг текста */
-    padding: 3px; /* Поля вокруг текста */
-   }
-  </style>
+    ul.hr {
+        margin: 0; /* Обнуляем значение отступов */
+        padding: 4px; /* Значение полей */
+    }
+    ul.hr li {
+        display: inline; /* Отображать как строчный элемент */
+        margin-right: 5px; /* Отступ слева */
+        border: 1px solid #000; /* Рамка вокруг текста */
+        padding: 3px; /* Поля вокруг текста */
+    }
+</style>
 
 <?php
 
@@ -38,9 +38,25 @@ class Taxes extends Util {
         return $list;
     }
 
+    function get_pagination_bar() {
+        $list = "";
+        $query = "select * from mdl_state_taxes order by state ";
+        $result = $this->db->query($query);
+        $i = 1;
+        $list.="<ul class='pagination'>";
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $list.="<li style='display:inline;margin-right:10px;'><a href='#' id='tax_page_" . $row['id'] . "' onClick='return false;'>$i</a></li>";
+            $i++;
+        }
+        $list.="</ul>";
+        return $list;
+    }
+
     function create_taxes_block($items, $wrap = 1) {
         $list = "";
         $i = 0;
+        $pagination = $this->get_pagination_bar();
+        //echo "Total items: " . count($items);
         if (count($items) > 0) {
             //print_r($items);
             if ($wrap == 1) {
@@ -57,13 +73,13 @@ class Taxes extends Util {
                 $list.="<span class='span3' style='padding-left:10px;'><span id='tax_status_$item->id'></span></span>";
                 $list.="</div>";
                 $i++;
-            } // end foreach 
+            } // end foreach             
+            $list.="</div>"; // div id='state_taxes'
             if ($wrap == 1) {
-                $list.="</div>"; // div id='state_taxes'
-            }   
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span12'><div id='pagination-demo' class='pagination' style='height: 10px;'></div></span>";
-            $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span9' id='pagination'></span>";
+                $list.="</div>";
+            } // end if $wrap == 1
         } // end if count($items)>0        
         return $list;
     }
@@ -75,18 +91,29 @@ class Taxes extends Util {
         return $list;
     }
 
-    function get_tax_item($id) {
+    function get_states_count() {
+        $query = "select count(id) as total from mdl_state_taxes";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $total = $row['total'];
+        }
+        return $total;
+    }
+
+    function get_tax_item($page) {
+        $page = $page - 1;
+        $rec_limit = 1;
+        $offset = $rec_limit * $page;
         $list = "";
-        $query = "select * from mdl_state_taxes where id=$id";
-        //echo "Query: " . $query;
+        $query = "select * from mdl_state_taxes LIMIT $offset, $rec_limit";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $item = new stdClass();
             foreach ($row as $key => $value) {
                 $item->$key = $value;
             } // end foreach
-        }
-        $items[] = $item;
+            $items[] = $item;
+        } // end while
         $list.= $this->create_taxes_block($items, 0);
         return $list;
     }

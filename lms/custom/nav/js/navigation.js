@@ -356,6 +356,14 @@ $(document).ready(function () {
         });
     }
 
+    function get_certificate_item(id) {
+        console.log('Page: ' + id);
+        var url = "/lms/custom/certificates/get_certificate_item.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#certificates_container').html(data);
+        });
+    }
+
     function get_course_users(id) {
         var url = "/lms/custom/certificates/get_course_users.php";
         $.post(url, {id: id}).done(function (data) {
@@ -368,15 +376,28 @@ $(document).ready(function () {
         var userid = $('#users').val();
         if (userid > 0 && courseid > 0) {
             var url = "/lms/custom/certificates/get_course_completion.php";
-            $.post(url, {userid: userid, courseid: courseid}).done(function (data) {
-                if (data==0) {
-                    
-                } 
-            });
+            $.post(url, {userid: userid, courseid: courseid}).done(function (completion_date) {
+                if (completion_date == 0) {
+                    if (confirm('User did not complete the course, send certificate anyway?')) {
+                        var url2 = "/lms/custom/certificates/send_certificate.php";
+                        $.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
+                            $('#send_cert_err').html(data);
+                        });
+                    } // end if confirm
+                } // end if data==0 
+                else {
+                    if (confirm('Send certificate to user?')) {
+                        $.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
+                            $('#send_cert_err').html(data);
+                        });
+                    } // end if conform
+                } // end else
+            }); // end of $.post get_course_completion.php
         } // end if userid>0 && courseid>0
         else {
             console.log('Incorrect data!');
-        }
+            $('#send_cert_err').html("<span style='color:red;'>Please select program and user</span>");
+        } // end else
     }
 
     function show_private_group_request_detailes(id) {
@@ -457,6 +478,19 @@ $(document).ready(function () {
         if (event.target.id == 'send_cert') {
             send_certicicate_to_user();
         }
+
+        if (event.target.id.indexOf("cert_page_") >= 0) {
+            var id = event.target.id.replace("cert_page_", "");
+            get_certificate_item(id);
+        }
+        
+        if (event.target.id.indexOf("tax_page_") >= 0) {
+            var id = event.target.id.replace("tax_page_", "");
+            get_tax_item(id);
+        }
+
+        //cert_page_
+        //tax_page_
 
 
     }); // end of $('#region-main').on('click', 'a'

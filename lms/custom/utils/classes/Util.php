@@ -118,6 +118,15 @@ class Util {
         return $user;
     }
 
+    function is_user_deleted($id) {
+        $query = "select deleted from mdl_user where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $status = $row['deleted'];
+        }
+        return $status;
+    }
+
     function get_course_users($id) {
         $list = "";
         $users = array();
@@ -133,11 +142,14 @@ class Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $user = new stdClass();
-                foreach ($row as $key => $value) {
-                    $user->$key = $value;
-                } // end foreach
-                $users[] = $user;
+                $status = $this->is_user_deleted($row['userid']);
+                if ($status == 0) {
+                    $user = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $user->$key = $value;
+                    } // end foreach
+                    $users[] = $user;
+                } // end if $status==0
             } // end while
         } // end if $num > 0
         if (count($users) > 0) {
