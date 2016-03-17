@@ -1,7 +1,7 @@
 <?php
 
 require_once './classes/Invoice.php';
-$invoice = new Invoice();
+$invoice = new Invoices();
 $phone = $_POST['phone'];
 $fax = $_POST['fax'];
 $email = $_POST['email'];

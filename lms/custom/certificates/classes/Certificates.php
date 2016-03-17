@@ -118,7 +118,7 @@ class Certificates extends Util {
                 $list.="<span class='span2'>Expiration date</span><span class='span2'>$_exp_date</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span4'><hr/></span>";
+                $list.="<span class='span6'><hr/></span>";
                 $list.="</div>";
             } // end foreach            
             $list.="</div>";
@@ -152,7 +152,7 @@ class Certificates extends Util {
         $list.="<span class='span6' id='send_cert_err'></span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span2'>Program type</span><span class='span3'>$programs_category</span>";
+        $list.="<span class='span8'>$programs_category</span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span8' id='category_courses'></span>";

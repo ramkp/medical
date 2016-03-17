@@ -69,7 +69,7 @@ class Util {
             $items[] = $item;
         } // end while
         if (count($items) > 0) {
-            $list.="<select id='course_categories'>";
+            $list.="<span class='span3'>Program type</span><span class='span4'><select id='course_categories'>";            
             $list.="<option value='0' selected>Program type</option>";
             foreach ($items as $item) {
                 $list.="<option value='$item->id'>$item->name</option>";
@@ -82,7 +82,7 @@ class Util {
     function get_course_by_category($id) {
         $list = "";
         $items = array();
-        $query = "select id, fullname from mdl_course where category=$id";
+        $query = "select id, fullname from mdl_course where category=$id and cost>0";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -104,8 +104,7 @@ class Util {
     }
 
     function get_user_details($id) {
-        $query = "select firstname, lastname, email from mdl_user where id=$id";
-        //echo "Query: ".$query."<br>";
+        $query = "select firstname, lastname, email from mdl_user where id=$id";        
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $user = new stdClass();

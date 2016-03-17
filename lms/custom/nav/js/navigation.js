@@ -371,6 +371,29 @@ $(document).ready(function () {
         });
     }
 
+    function send_invoice_to_user() {
+        var url = "/lms/custom/invoices/send_invoice.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function send_invoice() {
+        var courseid = $('#courses').val();
+        var userid = $('#users').val();
+        if (userid > 0 && courseid > 0) {
+            if (confirm('Send invoice to user?')) {
+                var url = "/lms/custom/invoices/send_invoice_send.php";
+                $.post(url, {userid: userid, courseid: courseid}).done(function (data) {
+                    $('#invoice_status').html(data);
+                });
+            } // end if confirm('Send invoice to user?')
+        } // end if userid > 0 && courseid > 0
+        else {
+            $('#invoice_status').html("<span style='color:red;'>Please select program and user</span>");
+        } // end else
+    }
+
     function send_certicicate_to_user() {
         var courseid = $('#courses').val();
         var userid = $('#users').val();
@@ -461,7 +484,9 @@ $(document).ready(function () {
             send_certicicate_to_user();
         }
 
-
+        if (event.target.id == 'send_invoice') {
+            send_invoice();
+        }
 
     }); // end of #region-main click', 'button',
 
@@ -483,14 +508,14 @@ $(document).ready(function () {
             var id = event.target.id.replace("cert_page_", "");
             get_certificate_item(id);
         }
-        
+
         if (event.target.id.indexOf("tax_page_") >= 0) {
             var id = event.target.id.replace("tax_page_", "");
             get_tax_item(id);
         }
 
-        //cert_page_
-        //tax_page_
+
+
 
 
     }); // end of $('#region-main').on('click', 'a'
@@ -577,6 +602,28 @@ $(document).ready(function () {
         update_navigation_status__menu('Invoice');
         get_invoice_spec_page();
     });
+
+    $("#send_inv").click(function (event) {
+        update_navigation_status__menu('Send invoice');
+
+    });
+
+    $("#send_inv").click(function (event) {
+        update_navigation_status__menu('Send invoice');
+        send_invoice_to_user();
+    });
+
+    $("#opn_inv").click(function (event) {
+        update_navigation_status__menu('Open invoices');
+
+    });
+
+    $("#paid_inv").click(function (event) {
+        update_navigation_status__menu('Paid invoices');
+
+    });
+
+
 
 }); // end of $(document).ready(function()
 

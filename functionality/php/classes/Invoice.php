@@ -161,7 +161,7 @@ class Invoice {
         $list.="</table>";
         $list.="</body>";
         $list.="</html>";
-
+        
         // instantiate and use the dompdf class
         $dompdf = new Dompdf();
         $dompdf->loadHtml($list);
@@ -183,8 +183,9 @@ class Invoice {
         $query = "select id from mdl_invoice order by id desc limit 0,1";
         $num = $this->db->numrows($query);
         if ($num > 0) {
+            $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $id = $row['id'];
+                $id = $row['id']+1;
             }
         } // end if $num>0
         $invoice_num = "MDL2_$id";
