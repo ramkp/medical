@@ -394,6 +394,34 @@ $(document).ready(function () {
         } // end else
     }
 
+    function get_installment_page() {
+        var url = "/lms/custom/installment/get_installment_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function add_installment_user() {
+        var userid = $('#users').val();
+        console.log('User id: '+userid);
+        var courseid = $('#courses').val();
+        console.log('Course id: '+courseid);
+        var num = $('#inst_num').val();
+        console.log('Payments num:'+num);
+        if (userid > 0 && courseid > 0 && num > 0) {
+            if (confirm('Add installment user?')) {
+                $('#add_inst_user_status').html('');
+                var url = "/lms/custom/installment/add_installment_user.php";
+                $.post(url, {userid: userid, num: num, courseid: courseid}).done(function (data) {
+                    $('#add_inst_user_status').html(data);
+                });
+            } // end if confirm
+        } // end if userid>0 && num>0 && sum>0
+        else {
+            $('#add_inst_user_status').html("<span style='color:red;'>Please select user and provide installment params</span>");
+        } // end else 
+    }
+
     function send_certicicate_to_user() {
         var courseid = $('#courses').val();
         var userid = $('#users').val();
@@ -488,6 +516,12 @@ $(document).ready(function () {
             send_invoice();
         }
 
+        if (event.target.id == 'add_installment_user') {
+            add_installment_user();
+        }
+
+
+
     }); // end of #region-main click', 'button',
 
     $('#region-main').on('click', 'a', function (event) {
@@ -512,6 +546,10 @@ $(document).ready(function () {
         if (event.target.id.indexOf("tax_page_") >= 0) {
             var id = event.target.id.replace("tax_page_", "");
             get_tax_item(id);
+        }
+
+        if (event.target.id == 'add_installment_user') {
+            $('#add_installment_user_container').show();
         }
 
 
@@ -549,6 +587,16 @@ $(document).ready(function () {
             var id = $('#courses').val();
             get_course_users(id);
         }
+
+        if (event.target.id == 'users') {
+            var page = document.cookie;
+            console.log('Page cookie: ' + page);
+            //if (page == 'installment_users') {
+            $('#installment_params').show();
+            //}
+        }
+
+
 
     }); // end of $('#region-main').on('change', 'select',
 
@@ -623,7 +671,10 @@ $(document).ready(function () {
 
     });
 
-
+    $("#installment").click(function (event) {
+        update_navigation_status__menu('Installment users');
+        get_installment_page();
+    });
 
 }); // end of $(document).ready(function()
 

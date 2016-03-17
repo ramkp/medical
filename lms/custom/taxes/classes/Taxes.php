@@ -106,6 +106,7 @@ class Taxes extends Util {
         $offset = $rec_limit * $page;
         $list = "";
         $query = "select * from mdl_state_taxes LIMIT $offset, $rec_limit";
+        //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $item = new stdClass();

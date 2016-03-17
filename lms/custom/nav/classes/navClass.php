@@ -11,10 +11,10 @@ class navClass extends Util {
 
     function get_navigation_items($userid) {
         $top_menu = "";
-        if ($userid == 2 || $userid == 3) {
-            // This is Admin or Manager - do not calculate role
+        if ($userid == 2) {
+            // This is Admin 
             $top_menu = $this->get_admin_menu_items($userid);
-        }// end if $userid==2 || $USER->id == 3
+        }// end if $userid==2 
         else {
             $roleid = $this->get_user_role($userid);
             if ($roleid == 3 || $roleid == 4) {
@@ -75,12 +75,13 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
                                     <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>
                                     <li><a href='#' title='Google Map' id='Google_Map'>Google Map</a></li>                                   
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
                                     <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li> 
-                                    <li><a href='#' title='Taxes' id='taxes'>State taxes</a></li> 
+                                    <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                     <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>                                     
                                 </ul>
                             </li>

@@ -95,16 +95,45 @@ class Invoice {
         return $name;
     }
 
+    function is_installment_user($userid) {
+        $query = "select inst from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $inst = $row['inst'];
+        }
+        return $inst;
+    }
+
+    function get_user_installment_payments($userid) {
+        $query = "select inst_sum, inst_num from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $installment = new stdClass();
+            $installment->sum = $row['inst_sum'];
+            $installment->num = $row['inst_num'];
+        }
+        return $installment;
+    }
+
     function create_user_invoice($user, $group, $participants) {
-        if ($group == null) {
-            $cost = $this->get_personal_course_cost($user->courseid); // cost, discount
-            $item_name = $this->get_course_name($user->courseid);
-        } // end if $group==null
+        $user_installment_status = $this->is_installment_user($user->id);
+        if ($user_installment_status == 0) {
+            if ($group == null) {
+                $cost = $this->get_personal_course_cost($user->courseid); // cost, discount
+                $item_name = $this->get_course_name($user->courseid);
+            } // end if $group==null
+            else {
+                $group_data = $_SESSION['group_common_section'];
+                $participants = ($participants == null) ? $_SESSION['tot_participants'] : $participants;
+                $cost = $this->get_course_group_discount($group_data->courseid, $participants); // cost, discount
+                $item_name = $this->get_course_name($group_data->courseid);
+            }
+        } // end if $user_installment_status==0
         else {
-            $group_data = $_SESSION['group_common_section'];
-            $participants = ($participants == null) ? $_SESSION['tot_participants'] : $participants;
-            $cost = $this->get_course_group_discount($group_data->courseid, $participants); // cost, discount
-            $item_name = $this->get_course_name($group_data->courseid);
+            $installment = $this->get_user_installment_payments($user->id);
+            $cost['cost'] = $installment['sum'];
+            $cost['discount'] = 0;
+            $item_name = $this->get_course_name($user->courseid);
         }
         if ($cost['discount'] > 0) {
             $amount = '$' . $cost['cost'] . '&nbsp;(discount is ' . $cost['discount'] . '%)';
@@ -161,7 +190,7 @@ class Invoice {
         $list.="</table>";
         $list.="</body>";
         $list.="</html>";
-        
+
         // instantiate and use the dompdf class
         $dompdf = new Dompdf();
         $dompdf->loadHtml($list);
@@ -185,7 +214,7 @@ class Invoice {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $id = $row['id']+1;
+                $id = $row['id'] + 1;
             }
         } // end if $num>0
         $invoice_num = "MDL2_$id";

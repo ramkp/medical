@@ -297,6 +297,7 @@ class Certificates extends Util {
         $page = $page - 1;
         $offset = $rec_limit * $page;
         $query = "select * from mdl_certificates LIMIT $offset, $rec_limit";
+        //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $certificate = new stdClass();

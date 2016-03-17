@@ -153,6 +153,7 @@ class Util {
         } // end if $num > 0
         if (count($users) > 0) {
             $list.="<span class='span3'>Enrolled users:</span><span class='span4'><select id='users'>";
+            $list.="<option value='0' selected>Select user</option>";
             foreach ($users as $user) {
                 $user_details = $this->get_user_details($user->userid);
                 if ($user_details->firstname != '' && $user_details->lastname != '') {

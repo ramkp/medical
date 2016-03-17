@@ -71,10 +71,11 @@ class Invoices extends Util {
         $file_invoice = new Invoice();
         $mailer = new Mailer();
         $user = $this->get_user_details($userid);
+        $user->id = $userid;
         $user->first_name = $user->firstname;
         $user->last_name = $user->lastname;
-        $user->courseid = $courseid;        
-        $user->invoice = $file_invoice->create_user_invoice($user, null, 1);        
+        $user->courseid = $courseid;
+        $user->invoice = $file_invoice->create_user_invoice($user, null, 1);
         $path = $file_invoice->invoice_path . "/$user->invoice.pdf";
         $sum = $file_invoice->get_personal_course_cost($courseid);
         $query = "insert into mdl_invoice"
@@ -91,8 +92,7 @@ class Invoices extends Util {
                 . "'" . $sum['cost'] . "',"
                 . "'0',"
                 . "'" . $path . "',"
-                . "'" . time() . "')";
-        //echo "Query: ".$query."<br/>";
+                . "'" . time() . "')";        
         $this->db->query($query);
         $mailer->send_invoice($user);
         $list = "Invoice has been sent.";
