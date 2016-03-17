@@ -95,28 +95,26 @@ class Invoice {
         return $name;
     }
 
-    function is_installment_user($userid) {
-        $query = "select inst from mdl_user where id=$userid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $inst = $row['inst'];
-        }
-        return $inst;
+    function is_installment_user($userid, $courseid) {
+        $query = "select *  from mdl_installment_users "
+                . "where userid=$userid and courseid=$courseid";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
-    function get_user_installment_payments($userid) {
-        $query = "select inst_sum, inst_num from mdl_user where id=$userid";
+    function get_user_installment_payments($userid, $courseid) {
+        $query = "select * from mdl_installment_users where userid=$userid and courseid=$courseid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $installment = new stdClass();
-            $installment->sum = $row['inst_sum'];
-            $installment->num = $row['inst_num'];
+            $installment->sum = $row['sum'];
+            $installment->num = $row['num'];
         }
         return $installment;
     }
 
     function create_user_invoice($user, $group, $participants) {
-        $user_installment_status = $this->is_installment_user($user->id);
+        $user_installment_status = $this->is_installment_user($user->id, $user->courseid);
         if ($user_installment_status == 0) {
             if ($group == null) {
                 $cost = $this->get_personal_course_cost($user->courseid); // cost, discount
@@ -130,7 +128,7 @@ class Invoice {
             }
         } // end if $user_installment_status==0
         else {
-            $installment = $this->get_user_installment_payments($user->id);
+            $installment = $this->get_user_installment_payments($user->id,$user->courseid);
             $cost['cost'] = $installment['sum'];
             $cost['discount'] = 0;
             $item_name = $this->get_course_name($user->courseid);
