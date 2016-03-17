@@ -75,7 +75,10 @@ class Invoices extends Util {
         $user->first_name = $user->firstname;
         $user->last_name = $user->lastname;
         $user->courseid = $courseid;
+        //print_r($user);
+        //die();
         $user->invoice = $file_invoice->create_user_invoice($user, null, 1);
+        //die ();
         $path = $file_invoice->invoice_path . "/$user->invoice.pdf";
         $sum = $file_invoice->get_personal_course_cost($courseid);
         $query = "insert into mdl_invoice"

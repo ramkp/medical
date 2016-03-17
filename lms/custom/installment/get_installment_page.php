@@ -10,7 +10,7 @@ echo $list;
 
     $(document).ready(function () {
 
-        document.cookie = "page=installment_users";
+        //document.cookie = "page=installment_users";
 
         $(function () {
             $('#pagination').pagination({

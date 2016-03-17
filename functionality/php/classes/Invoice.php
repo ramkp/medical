@@ -98,12 +98,14 @@ class Invoice {
     function is_installment_user($userid, $courseid) {
         $query = "select *  from mdl_installment_users "
                 . "where userid=$userid and courseid=$courseid";
+        //echo "is_installment Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         return $num;
     }
 
     function get_user_installment_payments($userid, $courseid) {
         $query = "select * from mdl_installment_users where userid=$userid and courseid=$courseid";
+        //echo "get_user_installment Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $installment = new stdClass();
@@ -114,7 +116,10 @@ class Invoice {
     }
 
     function create_user_invoice($user, $group, $participants) {
+        //print_r($user);
         $user_installment_status = $this->is_installment_user($user->id, $user->courseid);
+        //echo "User installment status: ".$user_installment_status."<br>";
+        
         if ($user_installment_status == 0) {
             if ($group == null) {
                 $cost = $this->get_personal_course_cost($user->courseid); // cost, discount
@@ -129,7 +134,8 @@ class Invoice {
         } // end if $user_installment_status==0
         else {
             $installment = $this->get_user_installment_payments($user->id,$user->courseid);
-            $cost['cost'] = $installment['sum'];
+            //print_r($installment);
+            $cost['cost'] = $installment->sum;
             $cost['discount'] = 0;
             $item_name = $this->get_course_name($user->courseid);
         }
@@ -141,6 +147,7 @@ class Invoice {
         }
         $invoice_credentials = $this->get_invoice_credentials();
         $invoice_num = $this->get_invoice_num();
+        //die('Stopped');
         $list = "";
         $list.="<html>";
         $list.="<body>";

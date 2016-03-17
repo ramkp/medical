@@ -589,8 +589,8 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'users') {
-            var page = document.cookie;
-            console.log('Page cookie: ' + page);
+            //var page = document.cookie;
+            //console.log('Page cookie: ' + page);
             //if (page == 'installment_users') {
             $('#installment_params').show();
             //}
