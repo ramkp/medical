@@ -75,7 +75,7 @@ class Installment extends Util {
                 $list.="<span class='span2'>Installment sum</span><span class='span2'>$$user->sum</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Installment num</span><span class='span2'>$user->num</span>";
+                $list.="<span class='span2'>Payments num</span><span class='span2'>$user->num</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Created by</span><span class='span2'>$modifier->firstname &nbsp;$modifier->lastname</span>";

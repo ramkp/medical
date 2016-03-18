@@ -10,6 +10,11 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
 class Invoices extends Util {
+    /*     * ******************************************************
+     * 
+     *             Invoice credentials
+     * 
+     * ******************************************************* */
 
     function get_invoice_crednetials() {
         $list = "";
@@ -45,6 +50,12 @@ class Invoices extends Util {
         $list = "Item successfully updated";
         return $list;
     }
+
+    /*     * ******************************************************
+     * 
+     *             Send invoice
+     * 
+     * ******************************************************* */
 
     function get_send_invoice_page() {
         $list = "";
@@ -108,6 +119,12 @@ class Invoices extends Util {
         return $list;
     }
 
+    /*     * ******************************************************
+     * 
+     *             Open invoices
+     * 
+     * ******************************************************* */
+
     function get_open_invoices() {
         $invoices = array();
         $query = "select * from mdl_invoice "
@@ -124,11 +141,11 @@ class Invoices extends Util {
                 $invoices[] = $invoice;
             } // end while
         } // end if $num>0
-        $list = $this->create_open_invoices_page($invoices);
+        $list = $this->create_open_invoices_page($invoices, true, false);
         return $list;
     }
 
-    function create_open_invoices_page($invoices, $toolbar = true) {
+    function create_open_invoices_page($invoices, $toolbar = true, $paid = false) {
         $list = "";
         //print_r($invoices);
         if (count($invoices) > 0) {
@@ -149,6 +166,9 @@ class Invoices extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Invoice</span><span class='span6'>Invoice # $invoice->i_num for $$invoice->i_sum from $date (<a href='$link' target='_blank'>link</a>)</span>";
                 $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span8'><hr/></span>";
+                $list.="</div>";
             } // end foreach
             $list.="</div>";
             if ($toolbar) {
@@ -158,18 +178,31 @@ class Invoices extends Util {
             } // end if $toolbar
         } // end if count($invoices)>0
         else {
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span3'>There are no open invoices</span>";
-            $list.="</div>";
+            if ($paid == false) {
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span3'>There are no open invoices</span>";
+                $list.="</div>";
+            } // end if $paid==false
+            else {
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span3'>There are no paid invoices</span>";
+                $list.="</div>";
+            } // end else
         }
         return $list;
     }
 
     function get_open_invoice_item($page) {
+        //echo "Function page: " . $page . "<br>";
         $invoices = array();
         $rec_limit = 1;
-        $page = $page - 1;
-        $offset = $rec_limit * $page;
+        if ($page == 1) {
+            $offset = 0;
+        } // end if $page==1
+        else {
+            $page = $page - 1;
+            $offset = $rec_limit * $page;
+        }
         $query = "select * from mdl_invoice where i_status=0 and i_ptype=0 "
                 . "LIMIT $offset, $rec_limit";
         $result = $this->db->query($query);
@@ -180,16 +213,74 @@ class Invoices extends Util {
             } // end foreach      
             $invoices[] = $invoice;
         } // end while
-        $list = $this->create_open_invoices_page($invoices, false);
+        $list = $this->create_open_invoices_page($invoices, false, false);
         return $list;
     }
 
     function get_open_invoices_total() {
         $query = "select * from mdl_invoice where i_status=0 and i_ptype=0 "
                 . "order by id asc";
-        //echo $query."<br/>";
         $num = $this->db->numrows($query);
         return $num;
+    }
+
+    /*     * ******************************************************
+     * 
+     *             Paid invoices
+     * 
+     * ******************************************************* */
+
+    function get_paid_invoices() {
+        $invoices = array();
+        $query = "select * from mdl_invoice "
+                . "where i_status=1 order by id asc limit 0,1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $invoice = new stdClass();
+                foreach ($row as $key => $value) {
+                    $invoice->$key = $value;
+                }
+                $invoices[] = $invoice;
+            } // end while
+        } // end if $num>0
+        $list = $this->create_open_invoices_page($invoices, true, true);
+        return $list;
+    }
+
+    function get_paid_invoices_total() {
+        $query = "select * from mdl_invoice where i_status=1  "
+                . "order by id asc";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_paid_invoice_item($page) {
+        //echo "Function page: ".$page."<br>";
+        $invoices = array();
+        $rec_limit = 1;
+        if ($page == 1) {
+            //echo "inside if ...";
+            $offset = 0;
+        } // end if $page==1
+        else {
+            $page = $page - 1;
+            $offset = $rec_limit * $page;
+        }
+        $query = "select * from mdl_invoice where i_status=1  "
+                . "LIMIT $offset, $rec_limit";
+        //echo $query;
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $invoice = new stdClass();
+            foreach ($row as $key => $value) {
+                $invoice->$key = $value;
+            } // end foreach      
+            $invoices[] = $invoice;
+        } // end while
+        $list = $this->create_open_invoices_page($invoices, false, true);
+        return $list;
     }
 
 }

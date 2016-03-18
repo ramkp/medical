@@ -393,10 +393,17 @@ $(document).ready(function () {
             $('#invoice_status').html("<span style='color:red;'>Please select program and user</span>");
         } // end else
     }
-    
-    function get_open_invoices_page (){
+
+    function get_open_invoices_page() {
         var url = "/lms/custom/invoices/open_invoices.php";
-        $.post(url, {id: 1}).done(function (data) {            
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function get_paid_invoice_page() {
+        var url = "/lms/custom/invoices/paid_invoices.php";
+        $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
     }
@@ -410,11 +417,11 @@ $(document).ready(function () {
 
     function add_installment_user() {
         var userid = $('#users').val();
-        console.log('User id: '+userid);
+        console.log('User id: ' + userid);
         var courseid = $('#courses').val();
-        console.log('Course id: '+courseid);
+        console.log('Course id: ' + courseid);
         var num = $('#inst_num').val();
-        console.log('Payments num:'+num);
+        console.log('Payments num:' + num);
         if (userid > 0 && courseid > 0 && num > 0) {
             if (confirm('Add installment user?')) {
                 $('#add_inst_user_status').html('');
@@ -676,7 +683,7 @@ $(document).ready(function () {
 
     $("#paid_inv").click(function (event) {
         update_navigation_status__menu('Paid invoices');
-
+        get_paid_invoice_page();
     });
 
     $("#installment").click(function (event) {

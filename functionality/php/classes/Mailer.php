@@ -52,14 +52,14 @@ class Mailer {
     }
 
     function send_account_confirmation_message($user) {
-        $subject = "Medical2 Institute - registration confirmation";
+        $subject = "Medical2 Career College - registration confirmation";
         $message = $this->get_account_confirmation_message($user);
         $recipient = $user->email;
         $this->send_email($subject, $message, $recipient);
     }
 
     function send_payment_confirmation_message($payment, $group = null) {
-        $subject = "Medical2 Institute - payment confirmation";
+        $subject = "Medical2 Career College - payment confirmation";
         $message = $this->get_payment_confirmation_message($payment, $group);
         $recipient = $payment->bill_email;
         $this->send_email($subject, $message, $recipient);
@@ -78,14 +78,14 @@ class Mailer {
     }
 
     function send_group_payment_confirmation_message($user) {
-        $subject = "Medical2 Institute - payment confirmation";
+        $subject = "Medical2 Career College - payment confirmation";
         $message = $this->get_payment_group_confirmation_message($user);
         $recipient = $user->username;
         $this->send_email($subject, $message, $recipient);
     }
 
     function send_group_reply_message($reply, $recipient) {
-        $subject = "Medical2 Institute - Private Group Request";
+        $subject = "Medical2 Career College - Private Group Request";
         $this->send_email($subject, $reply, $recipient);
     }
 
@@ -103,7 +103,7 @@ class Mailer {
     }
 
     function send_invoice($user, $gowner = null) {
-        $subject = "Medical2 Institute - invoice";
+        $subject = "Medical2 Career College - invoice";
         $message = $this->get_invoice_message($user, $gowner);
         $recipient = $user->email;
         $this->send_email($subject, $message, $recipient, $user->invoice);
@@ -115,7 +115,7 @@ class Mailer {
         print_r($user);
         echo "<pre>";
         */
-        $subject = "Medical2 Institute - Certificate";
+        $subject = "Medical2 Career College - Certificate";
         $list = "";
         $list.="<html><body>";
         $list.="<br/><p>Dear $user->firstname $user->lastname!</p>";
