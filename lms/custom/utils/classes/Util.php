@@ -69,7 +69,7 @@ class Util {
             $items[] = $item;
         } // end while
         if (count($items) > 0) {
-            $list.="<span class='span3'>Program type</span><span class='span4'><select id='course_categories'>";            
+            $list.="<span class='span3'>Program type</span><span class='span4'><select id='course_categories'>";
             $list.="<option value='0' selected>Program type</option>";
             foreach ($items as $item) {
                 $list.="<option value='$item->id'>$item->name</option>";
@@ -104,7 +104,7 @@ class Util {
     }
 
     function get_user_details($id) {
-        $query = "select firstname, lastname, email from mdl_user where id=$id";        
+        $query = "select firstname, lastname, email from mdl_user where id=$id";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $user = new stdClass();
@@ -163,6 +163,15 @@ class Util {
             $list.="</select></span>";
         } // end if count($users)>0
         return $list;
+    }
+
+    function get_course_name($courseid) {
+        $query = "select fullname from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $name = $row['fullname'];
+        }
+        return $name;
     }
 
 }

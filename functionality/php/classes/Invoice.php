@@ -115,11 +115,8 @@ class Invoice {
         return $installment;
     }
 
-    function create_user_invoice($user, $group, $participants) {
-        //print_r($user);
-        $user_installment_status = $this->is_installment_user($user->id, $user->courseid);
-        //echo "User installment status: ".$user_installment_status."<br>";
-        
+    function create_user_invoice($user, $group, $participants) {        
+        $user_installment_status = $this->is_installment_user($user->id, $user->courseid);        
         if ($user_installment_status == 0) {
             if ($group == null) {
                 $cost = $this->get_personal_course_cost($user->courseid); // cost, discount

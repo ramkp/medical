@@ -5,7 +5,7 @@
  *
  * @author sirromas
  */
-require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
@@ -75,12 +75,18 @@ class Invoices extends Util {
         $user->first_name = $user->firstname;
         $user->last_name = $user->lastname;
         $user->courseid = $courseid;
-        //print_r($user);
-        //die();
         $user->invoice = $file_invoice->create_user_invoice($user, null, 1);
-        //die ();
         $path = $file_invoice->invoice_path . "/$user->invoice.pdf";
-        $sum = $file_invoice->get_personal_course_cost($courseid);
+        $user_installment_status = $file_invoice->is_installment_user($userid, $courseid);
+        if ($user_installment_status == 0) {
+            $installment = new stdClass();
+            $cost = $file_invoice->get_personal_course_cost($courseid);
+            $sum = $cost['cost'];
+            $installment->sum = $sum;
+        } // end if $user_installment_status==0
+        else {
+            $installment = $file_invoice->get_user_installment_payments($userid, $courseid);
+        } // end else 
         $query = "insert into mdl_invoice"
                 . "(i_num,"
                 . "userid,"
@@ -92,10 +98,10 @@ class Invoices extends Util {
                 . "values ('" . $user->invoice . "',"
                 . "'" . $userid . "', "
                 . "'" . $courseid . "',"
-                . "'" . $sum['cost'] . "',"
+                . "'" . $installment->sum . "',"
                 . "'0',"
                 . "'" . $path . "',"
-                . "'" . time() . "')";        
+                . "'" . time() . "')";
         $this->db->query($query);
         $mailer->send_invoice($user);
         $list = "Invoice has been sent.";
@@ -103,7 +109,87 @@ class Invoices extends Util {
     }
 
     function get_open_invoices() {
-        $query = "";
+        $invoices = array();
+        $query = "select * from mdl_invoice "
+                . "where i_status=0 and i_ptype=0 order by id asc limit 0,1";
+        //echo $query."<br/>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $invoice = new stdClass();
+                foreach ($row as $key => $value) {
+                    $invoice->$key = $value;
+                }
+                $invoices[] = $invoice;
+            } // end while
+        } // end if $num>0
+        $list = $this->create_open_invoices_page($invoices);
+        return $list;
+    }
+
+    function create_open_invoices_page($invoices, $toolbar = true) {
+        $list = "";
+        //print_r($invoices);
+        if (count($invoices) > 0) {
+            $list.="<div id='open_invoices_container'>";
+            foreach ($invoices as $invoice) {
+                $user = $this->get_user_details($invoice->userid);
+                $date = date('Y-m-d', time());
+                $coursename = $this->get_course_name($invoice->courseid);
+                $link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $invoice->i_file));
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>User</span><span class='span6'>$user->firstname $user->lastname</span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Program applied</span><span class='span6'>$coursename</span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Invoice</span><span class='span6'>Invoice # $invoice->i_num for $$invoice->i_sum from $date (<a href='$link' target='_blank'>link</a>)</span>";
+                $list.="</div>";
+            } // end foreach
+            $list.="</div>";
+            if ($toolbar) {
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span6'  id='pagination'></span>";
+                $list.="</div>";
+            } // end if $toolbar
+        } // end if count($invoices)>0
+        else {
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'>There are no open invoices</span>";
+            $list.="</div>";
+        }
+        return $list;
+    }
+
+    function get_open_invoice_item($page) {
+        $invoices = array();
+        $rec_limit = 1;
+        $page = $page - 1;
+        $offset = $rec_limit * $page;
+        $query = "select * from mdl_invoice where i_status=0 and i_ptype=0 "
+                . "LIMIT $offset, $rec_limit";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $invoice = new stdClass();
+            foreach ($row as $key => $value) {
+                $invoice->$key = $value;
+            } // end foreach      
+            $invoices[] = $invoice;
+        } // end while
+        $list = $this->create_open_invoices_page($invoices, false);
+        return $list;
+    }
+
+    function get_open_invoices_total() {
+        $query = "select * from mdl_invoice where i_status=0 and i_ptype=0 "
+                . "order by id asc";
+        //echo $query."<br/>";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
 }

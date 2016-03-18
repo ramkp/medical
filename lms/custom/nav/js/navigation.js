@@ -393,6 +393,13 @@ $(document).ready(function () {
             $('#invoice_status').html("<span style='color:red;'>Please select program and user</span>");
         } // end else
     }
+    
+    function get_open_invoices_page (){
+        var url = "/lms/custom/invoices/open_invoices.php";
+        $.post(url, {id: 1}).done(function (data) {            
+            $('#region-main').html(data);
+        });
+    }
 
     function get_installment_page() {
         var url = "/lms/custom/installment/get_installment_page.php";
@@ -663,6 +670,7 @@ $(document).ready(function () {
 
     $("#opn_inv").click(function (event) {
         update_navigation_status__menu('Open invoices');
+        get_open_invoices_page();
 
     });
 
