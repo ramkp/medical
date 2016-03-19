@@ -416,6 +416,13 @@ $(document).ready(function () {
         });
     }
 
+    function get_users_stats_page() {
+        var url = "/lms/custom/stats/get_stats_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     function add_installment_user() {
         var userid = $('#users').val();
         console.log('User id: ' + userid);
@@ -690,6 +697,11 @@ $(document).ready(function () {
     $("#installment").click(function (event) {
         update_navigation_status__menu('Installment users');
         get_installment_page();
+    });
+
+    $("#user_report").click(function (event) {
+        update_navigation_status__menu('Users stats');
+        get_users_stats_page();
     });
 
 }); // end of $(document).ready(function()

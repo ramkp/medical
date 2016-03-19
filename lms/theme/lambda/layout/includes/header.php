@@ -23,7 +23,7 @@
  *
  */
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/nav/classes/navClass.php');
-
+echo "<script type='text/javascript' src='http://code.highcharts.com/highcharts.js'></script>";
 echo "<script type='text/javascript' src='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/nav/js/navigation.js'></script>";
 echo "<script type='text/javascript' src='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/vendor/jquery.ui.widget.js'></script>";
 echo "<script type='text/javascript' src='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/jquery.iframe-transport.js'></script>";
@@ -32,6 +32,7 @@ echo "<script src='https://cdn.ckeditor.com/4.5.6/standard/ckeditor.js'></script
 echo "<script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>";
 echo "<script type='text/javascript' src='http://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/jquery.simplePagination.js'></script>";
 echo "<link type='text/css' rel='stylesheet' href='http://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/simplePagination.css'/>";
+
 ?>
 
 <script>
