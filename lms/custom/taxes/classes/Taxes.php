@@ -25,7 +25,7 @@ class Taxes extends Util {
 
     function get_state_taxes_list() {
         $taxes = array();
-        $query = "select * from mdl_state_taxes where id=1 order by state ";
+        $query = "select * from mdl_state_taxes order by state limit 0,10";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $item = new stdClass();
@@ -101,11 +101,16 @@ class Taxes extends Util {
     }
 
     function get_tax_item($page) {
-        $page = $page - 1;
-        $rec_limit = 1;
-        $offset = $rec_limit * $page;
+        $rec_limit = 10;
+        if ($page == 1) {
+            $offset = 0;
+        } // end if $page==1
+        else {
+            $page = $page - 1;
+            $offset = $rec_limit * $page;
+        }
         $list = "";
-        $query = "select * from mdl_state_taxes LIMIT $offset, $rec_limit";
+        $query = "select * from mdl_state_taxes order by state LIMIT $offset, $rec_limit";
         //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {

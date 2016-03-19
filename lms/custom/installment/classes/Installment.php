@@ -5,7 +5,6 @@
  *
  * @author sirromas
  */
-
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 
 class Installment extends Util {
@@ -157,9 +156,14 @@ class Installment extends Util {
         //echo "Page: ".$page."<br>";
         $installment_users = array();
         $rec_limit = 1;
-        $page = $page - 1;
-        $offset = $rec_limit * $page;
-        $query = "select * from mdl_installment_users LIMIT $offset, $rec_limit";
+        if ($page == 1) {
+            $offset = 0;
+        } // end if $page==1
+        else {
+            $page = $page - 1;
+            $offset = $rec_limit * $page;
+        }
+        $query = "select * from mdl_installment_users order by id asc  LIMIT $offset, $rec_limit";
         //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {

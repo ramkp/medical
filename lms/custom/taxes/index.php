@@ -12,7 +12,7 @@ echo $list;
         $(function () {
             $('#pagination').pagination({
                 items: 51,
-                itemsOnPage: 1,
+                itemsOnPage: 10,
                 cssStyle: 'light-theme'
             });
         });

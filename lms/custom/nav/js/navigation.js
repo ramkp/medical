@@ -383,6 +383,7 @@ $(document).ready(function () {
         var userid = $('#users').val();
         if (userid > 0 && courseid > 0) {
             if (confirm('Send invoice to user?')) {
+                $('#invoice_status').html('');
                 var url = "/lms/custom/invoices/send_invoice_send.php";
                 $.post(url, {userid: userid, courseid: courseid}).done(function (data) {
                     $('#invoice_status').html(data);

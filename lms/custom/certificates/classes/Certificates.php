@@ -5,7 +5,6 @@
  *
  * @author sirromas
  */
-
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
@@ -273,7 +272,7 @@ class Certificates extends Util {
         } // end else
         $path = $this->prepare_ceriticate($courseid, $userid, $date);
         $user = $this->get_user_detailes($userid);
-        $user->path=$path;
+        $user->path = $path;
         $query = "insert into mdl_certificates (courseid,"
                 . "userid,"
                 . "path,"
@@ -285,18 +284,24 @@ class Certificates extends Util {
                 . " '$date',"
                 . " '$expiration_date_sec')";
         $this->db->query($query);
-        $mailer=new Mailer();
+        $mailer = new Mailer();
         $mailer->send_certificate($user);
         $list = "Certificate has been sent";
         return $list;
     }
 
     function get_certificate_item($page) {
+        //echo "Function page: ".$page;
         $certificates = array();
         $rec_limit = 1;
-        $page = $page - 1;
-        $offset = $rec_limit * $page;
-        $query = "select * from mdl_certificates LIMIT $offset, $rec_limit";
+        if ($page == 1) {
+            $offset = 0;
+        } // end if $page==1
+        else {
+            $page = $page - 1;
+            $offset = $rec_limit * $page;
+        }
+        $query = "select * from mdl_certificates order by issue_date LIMIT $offset, $rec_limit";
         //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
