@@ -65,6 +65,7 @@ class Stats extends Util {
     }
 
     function create_users_course_page($src_users) {
+        $whole_div = "";
         $list = "";
         $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
         $list.="<span class='span9'>Users - Source</span>";
@@ -73,16 +74,21 @@ class Stats extends Util {
             $src_data = $this->sources;
             foreach ($src_data as $data) {
                 if ($data->counter > 0) {
-                    $list.="<div class='container-fluid' style='text-align:left;'>";
-                    $list.="<span class='span3'>$data->src</span><span class='span3'>$data->counter</span>";
+                    $list.="<div class='container-fluid' style='text-align:left;padding-right:0;margin:0;'>";
+                    $list.="<span class='span4'>$data->src</span><span class='span1' style='padding-right:0px;'>$data->counter</span>";
                     $list.="</div>";
                 } // end if $data->counter>0
-            } // end foreach
-            $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span6'><hr/></span>";
-            $list.="</div>";
+            } // end foreach            
         } // end if count($src_users)>0        
-        return $list;
+        $whole_div.="<table align='center' width='100%' border='0' style='padding-right:0px;margin:0px;'>";
+        $whole_div.="<tr>";
+        $whole_div.="<td style='width:245px;'>$list</td><td align='left'><span class='span6' id='chart_div' style='border:0px solid;text-align:center;' vertical-align='top' valign='top'></span></td>";
+        $whole_div.="</tr>";
+        $whole_div.="<tr>";
+        $whole_div.="<td colspan='2'><div class='container-fluid' style='text-align:center;'><span class='span12'><br/><hr/></span></div></td>";
+        $whole_div.="</tr>";
+        $whole_div.="</table>";
+        return $whole_div;
     }
 
     /*     * **************************************************************
@@ -132,6 +138,7 @@ class Stats extends Util {
     }
 
     function create_users_states_page($state_users) {
+        $whole_page = "";
         $list = "";
         $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
         $list.="<span class='span9'>Users - States</span>";
@@ -141,15 +148,20 @@ class Stats extends Util {
             foreach ($states_data as $data) {
                 if ($data->counter > 0) {
                     $list.="<div class='container-fluid' style='text-align:left;'>";
-                    $list.="<span class='span3'>$data->state</span><span class='span3'>$data->counter</span>";
+                    $list.="<span class='span4'>$data->state</span><span class='span1'>$data->counter</span>";
                     $list.="</div>";
                 } // end if $data->counter>0
-            } // end foreach
-            $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span6'><hr/></span>";
-            $list.="</div>";
+            } // end foreach            
         } // end if count($state_users>0)
-        return $list;
+        $whole_div.="<table align='center' width='100%' border='0'>";
+        $whole_div.="<tr>";
+        $whole_div.="<td style='width:245px;'>$list</td><td align='left'><span class='span6' id='chart_div2' style='border:0px solid;text-align:center;width:600px;height:300px;vertical-align:top;' vertical-align='top' valign='top'></span></td>";
+        $whole_div.="</tr>";
+        $whole_div.="<tr>";
+        $whole_div.="<td colspan='2'><div class='container-fluid' style='text-align:center;'><span class='span12'><br/><hr/></span></div></td>";
+        $whole_div.="</tr>";
+        $whole_div.="</table>";
+        return $whole_div;
     }
 
 }

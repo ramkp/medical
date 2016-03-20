@@ -23,7 +23,6 @@
  *
  */
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/nav/classes/navClass.php');
-echo "<script type='text/javascript' src='http://code.highcharts.com/highcharts.js'></script>";
 echo "<script type='text/javascript' src='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/nav/js/navigation.js'></script>";
 echo "<script type='text/javascript' src='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/vendor/jquery.ui.widget.js'></script>";
 echo "<script type='text/javascript' src='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/jquery.iframe-transport.js'></script>";
@@ -32,7 +31,11 @@ echo "<script src='https://cdn.ckeditor.com/4.5.6/standard/ckeditor.js'></script
 echo "<script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>";
 echo "<script type='text/javascript' src='http://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/jquery.simplePagination.js'></script>";
 echo "<link type='text/css' rel='stylesheet' href='http://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/simplePagination.css'/>";
-
+echo "<script type = 'text/javascript' src = 'https://www.gstatic.com/charts/loader.js' ></script>";
+echo "<script type = 'text/javascript'>";
+// Load the Visualization API and the column package.
+echo "google.charts.load('current', {'packages': ['corechart']})";
+echo "</script>";
 ?>
 
 <script>
@@ -65,10 +68,10 @@ if (strpos($checkuseragent, 'MSIE 8')) {
 
 <?php if ($PAGE->theme->settings->socials_position == 1) { ?>
     <div class="container-fluid socials-header"> 
-    <?php require_once(dirname(__FILE__) . '/socials.php'); ?>
+        <?php require_once(dirname(__FILE__) . '/socials.php'); ?>
     </div>
-    <?php }
-    ?>
+<?php }
+?>
 
 <header id="page-header" class="clearfix">
 
