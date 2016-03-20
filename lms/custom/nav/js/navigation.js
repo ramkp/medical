@@ -423,6 +423,27 @@ $(document).ready(function () {
         });
     }
 
+    function get_cash_payments_page() {
+        var url = "/lms/custom/payments/get_cash_payments_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function get_check_payments_page() {
+        var url = "/lms/custom/payments/get_cheque_payments.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function get_free_payments() {
+        var url = "/lms/custom/payments/get_free_payments.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     function add_installment_user() {
         var userid = $('#users').val();
         console.log('User id: ' + userid);
@@ -702,6 +723,32 @@ $(document).ready(function () {
     $("#user_report").click(function (event) {
         update_navigation_status__menu('Users stats');
         get_users_stats_page();
+    });
+
+    $("#cash").click(function (event) {
+        update_navigation_status__menu('Cash payments');
+        get_cash_payments_page()
+    });
+
+    $("#cheque").click(function (event) {
+        update_navigation_status__menu('Cheque payments');
+        get_check_payments_page();
+
+    });
+
+    $("#cards").click(function (event) {
+        update_navigation_status__menu('Credit cards payments');
+
+    });
+
+    $("#free").click(function (event) {
+        update_navigation_status__menu('Free');
+        get_free_payments();
+    });
+
+    $("#refund").click(function (event) {
+        update_navigation_status__menu('Refund');
+
     });
 
 }); // end of $(document).ready(function()

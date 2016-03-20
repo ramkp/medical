@@ -60,11 +60,11 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
-                                    <li><a href='#' title='Cash'>Cash payments</a></li>
-                                    <li><a href='#' title='Cheque'>Cheque payments</a></li>
-                                    <li><a href='#' title='Cards'>Credit cards payments</a></li>
-                                    <li><a href='#' title='Free'>Free</a></li>                                    
-                                    <li><a href='#' title='Refund'>Refund</a></li>                            
+                                    <li><a href='#' id='cash' title='Cash'>Cash payments</a></li>
+                                    <li><a href='#' id='cheque' title='Cheque'>Cheque payments</a></li>
+                                    <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
+                                    <li><a href='#' id='free' title='Free'>Free</a></li>                                    
+                                    <li><a href='#' id='refund' title='Refund'>Refund</a></li>                            
                                 </ul>
                             </li>
                             <li class='dropdown'><a title='Reports' class='dropdown-toggle' href='#'>Reports<b class='caret'></b></a>

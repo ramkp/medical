@@ -290,8 +290,7 @@ class Certificates extends Util {
         return $list;
     }
 
-    function get_certificate_item($page) {
-        //echo "Function page: ".$page;
+    function get_certificate_item($page) {        
         $certificates = array();
         $rec_limit = 1;
         if ($page == 1) {
