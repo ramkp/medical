@@ -6,6 +6,7 @@
  * @author sirromas
  */
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/classes/Invoice.php');
 
 class Payments extends Util {
 
@@ -16,7 +17,8 @@ class Payments extends Util {
     function get_invoice_payments($payment_type) {
         $invoice_payments = array();
         $query = "select * from mdl_invoice "
-                . "where i_status=1 and i_ptype=$payment_type limit 0, $this->limit";
+                . "where i_status=1 and "
+                . "i_ptype=$payment_type limit 0, $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -41,6 +43,15 @@ class Payments extends Util {
             $type = $row['type'];
         }
         return $type;
+    }
+
+    function get_invoice_id($date) {
+        $query = "select id from mdl_invoice where i_pdate='$date'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
     }
 
     function get_invoice_payments_page($invoice_payments, $toolbar = true) {
@@ -97,7 +108,9 @@ class Payments extends Util {
             $page = $page - 1;
             $offset = $rec_limit * $page;
         }
-        $query = "select * from mdl_invoice where i_status=1 and i_ptype=$typeid LIMIT $offset, $rec_limit";
+        $query = "select * from mdl_invoice "
+                . "where i_status=1 and "
+                . "i_ptype=$typeid LIMIT $offset, $rec_limit";
         //echo "Query: ".$query ."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -109,6 +122,100 @@ class Payments extends Util {
         } // end while
         $list = $this->get_invoice_payments_page($payments, false);
         return $list;
+    }
+
+    function get_payment_log_page() {
+        $payments = array();
+        $query = "select * from mdl_payments_log "
+                . "order by date_added desc limit 0, $this->limit";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach 
+                $payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        $list = $this->create_payment_log_page($payments);
+        return $list;
+    }
+
+    function create_payment_log_page($payments, $toolbar = true) {
+        $list = "";
+        if (count($payments) > 0) {
+            $invoice = new Invoices();
+            $list.="<div id='payment_log_container'>";
+            foreach ($payments as $payment) {
+                $user = $this->get_user_details($payment->userid);
+                $modifier = $this->get_user_details($payment->modifierid);
+                $course = $this->get_course_name($payment->courseid);
+                $invoice_id = $this->get_invoice_id($payment->date_added);
+                $invoice_detailes = $invoice->get_invoice_detailes($invoice_id);
+                $date=date('Y-m-d', $invoice_detailes->i_date);
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>User</span><span class='span3'>$user->firstname &nbsp $user->lastname</span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Program</span><span class='span3'>$course </span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Invoice</span><span class='span5'>Invoice # $invoice_detailes->i_num for $$invoice_detailes->i_sum &nbsp; from $date</span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Access granted by</span><span class='span3'>$modifier->firstname &nbsp; $modifier->lastname</span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span7'><hr/></span>";
+                $list.="</div>";
+            } // end foreach
+            $list.="</div>";
+            if ($toolbar == true) {
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span6'  id='pagination'></span>";
+                $list.="</div>";
+            } // end if $toolbar==true
+        } // end if count($payments)>0
+        else {
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span6'>Payments log is empty</span>";
+            $list.="</div>";
+        } // end else
+        return $list;
+    }
+
+    function get_payment_log_item($page) {
+        $payments = array();
+        $rec_limit = $this->limit;
+        if ($page == 1) {
+            $offset = 0;
+        } // end if $page==1
+        else {
+            $page = $page - 1;
+            $offset = $rec_limit * $page;
+        }
+        $query = "select * from mdl_payments_log "
+                . "order by date_added desc "
+                . "LIMIT $offset, $rec_limit";
+        //echo "Query: ".$query ."<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $payment = new stdClass();
+            foreach ($row as $key => $value) {
+                $payment->$key = $value;
+            } // end foreach      
+            $payments[] = $payment;
+        } // end while
+        $list = $this->create_payment_log_page($payments, false);
+        return $list;
+    }
+
+    function get_total_log_entries() {
+        $query = "select id from mdl_payments_log order by id asc";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
 }

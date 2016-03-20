@@ -444,9 +444,16 @@ $(document).ready(function () {
         });
     }
 
+    function get_payment_log_page() {
+        var url = "/lms/custom/payments/get_payments_log_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     function make_invoice_paid(id) {
         var status_id = '#invoice_status_' + id;
-        var payment_type_id='#payment_type_'+id;
+        var payment_type_id = '#payment_type_' + id;
         var payment_type = $(payment_type_id).val();
         if (payment_type > 0) {
             $(status_id).html('');
@@ -752,6 +759,13 @@ $(document).ready(function () {
         update_navigation_status__menu('Users stats');
         get_users_stats_page();
     });
+
+    $("#payments_report").click(function (event) {
+        update_navigation_status__menu('Payments log');
+        get_payment_log_page();
+    });
+
+    //payments_report     
 
     $("#cash").click(function (event) {
         update_navigation_status__menu('Cash payments');
