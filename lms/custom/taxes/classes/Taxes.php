@@ -23,9 +23,11 @@ require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 
 class Taxes extends Util {
 
+    public $limit = 10;
+
     function get_state_taxes_list() {
         $taxes = array();
-        $query = "select * from mdl_state_taxes order by state limit 0,10";
+        $query = "select * from mdl_state_taxes order by state limit 0, $this->limit";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $item = new stdClass();
@@ -101,7 +103,7 @@ class Taxes extends Util {
     }
 
     function get_tax_item($page) {
-        $rec_limit = 10;
+        $rec_limit = $this->limit;
         if ($page == 1) {
             $offset = 0;
         } // end if $page==1

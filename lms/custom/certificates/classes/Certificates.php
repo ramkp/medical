@@ -12,23 +12,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php'
 class Certificates extends Util {
 
     public $cert_path;
-
+    public $limit=3;
+            
     function __construct() {
         parent::__construct();
         $this->cert_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates';
-    }
-
-    function get_user_detailes($id) {
-        $query = "select firstname, lastname, email from mdl_user where id=$id";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $user = new stdClass();
-            foreach ($row as $key => $value) {
-                $user->$key = $value;
-            } // end foreach 
-        } // end while
-        return $user;
-    }
+    }    
 
     function get_course_name($id) {
         $query = "select fullname from mdl_course where id=$id";
@@ -47,7 +36,7 @@ class Certificates extends Util {
 
     function get_certificates_list() {
         $certificates = array();
-        $query = "select * from mdl_certificates order by issue_date limit 0,1";
+        $query = "select * from mdl_certificates order by issue_date limit 0, $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -87,7 +76,7 @@ class Certificates extends Util {
             $pagination = $this->get_pagination_bar();
             $list.="<div id='certificates_container'>";
             foreach ($certificates as $certificate) {
-                $user = $this->get_user_detailes($certificate->userid);
+                $user = $this->get_user_details($certificate->userid);
                 $coursename = $this->get_course_name($certificate->courseid);
                 $date = date('Y-m-d', $certificate->issue_date);
                 $exp_date = date('Y-m-d', $certificate->expiration_date);
@@ -292,7 +281,7 @@ class Certificates extends Util {
 
     function get_certificate_item($page) {        
         $certificates = array();
-        $rec_limit = 1;
+        $rec_limit = $this->limit;
         if ($page == 1) {
             $offset = 0;
         } // end if $page==1

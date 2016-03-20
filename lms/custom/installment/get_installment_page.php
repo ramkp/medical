@@ -15,7 +15,7 @@ echo $list;
         $(function () {
             $('#pagination').pagination({
                 items: <?php echo $total; ?>,
-                itemsOnPage: 1,
+                itemsOnPage: <?php echo $installment->limit; ?>,
                 cssStyle: 'light-theme'
             });
         });

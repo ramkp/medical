@@ -444,6 +444,24 @@ $(document).ready(function () {
         });
     }
 
+    function make_invoice_paid(id) {
+        var status_id = '#invoice_status_' + id;
+        var payment_type_id='#payment_type_'+id;
+        var payment_type = $(payment_type_id).val();
+        if (payment_type > 0) {
+            $(status_id).html('');
+            if (confirm('Make current invoice as paid?')) {
+                var url = "/lms/custom/invoices/make_invoice_paid.php";
+                $.post(url, {id: id, payment_type: payment_type}).done(function (data) {
+                    $(status_id).html(data);
+                });
+            } // end if confirm            
+        } // end if payment_type>0
+        else {
+            $(status_id).html("<span style='color:red;'>Please select payment type</span>");
+        } // end else
+    }
+
     function add_installment_user() {
         var userid = $('#users').val();
         console.log('User id: ' + userid);
@@ -546,10 +564,14 @@ $(document).ready(function () {
             update_tax_item(event.target.id);
         }
 
+        if (event.target.id.indexOf("make_paid_") >= 0) {
+            var id = event.target.id.replace("make_paid_", "");
+            make_invoice_paid(id);
+        }
+
         if (event.target.id == 'invoice_data') {
             update_invoice_data();
         }
-
 
         if (event.target.id == 'send_cert') {
             send_certicicate_to_user();
@@ -589,6 +611,12 @@ $(document).ready(function () {
         if (event.target.id.indexOf("tax_page_") >= 0) {
             var id = event.target.id.replace("tax_page_", "");
             get_tax_item(id);
+        }
+
+        if (event.target.id.indexOf("change_paid_") >= 0) {
+            var id = event.target.id.replace("change_paid_", "");
+            var page_id = '#change_payment_status_page_' + id;
+            $(page_id).show();
         }
 
         if (event.target.id == 'add_installment_user') {

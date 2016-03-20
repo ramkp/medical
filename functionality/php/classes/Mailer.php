@@ -34,15 +34,25 @@ class Mailer {
         return $list;
     }
 
-    function get_payment_confirmation_message($payment, $group = null) {
+    function get_payment_confirmation_message($payment, $group = null, $free = null) {
         $list = "";
         $list.="<html><body>";
         $list.="<br/><p>Dear $payment->card_holder!</p>";
         if ($group == null) {
-            $list.="<p>Payment of $$payment->sum has been received. Thank you. Your account is active now.</p>";
+            if ($free == null) {
+                $list.="<p>Payment of $$payment->sum has been received. Thank you. Your account is active now.</p>";
+            } // end if $free == null
+            else {
+                $list.="<p>You got free access to the system. Your account is active now.</p>";
+            }
         } // end if $group==null
         else {
-            $list.="<p>Payment of $$payment->sum has been received. Thank you. All your group accounts are active now.</p>";
+            if ($free == null) {
+                $list.="<p>Payment of $$payment->sum has been received. Thank you. All your group accounts are active now.</p>";
+            } // end if $free == null
+            else {
+                $list.="<p>Your group membes got free access to the system. All your group accounts are active now.</p>";
+            } // end else
         } // end else
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
         $list.="<p>Best regards,</p>";
@@ -58,9 +68,9 @@ class Mailer {
         $this->send_email($subject, $message, $recipient);
     }
 
-    function send_payment_confirmation_message($payment, $group = null) {
+    function send_payment_confirmation_message($payment, $group = null, $free = null) {
         $subject = "Medical2 Career College - payment confirmation";
-        $message = $this->get_payment_confirmation_message($payment, $group);
+        $message = $this->get_payment_confirmation_message($payment, $group, $free);
         $recipient = $payment->bill_email;
         $this->send_email($subject, $message, $recipient);
     }
@@ -94,7 +104,7 @@ class Mailer {
         $list.="<html><body>";
         $list.="<br/><p>Dear $user->first_name $user->last_name!</p>";
         $list.="<p>Thank you for signup.</p>";
-        $list.="<p>Please find out invoice attached to make a payment.</p>";        
+        $list.="<p>Please find out invoice attached to make a payment.</p>";
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
         $list.="<p>Best regards,</p>";
         $list.="<p>Support team.</p>";
@@ -111,10 +121,10 @@ class Mailer {
 
     function send_certificate($user) {
         /*
-        echo "<pre>";
-        print_r($user);
-        echo "<pre>";
-        */
+          echo "<pre>";
+          print_r($user);
+          echo "<pre>";
+         */
         $subject = "Medical2 Career College - Certificate";
         $list = "";
         $list.="<html><body>";

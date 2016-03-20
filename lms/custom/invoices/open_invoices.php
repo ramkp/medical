@@ -13,7 +13,7 @@ echo $list;
         $(function () {
             $('#pagination').pagination({
                 items: <?php echo $total; ?>,
-                itemsOnPage: 1,
+                itemsOnPage: <?php echo $invoice->limit; ?>,
                 cssStyle: 'light-theme'
             });
         });

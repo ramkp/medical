@@ -12,14 +12,14 @@ echo $list;
         $(function () {
             $('#pagination').pagination({
                 items: 51,
-                itemsOnPage: 10,
+                itemsOnPage: <?php echo $taxes->limit; ?>,
                 cssStyle: 'light-theme'
             });
         });
 
         $("#pagination").click(function () {
             var page = $('#pagination').pagination('getCurrentPage');
-            console.log('Page: '+page);
+            console.log('Page: ' + page);
             var url = "/lms/custom/taxes/get_tax_item.php";
             $.post(url, {id: page}).done(function (data) {
                 $('#state_taxes').html(data);

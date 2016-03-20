@@ -9,9 +9,11 @@ require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 
 class Installment extends Util {
 
+    public $limit = 3;
+
     function get_installment_page() {
         $users = array();
-        $query = "select * from mdl_installment_users order by id asc limit 0,1";
+        $query = "select * from mdl_installment_users order by id asc limit 0, $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -82,10 +84,9 @@ class Installment extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Creation date</span><span class='span2'>$date_created</span>";
                 $list.="</div>";
-
-                //$list.="<div class='container-fluid'>";
-                //$list.="<span class='span4'><button type='button' id='update_user_installment' class='btn btn-primary'>Update</button></span>";
-                //$list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span6'><hr/></span>";
+                $list.="</div>";
             } // end foreach 
             $list.="</div>";
             if ($toolbar == true) {
@@ -148,6 +149,7 @@ class Installment extends Util {
         $list.="<div class='container-fluid'>";
         $list.="<span class='span6'><button type='button' id='add_installment_user' class='btn btn-primary'>Add User</button></span>";
         $list.="</div>";
+
         $list.="</div>";
         return $list;
     }
@@ -155,7 +157,7 @@ class Installment extends Util {
     function get_installment_item($page) {
         //echo "Page: ".$page."<br>";
         $installment_users = array();
-        $rec_limit = 1;
+        $rec_limit = $this->limit;
         if ($page == 1) {
             $offset = 0;
         } // end if $page==1

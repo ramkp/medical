@@ -87,7 +87,7 @@ class Payments extends Util {
         return $num;
     }
 
-    function get_payment_item($page) {
+    function get_payment_item($page, $typeid) {
         $payments = array();
         $rec_limit = $this->limit;
         if ($page == 1) {
@@ -97,7 +97,8 @@ class Payments extends Util {
             $page = $page - 1;
             $offset = $rec_limit * $page;
         }
-        $query = "select * from mdl_invoice where i_status=1 and i_ptype=$this->typeid LIMIT $offset, $rec_limit";
+        $query = "select * from mdl_invoice where i_status=1 and i_ptype=$typeid LIMIT $offset, $rec_limit";
+        //echo "Query: ".$query ."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $payment = new stdClass();

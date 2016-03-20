@@ -10,6 +10,9 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
 class Invoices extends Util {
+
+    public $limit = 3;
+
     /*     * ******************************************************
      * 
      *             Invoice credentials
@@ -126,9 +129,10 @@ class Invoices extends Util {
      * ******************************************************* */
 
     function get_open_invoices() {
+        //echo "<br/>Current user: $this->user->id<br/>";
         $invoices = array();
         $query = "select * from mdl_invoice "
-                . "where i_status=0 and i_ptype=0 order by id asc limit 0,1";
+                . "where i_status=0 and i_ptype=0 order by id asc limit 0,$this->limit";
         //echo $query."<br/>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -154,6 +158,7 @@ class Invoices extends Util {
                 $user = $this->get_user_details($invoice->userid);
                 $date = date('Y-m-d', time());
                 $coursename = $this->get_course_name($invoice->courseid);
+                $prefix = ($paid == false) ? "from " : "paid date ";
                 $link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $invoice->i_file));
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>User</span><span class='span6'>$user->firstname $user->lastname</span>";
@@ -164,8 +169,24 @@ class Invoices extends Util {
                 $list.="</div>";
 
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Invoice</span><span class='span6'>Invoice # $invoice->i_num for $$invoice->i_sum from $date (<a href='$link' target='_blank'>link</a>)</span>";
+                $list.="<span class='span2'>Invoice</span><span class='span6'>Invoice # $invoice->i_num for $$invoice->i_sum $prefix $date (<a href='$link' target='_blank'>link</a>)</span>";
                 $list.="</div>";
+
+                if ($paid == false) {
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span3'><a id='change_paid_$invoice->id' href='#' onClick='return false;'>Make it paid</a></span>";
+                    $list.="</div>";
+                    $payment_types = $this->get_payment_methods($invoice->id);
+                    $list.="<div id='change_payment_status_page_$invoice->id' style='display:none;'>";
+                    $list.="<div class='container-fluid'>";
+                    $list.=$payment_types;
+                    $list.="</div>";
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span3'><button type='button' id='make_paid_$invoice->id' class='btn btn-primary'>Make it paid</button></span><span class='span5' id='invoice_status_$invoice->id'></span>";
+                    $list.="</div>";
+                    $list.="</div>";
+                } // end if $paid==false
+
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span8'><hr/></span>";
                 $list.="</div>";
@@ -195,7 +216,7 @@ class Invoices extends Util {
     function get_open_invoice_item($page) {
         //echo "Function page: " . $page . "<br>";
         $invoices = array();
-        $rec_limit = 1;
+        $rec_limit = $this->limit;
         if ($page == 1) {
             $offset = 0;
         } // end if $page==1
@@ -233,7 +254,7 @@ class Invoices extends Util {
     function get_paid_invoices() {
         $invoices = array();
         $query = "select * from mdl_invoice "
-                . "where i_status=1 order by id asc limit 0,1";
+                . "where i_status=1 order by id asc limit 0, $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -259,7 +280,7 @@ class Invoices extends Util {
     function get_paid_invoice_item($page) {
         //echo "Function page: ".$page."<br>";
         $invoices = array();
-        $rec_limit = 1;
+        $rec_limit = $this->limit;
         if ($page == 1) {
             //echo "inside if ...";
             $offset = 0;
@@ -280,6 +301,93 @@ class Invoices extends Util {
             $invoices[] = $invoice;
         } // end while
         $list = $this->create_open_invoices_page($invoices, false, true);
+        return $list;
+    }
+
+    /*     * ******************************************************
+     * 
+     *                Make invoice paid
+     * 
+     * ******************************************************* */
+
+    function get_payment_methods($id) {
+        $list = "";
+        $query = "select * from mdl_payments_type order by type";
+        $list.="<span class='span3'>Payment type:</span><span class='span4'><select id='payment_type_$id' >";
+        $list.="<option value='0' selected>Payment type</option>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $list.="<option value='" . $row['id'] . "'>" . $row['type'] . "</option>";
+        }
+        $list.="</select></span>";
+        return $list;
+    }
+
+    function get_invoice_detailes($id) {
+        $query = "select * from mdl_invoice where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $invoice = new stdClass();
+            foreach ($row as $key => $value) {
+                $invoice->$key = $value;
+            } // end foreach 
+        } // end while
+        return $invoice;
+    }
+
+    function make_invoice_paid($id, $payment_type) {
+        $modifierid = $this->user->id;
+        $payment_date = time();
+
+        //1. Get invoice detailes
+        $invoice = $this->get_invoice_detailes($id);
+
+        //2. Get user detailes
+        $user = $this->get_user_details($invoice->userid);
+
+        // 3. Confirm user
+        $query = "update mdl_user set confirmed=1 "
+                . "where id=$invoice->userid";
+        $this->db->query($query);
+
+        // 4. Make invoice as paid
+        $query = "update mdl_invoice "
+                . "set i_status=1, "
+                . "i_ptype=$payment_type, "
+                . "i_pdate='$payment_date' "
+                . "where id=$id";
+        $this->db->query($query);
+
+        //5. Add log entry
+        $query = "insert into "
+                . "mdl_payments_log "
+                . "(userid,"
+                . "courseid,"
+                . "modifierid,"
+                . "sum,"
+                . "payment_type,"
+                . "date_added) "
+                . "values('" . $invoice->userid . "', "
+                . "'" . $invoice->courseid . "',"
+                . "'" . $modifierid . "',"
+                . "'" . $invoice->i_sum . "',"
+                . "'" . $payment_type . "',"
+                . "'" . $payment_date . "')";
+        $this->db->query($query);
+
+        //6. Send payment confirmation email        
+        $mailer = new Mailer();
+        $user->bill_email = $user->email;
+        $user->card_holder = $user->firstname . "&nbsp;" . $user->lastname;
+        $user->sum = $invoice->i_sum;
+        if ($payment_type != 3) {
+            $mailer->send_payment_confirmation_message($user, null, null);
+        } // end if $payment_type!=3
+        else {
+            $mailer->send_payment_confirmation_message($user, null, true);
+        } // end else
+
+        $list = "Invoice made as paid. Please reload the page";
         return $list;
     }
 
