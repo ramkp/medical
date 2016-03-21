@@ -407,7 +407,19 @@ class Payment {
         } // end if $user_installment_status==0
         else {
             $installment = $this->invoice->get_user_installment_payments($user->id, $user->courseid);
-        } // end else 
+        } // end else
+        $tax_status = $this->is_course_taxable($user->courseid);
+        if ($tax_status == 1) {
+            $user_state = $this->get_user_state($user->id);
+            $tax = $this->get_state_taxes($user_state);
+        } // end if $tax_status == 1
+        else {
+            $tax = 0;
+        } // end else
+        if ($tax > 0) {
+            $tax_sum = round(($installment->sum * $tax) / 100, 2);
+            $installment->sum = round(($installment->sum + $tax_sum), 2);
+        }
         $query = "insert into mdl_invoice"
                 . "(i_num,"
                 . "userid,"

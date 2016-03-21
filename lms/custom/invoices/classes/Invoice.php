@@ -81,6 +81,33 @@ class Invoices extends Util {
         return $list;
     }
 
+    function is_course_taxable($courseid) {
+        $query = "select taxes from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $status = $row['taxes'];
+        }
+        return $status;
+    }
+
+    function get_user_state($userid) {
+        $query = "select state from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        }
+        return $state;
+    }
+
+    function get_state_taxes($state) {
+        $query = "select tax from mdl_state_taxes where state='$state'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tax = $row['tax'];
+        }
+        return $tax;
+    }
+
     function send_invoice($courseid, $userid) {
         $file_invoice = new Invoice();
         $mailer = new Mailer();
@@ -101,6 +128,19 @@ class Invoices extends Util {
         else {
             $installment = $file_invoice->get_user_installment_payments($userid, $courseid);
         } // end else 
+        // State taxes section
+        $tax_status = $this->is_course_taxable($courseid);
+        if ($tax_status == 1) {
+            $user_state = $this->get_user_state($userid);
+            $tax = $this->get_state_taxes($user_state);
+        } // end if $tax_status == 1
+        else {
+            $tax = 0;
+        } // end else
+        if ($tax > 0) {
+            $tax_sum = round(($installment->sum * $tax) / 100, 2);
+            $installment->sum = round(($installment->sum + $tax_sum), 2);
+        }
         $query = "insert into mdl_invoice"
                 . "(i_num,"
                 . "userid,"
@@ -132,7 +172,7 @@ class Invoices extends Util {
         //echo "<br/>Current user: $this->user->id<br/>";
         $invoices = array();
         $query = "select * from mdl_invoice "
-                . "where i_status=0 and i_ptype=0 order by id asc limit 0,$this->limit";
+                . "where i_status=0 and i_ptype=0 order by i_date desc limit 0,$this->limit";
         //echo $query."<br/>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -225,6 +265,7 @@ class Invoices extends Util {
             $offset = $rec_limit * $page;
         }
         $query = "select * from mdl_invoice where i_status=0 and i_ptype=0 "
+                . "order by i_date desc "
                 . "LIMIT $offset, $rec_limit";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -254,7 +295,7 @@ class Invoices extends Util {
     function get_paid_invoices() {
         $invoices = array();
         $query = "select * from mdl_invoice "
-                . "where i_status=1 order by id asc limit 0, $this->limit";
+                . "where i_status=1 order by i_date desc limit 0, $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -289,7 +330,8 @@ class Invoices extends Util {
             $page = $page - 1;
             $offset = $rec_limit * $page;
         }
-        $query = "select * from mdl_invoice where i_status=1  "
+        $query = "select * from mdl_invoice where i_status=1 "
+                . "order by  i_date desc "
                 . "LIMIT $offset, $rec_limit";
         //echo $query;
         $result = $this->db->query($query);
