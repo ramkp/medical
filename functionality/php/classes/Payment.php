@@ -360,6 +360,73 @@ class Payment {
         return $id;
     }
 
+    function is_course_taxable($courseid) {
+        $query = "select taxes from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $status = $row['taxes'];
+        }
+        return $status;
+    }
+
+    function get_user_state($userid) {
+        $query = "select state from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        }
+        return $state;
+    }
+
+    function get_state_taxes($state) {
+        $query = "select tax from mdl_state_taxes where state='$state'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tax = $row['tax'];
+        }
+        return $tax;
+    }
+
+    function add_invoice_to_db($user) {
+
+        /*
+         * 
+          echo "<pre>----------<br>";
+          print_r($user);
+          echo "<pre>----------<br>";
+         * 
+         */
+
+        $path = $this->invoice->invoice_path . "/$user->invoice.pdf";
+        $user_installment_status = $this->invoice->is_installment_user($user->id, $user->courseid);
+        if ($user_installment_status == 0) {
+            $installment = new stdClass();
+            $cost = $this->invoice->get_personal_course_cost($user->courseid);
+            $sum = $cost['cost'];
+            $installment->sum = $sum;
+        } // end if $user_installment_status==0
+        else {
+            $installment = $this->invoice->get_user_installment_payments($user->id, $user->courseid);
+        } // end else 
+        $query = "insert into mdl_invoice"
+                . "(i_num,"
+                . "userid,"
+                . "courseid,"
+                . "i_sum,"
+                . "i_status,"
+                . "i_file,"
+                . "i_date) "
+                . "values ('" . $user->invoice . "',"
+                . "'" . $user->id . "', "
+                . "'" . $user->courseid . "',"
+                . "'" . $installment->sum . "',"
+                . "'0',"
+                . "'" . $path . "',"
+                . "'" . time() . "')";
+        //echo "<br>Query: " . $query . "<br>";
+        $this->db->query($query);
+    }
+
     function get_payment_with_options($payment_option) {
         $list = "";
         $installment_data = array();
@@ -375,6 +442,7 @@ class Payment {
             if ($payment_option == 'offline_personal') {
                 $invoice_path = $this->invoice->get_personal_invoice($users);
                 $users->invoice = $invoice_path;
+                $this->add_invoice_to_db($users);
                 $mailer = new Mailer();
                 $mailer->send_invoice($users);
 
@@ -409,7 +477,8 @@ class Payment {
                 foreach ($users as $user) {
                     $user->id = $this->get_user_id_by_email($user->email);
                     $user->courseid = $group_data->courseid;
-                    $user->invoice=$this->invoice->get_personal_invoice($user, 1, 1);
+                    $user->invoice = $this->invoice->get_personal_invoice($user, 1, 1);
+                    $this->add_invoice_to_db($user);
                     $mailer->send_invoice($user);
                 } // end foreach
                 $list.="<div class='panel panel-default' id='payment_detailes'>";
@@ -475,10 +544,16 @@ class Payment {
     function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null) {
 
         /*
-          print_r($group_data);
-          echo "<br/>";
+         * 
+          echo "<br/>-------------<br/>";
+          echo "<pre>";
           print_r($users);
-          echo "<br/>";
+          echo "<pre>";
+          echo "<br/>-------------<br/>";
+          echo "<pre>";
+          print_r($group_data);
+          echo "<pre>";
+          echo "<br/>-------------<br/>";
          * 
          */
 
@@ -501,26 +576,64 @@ class Payment {
                 $course_cost = $this->get_personal_course_cost($users->courseid);
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
+                $tax_status = $this->is_course_taxable($users->courseid);
+                if ($tax_status == 1) {
+                    $tax = $this->get_state_taxes($users->state);
+                } // end if $tax_status == 1
+                else {
+                    $tax = 0;
+                } // end else
             } // end if $group==NULL 
             else {
+                // We do not calculate taxes for group registration
                 $course_name = $this->get_course_name($group_data->courseid);
                 $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
             } // end else
+            // Discount block
             if ($course_cost['discount'] == 0) {
                 $cost_block.="$" . $course_cost['cost'];
             } // end if $course_cost['discount']==0
             else {
                 $cost_block.="$" . $course_cost['cost'] . "&nbsp; (discount is " . $course_cost['discount'] . "%)";
             }
-            $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
-            $list.="<span class='span2'>Selected program</span>";
-            $list.="<span class='span2'>$course_name</span>";
-            $list.="<span class='span2'>Sum to be charged</span>";
-            $list.="<span class='span2'>$cost_block</span>";
-            $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='payment_sum' />";
-            $list.="</div>";
+
+            //echo "Tax: " . $tax . "<br>";
+            if ($tax == 0) {
+                $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+                $list.="<span class='span2'>Selected program</span>";
+                $list.="<span class='span2'>$course_name</span>";
+                $list.="<span class='span2'>Sum to be charged</span>";
+                $list.="<span class='span2'>$cost_block</span>";
+                $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='payment_sum' />";
+                $list.="</div>";
+            } // end if $tax==0
+            else {
+                $tax_sum = round(($course_cost['cost'] * $tax) / 100, 2);
+                $grand_total = round(($course_cost['cost'] + $tax_sum), 2);
+                $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+                $list.="<span class='span2'>Selected program</span>";
+                $list.="<span class='span2'>$course_name</span>";
+                $list.="<span class='span2'>Subtotal</span>";
+                $list.="<span class='span2'>$cost_block</span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+                $list.="<span class='span2'>Selected program</span>";
+                $list.="<span class='span2'></span>";
+                $list.="<span class='span2'>Tax</span>";
+                $list.="<span class='span2'>$$tax_sum</span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+                $list.="<span class='span2'></span>";
+                $list.="<span class='span2'></span>";
+                $list.="<span class='span2'>Total</span>";
+                $list.="<span class='span2'>$$grand_total</span>";
+                $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
+                $list.="</div>";
+            } // end else 
         } // end if $installment==null
         else {
             if ($group_data == '') {

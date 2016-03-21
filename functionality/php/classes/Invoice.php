@@ -115,12 +115,47 @@ class Invoice {
         return $installment;
     }
 
-    function create_user_invoice($user, $group, $participants) {        
-        $user_installment_status = $this->is_installment_user($user->id, $user->courseid);        
+    function is_course_taxable($courseid) {
+        $query = "select taxes from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $status = $row['taxes'];
+        }
+        return $status;
+    }
+
+    function get_user_state($userid) {
+        $query = "select state from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        }
+        return $state;
+    }
+
+    function get_state_taxes($state) {
+        $query = "select tax from mdl_state_taxes where state='$state'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $tax = $row['tax'];
+        }
+        return $tax;
+    }
+
+    function create_user_invoice($user, $group, $participants) {
+        $user_installment_status = $this->is_installment_user($user->id, $user->courseid);
         if ($user_installment_status == 0) {
             if ($group == null) {
                 $cost = $this->get_personal_course_cost($user->courseid); // cost, discount
                 $item_name = $this->get_course_name($user->courseid);
+                $tax_status = $this->is_course_taxable($user->courseid);
+                if ($tax_status == 1) {
+                    $user_state = $this->get_user_state($user->id);
+                    $tax = $this->get_state_taxes($user_state);
+                } // end if $tax_status == 1
+                else {
+                    $tax = 0;
+                } // end else
             } // end if $group==null
             else {
                 $group_data = $_SESSION['group_common_section'];
@@ -130,12 +165,19 @@ class Invoice {
             }
         } // end if $user_installment_status==0
         else {
-            $installment = $this->get_user_installment_payments($user->id,$user->courseid);
-            //print_r($installment);
+            $installment = $this->get_user_installment_payments($user->id, $user->courseid);
             $cost['cost'] = $installment->sum;
             $cost['discount'] = 0;
             $item_name = $this->get_course_name($user->courseid);
-        }
+            $tax_status = $this->is_course_taxable($user->courseid);
+            if ($tax_status == 1) {
+                $user_state = $this->get_user_state($user->id);
+                $tax = $this->get_state_taxes($user_state);
+            } // end if $tax_status == 1
+            else {
+                $tax = 0;
+            } // end else
+        } // end else
         if ($cost['discount'] > 0) {
             $amount = '$' . $cost['cost'] . '&nbsp;(discount is ' . $cost['discount'] . '%)';
         } // end if $cost['discount']>0
@@ -144,7 +186,7 @@ class Invoice {
         }
         $invoice_credentials = $this->get_invoice_credentials();
         $invoice_num = $this->get_invoice_num();
-        //die('Stopped');
+
         $list = "";
         $list.="<html>";
         $list.="<body>";
@@ -177,12 +219,25 @@ class Invoice {
         $list.="<tr>";
         $list.="<td></td><td style='padding:10px;' align='right'>Subtotal</td><td bgcolor='black' style='color:white;padding-left:15px;'>$" . $cost['cost'] . "</td>";
         $list.="</tr>";
-        $list.="<tr>";
-        $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$0</td>";
-        $list.="</tr>";
-        $list.="<tr>";
-        $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $cost['cost'] . "</td>";
-        $list.="</tr>";
+
+        if ($tax == 0) {
+            $list.="<tr>";
+            $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$0</td>";
+            $list.="</tr>";
+            $list.="<tr>";
+            $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $cost['cost'] . "</td>";
+            $list.="</tr>";
+        } // end if $tax==0
+        else {
+            $tax_sum = round(($cost['cost'] * $tax)/100, 2);
+            $grand_total = round(($cost['cost'] + $tax_sum), 2);
+            $list.="<tr>";
+            $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$$tax_sum</td>";
+            $list.="</tr>";
+            $list.="<tr>";
+            $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $grand_total . "</td>";
+            $list.="</tr>";
+        } // end else
         $list.="<tr>";
         $list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:55px;'></td>";
         $list.="</tr>";
