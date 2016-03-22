@@ -17,10 +17,12 @@
                             </p>
                         </div>
                         <div class="social_icons pull-right">                            
-                            <a href="#" target="_blank" style="color: #bdc3c7;cursor:none;">Connect with us &nbsp;</a>
+                            <!--
+                            <a href="#" target="_blank" style="color: #bdc3c7;cursor:none;">Connect with us &nbsp;</a>                            
                             <a href="#" target="_blank" ><img src="http://cnausa.com/assets/icons/fb.png" alt="fb"> </a>
                             <a href="#" target="_blank" ><img src="http://cnausa.com/assets/icons/twt.png" alt="twt"></a>
-                            <a href="#" target="_blank" ><img src="http://cnausa.com/assets/icons/in.png" alt="in">  </a>
+                            <a href="#" target="_blank" ><img src="http://cnausa.com/assets/icons/in.png" alt="in">  </a> -->
+                            <a href=""><div class='shareaholic-canvas' data-app='share_buttons' data-app-id='24115344'></div></a>
 
                         </div>
                     </div>

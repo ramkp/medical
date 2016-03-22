@@ -46,6 +46,8 @@
 
         </noscript>
         <!-- Google web fonts -->
+        <script type='text/javascript' src='//dsms0mj1bbhn4.cloudfront.net/assets/pub/shareaholic.js' data-shr-siteid='8489bb1defd43443d2a49ab231f1bcdf' data-cfasync='false' async='async'></script>
+
     </head>
 
     <body  id="page-site-index" class="format-site course path-site safari dir-ltr lang-en yui-skin-sam yui3-skin-sam mycodebusters-com--medical-lms pagelayout-frontpage course-1 context-2 notloggedin two-column has-region-side-pre used-region-side-pre has-region-side-post used-region-side-post has-region-footer-left empty-region-footer-left has-region-footer-middle empty-region-footer-middle has-region-footer-right empty-region-footer-right has-region-hidden-dock empty-region-hidden-dock layout-option-nonavbar">
@@ -72,7 +74,7 @@
             <header  class="navbar">
                 <nav class="navbar-inner">
                     <div class="container-fluid">
-                        <a class="brand" href="http://cnausa.com" ><img src="http://cnausa.com/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2 Training Institute</a>
+                        <a class="brand" href="http://cnausa.com" style="height: 30;"><img src="http://cnausa.com/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2 Training Institute</a>
                         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
@@ -111,7 +113,18 @@
                             </div>                      
                             <ul class="nav pull-right">                                
                                 <li class="dropdown"><a href="http://cnausa.com/index.php/search"><img src="/lms/theme/image.php/lambda/theme/1453287272/bg/icon-search" style="cursor: pointer;" alt="search" id='search_item' /></a></li>
-                                <li class="dropdown"><a href="#">Select Language<span style="color: rgb(155, 155, 155);">▼</span></a></li>    
+                                <li class="dropdown"><a href="#">Select Language<span style="color: rgb(155, 155, 155);">▼</span></a></li>
+                                
+                                
+                                <!-- Google Translator widget - looks ugly, temporary disabled
+                                <li class="dropdown"><a><div id="google_translate_element" style="vertical-align:middle;"></div><script type="text/javascript">
+                                    function googleTranslateElementInit() {
+                                        new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+                                    }                                    
+                                    $('#google_translate_element').css({"height":"15"});
+                                </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script></a></li>
+                                -->
+                                
                             </ul>
                         </div>
                     </div>
