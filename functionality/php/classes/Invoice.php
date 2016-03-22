@@ -96,10 +96,15 @@ class Invoice {
     }
 
     function is_installment_user($userid, $courseid) {
-        $query = "select *  from mdl_installment_users "
-                . "where userid=$userid and courseid=$courseid";
-        //echo "is_installment Query: ".$query."<br>";
-        $num = $this->db->numrows($query);
+        if ($userid != '') {
+            $query = "select *  from mdl_installment_users "
+                    . "where userid=$userid and courseid=$courseid";
+            //echo "is_installment Query: ".$query."<br>";
+            $num = $this->db->numrows($query);
+        } // end if $userid!=''
+        else {
+            $num = 0;
+        } // end else 
         return $num;
     }
 
@@ -117,6 +122,7 @@ class Invoice {
 
     function is_course_taxable($courseid) {
         $query = "select taxes from mdl_course where id=$courseid";
+        //echo "is_course_taxable query: " .$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $status = $row['taxes'];
@@ -162,7 +168,19 @@ class Invoice {
                 $participants = ($participants == null) ? $_SESSION['tot_participants'] : $participants;
                 $cost = $this->get_course_group_discount($group_data->courseid, $participants); // cost, discount
                 $item_name = $this->get_course_name($group_data->courseid);
-            }
+                //echo "Course id: ".$group_data->courseid."<br>";
+                $tax_status = $this->is_course_taxable($group_data->courseid);
+                //echo "Tax status: " . $tax_status . "<br>";
+                if ($tax_status == 1) {
+                    $user_state = $group_data->state;
+                    //echo "Group state: " . $user_state . "<br>";
+                    $tax = $this->get_state_taxes($user_state);
+                    //echo "Group tax: " . $tax . "<br>";
+                } // end if $tax_status == 1
+                else {
+                    $tax = 0;
+                } // end else
+            } // end else when it is group members
         } // end if $user_installment_status==0
         else {
             $installment = $this->get_user_installment_payments($user->id, $user->courseid);
@@ -177,7 +195,7 @@ class Invoice {
             else {
                 $tax = 0;
             } // end else
-        } // end else
+        } // end else when installment is active
         if ($cost['discount'] > 0) {
             $amount = '$' . $cost['cost'] . '&nbsp;(discount is ' . $cost['discount'] . '%)';
         } // end if $cost['discount']>0
@@ -219,7 +237,6 @@ class Invoice {
         $list.="<tr>";
         $list.="<td></td><td style='padding:10px;' align='right'>Subtotal</td><td bgcolor='black' style='color:white;padding-left:15px;'>$" . $cost['cost'] . "</td>";
         $list.="</tr>";
-
         if ($tax == 0) {
             $list.="<tr>";
             $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$0</td>";
@@ -229,7 +246,7 @@ class Invoice {
             $list.="</tr>";
         } // end if $tax==0
         else {
-            $tax_sum = round(($cost['cost'] * $tax)/100, 2);
+            $tax_sum = round(($cost['cost'] * $tax) / 100, 2);
             $grand_total = round(($cost['cost'] + $tax_sum), 2);
             $list.="<tr>";
             $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$$tax_sum</td>";
@@ -237,7 +254,7 @@ class Invoice {
             $list.="<tr>";
             $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $grand_total . "</td>";
             $list.="</tr>";
-        } // end else
+        } // end else when tax is not null
         $list.="<tr>";
         $list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:55px;'></td>";
         $list.="</tr>";

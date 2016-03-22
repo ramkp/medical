@@ -53,7 +53,7 @@ class register_model extends CI_Model {
         $query = "select id,name from mdl_course_categories";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $drop_down.="<li><a href='#' id='cat_" . $row->id . "'>" . $row->name . "</a></li>";
+            $drop_down.="<li><a href='#' id='cat_" . $row->id . "' onClick='return false;'>" . $row->name . "</a></li>";
         }
         $drop_down.="</ul></div>";
         return $drop_down;
@@ -71,7 +71,7 @@ class register_model extends CI_Model {
             $num = $result->num_rows();
             if ($num > 0) {
                 foreach ($result->result() as $row) {
-                    $drop_down.="<li><a href='#' id='course_" . $row->id . "'>" . $row->fullname . "</a></li>";
+                    $drop_down.="<li><a href='#' id='course_" . $row->id . "' onClick='return false;'>" . $row->fullname . "</a></li>";
                 } // end while
             } // end if $num > 0
             $drop_down.="</ul></div>";
@@ -95,7 +95,7 @@ class register_model extends CI_Model {
         $list.="<span class='span2'>Business Or Institution*</span>";
         $list.="<span class='span2'><input type='text' id='group_inst' name='group_inst' ></span>";
         $list.="</div>";
-
+        $come_from = $this->come_from();
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>ZIP Code*</span>";
         $list.="<span class='span2'><input type='text' id='group_zip' name='group_zip' ></span>";
@@ -108,6 +108,11 @@ class register_model extends CI_Model {
         $list.="<span class='span2'><input type='text' id='group_state' name='group_state' ></span>";
         $list.="<span class='span2'>Group name*</span>";
         $list.="<span class='span2'><input type='text' id='group_name' name='group_name' ></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>How did you hear about us?*</span>";
+        $list.="<span class='span2'>$come_from</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -210,6 +215,20 @@ class register_model extends CI_Model {
         return $drop_down;
     }
 
+    public function get_register_states_list() {
+        $drop_down = "";
+        $drop_down.="<div class='dropdown'>
+        <a href='#' id='register_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State/City <b class='caret'></b></a>
+        <ul class='dropdown-menu'>";
+        $query = "select * from mdl_states";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $drop_down.="<li><a href='#' id='regiter_state_" . $row->id . "' onClick='return false;'>" . $row->state . "</a></li>";
+        } // end while
+        $drop_down.="</ul></div>";
+        return $drop_down;
+    }
+
     public function get_countries_list() {
         $drop_down = "";
         $drop_down.="<div class='dropdown'>
@@ -231,6 +250,7 @@ class register_model extends CI_Model {
         $participants = $this->get_participants_dropbox();
         $come_from = $this->come_from();
         $states = $this->get_states_list();
+        $register_state = $this->get_register_states_list();
         $countries = $this->get_countries_list();
 
         // ****************** Program information **************************
@@ -242,14 +262,11 @@ class register_model extends CI_Model {
             $list.="<div class='panel-body'>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Program type*</span>";
             $list.="<span class='span2'>$cats</span>";
             $list.="<span class='span2' id='cat_course'>$courses</span>";
+            $list.="<span class='span2'>$register_state</span>";
+            $list.="<span class='span2'>$countries</span>";
             $list.="<span class='span2' id='program_err' style='color:red;'></span>";
-            $list.="</div>"; // end of container-fluid
-
-            $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span>";
             $list.="</div>"; // end of container-fluid
 
             $list.="</div>"; // end of panel-body
@@ -302,22 +319,8 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>Email*</span>";
-        $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
-        $list.="<span class='span2'>Phone*</span>";
-        $list.="<span class='span2'><input type='text' id='phone' name='phone'  ></span>";
-        $list.="</div>";
-
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>Address*</span>";
+        $list.="<span class='span2'>St Address*</span>";
         $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
-        $list.="<span class='span2'>Business Or Institution</span>";
-        $list.="<span class='span2'><input type='text' id='inst' name='inst' ></span>";
-        $list.="</div>";
-
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>ZIP Code*</span>";
-        $list.="<span class='span2'><input type='text' id='zip' name='zip' ></span>";
         $list.="<span class='span2'>City*</span>";
         $list.="<span class='span2'><input type='text' id='city' name='city' ></span>";
         $list.="</div>";
@@ -329,14 +332,32 @@ class register_model extends CI_Model {
         $list.="<span class='span2'>$countries</span>";
         $list.="</div>";
 
-        /*
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'><a href='#' id='proceed_to_personal_payment' onClick='return false;'>Proceed to payment</a></span>&nbsp;<span style='color:red;' id='personal_err'></span>";
+        $list.="<span class='span2'>ZIP Code*</span>";
+        $list.="<span class='span2'><input type='text' id='zip' name='zip' ></span>";
+        $list.="<span class='span2'>Business Or Institution</span>";
+        $list.="<span class='span2'><input type='text' id='inst' name='inst' ></span>";
         $list.="</div>";
-        */
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'><a href='#' id='p_options_p' onClick='return false;'>Payment options</a></span>&nbsp;<span style='color:red;' id='personal_err'></span>";
+        $list.="<span class='span2'>Phone*</span>";
+        $list.="<span class='span2'><input type='text' id='phone' name='phone'  ></span>";
+        $list.="<span class='span2'>Email*</span>";
+        $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>How did you hear about us?*</span>";
+        $list.="<span class='span2'>$come_from</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span4' id='personal_err' style='color:red;'></span>";
+        $list.="</div>";
+
+        // Payment options link
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'><a href='#' id='p_options_p' onClick='return false;'>Payment options</a></span>&nbsp;<span style='color:red;' id=''></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";

@@ -215,6 +215,25 @@ class Register {
         }
         return $drop_down;
     }
+    
+    public function come_from() {
+        $drop_down = "";
+        $drop_down.="<div class='dropdown'>
+        <a href='#' id='come_from_group' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Select <b class='caret'></b></a>
+        <ul class='dropdown-menu'>";
+        $drop_down.="<li><a href='#' id='Newspaper' onClick='return false;'>Newspaper</a></li>";
+        $drop_down.="<li><a href='#' id='Magazine' onClick='return false;'>Magazine</a></li>";
+        $drop_down.="<li><a href='#' id='Radio' onClick='return false;'>Radio</a></li>";
+        $drop_down.="<li><a href='#' id='TV' onClick='return false;'>TV</a></li>";
+        $drop_down.="<li><a href='#' id='Google' onClick='return false;'>Google</a></li>";
+        $drop_down.="<li><a href='#' id='Microsoft' onClick='return false;'>Microsoft</a></li>";
+        $drop_down.="<li><a href='#' id='Yahoo' onClick='return false;'>Yahoo</a></li>";
+        $drop_down.="<li><a href='#' id='Twitter' onClick='return false;'>Twitter</a></li>";
+        $drop_down.="<li><a href='#' id='Instagram' onClick='return false;'>Instagram</a></li>";
+        $drop_down.="<li><a href='#' id='Other' onClick='return false;'>Other</a></li>";
+        $drop_down.="</ul></div>";
+        return $drop_down;
+    }
 
     function get_group_registration_form($tot_participants) {
 
@@ -223,7 +242,7 @@ class Register {
         $list.="<div class='panel panel-default' id='group_common_section'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Group Registration </h5></div>";
         $list.="<div class='panel-body'>";
-
+        $come_from=$this->come_from();
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
@@ -244,6 +263,11 @@ class Register {
         $list.="<span class='span2'>$states</span>";
         $list.="<span class='span2'>Group name*</span>";
         $list.="<span class='span2'><input type='text' id='group_name' name='group_name' ></span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>How did you hear about us?*</span>";
+        $list.="<span class='span2'>$come_from</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -309,6 +333,74 @@ class Register {
             $id = $row['id'];
         }
         return $id;
+    }
+
+    function get_category_state_items($categoryname, $statename) {
+        $list = "";
+        $courses = array();
+
+        //1. Get state id
+        $query = "select id from mdl_states where state='$statename'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $stateid = $row['id'];
+        }
+
+        //2. Get courses list for selected state
+        $query = "select courseid from mdl_course_to_state where stateid=$stateid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courseid[] = $row['courseid'];
+            }
+            //echo "<br>-------------------<br>";
+            //print_r($courseid);
+            //echo "<br>-------------------<br>";
+            //3. Get category id
+            $query = "select id from mdl_course_categories where name='$categoryname'";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $category_id = $row['id'];
+            }
+
+            //4. Get courses withing selected state and category
+            $query = "select id, fullname from mdl_course "
+                    . "where category=$category_id and cost>0";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    //echo "Course id: " . $row['id'] . "<br>";
+                    if (in_array($row['id'], $courseid)) {
+                        $course = new stdClass();
+                        $course->id = $row['id'];
+                        $course->name = $row['fullname'];
+                        $courses[] = $course;
+                    } // end if in_array($row['id'], $courseid)
+                } // end while
+                $list.="<div class='dropdown'>
+                <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
+                <ul class='dropdown-menu'>";
+                foreach ($courses as $course) {
+                    $list.="<li><a href='#' id='course_" . $course->id . "' onClick='return false;'>" . $course->name . "</a></li>";
+                } // end foreach
+                $list.="</ul></div>";
+            } // end if $num>0
+            else {
+                $list.="<div class='dropdown'>
+                <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
+                <ul class='dropdown-menu'>";
+                $list.="</ul></div>";
+            } // end else            
+        }  // end if $num>0    
+        else {
+            $list.="<div class='dropdown'>
+                <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
+                <ul class='dropdown-menu'>";
+            $list.="</ul></div>";
+        }
+        return $list;
     }
 
 }
