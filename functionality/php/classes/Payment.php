@@ -386,8 +386,8 @@ class Payment {
         }
         return $tax;
     }
-    
-    function get_cost_for_group_participants ($courseid) {
+
+    function get_cost_for_group_participants($courseid) {
         $query = "select id, cost from mdl_course "
                 . "where id=$courseid";
         $result = $this->db->query($query);
@@ -403,33 +403,32 @@ class Payment {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $discount = $row['group_discount_size'];
         }
-        
+
         $final_cost = $cost - round(($cost * $discount) / 100, 2);
-        $cost=array('cost'=>$final_cost);
-        return $cost;        
+        $cost = array('cost' => $final_cost);
+        return $cost;
     }
 
-    function add_invoice_to_db($user, $group=false) {
+    function add_invoice_to_db($user, $group = false) {
 
-          /* 
-           *  
+        /*
+         *  
           echo "<pre>----------<br>";
           print_r($user);
           echo "<pre>----------<br>";
-           * 
-           */
-        
+         * 
+         */
+
         $path = $this->invoice->invoice_path . "/$user->invoice.pdf";
         $user_installment_status = $this->invoice->is_installment_user($user->id, $user->courseid);
         //echo "Installment status: ".$user_installment_status."<br>";
-        if ($group==false) {
+        if ($group == false) {
             $cost = $this->invoice->get_personal_course_cost($user->courseid);
-        }
-        else {
-            $cost=$this->get_cost_for_group_participants($user->courseid);
+        } else {
+            $cost = $this->get_cost_for_group_participants($user->courseid);
         }
         if ($user_installment_status == 0) {
-            $installment = new stdClass();            
+            $installment = new stdClass();
             $sum = $cost['cost'];
             $installment->sum = $sum;
         } // end if $user_installment_status==0
@@ -471,15 +470,15 @@ class Payment {
         $list = "";
         $installment_data = array();
         $group_data = $_SESSION['group_common_section'];
-        
+
         /*
          * 
-        echo "<pre>----------Group data<br>";
-        print_r($group_data);
-        echo "<pre>--------------------<br>";
+          echo "<pre>----------Group data<br>";
+          print_r($group_data);
+          echo "<pre>--------------------<br>";
          * 
          */
-        
+
         $users = $_SESSION['users'];
         $participants = $_SESSION['tot_participants'];
         if ($participants == 1) {
@@ -527,7 +526,7 @@ class Payment {
                 foreach ($users as $user) {
                     $user->id = $this->get_user_id_by_email($user->email);
                     $user->courseid = $group_data->courseid;
-                    $user->come_from=$group_data->come_from;
+                    $user->come_from = $group_data->come_from;
                     $user->invoice = $this->invoice->get_personal_invoice($user, 1, 1);
                     $this->add_invoice_to_db($user, true);
                     $mailer->send_invoice($user);
@@ -585,7 +584,7 @@ class Payment {
         $list = "";
         $participants = $_SESSION['tot_participants'];
         $invoice_path = $this->invoice->get_personal_invoice($group_owner, 1, $participants);
-        $group_owner->invoice = $invoice_path;        
+        $group_owner->invoice = $invoice_path;
         $mailer = new Mailer();
         $mailer->send_invoice($group_owner, 1);
         $list.="Thank you! Invoice has been sent to $group_owner->email.";
@@ -594,7 +593,7 @@ class Payment {
 
     function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null) {
 
-         /*
+        /*
           echo "<br/>Users-------------<br/>";
           echo "<pre>";
           print_r($users);
@@ -604,7 +603,7 @@ class Payment {
           print_r($group_data);
           echo "<pre>";
           echo "<br/>-------------<br/>";
-        */
+         */
 
         $list = "";
         $cost_block = "";
@@ -625,6 +624,7 @@ class Payment {
                 $course_cost = $this->get_personal_course_cost($users->courseid);
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
+                $list.= "<input type='hidden' value='$users->courseid' id='courseid' name='courseid' />";
                 $tax_status = $this->is_course_taxable($users->courseid);
                 if ($tax_status == 1) {
                     $tax = $this->get_state_taxes($users->state);
@@ -633,11 +633,12 @@ class Payment {
                     $tax = 0;
                 } // end else
             } // end if $group==''
-            else {                
+            else {
                 $course_name = $this->get_course_name($group_data->courseid);
                 $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
+                $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
                 $tax_status = $this->is_course_taxable($group_data->courseid);
                 if ($tax_status == 1) {
                     $tax = $this->get_state_taxes($group_data->state);
@@ -675,7 +676,7 @@ class Payment {
                 $list.="</div>";
 
                 $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
-                $list.="<span class='span2'>Selected program</span>";
+                $list.="<span class='span2'></span>";
                 $list.="<span class='span2'></span>";
                 $list.="<span class='span2'>Tax</span>";
                 $list.="<span class='span2'>$$tax_sum</span>";
@@ -696,13 +697,15 @@ class Payment {
                 $course_cost = $this->get_personal_course_cost($users->courseid);
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
+                $list.= "<input type='hidden' value='$users->courseid' id='courseid' name='courseid' />";
             } // end if $group==NULL 
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
                 $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
-            } // end else
+                $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
+            } // end else when group is not null
 
             $first_payment = round(($course_cost['cost'] / $installment['num_payments']));
             $period = $installment['period'];
@@ -840,24 +843,47 @@ class Payment {
         return $user;
     }
 
+    function add_payment_to_db($card) {
+        $query = "insert into mdl_card_payments "
+                . "(userid,"
+                . "courseid,"
+                . "psum,"
+                . "pdate) "
+                . "values('" . $card->userid . "',"
+                . "'" . $card->courseid . "',"
+                . "'" . $card->sum . "',"
+                . "'" . time() . "')";
+        $this->db->query($query);
+    }
+
     function make_stub_payment($card) {
         $mailer = new Mailer();
         $user_group = $card->user_group;
         $userid = $card->userid;
 
+        // Personal online payment
         if ($user_group == '' && $userid != '') {
             $this->confirm_user($card->email);
+            $this->add_payment_to_db($card);
             $mailer->send_payment_confirmation_message($card);
         } // end if $user_group==''
+        // Installment online payment?
         if ($user_group != '' && $userid != '') {
             $this->confirm_user($card->email);
+            $this->add_payment_to_db($card);
             $mailer->send_payment_confirmation_message($card);
         } // end if $user_group!='' && $userid!=''
+        // Group online payment
         if ($user_group != '' && $userid == '') {
             $group_users = $this->get_group_users($user_group);
+            // Send payment confirmation to group owner
             $mailer->send_payment_confirmation_message($card, 1);
+            $group_sum = $card->sum;
             foreach ($group_users as $userid) {
                 $user = $this->get_user_detailes($userid);
+                $card->userid = $userid;
+                $card->sum = round(($group_sum / count($group_users)), 2);
+                $this->add_payment_to_db($card);
                 $this->confirm_user($user->username);
                 $mailer->send_group_payment_confirmation_message($user);
             } // end foreach

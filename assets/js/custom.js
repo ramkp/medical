@@ -529,6 +529,8 @@ $(document).ready(function () {
         var bill_zip = $('#bill_zip').val();
         var bill_email = $('#bill_email').val();
         var userid = $('#userid').val();
+        var courseid=$('#courseid').val();
+        var participants=$('#participants').val();
 
         if (card_type == 'Card type') {
             $('#personal_payment_err').html('Please select card type');
@@ -587,6 +589,8 @@ $(document).ready(function () {
             var card = {sum: sum,
                 email: email,
                 userid: userid,
+                courseid:courseid,
+                participants:participants,
                 card_type: card_type,
                 card_no: card_no,
                 card_holder: card_holder,
@@ -1089,7 +1093,6 @@ $(document).ready(function () {
             //$('#program_section').html(data);
             //console.log(data);
         });
-
     }
 
     /************************************************************************
@@ -1106,17 +1109,7 @@ $(document).ready(function () {
             $('#program_section').html(data);
         });
     }
-
-    /************************************************************************
-     * 
-     *                  File upload Group registration form
-     * 
-     ************************************************************************/
-
-    function get_file_upload_group_registration_form() {
-
-    }
-
+ 
     /************************************************************************
      * 
      *                  Individual registration block
@@ -1127,7 +1120,6 @@ $(document).ready(function () {
         $('#group_common_section').hide();
         $('#participants_details').hide();
     }
-
 
     /**************************************************************************
      * 
@@ -1396,9 +1388,7 @@ $(document).ready(function () {
 
         if (event.target.id == 'proceed_to_personal_payment') {
             verify_personal_manual_registration_form();
-        }
-
-        //option_personal_payment
+        }        
 
         if (event.target.id == 'p_options_p') {
             verify_personal_manual_registration_form();
