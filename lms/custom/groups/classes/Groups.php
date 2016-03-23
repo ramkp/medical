@@ -10,37 +10,30 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php'
 
 class Groups extends Util {
 
+    public $limit = 3;
+
     function get_requests_list() {
         $requests = array();
-        $query = "select * from mdl_private_groups order by request_date desc";
+        $query = "select * from mdl_private_groups order by request_date desc limit 0, $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-
                 $request = new stdClass();
                 foreach ($row as $key => $value) {
-
                     $request->$key = $value;
                 }
-
                 $requests[] = $request;
             } // end while 
         } // end if $num > 0
         $list = $this->render_requests_list($requests);
-        //echo "List: ".$list;
         return $list;
     }
 
     function render_requests_list($requests, $wrap = 1) {
-        $list = "";
-        $list.= "<div class='container-fluid' style='font-weight:bold;'>"
-                . "<span class='span3' style='font-weight:strong;'>Group Request</span>"
-                . "<span class='span3' style='font-weight:strong;'>Date</span>"
-                . "<span class='span3' style='font-weight:strong;'>Detailes</span>"
-                . "</div>";        
+        $list = "";        
         if (count($requests) > 0) {
-            // echo "<br>Inside count>0 ...";
+            $list.="<div id='group_items' >";
             foreach ($requests as $request) {
                 if ($request->group_request != '') {
                     $group_detailes = $this->get_request_detailed_view($request->id);
@@ -55,9 +48,12 @@ class Groups extends Util {
                     $list.= "</div>";
                 } // end if $request->group_request != ''
             } // end foreach
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span12'><div id='pagination-demo' class='pagination'></div></span>";
             $list.="</div>";
+            if ($wrap == 1) {
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span9'  id='pagination'></span>";
+                $list.="</div>";
+            } // end if $wrap == 1
         } // end if count($requests)>0
         else {
             $list.="<div class='container-fluid'>";
@@ -74,7 +70,7 @@ class Groups extends Util {
             $request = new stdClass();
             foreach ($row as $key => $value) {
                 $request->$key = $value;
-            }
+            } // end foreach
         } // end while 
         return $request;
     }
@@ -130,6 +126,35 @@ class Groups extends Util {
                 . "set group_reply='$reply_text', status=1 where id=$id";
         $this->db->query($query);
         $mailer->send_group_reply_message($reply_text, $recipient);
+    }
+
+    function get_group_item($page) {
+        $requests = array();
+        $rec_limit = $this->limit;
+        if ($page == 1) {
+            $offset = 0;
+        } // end if $page==1
+        else {
+            $page = $page - 1;
+            $offset = $rec_limit * $page;
+        }
+        $query = "select * from mdl_private_groups order by request_date desc LIMIT $offset, $rec_limit";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $request = new stdClass();
+            foreach ($row as $key => $value) {
+                $request->$key = $value;
+            } // end foreach      
+            $requests[] = $request;
+        } // end while
+        $list = $this->render_requests_list($requests, 0);
+        return $list;
+    }
+    
+    function get_total_group_items () {
+        $query="select * from mdl_private_groups order by request_date desc";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
 }
