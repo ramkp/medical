@@ -1,7 +1,6 @@
 
 $(document).ready(function () {
-    console.log("ready!");
-    var courseid;
+    console.log("ready!");    
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
         $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='http://cnausa.com/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
@@ -436,6 +435,13 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     }
+    
+    function get_credit_card_payments_page () {
+        var url = "/lms/custom/payments/get_card_payments.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
 
     function get_free_payments() {
         var url = "/lms/custom/payments/get_free_payments.php";
@@ -780,7 +786,7 @@ $(document).ready(function () {
 
     $("#cards").click(function (event) {
         update_navigation_status__menu('Credit cards payments');
-
+        get_credit_card_payments_page ();
     });
 
     $("#free").click(function (event) {
