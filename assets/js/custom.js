@@ -353,7 +353,7 @@ $(document).ready(function () {
                 }
 
                 var come_from = $('#come_from_group').text().trim();
-                console.log('Come from: '+come_from);
+                console.log('Come from: ' + come_from);
                 if (come_from == 'Select' || come_from == 'undefined') {
                     $('#group_common_errors').html('');
                     $('#group_common_errors').html('How did you hear about us?');
@@ -481,13 +481,17 @@ $(document).ready(function () {
         }
 
         if (cert_fio != '' && cert_no != '') {
-            var url = "http://cnausa.com/functionality/php/verify_cert.php";
-            var request = {user_fio: cert_fio, user_cert_no: cert_no};
+            var url = "http://cnausa.com/lms/custom/certificates/verify_certificate.php";
+            var request = {cert_fio: cert_fio, cert_no: cert_no};
             $.post(url, request).done(function (data) {
-                $("#cert_err").html("<span style='color:#444'>" + data + "</span>");
+                $("#cert_err").html("<span style='color:green;'>" + data + "</span>");
             });
-        }
+        } // end if cert_fio!='' && cert_no!=''
+        else {
+            $('#cert_err').html('Please provide your First and Last name and Certificate # as well');
+        } // end else 
     }
+
 
     /************************************************************************
      * 
@@ -529,8 +533,8 @@ $(document).ready(function () {
         var bill_zip = $('#bill_zip').val();
         var bill_email = $('#bill_email').val();
         var userid = $('#userid').val();
-        var courseid=$('#courseid').val();
-        var participants=$('#participants').val();
+        var courseid = $('#courseid').val();
+        var participants = $('#participants').val();
 
         if (card_type == 'Card type') {
             $('#personal_payment_err').html('Please select card type');
@@ -589,8 +593,8 @@ $(document).ready(function () {
             var card = {sum: sum,
                 email: email,
                 userid: userid,
-                courseid:courseid,
-                participants:participants,
+                courseid: courseid,
+                participants: participants,
                 card_type: card_type,
                 card_no: card_no,
                 card_holder: card_holder,
@@ -790,7 +794,7 @@ $(document).ready(function () {
                 }
 
                 var come_from = $('#come_from_group').text().trim();
-                console.log('Come from: '+come_from);
+                console.log('Come from: ' + come_from);
                 if (come_from == 'Select' || come_from == 'undefined') {
                     $('#group_common_errors').html('How did you hear about us?');
                     return false;
@@ -924,7 +928,7 @@ $(document).ready(function () {
                 if (last_name == '') {
                     $('#personal_err').html('Please provide lastname');
                     return false;
-                }                
+                }
 
                 if (addr == '') {
                     $('#personal_err').html('Please provide address');
@@ -962,7 +966,7 @@ $(document).ready(function () {
                     $('#personal_err').html('Please provide phone');
                     return false;
                 }
-                
+
                 if (email == '') {
                     $('#personal_err').html('Please provide email');
                     return false;
@@ -1072,6 +1076,22 @@ $(document).ready(function () {
         }
     }
 
+    function verify_user_certificate() {
+        var cert_fio = $('#cert_fio').val();
+        var cert_no = $('#cert_no').val();
+        if (cert_fio != '' && cert_no != '') {
+            $('#verify_cert_err').html('');
+            var url = "http://cnausa.com/lms/custom/certificates/verify_certificate.php";
+            var request = {cert_fio: cert_fio, cert_no: cert_no};
+            $.post(url, request).done(function (data) {
+                $("#verify_cert_err").html("<span style='color:green;'>" + data + "</span>");
+            });
+        } // end if cert_fio!='' && cert_no!=''
+        else {
+            $('#verify_cert_err').html('Please provide your First and Last name and Certificate # as well');
+        } // end else 
+    }
+
     function get_option_payment_personal() {
         var options = $('#payment_options input:radio:checked');
         console.log('Options: ' + options);
@@ -1109,7 +1129,7 @@ $(document).ready(function () {
             $('#program_section').html(data);
         });
     }
- 
+
     /************************************************************************
      * 
      *                  Individual registration block
@@ -1269,6 +1289,8 @@ $(document).ready(function () {
 
 
 
+
+
     }); // end of $('.form_div').on('click', 'button', function (event)
 
     // ***********************Links processing events **********************
@@ -1388,7 +1410,7 @@ $(document).ready(function () {
 
         if (event.target.id == 'proceed_to_personal_payment') {
             verify_personal_manual_registration_form();
-        }        
+        }
 
         if (event.target.id == 'p_options_p') {
             verify_personal_manual_registration_form();

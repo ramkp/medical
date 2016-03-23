@@ -31,8 +31,11 @@ class Cert_model extends CI_Model {
         $list.="<span class='span2'><button class='btn btn-primary' id='verify_cert'>Verify Certificate</button></span>";
         $list.="<span class='span6'><span id='cert_err' style='color:red;'></span></span>";
         $list.="</div>"; // end of container-fluid
-
-
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span6' style='color:red;' id='verify_cert_err'></span>";
+        $list.="</div>";
+        
         $list.="</div>"; // end of panel-body
         $list.="</div></div>"; // end of panel panel-default
 

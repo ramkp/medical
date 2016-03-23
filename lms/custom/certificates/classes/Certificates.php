@@ -12,12 +12,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php'
 class Certificates extends Util {
 
     public $cert_path;
-    public $limit=3;
-            
+    public $limit = 3;
+
     function __construct() {
         parent::__construct();
         $this->cert_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates';
-    }    
+    }
 
     function get_course_name($id) {
         $query = "select fullname from mdl_course where id=$id";
@@ -279,7 +279,7 @@ class Certificates extends Util {
         return $list;
     }
 
-    function get_certificate_item($page) {        
+    function get_certificate_item($page) {
         $certificates = array();
         $rec_limit = $this->limit;
         if ($page == 1) {
@@ -300,6 +300,29 @@ class Certificates extends Util {
             $certificates[] = $certificate;
         } // end while
         $list = $this->create_certificates_list($certificates, false);
+        return $list;
+    }
+
+    function verify_certificate($cert_fio, $cert_no) {
+        $list = "";
+        $query = "select * from mdl_certificates where cert_no='$cert_no'";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $exp_date = $row['expiration_date'];
+            } //end while
+            if ($exp_date != 'n/a') {
+                $cert_exp_date = date('Y-m-d', $exp_date);
+                $list.="Your Certificate will expire at $cert_exp_date";
+            } // end if $exp_date!='n/a'
+            else {
+                $list.="Your Certificate has no expiration date";
+            }
+        } // end if $num > 0
+        else {
+            $list.="Certificate is not found";
+        }
         return $list;
     }
 
