@@ -130,7 +130,7 @@ class Util {
         $list = "";
         $users = array();
         //1. Get course context
-        $instanceid = $this->get_course_context($id);
+        $instanceid = $this->get_course_context($id, $output = true);
 
         //2. Get course users
         $query = "select id, roleid, contextid, userid "
@@ -162,7 +162,12 @@ class Util {
             } // end foreach            
             $list.="</select></span>";
         } // end if count($users)>0
-        return $list;
+        if ($output == true) {
+            return $list;
+        } // end if $output == true
+        else {
+            return $users;
+        }
     }
 
     function get_course_name($courseid) {

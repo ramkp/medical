@@ -1,8 +1,19 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+require_once './classes/Report.php';
+$report=new Report();
+$list=$report->get_program_report();
+echo $list;
 
+?>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $(function () {
+            $('#datepicker1').datepicker();
+            $('#datepicker2').datepicker();
+        });
+    });
+
+</script>    

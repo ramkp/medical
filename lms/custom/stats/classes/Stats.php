@@ -158,8 +158,11 @@ class Stats extends Util {
         $whole_div.="<td style='width:245px;'>$list</td><td align='left'><span class='span6' id='chart_div2' style='border:0px solid;text-align:center;width:600px;height:300px;vertical-align:top;' vertical-align='top' valign='top'></span></td>";
         $whole_div.="</tr>";
         $whole_div.="<tr>";
-        $whole_div.="<td colspan='2'><div class='container-fluid' style='text-align:center;'><span class='span12'><br/><hr/></span></div></td>";
+        $whole_div.="<td colspan='2'><a href='#' onClick='return false;' id='source_report_export'>Export to CSV</a></td>";
         $whole_div.="</tr>";
+        $whole_div.="<tr>";
+        $whole_div.="<td colspan='2'><div class='container-fluid' style='text-align:center;'><span class='span12'><br/><hr/></span></div></td>";
+        $whole_div.="</tr>";        
         $whole_div.="</table>";
         return $whole_div;
     }

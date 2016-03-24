@@ -54,7 +54,7 @@ class Report extends Util {
     function get_revenue_report_data($courseid, $from, $to, $status = true) {
         $list = "";
         $list2 = "";
-        $coursename = $this->get_course_name($courseid);        
+        $coursename = $this->get_course_name($courseid);
         if ($status == true) {
             $list.="<div class='container-fluid' style='font-weight:bold'>";
             $list.="<span class='span9'>$coursename - $from - $to</span>";
@@ -104,7 +104,7 @@ class Report extends Util {
                 $this->cheque_sum = $this->cheque_sum + $row['i_sum'];
             } // end while            
         } // end if $num > 0
-        $grand_total = $this->card_sum + $this->cash_sum + $this->cheque_sum;        
+        $grand_total = $this->card_sum + $this->cash_sum + $this->cheque_sum;
         $list2.="<div class='container-fluid' style='padding-right:0px;'>";
         $list2.="<span class='span3'>Card</span><span class='span1'>$$this->card_sum</span>";
         $list2.="</div>";
@@ -116,7 +116,7 @@ class Report extends Util {
         $list2.="</div>";
         $list2.="<div class='container-fluid' style='font-weight:bold;' style='padding-right:0px;'>";
         $list2.="<span class='span3'>Total</span><span class='span1'>$$grand_total</span>";
-        $list2.="</div>";       
+        $list2.="</div>";
 
         $list.="<table border='0' style='padding-left: 20px;'>";
         $list.="<tr>";
@@ -129,7 +129,6 @@ class Report extends Util {
         $list.="<td colspan='2'><hr/></td>";
         $list.="</tr>";
         $list.="</table>";
-        
         return $list;
     }
 
@@ -148,6 +147,54 @@ class Report extends Util {
         $cheque_payments->counter = $this->cheque_sum;
         $payments[] = $cheque_payments;
         return $payments;
+    }
+
+    function get_program_report() {
+        $list = "";
+        $courses = $this->get_courses_list();
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6' id='program_report_err'></span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span3'>$courses</span><span class='span1'>From</span><span class='span2'><input type='text' id='datepicker1' style='width:75px;'></span><span class='span1'>To</span><span class='span2'><input type='text' id='datepicker2' style='width:75px;'></span><span class='span1'><button type='button' id='program_go' class='btn btn-primary'>Go</button></span>";
+        $list.="</div>";
+        $list.="<div id='program_report_container'>";
+        $list.="</div>";
+        return $list;
+    }
+    
+    function payment_types () {
+        
+    }
+    
+    function get_user_payment_status ($courseid, $userid) {
+        
+    }
+
+    function get_program_users($userid) {
+        $query = "select confirmed,firstname,lastname,email "
+                . "from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                
+            } // end while
+        
+    }
+
+    function get_program_report_data($courseid, $from, $to, $status = true) {
+        $list="";
+        $coursename = $this->get_course_name($courseid);
+        if ($status == true) {
+            $list.="<div class='container-fluid' style='font-weight:bold'>";
+            $list.="<span class='span9'>$coursename - $from - $to</span>";
+            $list.="</div>";
+        }
+        $users = $this->get_course_users($courseid, false);
+        if (count($users) > 0) {
+            foreach ($users as $user) {
+                
+            } // end foreach
+        } // end if count($users)>0
     }
 
 }

@@ -537,13 +537,6 @@ $(document).ready(function () {
         }
     }
 
-    function get_program_report() {
-        var url = "/lms/custom/reports/get_program_report.php";
-        $.post(url, {id: 1}).done(function (data) {
-            $('#region-main').html(data);
-        });
-    }
-
     function get_revenue_report() {
         var url = "/lms/custom/reports/get_revenue_report.php";
         $.post(url, {id: 1}).done(function (data) {
@@ -564,6 +557,29 @@ $(document).ready(function () {
         } // end if courseid>0 && from!='' && to!=''
         else {
             $('#revenue_report_err').html("<span style='color:red;'>Please select program and dates</span>");
+        }
+    }
+
+    function get_program_report() {
+        var url = "/lms/custom/reports/get_program_report.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function get_program_report_data() {
+        var courseid = $('#courses').val();
+        var from = $('#datepicker1').val();
+        var to = $('#datepicker2').val();
+        if (courseid > 0 && from != '' && to != '') {
+            $('#revenue_report_err').html('');
+            var url = "/lms/custom/reports/get_program_report_data.php";
+            $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
+                $('#program_report_container').html(data);
+            });
+        } // end if courseid>0 && from!='' && to!=''
+        else {
+            $('#program_report_err').html("<span style='color:red;'>Please select program and dates</span>");
         }
     }
 
@@ -638,6 +654,12 @@ $(document).ready(function () {
         if (event.target.id == 'rev_go') {
             get_revenue_report_data();
         }
+
+        if (event.target.id == 'program_go') {
+            get_program_report_data();
+        }
+
+
 
 
     }); // end of #region-main click', 'button',
