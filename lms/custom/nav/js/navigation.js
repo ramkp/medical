@@ -1,6 +1,6 @@
 
 $(document).ready(function () {
-    console.log("ready!");    
+    console.log("ready!");
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
         $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='http://cnausa.com/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
@@ -435,8 +435,8 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     }
-    
-    function get_credit_card_payments_page () {
+
+    function get_credit_card_payments_page() {
         var url = "/lms/custom/payments/get_card_payments.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
@@ -537,6 +537,43 @@ $(document).ready(function () {
         }
     }
 
+    function get_program_report() {
+        var url = "/lms/custom/reports/get_program_report.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function get_revenue_report() {
+        var url = "/lms/custom/reports/get_revenue_report.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function get_revenue_report_data() {
+        var courseid = $('#courses').val();
+        var from = $('#datepicker1').val();
+        var to = $('#datepicker2').val();
+        if (courseid > 0 && from != '' && to != '') {
+            $('#revenue_report_err').html('');
+            var url = "/lms/custom/reports/get_revenue_report_data.php";
+            $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
+                $('#revenue_report_container').html(data);
+            });
+        } // end if courseid>0 && from!='' && to!=''
+        else {
+            $('#revenue_report_err').html("<span style='color:red;'>Please select program and dates</span>");
+        }
+    }
+
+    function get_workshop_report() {
+        var url = "/lms/custom/reports/get_workshop_report.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -598,6 +635,9 @@ $(document).ready(function () {
             add_installment_user();
         }
 
+        if (event.target.id == 'rev_go') {
+            get_revenue_report_data();
+        }
 
 
     }); // end of #region-main click', 'button',
@@ -786,7 +826,7 @@ $(document).ready(function () {
 
     $("#cards").click(function (event) {
         update_navigation_status__menu('Credit cards payments');
-        get_credit_card_payments_page ();
+        get_credit_card_payments_page();
     });
 
     $("#free").click(function (event) {
@@ -798,6 +838,24 @@ $(document).ready(function () {
         update_navigation_status__menu('Refund');
 
     });
+
+    $("#program_reports").click(function (event) {
+        update_navigation_status__menu('Program reports');
+        get_program_report();
+    });
+
+    $("#revenue_reports").click(function (event) {
+        update_navigation_status__menu('Revenue reports');
+        get_revenue_report();
+
+    });
+
+    $("#workshop_reports").click(function (event) {
+        update_navigation_status__menu('Workshop reports');
+        get_workshop_report();
+    });
+
+
 
 }); // end of $(document).ready(function()
 

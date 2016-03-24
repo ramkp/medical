@@ -33,9 +33,10 @@ echo "<script type='text/javascript' src='http://" . $_SERVER['SERVER_NAME'] . "
 echo "<link type='text/css' rel='stylesheet' href='http://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/simplePagination.css'/>";
 echo "<script type = 'text/javascript' src = 'https://www.gstatic.com/charts/loader.js' ></script>";
 echo "<script type = 'text/javascript'>";
-// Load the Visualization API and the column package.
 echo "google.charts.load('current', {'packages': ['corechart']})";
 echo "</script>";
+echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
+echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
 ?>
 
 <script>

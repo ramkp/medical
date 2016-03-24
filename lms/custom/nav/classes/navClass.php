@@ -17,14 +17,94 @@ class navClass extends Util {
         }// end if $userid==2 
         else {
             $roleid = $this->get_user_role($userid);
+            if ($roleid == 1) {
+                // Manager
+                $top_menu=$this->get_manager_menu();
+            } // end if $roleid==1
             if ($roleid == 3 || $roleid == 4) {
+                // Tutors
                 $top_menu = $this->get_tutors_menu_items();
             } // end if $roleid == 3 || $roleid == 4            
             if ($roleid == 5) {
+                // Students
                 $top_menu = $this->get_students_menu_items();
             } // end if $roleid == 5
         }
         return $top_menu;
+    }
+
+    function get_manager_menu() {
+        $userid = $this->user->id;
+        $list = "";
+        $price_items = $this->get_price_items();
+        $list = $list . "<header role='banner' class='navbar'>
+        <nav role='navigation' class='navbar-inner'>
+            <div class='container-fluid'>
+                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
+                <a class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                </a>
+                <div class='nav-collapse collapse'>
+                    <div class='nav-divider-right'></div>
+                    <ul class='nav pull-right'>
+                        <li></li>
+                    </ul>
+                    <div class='nav-collapse collapse'>
+                        <ul class='nav'>
+                            <li class='dropdown'><a title='Programs' class='dropdown-toggle' href='#'>Programs<b class='caret'></b></a>                                
+                                $price_items
+                            </li>                            
+                            <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Invoices<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Invoice' id='data_inv'>Invoice</a></li>
+                                    <li><a href='#' title='Open invoices' id='opn_inv'>Open invoices</a></li>
+                                    <li><a href='#' title='Paid invoices' id='paid_inv'>Paid invoices</a></li>
+                                    <li><a href='#' title='Send invoice' id='send_inv'>Send invoice</a></li>                                    
+                                </ul>
+                            </li>                            
+                            <li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' id='cash' title='Cash'>Cash payments</a></li>
+                                    <li><a href='#' id='cheque' title='Cheque'>Cheque payments</a></li>
+                                    <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
+                                    <li><a href='#' id='free' title='Free'>Free</a></li>                                    
+                                    <li><a href='#' id='refund' title='Refund'>Refund</a></li>                            
+                                </ul>
+                            </li>                            
+                            <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
+                                    <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
+                                    <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>
+                                    <li><a href='#' title='Google Map' id='Google_Map'>Google Map</a></li>                                   
+                                    <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
+                                    <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li> 
+                                    <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
+                                    <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>                                     
+                                </ul>
+                            </li>
+                            <li class='dropdown'><a title='Account' class='dropdown-toggle' href='#cm_submenu_2'>Account<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>                                
+                                    <li><a href='/lms/user/profile.php?id=$userid' title='Profile'>Profile</a></li>                                    
+                                    <li><a href='/lms/user/preferences.php' title='Preferences'>Preferences</a></li>
+                                    <li><a href='/lms/message/index.php' title='Preferences'>Messages</a></li>
+                                    <li><a href='/lms/login/logout.php?seskey='gqe32fe3' title='Logout'>Logout</a></li>                                            
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class='nav-divider-right'></div>
+                        <ul class='nav pull-right'>
+                            <li></li>
+                        </ul>
+                    </div>
+                    <div class='nav-divider-left'></div>
+                </div>
+            </div>
+        </nav>
+    </header>";
+        return $list;
     }
 
     function get_admin_menu_items() {
