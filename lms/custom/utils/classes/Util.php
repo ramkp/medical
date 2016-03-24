@@ -126,11 +126,11 @@ class Util {
         return $status;
     }
 
-    function get_course_users($id) {
+    function get_course_users($id, $output) {
         $list = "";
         $users = array();
         //1. Get course context
-        $instanceid = $this->get_course_context($id, $output = true);
+        $instanceid = $this->get_course_context($id);
 
         //2. Get course users
         $query = "select id, roleid, contextid, userid "

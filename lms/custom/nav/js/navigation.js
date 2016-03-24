@@ -572,7 +572,7 @@ $(document).ready(function () {
         var from = $('#datepicker1').val();
         var to = $('#datepicker2').val();
         if (courseid > 0 && from != '' && to != '') {
-            $('#revenue_report_err').html('');
+            $('#program_report_err').html('');
             var url = "/lms/custom/reports/get_program_report_data.php";
             $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
                 $('#program_report_container').html(data);
