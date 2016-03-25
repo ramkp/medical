@@ -126,7 +126,7 @@ class Util {
         return $status;
     }
 
-    function get_course_users($id, $output) {
+    function get_course_users($id, $output=true) {
         $list = "";
         $users = array();
         //1. Get course context
