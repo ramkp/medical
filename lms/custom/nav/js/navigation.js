@@ -610,9 +610,11 @@ $(document).ready(function () {
          var to = $('#datepicker2').val();
          if (courseid > 0 && from != '' && to != '') {
         	$('#workshop_report_err').html('');        	
+        	   $('#ajax_loading').show();
                 var url = "/lms/custom/reports/get_workshops_report_data.php";
                 $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
-                    $('#workshops_report_container').html(data);
+                	$('#ajax_loading').hide();
+                	$('#workshops_report_container').html(data);
                 });                    	
          } // end if courseid > 0 && from != '' && to != ''
          else {

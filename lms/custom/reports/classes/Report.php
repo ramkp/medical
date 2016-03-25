@@ -13,6 +13,12 @@ class Report extends Util {
 	public $cash_sum = 0;
 	public $cheque_sum = 0;
 	public $program_sum = 0;
+	public $cert_path;
+
+	function __construct() {
+		parent::__construct();
+		$this->cert_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates';
+	}
 
 	/************************************* Service functions *********************************/
 	function get_courses_list() {
@@ -136,13 +142,81 @@ class Report extends Util {
 		}
 		return $list;
 	}
-	
-	function set_user_balance ($courseid,$courseid) {
-		
+
+	function get_user_certification_data ($courseid,$userid) {
+		$query="select * from mdl_certificates where courseid=$courseid and userid=$userid";
+		$num = $this->db->numrows($query);
+		$cert=new stdClass();
+		if ($num > 0) {
+			$result = $this->db->query($query);
+			while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+				$cert->certified=1;
+				$cert->no=str_replace($this->cert_path, "", $row['path']);
+				$cert->issue_date=date('d/m/Y',$row['issue_date']);
+				$cert->exp_date=date('d/m/Y',$row['expiration_date']);
+				$cert->payment_status=$this->get_user_payment_status($courseid, $userid);
+			} // end while
+		} // end if $num > 0
+		else {
+			$cert->certified=0;
+			$cert->no='n/a';
+			$cert->issue_date='n/a';
+			$cert->exp_date='n/a';
+			$cert->payment_status=$this->get_user_payment_status($courseid, $userid);
+		} // end else
+		return $cert;
 	}
-	
-	function get_user_balance ($courseid,$courseid) {
-		
+
+	function get_user_balance ($courseid,$userid) {
+		$list="";
+		$cert=$this->get_user_certification_data($courseid, $userid);
+		$cert_status=($cert->certified==0)? 'User is not certified': 'User is certified';
+		$query="select * from mdl_user_balance where courseid=$courseid and userid=$userid";
+		$num = $this->db->numrows($query);
+		if ($num > 0) {
+			$result = $this->db->query($query);
+			while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+				if ($cert->certified==1) {
+					$expiration_status=($cert->exp_date==null) ? "n/a" : $cert->exp_date;
+				} // end if $cert->certified==1
+				else {
+					$expiration_status="n/a";
+				} // end else
+				$balance_status=($row['balance_sum']==null) ? "n/a":$row['balance_sum'];
+			} // end while
+			$query="update mdl_user_balance 
+			set is_certified=$cert->certified 
+			where courseid=$courseid and userid=$userid";
+			$this->db->query($query);
+		} // end if $num > 0
+		else {
+			// Set User balance
+			$expiration_status="n/a";
+			$balance_status="n/a";			
+			$query="insert into mdl_user_balance
+				(courseid,
+				 userid,
+				 is_certified,
+				 cert_no,
+				 cert_exp,
+				 balance_sum) values
+				  ('".$courseid."',
+				  '".$userid."',
+				  '".$cert->certified."',
+				  '".$cert->no."',
+				  '".$cert->exp_date."',
+				   'n/a')";
+			//echo "Query: ".$query."<br>";
+			$this->db->query($query);
+
+		}
+		if ($cert->certified==1){ 		
+		$list.="$cert_status<br>Expiration date $expiration_status<br>Balance: $$balance_status";
+		}
+		else {
+		$list.="$cert_status<br>Balance: $$balance_status";	
+		}
+		return $list;
 	}
 
 	/************************************* Revenue report  ***********************************/
@@ -345,9 +419,13 @@ class Report extends Util {
 			if ($row['confirmed'] == 1) {
 				$payment_status = $this->get_user_payment_status($courseid, $userid);
 				$user->payment_status = $payment_status;
+
+				$balance=$this->get_user_balance($courseid, $userid);
+				$user->balance=$balance;
 			} // end if $row['confirmed']==1
 			else {
 				$user->payment_status = 'User does not have access';
+				$user->balance='n/a';
 			}
 		} // end while
 		return $user;
@@ -461,23 +539,23 @@ class Report extends Util {
 				} // end if $signup_date >= strtotime($from) && $signup_date <= strtotime($to)
 			} // end foreach
 			//print_r($workshop_users);
-			if (count($workshop_users)>0) {				
+			if (count($workshop_users)>0) {
 				$this->get_program_payments($courseid, $from, $to);
 				$list.="<div class='container-fluid' style='font-weight:bold;'>";
 				$list.="<span class='span4'>User credentials</span><span class='span4'>Payment status</span><span class='span2'>Signup date</span><span class='span2'>Balance</span>";
 				$list.="</div>";
 				$list.="<div class='container-fluid'>";
-				$list.="<span class='span10'><hr/></span>";
+				$list.="<span class='span12'><hr/></span>";
 				$list.="</div>";
 				foreach ($workshop_users as $user) {
 					$user_data=$this->get_program_user_data($courseid, $user->userid);
 					$date = date('m/d/Y', $user_data->timecreated);
 					if ($user_data->firstname != '' && $user_data->lastname != '') {
 						$list.="<div class='container-fluid'>";
-						$list.="<span class='span4'>$user_data->firstname $user_data->lastname $user_data->email</span><span class='span4'>$user_data->payment_status</span><span class='span2'>$date</span>";
+						$list.="<span class='span4'>$user_data->firstname $user_data->lastname $user_data->email</span><span class='span4'>$user_data->payment_status</span><span class='span2'>$date</span><span class='span2'>$user_data->balance</span>";
 						$list.="</div>";
 						$list.="<div class='container-fluid'>";
-						$list.="<span class='span10'><hr/></span>";
+						$list.="<span class='span12'><hr/></span>";
 						$list.="</div>";
 					} // end if $user->firstname!='' && $user->lastname!=''
 				} // end foreach
