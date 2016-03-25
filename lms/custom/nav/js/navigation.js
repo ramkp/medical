@@ -593,6 +593,32 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     }
+    
+    function get_state_workshops() {
+    	var stateid=$('#states').val();    	
+    	//if (stateid>0) {
+    		var url = "/lms/custom/reports/get_state_workshops.php";
+            $.post(url, {stateid:stateid}).done(function (data) {
+                $('#workshops_dropdown').html(data);
+            });
+    	//} // end if stateid>0
+    }
+    
+    function get_workshop_report_data() {
+    	var courseid=$('#workshops').val();
+    	 var from = $('#datepicker1').val();
+         var to = $('#datepicker2').val();
+         if (courseid > 0 && from != '' && to != '') {
+        	$('#workshop_report_err').html('');        	
+                var url = "/lms/custom/reports/get_workshops_report_data.php";
+                $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
+                    $('#workshops_report_container').html(data);
+                });                    	
+         } // end if courseid > 0 && from != '' && to != ''
+         else {
+        	 $('#workshop_report_err').html("<span style='color:red;'>Please select workshop and dates</span>"); 
+         }
+    }
 
     /**********************************************************************
      * 
@@ -663,8 +689,11 @@ $(document).ready(function () {
             get_program_report_data();
         }
 
+        if (event.target.id == 'workshops_go') {
+            get_workshop_report_data();
+        }
 
-
+        
 
     }); // end of #region-main click', 'button',
 
@@ -739,12 +768,14 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'users') {
-            //var page = document.cookie;
-            //console.log('Page cookie: ' + page);
-            //if (page == 'installment_users') {
-            $('#installment_params').show();
-            //}
+            $('#installment_params').show();         
         }
+        
+        if (event.target.id == 'states') {
+           get_state_workshops();        
+        }
+        
+       
 
 
 

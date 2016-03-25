@@ -14,6 +14,7 @@ class Report extends Util {
 	public $cheque_sum = 0;
 	public $program_sum = 0;
 
+	/************************************* Service functions *********************************/
 	function get_courses_list() {
 		$list = "";
 		$items = array();
@@ -38,6 +39,113 @@ class Report extends Util {
 		return $list;
 	}
 
+	function get_states_list () {
+		$list="";
+		$states=array();
+		$query="select * from mdl_states order by state";
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$state=new stdClass();
+			foreach ($row as $key => $value) {
+				$state->$key = $value;
+			} // end foreach
+			$states[] = $state;
+		} // end while
+		$list.="<select id='states' style='width:100px;'>";
+		$list.="<option value='0' selected>All states</option>";
+		foreach ($states as $state) {
+			$list.="<option value='$state->id'>$state->state</option>";
+		} // end foreach
+		$list.="</select>";
+		return $list;
+	}
+
+	function get_workshops_list () {
+		$list="";
+		$workshops=array();
+		$query="select * from mdl_course where category=2 and cost>0";
+		$num = $this->db->numrows($query);
+		if ($num > 0) {
+			$result = $this->db->query($query);
+			while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+				$workshop=new stdClass();
+				foreach ($row as $key => $value) {
+					$workshop->$key = $value;
+				} // end foreach
+				$workshops[]=$workshop;
+			} // end while
+			$list.="<select id='workshops' style='width:175px;'>";
+			$list.="<option value='0' selected>Workshop</option>";
+			foreach ($workshops as $workshop) {
+				$list.="<option value='$workshop->id'>$workshop->fullname</option>";
+			}
+			$list.="</select>";
+		} // end if $num > 0
+		return $list;
+	}
+
+	function get_course_category ($courseid) {
+		$query="select category from mdl_course where id=$courseid";
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$cat=$row['category'];
+		}
+		return $cat;
+	}
+
+	function get_workshop_by_state ($id) {
+		$list="";
+		//echo "State id: ".$id."<br>";
+		$state_courses=array();
+		$state_workshops=array();
+		if ($id>0) {
+			$query="select * from mdl_course_to_state where stateid=$id";
+		} // end if $id>0
+		else {
+			$query="select * from mdl_course_to_state";
+		}
+		$num = $this->db->numrows($query);
+		// echo "State num: ".$num."<br>";
+		if ($num > 0) {
+			$result = $this->db->query($query);
+			while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+				$state_courses[]=$row['courseid'];
+			} // end while
+			foreach ($state_courses as $courseid) {
+				$cat=$this->get_course_category($courseid);
+				if ($cat==2) {
+					$state_workshops[]= $courseid;
+				} // end if $cat==2
+			} // end foreach
+			// echo "Total workshops: ".count($state_workshops)."<br>";
+			if (count($state_workshops)>0) {
+				$list.="<select id='workshops' style='width:175px;'>";
+				$list.="<option value='0' selected>Workshop</option>";
+				foreach ($state_workshops as $workshop) {
+					$workshop_name=$this->get_course_name($workshop);
+					$list.="<option value='$workshop'>$workshop_name</option>";
+				} // end foreach
+				$list.="</select>";
+			} // end if $state_workshops)>0
+			else {
+				$list.="n/a";
+			}
+		} // end if $num > 0
+		else {
+			$list.="n/a";
+		}
+		return $list;
+	}
+	
+	function set_user_balance ($courseid,$courseid) {
+		
+	}
+	
+	function get_user_balance ($courseid,$courseid) {
+		
+	}
+
+	/************************************* Revenue report  ***********************************/
 	function get_revenue_report() {
 		$list = "";
 		$courses = $this->get_courses_list();
@@ -226,7 +334,7 @@ class Report extends Util {
 	}
 
 	function get_program_user_data($courseid, $userid) {
-		$query = "select confirmed,firstname,lastname,email,timecreated "
+		$query = "select confirmed,firstname,lastname,email,phone1,timecreated "
 		. "from mdl_user where id=$userid";
 		$result = $this->db->query($query);
 		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -252,7 +360,6 @@ class Report extends Util {
 		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 			$signup_date = $row['timecreated'];
 		}
-		//echo "Time created: ".date('d/m/Y', $signup_date)."<br>";
 		return $signup_date;
 	}
 
@@ -270,17 +377,11 @@ class Report extends Util {
 			$list.="</div>";
 		}
 		$users = $this->get_course_users($courseid, false);
-		//echo "<pre>";
-		//print_r($users);
-		//echo "<pre>";
 		if (count($users) > 0) {
 			$this->get_program_payments($courseid, $from, $to);
 			foreach ($users as $user) {
 				$signup_date = $this->get_user_signup_date($user->userid);
 				if ($signup_date >= strtotime($from) && $signup_date <= strtotime($to)) {
-					//echo "<pre>";
-					//print_r($user);
-					//echo "<pre>";
 					$user_data = $this->get_program_user_data($courseid, $user->userid);
 					$program_users[] = $user_data;
 				} // end if $signup_date>=strtotime($from)
@@ -322,5 +423,82 @@ class Report extends Util {
 		}
 		return $list;
 	}
+
+	/********************************* Workshops report *********************************/
+	function get_workshops_report () {
+		$list="";
+		$states_list=$this->get_states_list();
+		$workshops_list=$this->get_workshops_list();
+		$list.="<div class='container-fluid'>";
+		$list.="<span class='span6' id='workshop_report_err'></span>";
+		$list.="</div>";
+		$list.="<div class='container-fluid'>";
+		$list.="<span class='span2'>$states_list</span><span class='span3' id='workshops_dropdown'>$workshops_list</span><span class='span1'>From</span><span class='span2'><input type='text' id='datepicker1' style='width:75px;'></span><span class='span1'>To</span><span class='span2'><input type='text' id='datepicker2' style='width:75px;'></span><span class='span1'><button type='button' id='workshops_go' class='btn btn-primary'>Go</button></span>";
+		$list.="</div>";
+		$list.="<div class='container-fluid' style='text-align:left;'>";
+		$list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+		$list.="</div>";
+		$list.="<div id='workshops_report_container'>";
+		$list.="</div>";
+		return $list;
+	}
+
+	function get_workshop_report_data ($courseid,$from,$to,$status=false) {
+		$list="";
+		$workshop_users=array();
+		$coursename = $this->get_course_name($courseid);
+		if ($status == true) {
+			$list.="<div class='container-fluid' style='font-weight:bold'>";
+			$list.="<span class='span9'>$coursename - $from - $to</span>";
+			$list.="</div>";
+		}
+		$users=$this->get_course_users($courseid, false);
+		if (count($users)>0) {
+			foreach ($users as $user) {
+				$signup_date=$this->get_user_signup_date($user->userid);
+				if ($signup_date >= strtotime($from) && $signup_date <= strtotime($to)) {
+					$workshop_users[]=$user;
+				} // end if $signup_date >= strtotime($from) && $signup_date <= strtotime($to)
+			} // end foreach
+			//print_r($workshop_users);
+			if (count($workshop_users)>0) {				
+				$this->get_program_payments($courseid, $from, $to);
+				$list.="<div class='container-fluid' style='font-weight:bold;'>";
+				$list.="<span class='span4'>User credentials</span><span class='span4'>Payment status</span><span class='span2'>Signup date</span><span class='span2'>Balance</span>";
+				$list.="</div>";
+				$list.="<div class='container-fluid'>";
+				$list.="<span class='span10'><hr/></span>";
+				$list.="</div>";
+				foreach ($workshop_users as $user) {
+					$user_data=$this->get_program_user_data($courseid, $user->userid);
+					$date = date('m/d/Y', $user_data->timecreated);
+					if ($user_data->firstname != '' && $user_data->lastname != '') {
+						$list.="<div class='container-fluid'>";
+						$list.="<span class='span4'>$user_data->firstname $user_data->lastname $user_data->email</span><span class='span4'>$user_data->payment_status</span><span class='span2'>$date</span>";
+						$list.="</div>";
+						$list.="<div class='container-fluid'>";
+						$list.="<span class='span10'><hr/></span>";
+						$list.="</div>";
+					} // end if $user->firstname!='' && $user->lastname!=''
+				} // end foreach
+				$list.="<div class='container-fluid' style='font-weight:bold;'>";
+				$list.="<span class='span4'>Total users  " . count($workshop_users) . "</span><span class='span4'>Total program sum $$this->program_sum</span><span class='span2' style='font-weight:normal;'><a href='#' onClick='return false;' id='workshop_report_export'>Export to CSV</a></span>";
+				$list.="</div>";
+			} // end if count($workshop_users)>0
+			else {
+				$list.="<div class='container-fluid' style=''>";
+				$list.="<span class='span4'>There are no users at selected program</span>";
+				$list.="</div>";
+			}
+		} // end if count($users)>0
+		else {
+			$list.="<div class='container-fluid' style=''>";
+			$list.="<span class='span4'>There are no users at selected program</span>";
+			$list.="</div>";
+		}
+		return $list;
+	}
+
+
 
 }
