@@ -554,7 +554,7 @@ $(document).ready(function () {
             var url = "/lms/custom/reports/get_revenue_report_data.php";
             $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
                 $('#ajax_loading').hide();
-                $('#revenue_report_container').html(data);                
+                $('#revenue_report_container').html(data);
             });
         } // end if courseid>0 && from!='' && to!=''
         else {
@@ -586,6 +586,25 @@ $(document).ready(function () {
             $('#program_report_err').html("<span style='color:red;'>Please select program and dates</span>");
         }
     }
+    
+    function export_program_report () {
+    	if (confirm('Export data to CSV?')) {
+    		var courseid = $('#courses').val();
+            var from = $('#datepicker1').val();
+            var to = $('#datepicker2').val();
+            if (courseid > 0 && from != '' && to != '') {
+            	var url = "/lms/custom/reports/program_report_export.php";
+                $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
+                    $('#ajax_loading').hide();
+                    //$('#program_report_container').html(data);
+                });
+            } // end if courseid > 0 && from != ''
+            else {
+            	alert('Incorrect program data!');
+            }
+    	} // end if confirm
+    		
+    }
 
     function get_workshop_report() {
         var url = "/lms/custom/reports/get_workshop_report.php";
@@ -593,33 +612,33 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     }
-    
+
     function get_state_workshops() {
-    	var stateid=$('#states').val();    	
-    	//if (stateid>0) {
-    		var url = "/lms/custom/reports/get_state_workshops.php";
-            $.post(url, {stateid:stateid}).done(function (data) {
-                $('#workshops_dropdown').html(data);
-            });
-    	//} // end if stateid>0
+        var stateid = $('#states').val();
+        //if (stateid>0) {
+        var url = "/lms/custom/reports/get_state_workshops.php";
+        $.post(url, {stateid: stateid}).done(function (data) {
+            $('#workshops_dropdown').html(data);
+        });
+        //} // end if stateid>0
     }
-    
+
     function get_workshop_report_data() {
-    	var courseid=$('#workshops').val();
-    	 var from = $('#datepicker1').val();
-         var to = $('#datepicker2').val();
-         if (courseid > 0 && from != '' && to != '') {
-        	$('#workshop_report_err').html('');        	
-        	   $('#ajax_loading').show();
-                var url = "/lms/custom/reports/get_workshops_report_data.php";
-                $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
-                	$('#ajax_loading').hide();
-                	$('#workshops_report_container').html(data);
-                });                    	
-         } // end if courseid > 0 && from != '' && to != ''
-         else {
-        	 $('#workshop_report_err').html("<span style='color:red;'>Please select workshop and dates</span>"); 
-         }
+        var courseid = $('#workshops').val();
+        var from = $('#datepicker1').val();
+        var to = $('#datepicker2').val();
+        if (courseid > 0 && from != '' && to != '') {
+            $('#workshop_report_err').html('');
+            $('#ajax_loading').show();
+            var url = "/lms/custom/reports/get_workshops_report_data.php";
+            $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
+                $('#ajax_loading').hide();
+                $('#workshops_report_container').html(data);
+            });
+        } // end if courseid > 0 && from != '' && to != ''
+        else {
+            $('#workshop_report_err').html("<span style='color:red;'>Please select workshop and dates</span>");
+        }
     }
 
     /**********************************************************************
@@ -695,7 +714,7 @@ $(document).ready(function () {
             get_workshop_report_data();
         }
 
-        
+
 
     }); // end of #region-main click', 'button',
 
@@ -733,7 +752,9 @@ $(document).ready(function () {
             $('#add_installment_user_container').show();
         }
 
-
+        if (event.target.id == 'program_report_export') {
+            export_program_report();
+        }
 
 
 
@@ -770,14 +791,14 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'users') {
-            $('#installment_params').show();         
+            $('#installment_params').show();
         }
-        
+
         if (event.target.id == 'states') {
-           get_state_workshops();        
+            get_state_workshops();
         }
-        
-       
+
+
 
 
 
