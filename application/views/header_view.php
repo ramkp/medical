@@ -69,7 +69,7 @@
         <div id="wrapper">
             <header id="page-header" class="clearfix">
                 <!-- <div class="container-fluid"><div class="text-center"><a href="http://cnausa.com/"><img src="http://cnausa.com/assets/logo/logo_site.jpg" width="300" height="90"/></a></div></div> -->
-                <div class="container-fluid"><div class="text-center"><a href="http://cnausa.com/"><img src="http://cnausa.com/assets/logo/5.jpg" width="300" height="90"/></a></div></div>
+                <div class="container-fluid"><div class="text-center"><a href="http://cnausa.com/"><img src="http://cnausa.com/assets/logo/5.png" width="350" height="90"/></a></div></div>
             </header>
 
             <header  class="navbar">

@@ -1,7 +1,8 @@
 @page {
-    background: url('/assets/logo/logo_college.jpg') ; 
+    /*background: url('/assets/logo/logo_college.jpg') ;*/
+    background: url('/assets/logo/4.png') ; 
     background-repeat: no-repeat;
-    background-size: 675px 533px;
+    /* background-size: 675px 533px; */
     background-position: center;
     opacity: 0.1;
 }
@@ -27,9 +28,10 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-image: url('/assets/logo/logo_college.jpg');
+    /* background-image: url('/assets/logo/logo_college.jpg');*/
+    background: url('/assets/logo/4.png') ;
     background-repeat: no-repeat;
-    background-size: 675px 533px;
+    /* background-size: 675px 533px; */
     background-position: center;
     opacity: 0.1;
 }
