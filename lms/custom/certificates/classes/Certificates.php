@@ -5,9 +5,11 @@
  *
  * @author sirromas
  */
-require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
-require_once ($_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
+
 
 class Certificates extends Util {
 
@@ -81,7 +83,8 @@ class Certificates extends Util {
 				$date = date('Y-m-d', $certificate->issue_date);
 				$exp_date = date('Y-m-d', $certificate->expiration_date);
 				$_exp_date = ($exp_date == '') ? "n/a" : $exp_date;
-				$link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $certificate->path));
+				$cert_link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $certificate->path));
+				$addr_link="/lms/custom/certificates/$certificate->userid/label.pdf";
 				$list.="<div class='container-fluid'>";
 				$list.="<span class='span2'>Firstname</span><span class='span2'>$user->firstname</span>";
 				$list.="</div>";
@@ -96,7 +99,11 @@ class Certificates extends Util {
 				$list.="</div>";
 
 				$list.="<div class='container-fluid'>";
-				$list.="<span class='span2'>Certificate link</span><span class='span6'><a href='$link' target='_blank'>link</a></span>";
+				$list.="<span class='span2'>Certificate</span><span class='span6'><a href='$cert_link' target='_blank'>Print Certificate</a></span>";
+				$list.="</div>";
+
+				$list.="<div class='container-fluid'>";
+				$list.="<span class='span2'>Address Label</span><span class='span6'><a href='$addr_link' target='_blank'>Print Address Label</a></span>";
 				$list.="</div>";
 
 				$list.="<div class='container-fluid'>";
@@ -150,6 +157,8 @@ class Certificates extends Util {
 		$list.="</div>";
 		$list.="<div class='container-fluid'>";
 		$list.="<span class='span2'><button type='button' id='send_cert' class='btn btn-primary'>Send</button></span>";
+		//$list.="<span class='span2'><button type='button' id='print_label' class='btn btn-primary'>Address Label</button></span>";
+		//$list.="<span class='span2'><button type='button' id='print_cert' class='btn btn-primary'>Print Certificate</button></span>";
 		$list.="</div></div>";
 		return $list;
 	}
@@ -202,7 +211,7 @@ class Certificates extends Util {
 		$day = date('d', $date);
 		$month = date('m', $date);
 		$year = date('y', $date);
-	
+
 		$expr = '/(?<=\s|^)[a-z]/i';
 		preg_match_all($expr, $course_name, $matches);
 		$result = implode('', $matches[0]);
@@ -304,6 +313,7 @@ class Certificates extends Util {
 			$expiration_date_sec = 'n/a';
 		} // end else
 		$path = $this->prepare_ceriticate($courseid, $userid, $date);
+		$this->create_label($courseid, $userid);
 		$user = $this->get_user_details($userid);
 		$user->path = $path;
 		$code=$this->get_course_code($courseid, $userid);
@@ -372,4 +382,33 @@ class Certificates extends Util {
 		return $list;
 	}
 
+	function get_user_address_data ($userid) {
+		$query="SELECT firstname, lastname, email, phone1, address, city, state, zip
+                FROM  `mdl_user` where id=$userid";
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$user=new stdClass();
+			foreach ($row as $key => $value) {
+				$user->$key = $value;
+			}
+			$user->group_name='';
+		} // end while
+		return $user;
+	}
+
+	function create_label($courseid,$userid) {
+		$user_address=$this->get_user_address_data($userid);
+		$pdf = new PDF_Label('L7163');
+		$pdf->AddPage();
+		$text = sprintf("%s\n%s\n%s\n%s", "$user_address->firstname $user_address->lastname", "$user_address->address", "$user_address->state/".$user_address->city."", "$user_address->zip");
+		$pdf->Add_Label($text);
+		$dir_path = $this->cert_path . "/$userid";
+		if (!is_dir($dir_path)) {
+			if (!mkdir($dir_path)) {
+				die('Could not write to disk');
+			} // end if !mkdir($dir_path)
+		} // end if !is_dir($dir_path)
+		$path = $dir_path . "/label.pdf";
+		$pdf->Output($path, 'F');
+	}
 }

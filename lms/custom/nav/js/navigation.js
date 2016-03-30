@@ -522,7 +522,8 @@ $(document).ready(function () {
                 } // end if data==0 
                 else {
                     if (confirm('Send certificate to user?')) {
-                        $.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
+                    	$('#send_cert_err').html('');
+                    	$.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
                             $('#send_cert_err').html(data);
                         });
                     } // end if conform
@@ -533,6 +534,42 @@ $(document).ready(function () {
             console.log('Incorrect data!');
             $('#send_cert_err').html("<span style='color:red;'>Please select program and user</span>");
         } // end else
+    }
+    
+    function print_certificate_address_label () {
+    	var courseid = $('#courses').val();
+        var userid = $('#users').val();
+        if (userid > 0 && courseid > 0) {
+            if (confirm('Print address label?')) {
+            	$('#send_cert_err').html('');
+            	var url = "/lms/custom/certificates/print_label.php";
+                $.post(url, {courseid: courseid, userid: userid}).done(function (data) {
+                    $('#send_cert_err').html(data);
+                });
+            } // end if confirm
+        } // end if userid>0 && courseid>0
+        else {
+            console.log('Incorrect data!');
+            $('#send_cert_err').html("<span style='color:red;'>Please select program and user</span>");
+        } // end else    	
+    }
+    
+    function print_certificate () {
+    	var courseid = $('#courses').val();
+        var userid = $('#users').val();
+        if (userid > 0 && courseid > 0) {
+        	if (confirm('Print Certificate?')) {
+        		$('#send_cert_err').html('');
+        		var url = "/lms/custom/certificates/print_certificate.php";
+                $.post(url, {courseid: courseid, userid: userid}).done(function (data) {
+                    $('#send_cert_err').html(data);
+                });
+            } // end if confirm
+        } // end if userid>0 && courseid>0
+        else {
+            console.log('Incorrect data!');
+            $('#send_cert_err').html("<span style='color:red;'>Please select program and user</span>");
+        }    	
     }
 
     function show_private_group_request_detailes(id) {
@@ -723,7 +760,14 @@ $(document).ready(function () {
         if (event.target.id == 'workshops_go') {
             get_workshop_report_data();
         }
-
+        
+        if (event.target.id == 'print_label') {
+        	print_certificate_address_label ();
+        }
+        
+        if (event.target.id == 'print_cert') {
+        	print_certificate ();
+        }
 
 
     }); // end of #region-main click', 'button',
