@@ -182,6 +182,35 @@ class Certificates extends Util {
 		return $user;
 	}
 
+	function get_course_renew_status ($courseid) {
+		$query="select expired from mdl_course where id=$courseid";
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$expire=$row['expired'];
+		}
+		return $expire;
+	}
+
+	function get_course_code ($courseid,$userid) {
+		$query="select fullname from mdl_course where id=$courseid";
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$name=$row['fullname'];
+		}
+		$course_name=trim(str_replace('Workshop', '', $name));
+		$date = time();
+		$day = date('d', $date);
+		$month = date('m', $date);
+		$year = date('y', $date);
+	
+		$expr = '/(?<=\s|^)[a-z]/i';
+		preg_match_all($expr, $course_name, $matches);
+		$result = implode('', $matches[0]);
+		$result = strtoupper($result);
+		$code="$month$day$year-$result$userid";
+		return $code;
+	}
+
 	function prepare_ceriticate($courseid, $userid, $date = 0) {
 		$list = "";
 		$coursename = $this->get_course_name($courseid); // string
@@ -194,8 +223,9 @@ class Certificates extends Util {
 		$day = date('d', $date);
 		$month = date('M', $date);
 		$year = date('Y', $date);
-		$renew_status = $this->get_course_category($courseid);
-		if ($renew_status == true) {
+		$renew_status = $this->get_course_renew_status($courseid);
+		$code=$this->get_course_code($courseid, $userid);
+		if ($renew_status == 1) {
 			$expiration_date_sec = $date + 31536000;
 		}
 		$expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
@@ -211,7 +241,7 @@ class Certificates extends Util {
 		$list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
 		$list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
 		$list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
-		$list.="<br><br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION #: 010836-IV12<br>";
+		$list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION #: $code<br>";
 		if ($renew_status == true) {
 			$list.="EXPIRATION DATE $expiration_date</p>";
 		}
@@ -276,14 +306,15 @@ class Certificates extends Util {
 		$path = $this->prepare_ceriticate($courseid, $userid, $date);
 		$user = $this->get_user_details($userid);
 		$user->path = $path;
+		$code=$this->get_course_code($courseid, $userid);
 		$query = "insert into mdl_certificates (courseid,"
 		. "userid,"
-		. "path,"
+		. "path, cert_no, "
 		. "issue_date,"
 		. "expiration_date) "
 		. "values('$courseid',"
 		. " '$userid',"
-		. " '$path',"
+		. " '$path', '$code', "
 		. " '$date',"
 		. " '$expiration_date_sec')";
 		//echo "Query: ".$query."<br>";
