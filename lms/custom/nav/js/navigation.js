@@ -274,12 +274,21 @@ $(document).ready(function () {
         var num_payments = $(num_payments_id).val();
         var taxes_num = '#taxes_' + courseid;
         var taxes;
+        var expire_num='#expire_'+courseid;
+        var expire
 
         if ($(taxes_num).is(':checked')) {
             taxes = 1;
         }
         else {
             taxes = 0;
+        }
+        
+        if ($(expire_num).is(':checked')) {
+        	expire = 1;
+        }
+        else {
+        	expire = 0;
         }
 
         if ($(installment_id).is(':checked')) {
@@ -329,6 +338,7 @@ $(document).ready(function () {
                     installment: installment,
                     num_payments: num_payments,
                     taxes: taxes,
+                    expire: expire,
                     states: JSON.stringify(states)};
                 $.post(url, request).done(function (data) {
                     //alert ('Server response: '+data);
