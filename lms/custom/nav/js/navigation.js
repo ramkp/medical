@@ -29,6 +29,20 @@ $(document).ready(function () {
             $('#region-main').html("<p align='center'>Data successfully saved. </p>");
         });
     }
+    
+    function get_about_edit_page() {
+        var url = "/lms/custom/about/index.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+    
+    function update_about_page(data) {
+        var url = "/lms/custom/about/edit.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully saved. </p>");
+        });
+    }
 
     function get_testimonial_page() {
         var url = "/lms/custom/testimonial/index.php";
@@ -615,6 +629,13 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     }
+    
+    function get_feedback_page() {
+    	var url = "/lms/custom/feedback/list.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
 
     function get_program_report_data() {
         var courseid = $('#courses').val();
@@ -686,8 +707,8 @@ $(document).ready(function () {
         else {
             $('#workshop_report_err').html("<span style='color:red;'>Please select workshop and dates</span>");
         }
-    }
-
+    }    
+    
     /**********************************************************************
      * 
      *                       Events processing block
@@ -705,6 +726,11 @@ $(document).ready(function () {
         if (event.target.id.indexOf("_faq") >= 0) {
             var data = CKEDITOR.instances.editor1.getData();
             update_faq_page(data);
+        }
+        
+        if (event.target.id.indexOf("_about") >= 0) {
+            var data = CKEDITOR.instances.editor1.getData();
+            update_about_page(data);
         }
 
         if (event.target.id.indexOf("_test") >= 0) {
@@ -873,6 +899,17 @@ $(document).ready(function () {
         update_navigation_status__menu('FAQ');
         get_faq_edit_page();
     });
+    
+    $("#about").click(function (event) {
+        update_navigation_status__menu('About');
+        get_about_edit_page();
+    });
+    
+    $("#feedback").click(function (event) {
+        update_navigation_status__menu('Feedback');
+        get_feedback_page();
+    });
+
 
     $("#Google_Map").click(function (event) {
         update_navigation_status__menu('Google Map');
