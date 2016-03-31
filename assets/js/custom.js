@@ -1075,6 +1075,30 @@ $(document).ready(function () {
             });
         }
     }
+    
+    function submit_contact_form () {
+    	var firstname=$('#firstname').val();
+    	var lastname=$('#lastname').val();
+    	var email=$('#email').val();
+    	var phone=$('#phone').val();
+    	var message=$('#message').val();
+    	if (firstname!='' && lastname!='' && email!='' && validateEmail(email) == true && phone!='' && message!='') {
+    		$('#contact_result').html('');
+    		$('#firstname').val('');
+    		$('#lastname').val('');
+    		$('#email').val('');
+    		$('#phone').val('');
+    		$('#message').val('');
+    		var url = "http://cnausa.com/functionality/php/send_contact_request.php";
+            var request = {firstname:firstname,lastname:lastname,email:email,phone:phone,message:message};
+            $.post(url, request).done(function (data) {                
+                $('#contact_result').html(data);                
+            })    		
+    	} // end if firstname!='' && lastname!=''
+    	else {
+    		$('#contact_result').html("<span style='colore:red;'>Please provide all fields and correct email address</span>");
+    	}
+    }
 
     function verify_user_certificate() {
         var cert_fio = $('#cert_fio').val();
@@ -1287,8 +1311,9 @@ $(document).ready(function () {
             verify_group_owner_detailes();
         }
 
-
-
+        if (event.target.id == 'contact_button') {
+        	submit_contact_form ();
+        }  
 
 
     }); // end of $('.form_div').on('click', 'button', function (event)
