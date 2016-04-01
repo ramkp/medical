@@ -350,5 +350,9 @@ class program_model extends CI_Model {
         $list.= "</div>"; // end of form div
         return $list;
     }
+    
+    public function get_search_result($item) {
+        
+    }
 
 }

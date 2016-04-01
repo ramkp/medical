@@ -1075,29 +1075,29 @@ $(document).ready(function () {
             });
         }
     }
-    
-    function submit_contact_form () {
-    	var firstname=$('#firstname').val();
-    	var lastname=$('#lastname').val();
-    	var email=$('#email').val();
-    	var phone=$('#phone').val();
-    	var message=$('#message').val();
-    	if (firstname!='' && lastname!='' && email!='' && validateEmail(email) == true && phone!='' && message!='') {
-    		$('#contact_result').html('');
-    		$('#firstname').val('');
-    		$('#lastname').val('');
-    		$('#email').val('');
-    		$('#phone').val('');
-    		$('#message').val('');
-    		var url = "http://cnausa.com/functionality/php/send_contact_request.php";
-            var request = {firstname:firstname,lastname:lastname,email:email,phone:phone,message:message};
-            $.post(url, request).done(function (data) {                
-                $('#contact_result').html(data);                
-            })    		
-    	} // end if firstname!='' && lastname!=''
-    	else {
-    		$('#contact_result').html("<span style='colore:red;'>Please provide all fields and correct email address</span>");
-    	}
+
+    function submit_contact_form() {
+        var firstname = $('#firstname').val();
+        var lastname = $('#lastname').val();
+        var email = $('#email').val();
+        var phone = $('#phone').val();
+        var message = $('#message').val();
+        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && message != '') {
+            $('#contact_result').html('');
+            $('#firstname').val('');
+            $('#lastname').val('');
+            $('#email').val('');
+            $('#phone').val('');
+            $('#message').val('');
+            var url = "http://cnausa.com/functionality/php/send_contact_request.php";
+            var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message};
+            $.post(url, request).done(function (data) {
+                $('#contact_result').html(data);
+            })
+        } // end if firstname!='' && lastname!=''
+        else {
+            $('#contact_result').html("<span style='colore:red;'>Please provide all fields and correct email address</span>");
+        }
     }
 
     function verify_user_certificate() {
@@ -1152,6 +1152,20 @@ $(document).ready(function () {
             $('#ajax_loading_schedule').hide();
             $('#program_section').html(data);
         });
+    }
+
+    function submit_search_form() {
+        var search_item = $('#input_search_box').val();
+        if (search_item != '') {
+            var url = "http://cnausa.com/functionality/php/get_search_item.php";
+            var request = {search_item: search_item};            
+            $.post(url, request).done(function (data) {                
+                $('#search_result').html(data);
+            });
+        } // end if search_item!=''
+        else {
+           $('#search_result').html("<span style='color:red;'>Please provide search criteria</span>");
+        }
     }
 
     /************************************************************************
@@ -1312,8 +1326,12 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'contact_button') {
-        	submit_contact_form ();
-        }  
+            submit_contact_form();
+        }
+
+        if (event.target.id == 'search_button') {
+            submit_search_form();
+        }
 
 
     }); // end of $('.form_div').on('click', 'button', function (event)
@@ -1472,6 +1490,10 @@ $(document).ready(function () {
         }
 
     }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
+
+    $("#search_button").click(function () {
+        submit_search_form();
+    });
 
     var url = window.location.href;
     if (url.indexOf("school") >= 0) {

@@ -43,5 +43,11 @@ class Programs extends CI_Controller {
         $this->load->view('program_view', $data);
         $this->load->view('footer_view');
     }
+    
+    public function searh_result() {
+        $item = $this->uri->segment(3);
+        
+        
+    }
 
 }
