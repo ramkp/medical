@@ -31,7 +31,7 @@ class Contact_model extends CI_Model {
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Message*</span>";
         //$list.="<span class='span6' style='text-align:left;'>&nbsp;&nbsp;<textarea id='message' name='message' rows='4' cols='75'></textarea></span>";
-        $list.="<span  class='span2' style='text-align:left;'><textarea id='message' name='message' rows='4' ></textarea></span>";
+        $list.="<span  class='span2'><textarea id='message' name='message' rows='4' ></textarea></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
