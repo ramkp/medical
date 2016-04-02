@@ -29,14 +29,14 @@ $(document).ready(function () {
             $('#region-main').html("<p align='center'>Data successfully saved. </p>");
         });
     }
-    
+
     function get_about_edit_page() {
         var url = "/lms/custom/about/index.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
     }
-    
+
     function update_about_page(data) {
         var url = "/lms/custom/about/edit.php";
         $.post(url, {data: data}).done(function () {
@@ -288,7 +288,7 @@ $(document).ready(function () {
         var num_payments = $(num_payments_id).val();
         var taxes_num = '#taxes_' + courseid;
         var taxes;
-        var expire_num='#expire_'+courseid;
+        var expire_num = '#expire_' + courseid;
         var expire
 
         if ($(taxes_num).is(':checked')) {
@@ -297,12 +297,12 @@ $(document).ready(function () {
         else {
             taxes = 0;
         }
-        
+
         if ($(expire_num).is(':checked')) {
-        	expire = 1;
+            expire = 1;
         }
         else {
-        	expire = 0;
+            expire = 0;
         }
 
         if ($(installment_id).is(':checked')) {
@@ -536,8 +536,8 @@ $(document).ready(function () {
                 } // end if data==0 
                 else {
                     if (confirm('Send certificate to user?')) {
-                    	$('#send_cert_err').html('');
-                    	$.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
+                        $('#send_cert_err').html('');
+                        $.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
                             $('#send_cert_err').html(data);
                         });
                     } // end if conform
@@ -549,14 +549,14 @@ $(document).ready(function () {
             $('#send_cert_err').html("<span style='color:red;'>Please select program and user</span>");
         } // end else
     }
-    
-    function print_certificate_address_label () {
-    	var courseid = $('#courses').val();
+
+    function print_certificate_address_label() {
+        var courseid = $('#courses').val();
         var userid = $('#users').val();
         if (userid > 0 && courseid > 0) {
             if (confirm('Print address label?')) {
-            	$('#send_cert_err').html('');
-            	var url = "/lms/custom/certificates/print_label.php";
+                $('#send_cert_err').html('');
+                var url = "/lms/custom/certificates/print_label.php";
                 $.post(url, {courseid: courseid, userid: userid}).done(function (data) {
                     $('#send_cert_err').html(data);
                 });
@@ -567,14 +567,14 @@ $(document).ready(function () {
             $('#send_cert_err').html("<span style='color:red;'>Please select program and user</span>");
         } // end else    	
     }
-    
-    function print_certificate () {
-    	var courseid = $('#courses').val();
+
+    function print_certificate() {
+        var courseid = $('#courses').val();
         var userid = $('#users').val();
         if (userid > 0 && courseid > 0) {
-        	if (confirm('Print Certificate?')) {
-        		$('#send_cert_err').html('');
-        		var url = "/lms/custom/certificates/print_certificate.php";
+            if (confirm('Print Certificate?')) {
+                $('#send_cert_err').html('');
+                var url = "/lms/custom/certificates/print_certificate.php";
                 $.post(url, {courseid: courseid, userid: userid}).done(function (data) {
                     $('#send_cert_err').html(data);
                 });
@@ -583,7 +583,7 @@ $(document).ready(function () {
         else {
             console.log('Incorrect data!');
             $('#send_cert_err').html("<span style='color:red;'>Please select program and user</span>");
-        }    	
+        }
     }
 
     function show_private_group_request_detailes(id) {
@@ -629,9 +629,9 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     }
-    
+
     function get_feedback_page() {
-    	var url = "/lms/custom/feedback/list.php";
+        var url = "/lms/custom/feedback/list.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
@@ -654,24 +654,24 @@ $(document).ready(function () {
             $('#program_report_err').html("<span style='color:red;'>Please select program and dates</span>");
         }
     }
-    
-    function export_program_report () {
-    	if (confirm('Export data to CSV?')) {
-    		var courseid = $('#courses').val();
+
+    function export_program_report() {
+        if (confirm('Export data to CSV?')) {
+            var courseid = $('#courses').val();
             var from = $('#datepicker1').val();
             var to = $('#datepicker2').val();
             if (courseid > 0 && from != '' && to != '') {
-            	var url = "/lms/custom/reports/program_report_export.php";
+                var url = "/lms/custom/reports/program_report_export.php";
                 $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
                     $('#ajax_loading').hide();
                     //$('#program_report_container').html(data);
                 });
             } // end if courseid > 0 && from != ''
             else {
-            	alert('Incorrect program data!');
+                alert('Incorrect program data!');
             }
-    	} // end if confirm
-    		
+        } // end if confirm
+
     }
 
     function get_workshop_report() {
@@ -707,8 +707,22 @@ $(document).ready(function () {
         else {
             $('#workshop_report_err').html("<span style='color:red;'>Please select workshop and dates</span>");
         }
-    }    
-    
+    }   
+
+    function get_certificate() {
+        var url = "/lms/custom/nav/get_certificate.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function renew_certificate() {
+        var url = "/lms/custom/nav/renew_certificate.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -727,7 +741,7 @@ $(document).ready(function () {
             var data = CKEDITOR.instances.editor1.getData();
             update_faq_page(data);
         }
-        
+
         if (event.target.id.indexOf("_about") >= 0) {
             var data = CKEDITOR.instances.editor1.getData();
             update_about_page(data);
@@ -786,13 +800,13 @@ $(document).ready(function () {
         if (event.target.id == 'workshops_go') {
             get_workshop_report_data();
         }
-        
+
         if (event.target.id == 'print_label') {
-        	print_certificate_address_label ();
+            print_certificate_address_label();
         }
-        
+
         if (event.target.id == 'print_cert') {
-        	print_certificate ();
+            print_certificate();
         }
 
 
@@ -899,12 +913,12 @@ $(document).ready(function () {
         update_navigation_status__menu('FAQ');
         get_faq_edit_page();
     });
-    
+
     $("#about").click(function (event) {
         update_navigation_status__menu('About');
         get_about_edit_page();
     });
-    
+
     $("#feedback").click(function (event) {
         update_navigation_status__menu('Feedback');
         get_feedback_page();
@@ -1026,7 +1040,15 @@ $(document).ready(function () {
         get_workshop_report();
     });
 
+    $("#get_cert").click(function (event) {
+        update_navigation_status__menu('Get Certificate');
+        get_certificate();
+    });
 
+    $("#ren_cert").click(function (event) {
+        update_navigation_status__menu('Renew Certificate');
+        renew_certificate();
+    });
 
 }); // end of $(document).ready(function()
 
