@@ -39,7 +39,7 @@ class pdo_db {
     }
 
     public function query($query) {
-       //echo "Query: ".$query."<br/>";
+        //echo "Query: ".$query."<br/>";
         return $this->db->query($query);      
     }
 

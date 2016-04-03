@@ -7,6 +7,8 @@
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
 class navClass extends Util {
 
@@ -367,17 +369,17 @@ class navClass extends Util {
         } // end if $compleation_status!=0
         else {
             $date = $this->get_course_completion_date($courseid, $this->user->id);
-            $now = time();
+            $now = time(); // secs
             $year_expiration_sec = 28512000; // 11 month expiration in secs
-            $diff = $now - $year_expiration_sec;
-            if ($diff > 0) {
+            $diff = $now - $date;
+            if ($diff < $year_expiration_sec) {
                 $user = $this->get_user_details($this->user->id);
                 $cert = new Certificates();
                 $cert->send_certificate($courseid, $this->user->id, $date);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span9'>Certificate has been sent to $user->email.</span>";
                 $list.="</div>";
-            } // end if $diff>0
+            } // end if $diff<$year_expiration_sec
             else {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span9'>Your Certificate almost expire, please use renew option</span>";
@@ -387,8 +389,74 @@ class navClass extends Util {
         return $list;
     }
 
+    function check_user_balance($courseid, $userid) {
+        $query = "select * from mdl_user_balance "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $sum = $row['balance_sum'];
+            } // end while
+        } // end if $num>0
+        else {
+            $sum = 'n/a';
+        }
+        return $sum;
+    }
+
+    function update_user_balance($courseid, $userid) {
+        $query = "update mdl_user_balance "
+                . "set balance_sum='0' "
+                . "where courseid=$courseid and userid=$userid";
+        //echo $query;
+        $this->db->query($query);
+    }
+
     function renew_certificate() {
         $courseid = $this->get_user_course($this->user->id);
+        $sum = $this->check_user_balance($courseid, $this->user->id);
+        if ($sum > 0) {            
+            $user = $this->get_user_details($this->user->id);
+            $cert = new Certificates();
+            $date=$cert->get_course_completion($courseid, $this->user->id, TRUE);
+            $new_date=$date+31536000;
+            $cert->send_certificate($courseid, $this->user->id, $new_date);
+            $this->update_user_balance($courseid, $this->user->id);
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9'>New Certificate has been sent to $user->email.</span>";
+            $list.="</div>";
+        } // end if $sum>0
+        else {
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9'>Your balance does not contain enough funds to renew certificate.</span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9'>Certificate renew is a paid service. Please click <a href='#' onClick='return false;' id='send_invoice_renew'>here</a> to get Certificate Renew invoice. Once invoice will be paid you will be able to Renew Certificate</span>";
+            $list.="</div>";
+            return $list;
+        }
+        return $list;
+    }
+
+    function send_invoice_for_renew() {
+        $courseid = $this->get_user_course($this->user->id);
+        $invoice = new Invoice();
+        $path = $invoice->send_renew_invoice($courseid, $this->user->id);
+        //echo "Invoice path: ".$path."<br>";
+        $userdata = $this->get_user_details($this->user->id);
+        $user = new stdClass();
+        $user->first_name = $userdata->firstname;
+        $user->last_name = $userdata->lastname;
+        $user->email = $userdata->email;
+        $user->invoice = $path;
+
+        $mailer = new Mailer();
+        $mailer->send_invoice($user);
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span9'>Invoice has been sent to $user->email.</span>";
+        $list.="</div>";
+        return $list;
     }
 
 }

@@ -400,6 +400,36 @@ class Invoices extends Util {
                 . "where id=$id";
         $this->db->query($query);
 
+        if ($invoice->renew == 1) {
+            $query = "select * from mdl_user_balance "
+                    . "where courseid=$invoice->courseid "
+                    . "and userid=$invoice->userid";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $query = "update mdl_user_balance "
+                        . "set balance_sum='$invoice->i_sum' "
+                        . "where courseid=$invoice->courseid "
+                        . "and userid=$invoice->userid";
+                $this->db->query($query);
+            } // end if $num>0
+            else {
+                $query = "insert into mdl_user_balance "
+                        . "(userid,"
+                        . "courseid,"
+                        . "is_certified,"
+                        . "cert_no,"
+                        . "cert_exp,"
+                        . "balance_sum) "
+                        . "values ('$invoice->userid',"
+                        . "'$invoice->courseid',"
+                        . "1,"
+                        . "'/$invoice->courseid/certificate.pdf',"
+                        . "1,"
+                        . "'$invoice->i_sum')";
+                $this->db->query($query);
+            } // end else 
+        } // end if $invoice->renew==1
+        
         //5. Add log entry
         $query = "insert into "
                 . "mdl_payments_log "

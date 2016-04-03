@@ -163,15 +163,21 @@ class Certificates extends Util {
 		return $list;
 	}
 
-	function get_course_completion($courseid, $userid) {
+	function get_course_completion($courseid, $userid, $raw=false) {
 		$date = 0;
 		$query = "select * from mdl_course_completions where "
 		. "course=$courseid and userid=$userid";
+                //echo "Query: ".$query."<br>";
 		$num = $this->db->numrows($query);
 		if ($num > 0) {
 			$result = $this->db->query($query);
 			while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-				$date = date('Y-m-d', $row['timecompleted']);
+                            if ($raw==FALSE) {
+                                $date = date('Y-m-d', $row['reaggregate']);
+                            } // end if $raw==FALSE
+                            else {
+                                $date=$row['reaggregate'];
+                            }                            
 			} // end while
 		} // end if $num > 0)
 		return $date;
@@ -206,7 +212,8 @@ class Certificates extends Util {
 		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 			$name=$row['fullname'];
 		}
-		$course_name=trim(str_replace('Workshop', '', $name));
+		//$course_name=trim(str_replace('Workshop', '', $name));
+                $course_name=$name;
 		$date = time();
 		$day = date('d', $date);
 		$month = date('m', $date);
@@ -234,6 +241,7 @@ class Certificates extends Util {
 		$year = date('Y', $date);
 		$renew_status = $this->get_course_renew_status($courseid);
 		$code=$this->get_course_code($courseid, $userid);
+                //echo "Certificate code: ".$code."<br>";
 		if ($renew_status == 1) {
 			$expiration_date_sec = $date + 31536000;
 		}
@@ -302,7 +310,8 @@ class Certificates extends Util {
 	}
 
 	function send_certificate($courseid, $userid, $date = 0) {
-		if ($date == 0) { // course is not yet completed
+		//echo "Date: ".$date."<br>";
+                if ($date == 0) { // course is not yet completed
 			$date = $this->get_user_course_entollment_date($courseid, $userid);
 		} // end if $date == 0
 		$renew_status = $this->get_course_category($courseid);

@@ -707,7 +707,7 @@ $(document).ready(function () {
         else {
             $('#workshop_report_err').html("<span style='color:red;'>Please select workshop and dates</span>");
         }
-    }   
+    }
 
     function get_certificate() {
         var url = "/lms/custom/nav/get_certificate.php";
@@ -721,6 +721,15 @@ $(document).ready(function () {
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
+    }
+
+    function send_invoice_renew() {
+        if (confirm('Send invoice?')) {
+            var url = "/lms/custom/nav/send_renew_certificate.php";
+            $.post(url, {id: 1}).done(function (data) {
+                $('#region-main').html(data);
+            });
+        } // end if confirm
     }
 
     /**********************************************************************
@@ -848,6 +857,10 @@ $(document).ready(function () {
 
         if (event.target.id == 'program_report_export') {
             export_program_report();
+        }
+
+        if (event.target.id == 'send_invoice_renew') {
+            send_invoice_renew();
         }
 
 
