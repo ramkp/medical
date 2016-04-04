@@ -1,22 +1,18 @@
 <?php
 
 ini_set('display_errors', '1');
-require_once($_SERVER['DOCUMENT_ROOT'] . '/lms/class.database.php');
-require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/payments/Api/vendor/autoload.php');
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Api/vendor/autoload.php');
 
 use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
 
 class ProcessPayment {
-
-    private $db;
-    //public $PAYMENT_SUM = '20.00';
+    
     private $AUTHORIZENET_LOG_FILE;
     private $LOGIN_ID = '6cUTfQ5238'; // sandbox data
     private $TRANSACTION_KEY = '4qNhCM92j6h6g69Z'; // sandbox data
 
-    function __construct() {
-        $this->db = DB::getInstance();
+    function __construct() {       
         $this->AUTHORIZENET_LOG_FILE = 'phplog';
     }
 
@@ -36,56 +32,6 @@ class ProcessPayment {
         $payment = new AnetAPI\PaymentType();
         $payment->setCreditCard($creditCard);
         return $payment;
-    }
-
-    function create_profile($order) {
-        $names = explode(" ", $order->cds_name);
-        $billto = new AnetAPI\CustomerAddressExType();
-        $billto->setFirstName($names[0]);
-        $billto->setLastName($names[1]);
-        $billto->setCompany("Student");
-        $billto->setAddress($order->cds_address_1);
-        $billto->setCity($order->cds_city);
-        $billto->setState($order->cds_state);
-        $billto->setZip($order->cds_zip);
-        $billto->setCountry("USA");
-
-        // Create a Customer Profile Request
-        //  1. create a Payment Profile
-        //  2. create a Customer Profile   
-        //  3. Submit a CreateCustomerProfile Request
-        //  4. Validate Profiiel ID returned
-
-        $payment = $this->prepare_order($order);
-        $paymentprofile = new AnetAPI\CustomerPaymentProfileType();
-        $paymentprofile->setCustomerType('individual');
-        $paymentprofile->setBillTo($billto);
-        $paymentprofile->setPayment($payment);
-        $paymentprofiles[] = $paymentprofile;
-        $customerprofile = new AnetAPI\CustomerProfileType();
-        $customerprofile->setDescription($order->cds_name);
-        $merchantCustomerId = time() . rand(1, 150);
-        $customerprofile->setMerchantCustomerId($merchantCustomerId);
-        $customerprofile->setEmail($order->cds_email);
-        $customerprofile->setPaymentProfiles($paymentprofiles);
-
-        $refId = 'ref' . time();
-        $merchantAuthentication = $this->authorize();
-        $request = new AnetAPI\CreateCustomerProfileRequest();
-        $request->setMerchantAuthentication($merchantAuthentication);
-        $request->setRefId($refId);
-        $request->setProfile($customerprofile);
-        $controller = new AnetController\CreateCustomerProfileController($request);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
-        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
-            echo "SUCCESS: PROFILE ID : " . $response->getCustomerProfileId() . "\n";
-            echo "SUCCESS: PAYMENT PROFILE ID : " . $response->getCustomerPaymentProfileIdList()[0] . "\n";
-            echo "<br/><br/><br/>";
-        } else {
-            echo "ERROR :  Invalid response\n";
-            echo "Response : " . $response->getMessages()->getMessage()[0]->getCode() . "  " . $response->getMessages()->getMessage()[0]->getText() . "\n";
-            echo "<br/><br/><br/>";
-        }
     }
 
     function make_transaction($post_order) {
@@ -169,17 +115,19 @@ class ProcessPayment {
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
             
+              /*
               echo "<pre>";
               print_r($tresponse);
               echo "</pre>";
+              */
             
             if (($tresponse != null) && ($tresponse->getResponseCode() == "1")) {
                 //echo "Charge Credit Card AUTH CODE : " . $tresponse->getAuthCode() . "\n";
                 //echo "Charge Credit Card TRANS ID  : " . $tresponse->getTransId() . "\n";
                 $status = array('auth_code' => $tresponse->getAuthCode(),
                     'trans_id' => $tresponse->getTransId(),
-                    'response_code' => $tresponse->getResponseCode(),
-                    'sum' => $this->PAYMENT_SUM);
+                    'auth_code' => $tresponse->getResponseCode(),
+                    'sum' => $post_order->sum);
                 return $status;
             } else {
                 //echo "Charge Credit Card ERROR :  Invalid response\n";

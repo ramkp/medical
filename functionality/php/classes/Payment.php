@@ -1016,7 +1016,7 @@ class Payment {
             else {
                 $card->transid = $status['trans_id'];
                 $card->auth_code = $status['auth_code'];                              
-                $mailer->send_payment_confirmation_message($card, 1);
+                $mailer->send_payment_confirmation_message($card, 1); // payment confrnation email to group owner
                 $list.="<div class='panel panel-default' id='personal_payment_details'>";
                 $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
                 $list.="<div class='panel-body'>";
