@@ -1,0 +1,6 @@
+authorize.net API Login & transaction key 
+
+API Login ID: 6cUTfQ5238
+Transaction key: 4qNhCM92j6h6g69Z
+
+Please be aware this is sandbox data for testing purposes only.
