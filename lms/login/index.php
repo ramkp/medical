@@ -35,6 +35,9 @@ $CFG->additionalhtmlhead .= '<meta name="robots" content="noindex" />';
 
 redirect_if_major_upgrade_required();
 
+//echo "<br><p align='center'>Your account is not active. Please contact support support@cnausa.com.</p>";
+//die();
+
 $testsession = optional_param('testsession', 0, PARAM_INT); // test session works properly
 $cancel      = optional_param('cancel', 0, PARAM_BOOL);      // redirect to frontpage, needed for loginhttps
 

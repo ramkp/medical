@@ -113,7 +113,8 @@ class Mailer {
     }
 
     function send_invoice($user, $gowner = null) {
-        $subject = "Medical2 Career College - invoice";
+        //print_r($user);
+    	$subject = "Medical2 Career College - invoice";
         $message = $this->get_invoice_message($user, $gowner);
         $recipient = $user->email;
         $this->send_email($subject, $message, $recipient, $user->invoice);

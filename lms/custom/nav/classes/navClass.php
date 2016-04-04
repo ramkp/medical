@@ -12,35 +12,35 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php'
 
 class navClass extends Util {
 
-    function get_navigation_items($userid) {
-        $top_menu = "";
-        if ($userid == 2) {
-            // This is Admin
-            $top_menu = $this->get_admin_menu_items($userid);
-        }// end if $userid==2
-        else {
-            $roleid = $this->get_user_role($userid);
-            if ($roleid == 1) {
-                // Manager
-                $top_menu = $this->get_manager_menu();
-            } // end if $roleid==1
-            if ($roleid == 3 || $roleid == 4) {
-                // Tutors
-                $top_menu = $this->get_tutors_menu_items();
-            } // end if $roleid == 3 || $roleid == 4
-            if ($roleid == 5) {
-                // Students
-                $top_menu = $this->get_students_menu_items();
-            } // end if $roleid == 5
-        }
-        return $top_menu;
-    }
+	function get_navigation_items($userid) {
+		$top_menu = "";
+		if ($userid == 2) {
+			// This is Admin
+			$top_menu = $this->get_admin_menu_items($userid);
+		}// end if $userid==2
+		else {
+			$roleid = $this->get_user_role($userid);
+			if ($roleid == 1) {
+				// Manager
+				$top_menu = $this->get_manager_menu();
+			} // end if $roleid==1
+			if ($roleid == 3 || $roleid == 4) {
+				// Tutors
+				$top_menu = $this->get_tutors_menu_items();
+			} // end if $roleid == 3 || $roleid == 4
+			if ($roleid == 5) {
+				// Students
+				$top_menu = $this->get_students_menu_items();
+			} // end if $roleid == 5
+		}
+		return $top_menu;
+	}
 
-    function get_manager_menu() {
-        $userid = $this->user->id;
-        $list = "";
-        $price_items = $this->get_price_items();
-        $list = $list . "<header role='banner' class='navbar'>
+	function get_manager_menu() {
+		$userid = $this->user->id;
+		$list = "";
+		$price_items = $this->get_price_items();
+		$list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
                 <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
@@ -107,14 +107,14 @@ class navClass extends Util {
             </div>
         </nav>
     </header>";
-        return $list;
-    }
+                            return $list;
+	}
 
-    function get_admin_menu_items() {
-        $userid = $this->user->id;
-        $list = "";
-        $price_items = $this->get_price_items();
-        $list = $list . "<header role='banner' class='navbar'>
+	function get_admin_menu_items() {
+		$userid = $this->user->id;
+		$list = "";
+		$price_items = $this->get_price_items();
+		$list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
                 <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
@@ -192,42 +192,42 @@ class navClass extends Util {
             </div>
         </nav>
     </header>";
-        return $list;
-    }
+                            return $list;
+	}
 
-    function get_price_items() {
-        $list = "";
-        $list = $list . "<ul class='dropdown-menu' id='prices'>";
-        $query = "select id,name from mdl_course_categories order by id ";
-        $num = $this->db->numrows($query);
-        if ($num) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list = $list . "<li><a href='' title='" . $row['name'] . "' id='" . $row['id'] . "' onClick='return false;'>" . $row['name'] . "</a></li>";
-            } // end while
-        } // end if $num)
-        else {
-            $list = $list . "<li><a href='' title='There are no price items' >There are no price items</a></li>";
-        }
-        $list = $list . "</ul>";
-        return $list;
-    }
+	function get_price_items() {
+		$list = "";
+		$list = $list . "<ul class='dropdown-menu' id='prices'>";
+		$query = "select id,name from mdl_course_categories order by id ";
+		$num = $this->db->numrows($query);
+		if ($num) {
+			$result = $this->db->query($query);
+			while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+				$list = $list . "<li><a href='' title='" . $row['name'] . "' id='" . $row['id'] . "' onClick='return false;'>" . $row['name'] . "</a></li>";
+			} // end while
+		} // end if $num)
+		else {
+			$list = $list . "<li><a href='' title='There are no price items' >There are no price items</a></li>";
+		}
+		$list = $list . "</ul>";
+		return $list;
+	}
 
-    function is_course_expired($courseid) {
-        $query = "select expired from mdl_course where id=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $expired = $row['expired'];
-        }
-        return $expired;
-    }
+	function is_course_expired($courseid) {
+		$query = "select expired from mdl_course where id=$courseid";
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$expired = $row['expired'];
+		}
+		return $expired;
+	}
 
-    function get_students_menu_items() {
-        $userid = $this->user->id;
-        $courseid = $this->get_user_course($userid);
-        $expired = $this->is_course_expired($courseid);
-        $list = "";
-        $list = $list . "<header role='banner' class='navbar'>
+	function get_students_menu_items() {
+		$userid = $this->user->id;
+		$courseid = $this->get_user_course($userid);
+		$expired = $this->is_course_expired($courseid);
+		$list = "";
+		$list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
                 <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
@@ -243,10 +243,10 @@ class navClass extends Util {
                         <li class='dropdown'><a href='#cm_submenu_2' class='dropdown-toggle' title='Cerrtificate'>Certtificate<b class='caret'></b></a>                        
                         <ul class='dropdown-menu' style='display: none;'>                                            
                         <li><a title='Get Certificate' id='get_cert' href='#'>Get Certificate</a></li>";
-        if ($expired != 0) {
-            $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>Renew Certificate</a></li>";
-        }
-        $list.="</ul>
+		if ($expired != 0) {
+			$list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>Renew Certificate</a></li>";
+		}
+		$list.="</ul>
                         </li>                        
                     </ul>                            
                     <div class='nav-collapse collapse'>
@@ -270,13 +270,13 @@ class navClass extends Util {
             </div>
         </nav>
     </header>";
-        return $list;
-    }
+		return $list;
+	}
 
-    function get_tutors_menu_items() {
-        $userid = $this->user->id;
-        $list = "";
-        $list = $list . "<header role='banner' class='navbar'>
+	function get_tutors_menu_items() {
+		$userid = $this->user->id;
+		$list = "";
+		$list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
                 <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
@@ -311,152 +311,160 @@ class navClass extends Util {
             </div>
         </nav>
     </header>";
-        return $list;
-    }
+		return $list;
+	}
 
-    function get_user_creation_time($userid) {
-        $query = "select timecreated from mdl_user where id=$userid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $timecreated = $row['timecreated'];
-        }
-        return $timecreated;
-    }
+	function get_user_creation_time($userid) {
+		$query = "select timecreated from mdl_user where id=$userid";
+		//echo "Query: ".$query."<br>";
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$timecreated = $row['timecreated'];
+		}
+		return $timecreated;
+	}
 
-    function get_user_course($userid) {
-        $timecreated = $this->get_user_creation_time($userid);
-        $query = "select * from mdl_role_assignments "
-                . "where roleid=5 and userid=$userid "
-                . "and timemodified='$timecreated'";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $contextid = $row['contextid'];
-        }
+	function get_user_course($userid) {
+		$timecreated = $this->get_user_creation_time($userid);
+		$query = "select * from mdl_role_assignments "
+		. "where roleid=5 and userid=$userid "
+		. "and timemodified='$timecreated'";
+		//echo "Query: ".$query."<br>";
+		$num = $this->db->numrows($query);
+		if ($num== 0) {
+			$query = "select * from mdl_role_assignments "
+			. "where roleid=5 and userid=$userid ";			
+		}
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$contextid = $row['contextid'];
+		}
 
-        $query = "select * from mdl_context where id=$contextid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $courseid = $row['instanceid'];
-        }
-        return $courseid;
-    }
+		$query = "select * from mdl_context where id=$contextid";
+		//echo "Query: ".$query."<br>";
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$courseid = $row['instanceid'];
+		}
+		return $courseid;
+	}
 
-    function is_course_completed($courseid, $userid) {
-        $query = "select * from mdl_course_completions "
-                . "where course=$courseid and userid=$userid";
-        $num = $this->db->numrows($query);
-        return $num;
-    }
+	function is_course_completed($courseid, $userid) {
+		$query = "select * from mdl_course_completions "
+		. "where course=$courseid and userid=$userid";
+		$num = $this->db->numrows($query);
+		return $num;
+	}
 
-    function get_course_completion_date($courseid, $userid) {
-        $query = "select * from mdl_course_completions "
-                . "where course=$courseid and userid=$userid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $completed = $row['timestarted'];
-        }
-        return $completed;
-    }
+	function get_course_completion_date($courseid, $userid) {
+		$query = "select * from mdl_course_completions "
+		. "where course=$courseid and userid=$userid";
+		$result = $this->db->query($query);
+		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+			$completed = $row['timestarted'];
+		}
+		return $completed;
+	}
 
-    function get_certificate() {
-        $list = "";
-        $courseid = $this->get_user_course($this->user->id);
-        $completion_status = $this->is_course_completed($courseid, $this->user->id);
-        if ($completion_status == 0) {
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>You still did not completed the course, certificate is not available.</span>";
-            $list.="</div>";
-        } // end if $compleation_status!=0
-        else {
-            $date = $this->get_course_completion_date($courseid, $this->user->id);
-            $now = time(); // secs
-            $year_expiration_sec = 28512000; // 11 month expiration in secs
-            $diff = $now - $date;
-            if ($diff < $year_expiration_sec) {
-                $user = $this->get_user_details($this->user->id);
-                $cert = new Certificates();
-                $cert->send_certificate($courseid, $this->user->id, $date);
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span9'>Certificate has been sent to $user->email.</span>";
-                $list.="</div>";
-            } // end if $diff<$year_expiration_sec
-            else {
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span9'>Your Certificate almost expire, please use renew option</span>";
-                $list.="</div>";
-            } // end else 
-        }
-        return $list;
-    }
+	function get_certificate() {
+		$list = "";
+		$courseid = $this->get_user_course($this->user->id);
+		$completion_status = $this->is_course_completed($courseid, $this->user->id);
+		if ($completion_status == 0) {
+			$list.="<div class='container-fluid'>";
+			$list.="<span class='span9'>You still did not completed the course, certificate is not available.</span>";
+			$list.="</div>";
+		} // end if $compleation_status!=0
+		else {
+			$date = $this->get_course_completion_date($courseid, $this->user->id);
+			$now = time(); // secs
+			$year_expiration_sec = 28512000; // 11 month expiration in secs
+			$diff = $now - $date;
+			if ($diff < $year_expiration_sec) {
+				$user = $this->get_user_details($this->user->id);
+				$cert = new Certificates();
+				$cert->send_certificate($courseid, $this->user->id, $date);
+				$list.="<div class='container-fluid'>";
+				$list.="<span class='span9'>Certificate has been sent to $user->email.</span>";
+				$list.="</div>";
+			} // end if $diff<$year_expiration_sec
+			else {
+				$list.="<div class='container-fluid'>";
+				$list.="<span class='span9'>Your Certificate almost expire, please use renew option</span>";
+				$list.="</div>";
+			} // end else
+		}
+		return $list;
+	}
 
-    function check_user_balance($courseid, $userid) {
-        $query = "select * from mdl_user_balance "
-                . "where courseid=$courseid and userid=$userid";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $sum = $row['balance_sum'];
-            } // end while
-        } // end if $num>0
-        else {
-            $sum = 'n/a';
-        }
-        return $sum;
-    }
+	function check_user_balance($courseid, $userid) {
+		$query = "select * from mdl_user_balance "
+		. "where courseid=$courseid and userid=$userid";
+		$num = $this->db->numrows($query);
+		if ($num > 0) {
+			$result = $this->db->query($query);
+			while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+				$sum = $row['balance_sum'];
+			} // end while
+		} // end if $num>0
+		else {
+			$sum = 'n/a';
+		}
+		return $sum;
+	}
 
-    function update_user_balance($courseid, $userid) {
-        $query = "update mdl_user_balance "
-                . "set balance_sum='0' "
-                . "where courseid=$courseid and userid=$userid";
-        //echo $query;
-        $this->db->query($query);
-    }
+	function update_user_balance($courseid, $userid) {
+		$query = "update mdl_user_balance "
+		. "set balance_sum='0' "
+		. "where courseid=$courseid and userid=$userid";
+		//echo $query;
+		$this->db->query($query);
+	}
 
-    function renew_certificate() {
-        $courseid = $this->get_user_course($this->user->id);
-        $sum = $this->check_user_balance($courseid, $this->user->id);
-        if ($sum > 0) {            
-            $user = $this->get_user_details($this->user->id);
-            $cert = new Certificates();
-            $date=$cert->get_course_completion($courseid, $this->user->id, TRUE);
-            $new_date=$date+31536000;
-            $cert->send_certificate($courseid, $this->user->id, $new_date);
-            $this->update_user_balance($courseid, $this->user->id);
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>New Certificate has been sent to $user->email.</span>";
-            $list.="</div>";
-        } // end if $sum>0
-        else {
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Your balance does not contain enough funds to renew certificate.</span>";
-            $list.="</div>";
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Certificate renew is a paid service. Please click <a href='#' onClick='return false;' id='send_invoice_renew'>here</a> to get Certificate Renew invoice. Once invoice will be paid you will be able to Renew Certificate</span>";
-            $list.="</div>";
-            return $list;
-        }
-        return $list;
-    }
+	function renew_certificate() {
+		$courseid = $this->get_user_course($this->user->id);
+		$sum = $this->check_user_balance($courseid, $this->user->id);
+		if ($sum > 0) {
+			$user = $this->get_user_details($this->user->id);
+			$cert = new Certificates();
+			$date=$cert->get_course_completion($courseid, $this->user->id, TRUE);
+			$new_date=$date+31536000;
+			$cert->send_certificate($courseid, $this->user->id, $new_date);
+			$this->update_user_balance($courseid, $this->user->id);
+			$list.="<div class='container-fluid'>";
+			$list.="<span class='span9'>New Certificate has been sent to $user->email.</span>";
+			$list.="</div>";
+		} // end if $sum>0
+		else {
+			$list.="<div class='container-fluid'>";
+			$list.="<span class='span9'>Your balance does not contain enough funds to renew certificate.</span>";
+			$list.="</div>";
+			$list.="<div class='container-fluid'>";
+			$list.="<span class='span9'>Certificate renew is a paid service. Please click <a href='#' onClick='return false;' id='send_invoice_renew'>here</a> to get Certificate Renew invoice. Once invoice will be paid you will be able to Renew Certificate</span>";
+			$list.="</div>";
+			return $list;
+		}
+		return $list;
+	}
 
-    function send_invoice_for_renew() {
-        $courseid = $this->get_user_course($this->user->id);
-        $invoice = new Invoice();
-        $path = $invoice->send_renew_invoice($courseid, $this->user->id);
-        //echo "Invoice path: ".$path."<br>";
-        $userdata = $this->get_user_details($this->user->id);
-        $user = new stdClass();
-        $user->first_name = $userdata->firstname;
-        $user->last_name = $userdata->lastname;
-        $user->email = $userdata->email;
-        $user->invoice = $path;
+	function send_invoice_for_renew() {
+		$courseid = $this->get_user_course($this->user->id);
+		$invoice = new Invoice();
+		$path = $invoice->send_renew_invoice($courseid, $this->user->id);
+		//echo "Invoice path: ".$path."<br>";
+		$userdata = $this->get_user_details($this->user->id);
+		$user = new stdClass();
+		$user->first_name = $userdata->firstname;
+		$user->last_name = $userdata->lastname;
+		$user->email = $userdata->email;
+		$user->invoice = $path;
 
-        $mailer = new Mailer();
-        $mailer->send_invoice($user);
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Invoice has been sent to $user->email.</span>";
-        $list.="</div>";
-        return $list;
-    }
+		$mailer = new Mailer();
+		$mailer->send_invoice($user);
+		$list.="<div class='container-fluid'>";
+		$list.="<span class='span9'>Invoice has been sent to $user->email.</span>";
+		$list.="</div>";
+		return $list;
+	}
 
 }

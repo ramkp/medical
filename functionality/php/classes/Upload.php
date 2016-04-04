@@ -66,12 +66,16 @@ class Upload {
 
     function upload_users_file($files) {
         $file = $files[0];
+        //echo "Input file: ".$file."<br>";
         if ($file['error'] == 0 && $file['size'] > 0) {
-            $status = $this->check_file_structure($file);
+            // echo "Inside when file is uploaded <br>";
+        	$status = $this->check_file_structure($file);
+        	// echo "<br>File verification status: ".$status."<br>";
             if ($status > 0) {
                 // File structure is ok we can move it to safe place
                 $filename = time() . rand(10, 175);
                 $full_file_path = $this->dir_path . '/' . $filename . '.csv';
+                //echo "New file name: ".$full_file_path."<br>";
                 move_uploaded_file($file['tmp_name'], $full_file_path);
                 $_SESSION["file_path"] = $full_file_path;
             } // end if $status
@@ -87,14 +91,19 @@ class Upload {
     }
 
     function check_file_structure($file) {
-        $status = NULL;
+        //print_r($file);
+    	$status = NULL;
         $counter = 0;
         $handle = fopen($file['tmp_name'], "r");
         if ($handle) {
             while (($line = fgets($handle)) !== false) {
                 $items = explode(",", $line);
-                if ($items[0] != '' && $items[1] != '' && $this->check_email($items[2]) == true && $items[3] != '') {
-                    $counter++;
+               // echo "<br>-----------<br>";
+               // print_r($items);
+               // echo "<br>-----------<br>";
+                if ($items[0] != '' && $items[1] != '' && $items[2]!='' && $items[3] != '') {
+                   // echo "<br>Inside counter ...<br>";
+                	$counter++;
                 } // end if $items[0]!='' && $items[1]!=''                
             } // end while            
             $status = ($counter > 0) ? $counter : "Incorrect file structure";
@@ -108,17 +117,18 @@ class Upload {
 
     function get_users_file_data() {
         $filepath = $_SESSION["file_path"];
+        //echo "File path: ".$filepath."<br>";
         $users = array();
         $handle = fopen($filepath, "r");
         if ($handle) {
             while (($line = fgets($handle)) !== false) {
                 $items = explode(",", $line);
-                if ($items[0] != '' && $items[1] != '' && $this->check_email($items[2]) == true && $items[3] != '') {
+                if ($items[0] != '' && $items[1] != '' && $items[2]!='' && $items[3] != '') {
                     $user = new stdClass();
-                    $user->first_name = $items[0];
-                    $user->last_name = $items[1];
-                    $user->email = $items[2];
-                    $user->phone = $items[3];
+                    $user->first_name = trim($items[0]);
+                    $user->last_name = trim($items[1]);
+                    $user->email = trim($items[2]);
+                    $user->phone = trim($items[3]);
                     $users[] = $user;
                 } // end if $items[0]!='' && $items[1]!=''                
             } // end while            

@@ -305,6 +305,10 @@ class Payment {
     function get_group_payment_section_file($group_common_section) {
         $upload = new Upload();
         $users = $upload->get_users_file_data();
+        //echo "<br>----------------<br>";
+        //print_r($users);
+        //echo "<br>----------------<br>";
+        
         $tot_participants = count($users);
         $groupid = $this->enroll->create_course_group($group_common_section->courseid, $group_common_section->group_name);
 
@@ -524,6 +528,7 @@ class Payment {
 
             if ($payment_option == 'online_group_members_payment') {
                 $mailer = new Mailer();
+                //print_r($users);
                 foreach ($users as $user) {
                     $user->id = $this->get_user_id_by_email($user->email);
                     $user->courseid = $group_data->courseid;

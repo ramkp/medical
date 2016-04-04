@@ -116,14 +116,17 @@ $(document).ready(function () {
                 contentType: false,
                 type: 'POST',
                 success: function (data) {
-                    if (data > 0) {
-                        $('#upload_err').html('');
+            	console.log(data);
+            			if (data > 0) {
+            			// It means we have valid users in file >0	
+                    	$('#upload_err').html('');
                         var selected_course = $('#courses').text();
                         var course_name = selected_course.trim();
                         var course_url = "http://"+domain+"/functionality/php/get_course_id.php";
                         var request = {course_name: course_name};
                         $.post(course_url, request).done(function (courseid) {
-                            var addr = $('#group_addr').val();
+                        	$('#ajax_loading_group_file').hide();
+                        	var addr = $('#group_addr').val();
                             var inst = $('#group_inst').val();
                             var zip = $('#group_zip').val();
                             var city = $('#group_city').val();
@@ -1315,7 +1318,8 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'start_upload') {
-            verify_users_upload_form();
+            //console.log();
+        	verify_users_upload_form();
         }
 
         if (event.target.id == 'send_group_invoice') {

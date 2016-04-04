@@ -386,6 +386,7 @@ class Invoice {
         else {
             // Group registration
             $item_block = "$user_data->group_name<br/> payment for $item_name";
+            //$item_block = "$user_data->firstname $user_data->lastname<br/> payment for $item_name";
             $list.="<tr>";
             $list.="<td colspan='3'>$user_data->group_name<br/>$user_data->address<br/> $user_data->state" . "/" . $user_data->city . "<br/>$user_data->zip</td>";
             $list.="</tr>";
