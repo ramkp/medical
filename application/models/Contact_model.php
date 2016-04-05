@@ -36,7 +36,7 @@ class Contact_model extends CI_Model {
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'><button class='btn btn-primary' id='contact_button'>Submit</button></span>";
-        $list.="<span class='span3' id='contact_result'></span>";
+        $list.="<span class='span6' id='contact_result'></span>";
         $list.="</div>";
 
         $list.="</div>"; // end of panel-body

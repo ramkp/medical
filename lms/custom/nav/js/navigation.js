@@ -732,6 +732,29 @@ $(document).ready(function () {
         } // end if confirm
     }
 
+    function get_renew_fee_page() {
+        var url = "/lms/custom/payments/get_renew_fee_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function update_renew_fee() {
+        var fee = $('#renew_fee2').val();        
+        //var renew_fee=fee.trim();
+        var renew_fee=fee;
+        console.log('Fee: '+renew_fee);
+        if (renew_fee > 0) {
+            var url = "/lms/custom/payments/update_renew_fee.php";
+            $.post(url, {fee: renew_fee}).done(function (data) {
+                $('#fee_err').html(data);
+            });
+        } // end if fee>0
+        else {
+            $('#fee_err').html('Please provide correct renew fee');
+        }
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -816,6 +839,10 @@ $(document).ready(function () {
 
         if (event.target.id == 'print_cert') {
             print_certificate();
+        }
+
+        if (event.target.id == 'update_renew_fee') {
+            update_renew_fee();
         }
 
 
@@ -1009,8 +1036,6 @@ $(document).ready(function () {
         get_payment_log_page();
     });
 
-    //payments_report     
-
     $("#cash").click(function (event) {
         update_navigation_status__menu('Cash payments');
         get_cash_payments_page()
@@ -1062,6 +1087,12 @@ $(document).ready(function () {
         update_navigation_status__menu('Renew Certificate');
         renew_certificate();
     });
+
+    $("#renew_fee").click(function (event) {
+        update_navigation_status__menu('Renew Fee');
+        get_renew_fee_page();
+    });
+
 
 }); // end of $(document).ready(function()
 

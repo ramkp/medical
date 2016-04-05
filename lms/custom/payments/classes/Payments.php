@@ -306,4 +306,27 @@ class Payments extends Util {
         return $list;
     }
 
+    function get_renew_fee_page() {
+        $list = "";
+        $query = "select * from mdl_renew_fee where id=1";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $fee = $row['fee_sum'];
+        }
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span3'>Renew Fee Amount</span><span class='span3'><input type='text' id='renew_fee2' name='renew_fee2' value='$fee' style='width:45px;'></span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span3'><button type='button' id='update_renew_fee' class='btn btn-primary'>Update</button></span><span class='span5' id='fee_err'></span>";
+        $list.="</div>";
+        return $list;
+    }
+    
+    function update_renew_fee ($fee) {
+        $query="update mdl_renew_fee set fee_sum='$fee' where id=1";
+        $this->db->query($query);
+        $list="Item successfully updated";
+        return $list;
+    }
+
 }

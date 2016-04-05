@@ -20,6 +20,7 @@ class navClass extends Util {
 		}// end if $userid==2
 		else {
 			$roleid = $this->get_user_role($userid);
+                        //echo "Role ID: ".$roleid."<br>";
 			if ($roleid == 1) {
 				// Manager
 				$top_menu = $this->get_manager_menu();
@@ -78,6 +79,8 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
+                                    <li><a href='#' title='About' id='about'>About page</a></li>
+                                    <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
                                     <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>
@@ -161,8 +164,9 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
-                                	<li><a href='#' title='About' id='about'>About page</a></li>
-                                	<li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
+                                    <li><a href='#' title='About' id='about'>About page</a></li>
+                                    <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
+                                    <li><a href='#' title='Renew fee' id='renew_fee'>Renew Fee</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
                                     <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>
