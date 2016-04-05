@@ -243,11 +243,16 @@ class Report extends Util {
 	}
 
 	function get_revenue_report_data($courseid, $from, $to, $status = true, $output = true) {
-		$this->courseid=$courseid;
+		//echo "From: ".$from."<br>";
+                //echo "To: ".$to."<br>";                
+                $this->courseid=$courseid;
 		$this->from=$from;
 		$this->to=$to;
 		$list = "";
 		$list2 = "";
+                $one_day_sec=86400;
+                $unix_to=strtotime($to);
+                $query_to=$unix_to+$one_day_sec;
 		$coursename = $this->get_course_name($courseid);
 		if ($status == true) {
 			$list.="<div class='container-fluid' style='font-weight:bold'>";
@@ -258,7 +263,7 @@ class Report extends Util {
 		$query = "select * from mdl_card_payments "
 		. "where courseid=$courseid "
 		. "and pdate>='" . strtotime($from) . "' "
-		. "and pdate<='" . strtotime($to) . "'  "
+		. "and pdate<='" . $query_to . "'  "
 		. "order by pdate desc ";
 		//echo "<br/>Query: $query<br/>";
 		$num = $this->db->numrows($query);
@@ -276,7 +281,7 @@ class Report extends Util {
 		. "where courseid=$courseid  "
 		. "and i_status=1 "
 		. "and i_pdate>='" . strtotime($from) . "' "
-		. "and i_pdate<='" . strtotime($to) . "' "
+		. "and i_pdate<='" . $query_to . "' "
 		. "and i_ptype=1";
 		//echo "<br/>Query: $query<br/>";
 		$num = $this->db->numrows($query);
@@ -294,7 +299,7 @@ class Report extends Util {
 		. "where courseid=$courseid  "
 		. "and i_status=1 "
 		. "and i_pdate>='" . strtotime($from) . "' "
-		. "and i_pdate<='" . strtotime($to) . "' "
+		. "and i_pdate<='" . $query_to . "' "
 		. "and i_ptype=2";
 		//echo "<br/>Query: $query<br/>";
 		$num = $this->db->numrows($query);
@@ -315,7 +320,7 @@ class Report extends Util {
 		$list2.="<span class='span3'>Cash</span><span class='span1'>$$this->cash_sum</span>";
 		$list2.="</div>";
 		$list2.="<div class='container-fluid' style='padding-right:0px;'>";
-		$list2.="<span class='span3'>Cheque</span><span class='span1'>$this->cheque_sum</span>";
+		$list2.="<span class='span3'>Cheque</span><span class='span1'>$$this->cheque_sum</span>";
 		$list2.="</div>";
 		$list2.="<div class='container-fluid' style='font-weight:bold;' style='padding-right:0px;'>";
 		$list2.="<span class='span3'>Total</span><span class='span1'>$$grand_total</span>";
@@ -474,11 +479,18 @@ class Report extends Util {
 			$list.="</div>";
 		}
 		$users = $this->get_course_users($courseid, false);
+                $one_day_sec=86400;
+                $unix_to=strtotime($to);
+                $query_to=$unix_to+$one_day_sec;
+                //echo "From :".$from."<br>";
+                //echo "To: ".$to."<br>";
 		if (count($users) > 0) {
 			$this->get_program_payments($courseid, $from, $to);
 			foreach ($users as $user) {
 				$signup_date = $this->get_user_signup_date($user->userid);
-				if ($signup_date >= strtotime($from) && $signup_date <= strtotime($to)) {
+                                //echo "User signup date (human) : ".date('Y-m-d',$signup_date)."<br>";
+                                //echo "User signup date (unix) : ".$signup_date."<br>";
+				if ($signup_date >= strtotime($from) && $signup_date <= $query_to) {
 					$user_data = $this->get_program_user_data($courseid, $user->userid);
 					$program_users[] = $user_data;
 				} // end if $signup_date>=strtotime($from)
@@ -568,10 +580,13 @@ class Report extends Util {
 			$list.="</div>";
 		}
 		$users = $this->get_course_users($courseid, false);
+                $one_day_sec=86400;
+                $unix_to=strtotime($to);
+                $query_to=$unix_to+$one_day_sec;
 		if (count($users) > 0) {
 			foreach ($users as $user) {
 				$signup_date = $this->get_user_signup_date($user->userid);
-				if ($signup_date >= strtotime($from) && $signup_date <= strtotime($to)) {
+				if ($signup_date >= strtotime($from) && $signup_date <= $query_to) {
 					$workshop_users[] = $user;
 				} // end if $signup_date >= strtotime($from) && $signup_date <= strtotime($to)
 			} // end foreach

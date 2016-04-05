@@ -345,6 +345,8 @@ class Invoice {
             else {
                 $tax = 0;
             } // end else
+            // Get invoice user data
+            $user_data = $this->get_invoice_user_data($user->id);
         } // end else when installment is active
         if ($cost['discount'] > 0) {
             $amount = '$' . $cost['cost'] . '&nbsp;(discount is ' . $cost['discount'] . '%)';
