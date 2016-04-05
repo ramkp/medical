@@ -42,7 +42,7 @@ class Stats extends Util {
     function get_users_source_page() {
         $src_users = array();
         $query = "select id, firstname, lastname, email, come_from "
-                . "from  mdl_user where come_from <>''";
+                . "from  mdl_user where deleted=0 and come_from <>''";
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {

@@ -100,6 +100,9 @@ class Util {
             } // end foreach
             $list.="</select></span>";
         } // end if $num>0
+        else {
+            $list.="<span class='span3'>Programs:</span><span class='span4'>n/a</span>";
+        }
         return $list;
     }
 
@@ -126,7 +129,7 @@ class Util {
         return $status;
     }
 
-    function get_course_users($id, $output=true) {
+    function get_course_users($id, $output = true) {
         $list = "";
         $users = array();
         //1. Get course context
@@ -162,6 +165,9 @@ class Util {
             } // end foreach            
             $list.="</select></span>";
         } // end if count($users)>0
+        else {
+            $list.="<span class='span3'>Enrolled users:</span><span class='span4'>n/a</span>";
+        }
         if ($output == true) {
             return $list;
         } // end if $output == true
