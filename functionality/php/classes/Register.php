@@ -205,7 +205,7 @@ class Register {
             if ($num > 0) {
                 $result = $this->db->query($query);
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $drop_down.="<li><a href='#' id='course_" . $row['id'] . "'>" . $row['fullname'] . "</a></li>";
+                    $drop_down.="<li><a href='#' id='course_" . $row['id'] . "' onClick='return false;'>" . $row['fullname'] . "</a></li>";
                 } // end while
             } // end if $num > 0
             $drop_down.="</ul></div>";

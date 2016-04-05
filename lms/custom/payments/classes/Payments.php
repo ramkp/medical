@@ -69,7 +69,7 @@ class Payments extends Util {
                 $list.="<span class='span1'>Program</span><span class='span3'>$course</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span1'>Payment</span><span class='span5'>Invoice # $payment->i_num for $$payment->i_sum payment date $date</span>";
+                $list.="<span class='span1'>Payment</span><span class='span7'>Invoice # $payment->i_num for $$payment->i_sum payment date $date</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span6'><hr/></span>";

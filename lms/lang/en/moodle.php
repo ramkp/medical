@@ -589,9 +589,9 @@ line at the top of your web browser window.
 If you need help, please contact the site administrator,
 {$a->admin}';
 $string['emailconfirmationsubject'] = '{$a}: account confirmation';
-$string['emailconfirmsent'] = '<p>An email should have been sent to your address at <b>{$a}</b></p>
-   <p>It contains easy instructions to complete your registration.</p>
-   <p>If you continue to have difficulty, contact the site administrator.</p>';
+$string['emailconfirmsent'] = '<p>Payment is required to make your account active. 
+   Please contact  site administrator to get invoice for your account login <b>{$a}</b>.</p>
+   <p>If you continue to have difficulty, contact the site administrator too.</p>';
 $string['emaildigest'] = 'Email digest type';
 $string['emaildigest_help'] = 'This is the daily digest setting that forums will use by default.
 
@@ -1215,7 +1215,7 @@ $string['moveselectedcoursesto'] = 'Move selected courses to...';
 $string['movetoanotherfolder'] = 'Move to another folder';
 $string['moveup'] = 'Move up';
 $string['msnid'] = 'MSN ID';
-$string['mustconfirm'] = 'You need to confirm your login';
+$string['mustconfirm'] = 'Account is not active';
 $string['mustchangepassword'] = 'The new password must be different than the current one';
 $string['mycourses'] = 'My courses';
 $string['myfiles'] = 'My private files';
