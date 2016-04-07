@@ -200,7 +200,7 @@ class Register {
             <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
             <ul class='dropdown-menu'>";
 
-            $query = "select id, fullname from mdl_course where category=$cat_id";
+            $query = "select id, fullname from mdl_course where category=$cat_id and cost>0";
             $num = $this->db->numrows($query);
             if ($num > 0) {
                 $result = $this->db->query($query);

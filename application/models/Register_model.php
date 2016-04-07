@@ -362,8 +362,8 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         // Payment options link
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'><a href='#' id='p_options_p' onClick='return false;'>Payment options</a></span>&nbsp;<span style='color:red;' id=''></span>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><a href='#' id='p_options_p' onClick='return false;'>Payment options</a></span>&nbsp;<span style='color:red;' id=''></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
