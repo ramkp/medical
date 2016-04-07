@@ -75,6 +75,7 @@
     //]]>
 </script>
 <script type="text/javascript" src="http://cnausa.com/lms/lib/javascript.php/1451892663/lib/requirejs/require.min.js"></script>
+<!--<script type="text/javascript" src="http://cnausa.com/assets/js/bootstrap.min.js"></script>-->
 <script type="text/javascript">
     //<![CDATA[
     require(['core/first'], function () {

@@ -56,6 +56,9 @@ class register_model extends CI_Model {
             $drop_down.="<li><a href='#' id='cat_" . $row->id . "' onClick='return false;'>" . $row->name . "</a></li>";
         }
         $drop_down.="</ul></div>";
+
+        //$drop_down.="<select id='categories'>";
+
         return $drop_down;
     }
 
@@ -88,7 +91,6 @@ class register_model extends CI_Model {
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Group Registration </h5></div>";
         $list.="<div class='panel-body'>";
 
-
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
         $list.="<span class='span2'><input type='text' id='group_addr' name='group_addr' ></span>";
@@ -113,7 +115,7 @@ class register_model extends CI_Model {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>How did you hear about us?*</span>";
         $list.="<span class='span2'>$come_from</span>";
-        $list.="<span class='span4'><input type='checkbox' id='policy'> I have read and agree to Terms and Conditions</span>";
+        $list.="<span class='span4'><input type='checkbox' id='gr_policy'> I have read and agree to Terms and Conditions</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -219,7 +221,7 @@ class register_model extends CI_Model {
     public function get_register_states_list() {
         $drop_down = "";
         $drop_down.="<div class='dropdown'>
-        <a href='#' id='register_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State/City <b class='caret'></b></a>
+        <a href='#' id='register_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>All States <b class='caret'></b></a>
         <ul class='dropdown-menu'>";
         $query = "select * from mdl_states";
         $result = $this->db->query($query);
@@ -260,6 +262,10 @@ class register_model extends CI_Model {
         if ($courseid == null) {
             $list.="<br/><div  class='form_div'>";
 
+            //$list.="<div class='container-fluid' tyle='text-align:center;'>";
+            //$list.="<span class='span8'>$policy_dialog</span>";
+            //$list.="</div>";
+
             $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
             $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program information</h5></div>";
             $list.="<div class='panel-body'>";
@@ -286,15 +292,6 @@ class register_model extends CI_Model {
             $list.="<span class='span2'>Selected program:</span>";
             $list.="<span class='span2'>$selected_program</span>";
             $list.="</div>"; // end of container-fluid
-
-            /*
-             * 
-              $list.="<div class='container-fluid' style='text-align:left;'>";
-              $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span><span style='color:red;' id='program_err' class='span2'></span>";
-              $list.="<span class='span4'><input type='checkbox' id='policy'> I have read and agree to Terms and Conditions</span>";
-              $list.="</div>"; // end of container-fluid
-             * 
-             */
 
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default
@@ -354,10 +351,6 @@ class register_model extends CI_Model {
         $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
         $list.="</div>";
 
-        $list.="<div class='container-fluid' id='policy_dialog' style='text-align:center;'>";
-        $list.="<span class='span8'>$policy_dialog</span>";
-        $list.="</div>";
-
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>How did you hear about us?*</span>";
         $list.="<span class='span2'>$come_from</span>";
@@ -388,7 +381,6 @@ class register_model extends CI_Model {
     function get_policy_dialog() {
         $list = "";
         $list.="<div id='myModal' class='modal fade'>
-
     <div class='modal-dialog'>
         <div class='modal-content'>
             <div class='modal-header'>

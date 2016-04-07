@@ -799,6 +799,11 @@ $(document).ready(function () {
                     $('#group_common_errors').html('How did you hear about us?');
                     return false;
                 }
+                
+                if (!$('#gr_policy').prop( "checked" )) {
+                    $('#group_common_errors').html('Please agree with Terms and Conditions');
+                    return false;
+                }
 
                 if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '' && come_from != '' && come_from != 'Select') {
                     // Check is group name exist?
@@ -979,6 +984,11 @@ $(document).ready(function () {
 
                 if (come_from == '' || come_from == 'undefined') {
                     $('#personal_err').html('How did you hear about us?');
+                    return false;
+                }
+                
+                if (!$('#policy').prop( "checked" )) {
+                    $('#personal_err').html('Please agree with Terms and Conditions');
                     return false;
                 }
 
@@ -1170,7 +1180,8 @@ $(document).ready(function () {
 
     function  show_policy_modal_dialog() {
         //$('#policy_dialog').show();
-        $("#myModal").modal('show');
+        //$("#myModal").modal('show');
+        console.log('Show modal dialog ...');
     }
 
 
@@ -1501,35 +1512,23 @@ $(document).ready(function () {
         }
 
     }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
-
-    /************************************************************************
-     *  
-     *               Policy checkbox for group registration
-     * 
-     ************************************************************************/
-
-    $('.form_div').on('change', 'input[type=checkbox]', function (event) {
+    
+        $('.form_div').on('change', 'input[type=checkbox]', function (event) {
         //alert(event.target.id);
         if (event.target.id == 'gr_policy') {
             if (this.checked) {
                 show_policy_modal_dialog();
             }
         }
-
     }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
-
-    /************************************************************************
-     *  
-     *               Policy checkbox for individual registration
-     * 
-     ************************************************************************/
+    
 
     $("#policy").change(function () {
         if (this.checked) {
             show_policy_modal_dialog();
         }
     });
-
+    
     $("#search_button").click(function () {
         submit_search_form();
     });

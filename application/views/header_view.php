@@ -46,7 +46,7 @@
 
         </noscript>
         <!-- Google web fonts -->
-        <script type='text/javascript' src='//dsms0mj1bbhn4.cloudfront.net/assets/pub/shareaholic.js' data-shr-siteid='8489bb1defd43443d2a49ab231f1bcdf' data-cfasync='false' async='async'></script>
+        
 
     </head>
 
@@ -58,9 +58,9 @@
         <script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/theme_lambda/jquery.easing.1.3.js"></script>
         <script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/theme_lambda/camera.min.1.11.js"></script>
         <script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/theme_lambda/jquery.bxslider.js"></script>
-        <script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>
-        <script type="text/javascript" src="http://cnausa.com/assets/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="http://cnausa.com/assets/js/custom.js"></script>
+        <script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>        
+        <script type="text/javascript" src="http://cnausa.com/assets/js/custom.js"></script>        
+        <!--<script type="text/javascript" src="http://cnausa.com/assets/js/bootstrap.min.js"></script>-->        
         <script type="text/javascript">
             //<![CDATA[
             document.body.className += ' jsenabled';
