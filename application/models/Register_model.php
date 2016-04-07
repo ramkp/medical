@@ -253,11 +253,13 @@ class register_model extends CI_Model {
         $states = $this->get_states_list();
         $register_state = $this->get_register_states_list();
         $countries = $this->get_countries_list();
+        $policy_dialog = $this->get_policy_dialog();
 
         // ****************** Program information **************************
 
         if ($courseid == null) {
             $list.="<br/><div  class='form_div'>";
+
             $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
             $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program information</h5></div>";
             $list.="<div class='panel-body'>";
@@ -287,10 +289,10 @@ class register_model extends CI_Model {
 
             /*
              * 
-            $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span><span style='color:red;' id='program_err' class='span2'></span>";
-            $list.="<span class='span4'><input type='checkbox' id='policy'> I have read and agree to Terms and Conditions</span>";
-            $list.="</div>"; // end of container-fluid
+              $list.="<div class='container-fluid' style='text-align:left;'>";
+              $list.="<span class='span2'>How did you hear about us*</span><span class='span2'>$come_from</span><span style='color:red;' id='program_err' class='span2'></span>";
+              $list.="<span class='span4'><input type='checkbox' id='policy'> I have read and agree to Terms and Conditions</span>";
+              $list.="</div>"; // end of container-fluid
              * 
              */
 
@@ -352,6 +354,10 @@ class register_model extends CI_Model {
         $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
         $list.="</div>";
 
+        $list.="<div class='container-fluid' id='policy_dialog' style='text-align:center;'>";
+        $list.="<span class='span8'>$policy_dialog</span>";
+        $list.="</div>";
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>How did you hear about us?*</span>";
         $list.="<span class='span2'>$come_from</span>";
@@ -376,6 +382,49 @@ class register_model extends CI_Model {
 
         $list.= "</div></div>"; // end of form div
 
+        return $list;
+    }
+
+    function get_policy_dialog() {
+        $list = "";
+        $list.="<div id='myModal' class='modal fade'>
+
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+                <h4 class='modal-title'>Terms and Conditions</h4>
+            </div>
+            <div class='modal-body'>
+                <p style='font-weight:bold;'>Medical2 Inc.  ADVANCE REGISTRATION / REFUND / PREREQUISITE POLICY:</p>
+                
+                <p align='justify'>Participants who wish to cancel/transfer their registration must provide official written notification. Medical2 does not accept cancellations/transfers by phone. Cancellations must be received by Medical2 no later than 2 weeks (14Days) prior to your original workshop date. Cancellations/transfers must include the participant's name, and workshop name and date. A 100% refund can be issued if the deadline has been met. Failure to notify will result in the forfeit of any obligation by Medical2. Failure to attend your Workshop results in the forfeit of the entire Workshop Fee. Late Registrations are not entitled to any refund. Transfers forfeit the right to a refund if they voluntarily cancel their enrollment after transferring. Transfers must attend a Workshop within 6 months of their original Workshop date. After 6 months, your transfer is null and void, and you will be required to re-register and pay in full again.
+                All books are non-refundable and non-returnable. Medical2 Medical Certification Agency reserves the right to cancel or limit the time of the workshops without any prior notice, if minimum registration requirements are not met. Medical2 Medical Certification Agency is not responsible for any travel related expenses incurred, including but not limited to: Airfare, Hotel, Taxi, Parking, Rental Car, etc…by registering for and/or attending our workshops. The OB Tech Program is entirely non-refundable. All Online Exam fees are non-refundable. Your certification is non-refundable, non-transferable. Medical2 Medical Certification Agency is not a Job Placement Agency. We neither provide jobs, nor guarantee jobs. Medical2 simply provides a training, certification and continuing education service. It is your sole responsibility to check with your state and/or employer for acceptance of our certification.
+                Should the workshop for which you are registered be cancelled or rescheduled by Medical2 Medical Certification Agency, you are subject to a full refund or transfer. All refund requests and transfers must be made in writing. If you transfer, you forfeit your right to any refund, and any future cancellation refunds, no exceptions.<br> 
+                <span style='color:red;'>
+                Notice:There will be $25 late registration fee within 7 days prior to the workshop.
+                Medical2 Medical Certification Agencys Phlebotomy Workshop & Online Exam shall not be used to obtain a California Phlebotomy State License.</span><br>
+                
+                By submitting this form I confirm that I have read and meet all of the medical background pre-requisites, am at least 18 years of age, and completely understand and agree with the Medical2 Medical Certification Agency policies stated on this form. Noncompliance of any these polices will forfeit any obligation by Medical2 Medical Certification Agency.<br>
+                <span style='color:red;'>Refund / Pre-Requisite Policy for On-line Exams</span> (online phlebotomy certification exams are not part of phlebotomy workshop)
+                In order to be eligible for a Madical2 On-line Exam, you are required to send Medical2 proof of eligibility as outlined in the eligibility requirements for the exam for which you are registering.
+                The exam fee is non-refundable, non-transferable. Medical2,Inc will not be held responsible for any registrant who fails to read and/or comply with these policies. It is your sole responsibility to check with your state and/or employer for acceptance of our certification.
+                Your test will be activated only after we receive proof of eligibility from you.
+                You have 90 days from the activation date to finish the exam. You acknowledge that in the event that you fail the exam on your first attempt you are only eligible to attempt this exam 4 times in a 12 month period. You must register and pay the fee each time you attempt the exam.You must use a computer with a stable, high-speed Internet connection. Medical2 is not responsible for any technical difficulties you may have due to your computer and/or poor Internet connection. Once you have started your exam, you cannot log out, as it is timed. Medical2 is not responsible if you log out of your timed exam, and lose time. In the event of a technical problem you can retry 2 times in a 1 hour period from the same computer at the discretion of Medical2 technical support staff. It is your responsibility to disable call waiting, answering machines, and any other devise that may cause interference of your on-line exam. This exam must be passed with an 75% or better in order to become certified. You may request a hand score of the exam for an additional fee of $25.
+                Medical2,Inc reserves the right to update our Terms and Conditions at any time, without prior notice. Updates are effective immediately.
+                By submitting this form: I confirm that I meet all of the medical background pre-requisites for the program for which I am registering, I am at least 18 years of age, and I fully understand and agree with the Medical2,Inc policies stated on this form. I understand noncompliance of any of these policies will forfeit any obligation by Medical2,Inc.
+                Refund / Pre-Requisite Policy for: Online Exams.
+                In order to be eligible for the 'Medical2 Online Exams', you will need to send us your proof of eligibility as outlined in the eligibility requirements for this exam (Please see FAQs).
+                The exam fee is non-refundable, non-transferable. Medical2 will not be held responsible for any registrant who fails to read and/or comply with these policies. It is your sole responsibility to check with your state and/or employer for acceptance our certification. Your test will be activated only after we receive proof of eligibility from you.
+                You have 90 days from the registration date to finish the exam. You acknowledge that in the event that you fail the exam on your first attempt you are only eligible to attempt this exam 4 times in a 12 month period. The fee is the same each time. In the event of a technical problem you can retry 2 times in a 1 hour period from the same computer at the discretion of Medical2 Medical Certification Agency technical support staff. It is your responsibility to disable call waiting, answering machines, and any other devise that may cause interference of your online exam. This exam must be passed with an 75% or better in order to become certified. You may request a hand score of the exam for an additional fee of $25.'
+                </p>
+            </div>
+            <div class='modal-footer'>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal'>I Agree with Terms and Conditions</button></span>
+            </div>
+        </div>
+    </div>
+</div>";
         return $list;
     }
 

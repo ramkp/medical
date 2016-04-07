@@ -25,7 +25,7 @@ if ($_POST) {
     $user->lastname = $posted_user->last_name;
     $user->courseid = $posted_user->courseid;    
     $user->address = $posted_user->addr;
-    $user->inst=$posted_user->inst;
+    $user->institution=$posted_user->inst;
     $user->zip=$posted_user->zip;
     $user->city=$posted_user->city;
     $user->state=$posted_user->state;

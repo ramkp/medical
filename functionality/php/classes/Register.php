@@ -268,6 +268,7 @@ class Register {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>How did you hear about us?*</span>";
         $list.="<span class='span2'>$come_from</span>";
+        $list.="<span class='span4'><input type='checkbox' id='gr_policy'> I have read and agree to Terms and Conditions</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
