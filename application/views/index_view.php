@@ -24,9 +24,9 @@
                                           margin-left: 5%;
                                           padding: 15px 20px;
                                           text-shadow: 0 0 1px rgba(0, 0, 0, 0.5)">
-                                        The important thing is not so much that every 
-                                        child should be taught, as that every child should
-                                        be given the wish to learn.</span>
+                                        1. Pick Program  <br/>
+                                        2. Pick Schedule <br/>
+                                        3. Signup and Register</span>
                                 </div>
                             </div>
                         </div>

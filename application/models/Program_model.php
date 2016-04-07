@@ -151,13 +151,13 @@ class program_model extends CI_Model {
                 $list.="</div>";
                 $list.="</div>"; // end of panel-body
                 $list.="</div>"; // end of panel panel-default                
-            } // end foreach
+            } // end foreach            
         } //end if count($items) > 0)
         else {
             $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
             $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$cat_name</h5></div>";
             $list.="<div class='panel-body'>";
-            $list.="<class='container-fluid'>";
+            $list.="<div class='container-fluid'>";
             $list.="<span class='span6'>No items found</span>";
             $list.="</div>"; // end of container-fluid
             $list.="</div>"; // end of panel-body
@@ -207,7 +207,7 @@ class program_model extends CI_Model {
             $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$cat_name</h5></div>";
             $list.="<div class='panel-body'>";
 
-            $list.="<class='container-fluid'>";
+            $list.="<div class='container-fluid'>";
             $list.="<span class='span6'>No items found</span>";
             $list.="</div>"; // end of container-fluid
 

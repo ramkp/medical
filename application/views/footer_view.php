@@ -13,10 +13,19 @@
                     <!--<i class="fa fa-mobile fa-lg"></i>&nbsp; Phone: (007) 123-456    
                     <i class="fa fa-envelope-o"></i>&nbsp; E-mail:
                     <a href="mailto:info@medical-training.com">info@medical-training.com</a>
-                    -->                                                
-                <div class="social_icons pull-left">
-                    <div class='shareaholic-canvas' data-app='share_buttons' data-app-id='24115344'></div>
-                </div>
+                    -->  
+                    <!--   
+                    <div class="social_icons pull-left">
+                        <div class='shareaholic-canvas' data-app='share_buttons' data-app-id='24115344'></div>
+                    </div>
+                    -->
+                    <!-- Social sharing buttons -->
+                    <span class='st_facebook' displayText='Facebook'></span>
+                    <span class='st_twitter' displayText='Tweet'></span>
+                    <span class='st_linkedin' displayText='LinkedIn'></span>
+                    <span class='st_instagram' displayText='Instagram Badge'></span>
+
+
                 </p>
             </div>
 

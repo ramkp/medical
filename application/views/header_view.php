@@ -75,7 +75,7 @@
             <header  class="navbar">
                 <nav class="navbar-inner">
                     <div class="container-fluid">
-                        <a class="brand" href="http://cnausa.com" style="height: 30;"><img src="http://cnausa.com/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2 Training Institute</a>
+                        <a class="brand" href="http://cnausa.com" style="height: 30;"><img src="http://cnausa.com/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2 Career College</a>
                         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
@@ -115,9 +115,9 @@
                             <ul class="nav pull-right">                                
                                 <li class="dropdown"><a href="http://cnausa.com/index.php/search"><img src="/lms/theme/image.php/lambda/theme/1453287272/bg/icon-search" style="cursor: pointer;" alt="search" id='search_item' /></a></li>
                                 <li class="dropdown"><a href="#">Select Language<span style="color: rgb(155, 155, 155);">▼</span></a></li>
-                                
-                                
-                                <!-- Google Translator widget - looks ugly, temporary disabled
+
+
+                                <!-- Google translation widget 
                                 <li class="dropdown"><a><div id="google_translate_element" style="vertical-align:middle;"></div><script type="text/javascript">
                                     function googleTranslateElementInit() {
                                         new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
@@ -125,7 +125,10 @@
                                     $('#google_translate_element').css({"height":"15"});
                                 </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script></a></li>
                                 -->
-                                
+                                <!-- Sharethis buttons -->
+                                <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+                                <script type="text/javascript">stLight.options({publisher: "eda8d1a9-031a-4879-9550-5afd52ee1ddf", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+
                             </ul>
                         </div>
                     </div>
