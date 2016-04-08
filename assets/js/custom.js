@@ -799,8 +799,8 @@ $(document).ready(function () {
                     $('#group_common_errors').html('How did you hear about us?');
                     return false;
                 }
-                
-                if (!$('#gr_policy').prop( "checked" )) {
+
+                if (!$('#gr_policy').prop("checked")) {
                     $('#group_common_errors').html('Please agree with Terms and Conditions');
                     return false;
                 }
@@ -986,8 +986,8 @@ $(document).ready(function () {
                     $('#personal_err').html('How did you hear about us?');
                     return false;
                 }
-                
-                if (!$('#policy').prop( "checked" )) {
+
+                if (!$('#policy').prop("checked")) {
                     $('#personal_err').html('Please agree with Terms and Conditions');
                     return false;
                 }
@@ -1182,6 +1182,19 @@ $(document).ready(function () {
         //$('#policy_dialog').show();
         //$("#myModal").modal('show');
         console.log('Show modal dialog ...');
+        var js_url="http://" + domain + "/assets/js/bootstrap.min.js";
+        $.getScript(js_url)
+                .done(function () {
+                    var url = "http://" + domain + "/functionality/php/get_terms_box.php";
+                    var request = {search_item: 1};
+                    $.post(url, request).done(function (data) {
+                        $("body").append(data);
+                        $("#myModal").modal('show');                        
+                    });
+                })
+        .fail(function () {
+            console.log('Failed to load bootstrap.min.js');
+        });
     }
 
 
@@ -1512,8 +1525,8 @@ $(document).ready(function () {
         }
 
     }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
-    
-        $('.form_div').on('change', 'input[type=checkbox]', function (event) {
+
+    $('.form_div').on('change', 'input[type=checkbox]', function (event) {
         //alert(event.target.id);
         if (event.target.id == 'gr_policy') {
             if (this.checked) {
@@ -1521,14 +1534,14 @@ $(document).ready(function () {
             }
         }
     }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
-    
+
 
     $("#policy").change(function () {
         if (this.checked) {
             show_policy_modal_dialog();
         }
     });
-    
+
     $("#search_button").click(function () {
         submit_search_form();
     });
