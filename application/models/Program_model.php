@@ -138,6 +138,7 @@ class program_model extends CI_Model {
                 $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$item->fullname</h5></div>";
                 $list.="<div class='panel-body'>";
                 $list.="<div class='container-fluid' style='text-align:left;'>";
+                //$list.= "<span class='span4'>&nbsp;</span><span class='span4' style='text-align:right;'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></span>";
                 $list.= "<span class='span4'>Start date <strong>" . date('Y-m-d', $item->startdate) . "</strong></span><span class='span4' style='text-align:right;'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -273,7 +274,7 @@ class program_model extends CI_Model {
                 $item->$key = $value;
             }
         } // end foreach        
-        $list = $this->create_item_detail_page($item,$form_div, $state);
+        $list = $this->create_item_detail_page($item, $form_div, $state);
         return $list;
     }
 
@@ -281,7 +282,7 @@ class program_model extends CI_Model {
         $drop_down = "";
         $drop_down.="<div class='dropdown'>
         <a href='#' id='states' data-toggle='dropdown' 
-        class='dropdown-toggle'>States 
+        class='dropdown-toggle'>All States 
         <b class='caret'></b></a>
         <ul class='dropdown-menu'>";
         $query = "select * from mdl_states order by state";
@@ -317,28 +318,70 @@ class program_model extends CI_Model {
         return $drop_down;
     }
 
+    public function get_all_courses() {
+        $list = "";
+        $query = "select * from mdl_course where cost>0 order by fullname ";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $item = new stdClass();
+                foreach ($row as $key => $value) {
+                    $item->$key = $value;
+                }
+                $items[] = $item;
+            } // end foreach
+            foreach ($items as $item) {
+                $blocks = $this->get_item_cost_blocks($item);
+                $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+                $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$item->fullname</h5></div>";
+                $list.="<div class='panel-body'>";
+                $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.= "<span class='span4'>Start date <strong>" . date('Y-m-d', $item->startdate) . "</strong></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.= "<span class='span6'>" . $blocks['item_cost'] . "</span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.= "<span class='span6'>" . $blocks['item_group_cost'] . "</span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.= "<span class='span6'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></span>";
+                $list.="</div>";
+
+                $list.="<br/><div class='container-fluid' style='text-align:left;'>";                
+                $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";                
+                $list.="</div>";
+
+                $list.="</div>"; // end of panel-body
+                $list.="</div>"; // end of panel panel-default  
+            } // end foreach
+        } // end if $num > 0
+        return $list;
+    }
+
     public function get_schedule_page($courseid) {
         $list = "";
         $states = $this->get_states_list();
         $courses = $this->get_courses_list();
-        $item = $this->get_item_detail_page($courseid, false, false);
+        $item = $this->get_all_courses();
         $list.="<br/><div  class='form_div'>";
         $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
         $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program Schedule</h5></div>";
         $list.="<div class='panel-body'>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.= "<span class='span3'>Please select state:</span><span class='span3'>$states</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.= "<span class='span3'>Please select program:</span><span class='span3'>$courses</span>";
-        $list.="</div>";       
+        $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.= "<span class='span6' style='colore:red;' id='schedule_err'></span>";
-        $list.="</div>";      
-        
+        $list.="</div>";
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_schedule'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
         $list.="</div>";
@@ -350,7 +393,7 @@ class program_model extends CI_Model {
         $list.= "</div>"; // end of form div
         return $list;
     }
-    
+
     public function get_search_result($item) {
         
     }

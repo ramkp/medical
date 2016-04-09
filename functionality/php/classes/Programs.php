@@ -50,9 +50,16 @@ class Programs {
         $query = "select group_discount_size "
                 . "from mdl_group_discount "
                 . "where courseid=$id";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $discount = $row['group_discount_size'];
+        //echo "Query: ".$query."<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $discount = $row['group_discount_size'];
+            } // end while 
+        } // end if $num>0
+        else {
+            $discount = 0;
         }
         return $discount;
     }
@@ -65,7 +72,12 @@ class Programs {
         return $cost;
     }
 
-    function get_item_cost_blocks($item) {
+    function get_item_cost_blocks($item) {        
+        
+        //echo "<br>Get Item cost block:--------------<br>";
+        //print_r($item);
+        //echo "<br>---------------<br>";
+        
         $cost_block = "";
         $cost_group_block = "";
         $item_costs = $this->calculate_item_cost($item->id, $item->cost, $item->discount_size);
@@ -86,23 +98,23 @@ class Programs {
     function get_school_page($cat_name) {
         $list = "";
 
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.= "<span class='span9'>A <strong>nursing school</strong> is a type of educational "
                 . "institution, or part thereof, providing education and "
                 . "training to become a fully qualified nurse. The nature of "
                 . "nursing education and nursing qualifications varies "
                 . "considerably across the world. Please select on the map your closest location.</span>";
-        $list.="</div>";        
+        $list.="</div>";
 
-        $list."<div style='text-align:center;'>";
+        $list . "<div style='text-align:center;'>";
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.= "<span class='span9'><hr></span>";
         $list.="</div>";
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.= "<span class='span9' id='map' style='position: relative;height:675px;'></span>";
-        $list.="</div></div>";        
-        
+        $list.="</div></div>";
+
 
         return $list;
     }
