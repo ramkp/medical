@@ -100,10 +100,35 @@ class Enroll {
         return $code;
     }
 
+    function get_state_name($id) {
+        $query = "select * from mdl_states where id=$id";
+        //echo "Query: ".$query."<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        }
+        return $state;
+    }
+
+    function get_country_name($id) {
+        $query = "select * from mdl_countries where id=$id";
+        //echo "Query: " . $query . "<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $code = $row['code'];
+        }
+        return $code;
+    }
+
     function single_signup($user) {
+        $user->state = $this->get_state_name($user->state);
+        if (is_numeric($user->country)) {
+            $user->country = $this->get_country_name($user->country);
+        } //end if is_number($user->country)
         //echo "<br>---Enroll user----<br>";
         //print_r($user);
         //echo "<br>-------------------<br>";
+        //die();
         $list = "";
         $user->pwd = $this->get_password();
         //echo "Provided country: " . $user->country . "<br/>";
@@ -137,7 +162,7 @@ class Enroll {
             // 2. Enroll user into course
             $this->enroll_user_to_course($user);
         }  // end if $response !== false        
-        else {            
+        else {
             $list.="<div class='container-fluid'>";
             $list.="<span class='span9'>Signup error happened </span>";
             $list.="</div>";
@@ -177,7 +202,7 @@ class Enroll {
             $this->single_signup($user);
         }
     }
-    
+
     function create_course_group($courseid, $groupname) {
         $query = "insert into mdl_groups
                      (courseid,

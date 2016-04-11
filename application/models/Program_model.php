@@ -139,7 +139,7 @@ class program_model extends CI_Model {
                 $list.="<div class='panel-body'>";
                 $list.="<div class='container-fluid' style='text-align:left;'>";
                 //$list.= "<span class='span4'>&nbsp;</span><span class='span4' style='text-align:right;'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></span>";
-                $list.= "<span class='span4'>Start date <strong>" . date('Y-m-d', $item->startdate) . "</strong></span><span class='span4' style='text-align:right;'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></span>";
+                $list.= "<span class='span4'>Start date <strong>" . date('m-d-Y', $item->startdate) . "</strong></span><span class='span4' style='text-align:right;'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid' style='text-align:left;'>";
                 $list.= "<span class='span6'>" . $blocks['item_cost'] . "</span>";
@@ -280,17 +280,14 @@ class program_model extends CI_Model {
 
     public function get_states_list() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='states' data-toggle='dropdown' 
-        class='dropdown-toggle'>All States 
-        <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+        $drop_down.="<select id='states' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>All states</option>";
         $query = "select * from mdl_states order by state";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $drop_down.="<li><a href='#' id='state_$row->id' onClick='return false;'>$row->state</a></li>";
+            $drop_down.="<option value='$row->id'>$row->state</option>";
         }
-        $drop_down.="</ul></div>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
@@ -306,15 +303,12 @@ class program_model extends CI_Model {
             $items[] = $item;
         } // end foreach
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='courses' data-toggle='dropdown' 
-        class='dropdown-toggle'>Programs 
-        <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+        $drop_down.="<select id='courses' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>Programs</option>";
         foreach ($items as $item) {
-            $drop_down.="<li><a href='#' id='course_$item->id' onClick='return false;'>$item->fullname</a></li>";
+            $drop_down.="<option value='$item->id'>$item->fullname</option>";
         } // end foreach
-        $drop_down.="</ul></div>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
@@ -349,14 +343,102 @@ class program_model extends CI_Model {
                 $list.= "<span class='span6'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></span>";
                 $list.="</div>";
 
-                $list.="<br/><div class='container-fluid' style='text-align:left;'>";                
-                $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";                
+                $list.="<br/><div class='container-fluid' style='text-align:left;'>";
+                $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
                 $list.="</div>";
 
                 $list.="</div>"; // end of panel-body
                 $list.="</div>"; // end of panel panel-default  
             } // end foreach
         } // end if $num > 0
+        return $list;
+    }
+
+    public function get_course_name($courseid) {
+        $query = "select fullname from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $name = $row->fullname;
+        }
+        return $name;
+    }
+
+    public function get_state_name($stateid) {
+        $query = "select * from mdl_states where id=$stateid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $state = $row->state;
+        }
+        return $state;
+    }
+
+    public function get_course_schedule($courseid, $state = null) {
+
+        $list = "";
+        // 1.Get scheduler id
+        $query = "select id from mdl_scheduler where course=$courseid";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $schedulerid = $row->id;
+            } // end foreach
+            // 2. Get slots list
+            if ($state == null) {
+                $query = "select * from mdl_scheduler_slots "
+                        . "where schedulerid=$schedulerid order by starttime";
+            } // end if $state==null
+            else {
+                $statename = $this->get_state_name();
+                $query = "select * from mdl_scheduler_slots "
+                        . "where schedulerid=$schedulerid "
+                        . "and appointmentlocation like '%$statename%' "
+                        . "order by starttime";
+            } // end else 
+            $coursename = $this->get_course_name($courseid);
+            $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$coursename</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+
+            if ($num > 0) {
+                foreach ($result->result() as $row) {
+                    $human_date = date('m-d-Y', $row->starttime);
+                    $hours_num = round($row->duration / 60);
+                    $human_start_time = date('m-d-Y H:i', $row->timemodified);
+                    $end_time = $row->timemodified + $hours_num*3600;
+                    $human_end_date=date('m-d-Y H:i', $end_time);
+                    $locations = explode("/", $row->appointmentlocation);
+                    $state = $locations[0];
+                    $city = $locations[1];
+
+                    $list.="<div class='container-fluid' style='text-align:left;'>";
+                    $list.= "<span class='span1'>$human_date</span>";
+                    $list.= "<span class='span2'>$row->appointmentlocation</span>";
+                    $list.= "<span class='span3'>$row->notes</span>";
+                    $list.= "<span class='span1'>9am -  5pm</span>";
+                    $list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid'><button class='btn btn-primary'>Register</button></a></span>";
+                    $list.="</div>";
+                    
+                    $list.="<div class='container-fluid' style='text-align:left;'>";
+                    $list.= "<span class='span9'><hr/></span>";
+                    $list.="</div>";
+                } // end foreach
+
+                $list.="</div>"; // end of panel-body
+                $list.="</div>"; // end of panel panel-default           
+            } // end if $num > 0 when slots are available at the course
+            else {
+                $list.="<div class='container-fluid' style='text-align:left;'>";                
+                $list.= "<span class='span6'>This program does not have schedule</span>";
+                $list.="</div>";
+                
+                $list.="</div>"; // end of panel-body
+                $list.="</div>"; // end of panel panel-default           
+            }
+        } // end if $num > 0 when scheduler is available at the course
         return $list;
     }
 
@@ -388,7 +470,7 @@ class program_model extends CI_Model {
 
         $list.="</div>"; // end of panel-body
         $list.="</div>"; // end of panel panel-default                
-        $list.= $item; // add detailes about selected item
+        $list.= $this->get_course_schedule($courseid);
 
         $list.= "</div>"; // end of form div
         return $list;

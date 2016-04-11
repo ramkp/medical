@@ -144,27 +144,34 @@ class Payment {
 
     function get_card_types_dropbox() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='card_type' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Card type<b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
-        $drop_down.="<li><a href='#' id='American Express' onClick='return false;'>American Express</a></li>";
-        $drop_down.="<li><a href='#' id='Discover' onClick='return false;'>Discover</a></li>";
-        $drop_down.="<li><a href='#' id='Master' onClick='return false;'>Master</a></li>";
-        $drop_down.="<li><a href='#' id='Visa' onClick='return false;'>Visa</a></li>";
-        //$drop_down.="<li><a href='#' id='Diner Club' onClick='return false;'>Diner Club</a></li>";
-        $drop_down.="</ul></div>";
+        $drop_down.="<select id='card_type'>";
+        $drop_down.="<option value='American Express'>American Express</option>";
+        $drop_down.="<option value='Discover' >Discover</option>";
+        $drop_down.="<option value='Master' >Master</option>";
+        $drop_down.="<option value='Visa' >Visa</option>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
     function get_year_drop_box() {
         $drop_down = "";
         $drop_down.= "<select id='card_year' style='width: 75px;'>";
-        $drop_down.="<option value='--' selected>--</option>";
+        $drop_down.="<option value='--' selected>Year</option>";
         $drop_down.="<option value='2016'>2016</option>";
         $drop_down.="<option value='2017'>2017</option>";
         $drop_down.="<option value='2018'>2018</option>";
         $drop_down.="<option value='2019'>2019</option>";
         $drop_down.="<option value='2020'>2020</option>";
+        $drop_down.="<option value='2021'>2021</option>";
+        $drop_down.="<option value='2022'>2022</option>";
+        $drop_down.="<option value='2023'>2023</option>";
+        $drop_down.="<option value='2024'>2024</option>";
+        $drop_down.="<option value='2025'>2025</option>";
+        $drop_down.="<option value='2026'>2026</option>";
+        $drop_down.="<option value='2027'>2027</option>";
+        $drop_down.="<option value='2028'>2028</option>";
+        $drop_down.="<option value='2029'>2029</option>";
+        $drop_down.="<option value='2030'>2030</option>";
         $drop_down.="</select>";
         return $drop_down;
     }
@@ -172,7 +179,7 @@ class Payment {
     function get_month_drop_box() {
         $drop_down = "";
         $items = "<option value='01'>01</option>
-                <option value='--' selected>--</option>
+                <option value='--' selected>Month</option>
                 <option value='03'>02</option>
                 <option value='03'>03</option>
                 <option value='04'>04</option>
@@ -250,7 +257,7 @@ class Payment {
         $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
         $list.="<span class='span2'>Selected program</span>";
         $list.="<span class='span2'>$course_name</span>";
-        $list.="<span class='span2'>Sum to be charged</span>";
+        $list.="<span class='span2'>Fee</span>";
         $list.="<span class='span2'>$cost_block</span>";
         $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='payment_sum' />";
         $list.="</div>";
@@ -283,8 +290,12 @@ class Payment {
         $list.="<span class='span2'><input type='text' id='bill_email' name='bill_email'  ></span>";
         $list.="</div>";
 
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+
+        $list.="</div>";
+
         $list.= "<div class='container-fluid' style='text-align:left;'>";
-        $list.= "<span class='span2'><button class='btn btn-primary' id='make_payment_personal'>Make payment</button></span>";
+        $list.= "<span class='span2'><button class='btn btn-primary' id='make_payment_personal'>Submit</button></span>";
         $list.= "&nbsp <span style='color:red;' id='personal_payment_err'></span>";
         $list.= "</div>";
 
@@ -597,6 +608,18 @@ class Payment {
         return $list;
     }
 
+    function get_states_list() {
+        $drop_down.="<select id='bill_state' style='width:140px;' name='bill_state'>";
+        $drop_down.="<option value='0' selected>State</option>";
+        $query = "select * from mdl_states";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $drop_down.="<option value='".$row['id']."'>".$row['state']."</option>";
+        } // end while
+        $drop_down.="</select>";
+        return $drop_down;
+    }
+
     function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null) {
 
         /*
@@ -616,6 +639,7 @@ class Payment {
         $card_types = $this->get_card_types_dropbox();
         $card_year = $this->get_year_drop_box();
         $card_month = $this->get_month_drop_box();
+        $states = $this->get_states_list();
 
         if ($from_email != null) {
             $list.="<br/><div  class='form_div'>";
@@ -623,6 +647,10 @@ class Payment {
         $list.="<div class='panel panel-default' id='payment_detailes'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
         $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><input type='checkbox' id='same_address'>Click here if billing Address is same as Contact</span>";
+        $list.="</div>";
 
         if ($installment == null) {
             if ($group_data == '') {
@@ -666,7 +694,7 @@ class Payment {
                 $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                 $list.="<span class='span2'>Selected program</span>";
                 $list.="<span class='span2'>$course_name</span>";
-                $list.="<span class='span2'>Sum to be charged</span>";
+                $list.="<span class='span2'>Fee</span>";
                 $list.="<span class='span2'>$cost_block</span>";
                 $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='payment_sum' />";
                 $list.="</div>";
@@ -720,7 +748,7 @@ class Payment {
             $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
             $list.="<span class='span2'>Selected program</span>";
             $list.="<span class='span2'>$course_name</span>";
-            $list.="<span class='span2'>Sum to be charged</span>";
+            $list.="<span class='span2'>Fee</span>";
             $list.="<span class='span2'>$$first_payment &nbsp; (discount is " . $course_cost['discount'] . "%)</span>";
             $list.= "<input type='hidden' value='" . $first_payment . "' id='payment_sum' />";
             $list.="</div>";
@@ -740,26 +768,41 @@ class Payment {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Card Holder Name*</span>";
         $list.="<span class='span2'><input type='text' id='card_holder' name='card_holder'  ></span>";
+        $list.="<span class='span2'>CVV*</span>";
+        $list.="<span class='span2'><input type='text' id='bill_cvv' name='bill_cvv'  ></span>";
+        $list.="</div>";        
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Address*</span>";
+        $list.="<span class='span2'><input type='text' id='bill_addr' name='bill_addr'  ></span>";        
         $list.="<span class='span2'>Expiration Date*</span>";
         $list.="<span class='span2'>" . $card_year . "&nbsp;&nbsp;&nbsp;" . $card_month . "</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>Address*</span>";
-        $list.="<span class='span2'><input type='text' id='bill_addr' name='bill_addr'  ></span>";
+        $list.="<span class='span2'>State*</span>";
+        $list.="<span class='span2'>$states</span>";
         $list.="<span class='span2'>City*</span>";
-        $list.="<span class='span2'><input type='text' id='bill_city' name='bill_city'  ></span>";
+        $list.="<span class='span2'><input type='text' id='bill_city' name='bill_city'  ></span>";        
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Zip code*</span>";
-        $list.="<span class='span2'><input type='text' id='bill_zip' name='bill_zip'  ></span>";
+        $list.="<span class='span2'><input type='text' id='bill_zip' name='bill_zip'  ></span>";        
         $list.="<span class='span2'>Contact email*</span>";
-        $list.="<span class='span2'><input type='text' id='bill_email' name='bill_email'  ></span>";
+        $list.="<span class='span2'><input type='text' id='bill_email' name='bill_email'  ></span>";        
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:center;'>";        
+        $list.="<span class='span2'>&nbsp;</span><span class='span4'><a href='#' onClick='return false;' id='policy'>Click Here to View Terms And Conditions</a></span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";        
+        $list.="<span class='span2'>&nbsp;</span><span class='span4'><input type='checkbox' id='policy_checkbox'> I have read and agree to Terms and Conditions</span>";
         $list.="</div>";
 
         $list.= "<div class='container-fluid' style='text-align:left;'>";
-        $list.= "<span class='span2'><button class='btn btn-primary' id='make_payment_personal'>Make payment</button></span>";
+        $list.= "<span class='span2'><button class='btn btn-primary' id='make_payment_personal'>Submit</button></span>";
         $list.= "&nbsp <span style='color:red;' id='personal_payment_err'></span>";
         $list.= "</div>";
 
@@ -911,8 +954,8 @@ class Payment {
         $user_group = $card->user_group;
         $userid = $card->userid;
         $item = $this->get_course_name($card->courseid);
-        $cart_type_num=$this->get_card_type($card->card_type);
-        
+        $cart_type_num = $this->get_card_type($card->card_type);
+
         // Personal online payment
         if ($user_group == '' && $userid != '') {
             $user_payment_data = $this->get_user_payment_credentials($userid);

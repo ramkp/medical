@@ -51,21 +51,25 @@ class Register {
     function get_states_list($group = false) {
         $drop_down = "";
         if ($group == false) {
-            $drop_down.="<div class='dropdown'>
-        <a href='#' id='state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+            //$drop_down.="<div class='dropdown'>
+        //<a href='#' id='state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
+        //<ul class='dropdown-menu'>";
+            $drop_down.="<select id='state' style='width:120px;'>";
         } // end if $group==false
         else {
-            $drop_down.="<div class='dropdown'>
-        <a href='#' id='group_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+            //$drop_down.="<div class='dropdown'>
+        //<a href='#' id='group_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
+        //<ul class='dropdown-menu'>";
+            $drop_down.="<select id='group_state' style='width:120px;'>";
         }
+        
         $query = "select * from mdl_states";
         $result = $this->db->query($query);
+        $drop_down.="<option value='0' selected>State</option>";
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $drop_down.="<li><a href='#' id='state_" . $row['id'] . "' onClick='return false;'>" . $row['state'] . "</a></li>";
+            $drop_down.="<option value='".$row['id']."'>".$row['state']."</option>";
         } // end while
-        $drop_down.="</ul></div>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
@@ -196,42 +200,42 @@ class Register {
     function get_courses_by_category($cat_id = null) {
         $drop_down = "";
         if ($cat_id != null) {
-            $drop_down.="<div class='dropdown'>
-            <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
-            <ul class='dropdown-menu'>";
+            //$drop_down.="<div class='dropdown'>
+            //<a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
+            //<ul class='dropdown-menu'>";
 
+            $drop_down.="<select id='courses' style='width:120px;'>";
             $query = "select id, fullname from mdl_course where category=$cat_id and cost>0";
             $num = $this->db->numrows($query);
             if ($num > 0) {
                 $result = $this->db->query($query);
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $drop_down.="<li><a href='#' id='course_" . $row['id'] . "' onClick='return false;'>" . $row['fullname'] . "</a></li>";
+                    $drop_down.="<option value='".$row['id']."'>".$row['fullname']."</option>";
                 } // end while
             } // end if $num > 0
-            $drop_down.="</ul></div>";
+            $drop_down.="</select>";
         } // end if $num > 0
         else {
-            $drop_down.="<a href='#' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program </a>";
+            $drop_down.="<select id='courses' style='width:120px;'></select>";
         }
         return $drop_down;
     }
 
     public function come_from() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='come_from_group' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Select <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
-        $drop_down.="<li><a href='#' id='Newspaper' onClick='return false;'>Newspaper</a></li>";
-        $drop_down.="<li><a href='#' id='Magazine' onClick='return false;'>Magazine</a></li>";
-        $drop_down.="<li><a href='#' id='Radio' onClick='return false;'>Radio</a></li>";
-        $drop_down.="<li><a href='#' id='TV' onClick='return false;'>TV</a></li>";
-        $drop_down.="<li><a href='#' id='Google' onClick='return false;'>Google</a></li>";
-        $drop_down.="<li><a href='#' id='Microsoft' onClick='return false;'>Microsoft</a></li>";
-        $drop_down.="<li><a href='#' id='Yahoo' onClick='return false;'>Yahoo</a></li>";
-        $drop_down.="<li><a href='#' id='Twitter' onClick='return false;'>Twitter</a></li>";
-        $drop_down.="<li><a href='#' id='Instagram' onClick='return false;'>Instagram</a></li>";
-        $drop_down.="<li><a href='#' id='Other' onClick='return false;'>Other</a></li>";
-        $drop_down.="</ul></div>";
+        $drop_down = "<select id='come_from_group' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>Select</option>";
+        $drop_down.="<option value='Newspaper'>Newspaper</option>";
+        $drop_down.="<option value='Magazine' >Magazine</option>";
+        $drop_down.="<option value='Radio' >Radio</option>";
+        $drop_down.="<option value='TV'>TV</option>";
+        $drop_down.="<option value='Google' >Google</option>";
+        $drop_down.="<option value='Microsoft' >Microsoft</option>";
+        $drop_down.="<option value='Yahoo' >Yahoo</option>";
+        $drop_down.="<option value='Twitter' >Twitter</option>";
+        $drop_down.="<option value='Instagram' >Instagram</option";
+        $drop_down.="<option value='Other'>Other</option>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
@@ -268,7 +272,7 @@ class Register {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>How did you hear about us?*</span>";
         $list.="<span class='span2'>$come_from</span>";
-        $list.="<span class='span4'><input type='checkbox' id='gr_policy'> I have read and agree to Terms and Conditions</span>";
+        //$list.="<span class='span4'><input type='checkbox' id='gr_policy'> I have read and agree to Terms and Conditions</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -305,11 +309,16 @@ class Register {
             $list.="<span class='span8'><hr/></span>";
             $list.="</div>";
         } // end for
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.= "<span style='color:red;' id='group_manual_form_err'></span>";
+        $list.="</div>";
 
-        $list.= "<div class='container-fluid' style='text-align:left;'";
-        $list.= "<span class='span2'><a href='#' id='proceed_to_group_payment' onClick='return false;'>Payment options</a></span>";
-        $list.= "&nbsp <span style='color:red;' id='group_manual_form_err'></span>";
+        $list.= "<div class='container-fluid' style='text-align:center;'";
+        $list.= "<span class='span2'><a href='#' id='proceed_to_group_payment' onClick='return false;'>Next</a></span>";        
         $list.= "</div>";
+        
+        
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
@@ -341,13 +350,13 @@ class Register {
         $courses = array();
 
         //1. Get state id
-        $query = "select id from mdl_states where state='$statename'";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $stateid = $row['id'];
-        }
-
+        //$query = "select id from mdl_states where state='$statename'";
+        //$result = $this->db->query($query);
+        //while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        //  $stateid = $row['id'];
+        //}
         //2. Get courses list for selected state
+        $stateid = $statename;
         $query = "select courseid from mdl_course_to_state where stateid=$stateid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -359,13 +368,13 @@ class Register {
             //print_r($courseid);
             //echo "<br>-------------------<br>";
             //3. Get category id
-            $query = "select id from mdl_course_categories where name='$categoryname'";
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $category_id = $row['id'];
-            }
-
+            //$query = "select id from mdl_course_categories where name='$categoryname'";
+            //$result = $this->db->query($query);
+            //while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            //  $category_id = $row['id'];
+            //}
             //4. Get courses withing selected state and category
+            $category_id = $categoryname;
             $query = "select id, fullname from mdl_course "
                     . "where category=$category_id and cost>0";
             $num = $this->db->numrows($query);
@@ -380,26 +389,23 @@ class Register {
                         $courses[] = $course;
                     } // end if in_array($row['id'], $courseid)
                 } // end while
-                $list.="<div class='dropdown'>
-                <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
-                <ul class='dropdown-menu'>";
+                //$list.="<div class='dropdown'>
+                //<a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
+                //<ul class='dropdown-menu'>";
+                $list.="<select id='courses' style='width:120px;'>";
                 foreach ($courses as $course) {
-                    $list.="<li><a href='#' id='course_" . $course->id . "' onClick='return false;'>" . $course->name . "</a></li>";
+                    $list.="<option value='$course->id'>$course->name</option>";
                 } // end foreach
-                $list.="</ul></div>";
+                $list.="</select>";
             } // end if $num>0
             else {
-                $list.="<div class='dropdown'>
-                <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
-                <ul class='dropdown-menu'>";
-                $list.="</ul></div>";
+                $list.="<select id='courses' style='width:120px;'>";
+                $list.="</select>";
             } // end else            
         }  // end if $num>0    
         else {
-            $list.="<div class='dropdown'>
-                <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
-                <ul class='dropdown-menu'>";
-            $list.="</ul></div>";
+            $list.="<select id='courses' style='width:120px;'>";
+            $list.="</select>";
         }
         return $list;
     }
@@ -438,7 +444,8 @@ class Register {
                 </p>
             </div>
             <div class='modal-footer'>
-                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal'>I Agree with Terms and Conditions</button></span>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='ok'>I Agree with Terms and Conditions</button></span>
             </div>
         </div>
     </div>

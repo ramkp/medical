@@ -14,15 +14,17 @@ class register_model extends CI_Model {
 
     public function get_participants_dropbox() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='participants' data-toggle='dropdown' 
-        class='dropdown-toggle'>Participants 
-        <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+        //$drop_down.="<div class='dropdown'>
+        //<a href='#' id='participants' data-toggle='dropdown' 
+        //class='dropdown-toggle'>Participants 
+        //<b class='caret'></b></a>
+        //<ul class='dropdown-menu'>";
+        $drop_down.="<select id='participants' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>Participants</option>";
         for ($i = 1; $i <= 50; $i++) {
-            $drop_down.="<li><a href='#' id='tot_" . $i . "'>" . $i . "</a></li>";
+            $drop_down.="<option value='$i'>$i</option>";
         }
-        $drop_down.="</ul></div>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
@@ -47,16 +49,29 @@ class register_model extends CI_Model {
 
     public function get_course_categories() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='categories' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program type<b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+
+        /*
+         * 
+          $drop_down.="<div class='dropdown'>
+          <a href='#' id='categories' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program type<b class='caret'></b></a>
+          <ul class='dropdown-menu'>";
+          $query = "select id,name from mdl_course_categories";
+          $result = $this->db->query($query);
+          foreach ($result->result() as $row) {
+          $drop_down.="<li><a href='#' id='cat_" . $row->id . "' onClick='return false;'>" . $row->name . "</a></li>";
+          }
+          $drop_down.="</ul></div>";
+         * 
+         */
+
+        $drop_down.="<select id='categories' style='width:120px;'>";
+        $drop_down.="<option value='0' selected='selected'>Program type</option>";
         $query = "select id,name from mdl_course_categories";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $drop_down.="<li><a href='#' id='cat_" . $row->id . "' onClick='return false;'>" . $row->name . "</a></li>";
+            $drop_down.="<option value='$row->id'>$row->name</option>";
         }
-        $drop_down.="</ul></div>";
-
+        $drop_down.="</select>";
         //$drop_down.="<select id='categories'>";
 
         return $drop_down;
@@ -80,7 +95,7 @@ class register_model extends CI_Model {
             $drop_down.="</ul></div>";
         } // end if $cat_id != null
         else {
-            $drop_down.="<a href='#' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program </a>";
+            $drop_down.="<select id='courses' style='width:120px;'><option value='0'>Program</option></select>";
         }
         return $drop_down;
     }
@@ -187,62 +202,72 @@ class register_model extends CI_Model {
 
     public function come_from() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='come_from' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Select <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
-        $drop_down.="<li><a href='#' id='Newspaper' onClick='return false;'>Newspaper</a></li>";
-        $drop_down.="<li><a href='#' id='Magazine' onClick='return false;'>Magazine</a></li>";
-        $drop_down.="<li><a href='#' id='Radio' onClick='return false;'>Radio</a></li>";
-        $drop_down.="<li><a href='#' id='TV' onClick='return false;'>TV</a></li>";
-        $drop_down.="<li><a href='#' id='Google' onClick='return false;'>Google</a></li>";
-        $drop_down.="<li><a href='#' id='Microsoft' onClick='return false;'>Microsoft</a></li>";
-        $drop_down.="<li><a href='#' id='Yahoo' onClick='return false;'>Yahoo</a></li>";
-        $drop_down.="<li><a href='#' id='Twitter' onClick='return false;'>Twitter</a></li>";
-        $drop_down.="<li><a href='#' id='Instagram' onClick='return false;'>Instagram</a></li>";
-        $drop_down.="<li><a href='#' id='Other' onClick='return false;'>Other</a></li>";
-        $drop_down.="</ul></div>";
+        $drop_down = "<select id='come_from' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>Select</option>";
+        $drop_down.="<option value='Newspaper'>Newspaper</option>";
+        $drop_down.="<option value='Magazine' >Magazine</option>";
+        $drop_down.="<option value='Radio' >Radio</option>";
+        $drop_down.="<option value='TV'>TV</option>";
+        $drop_down.="<option value='Google' >Google</option>";
+        $drop_down.="<option value='Microsoft' >Microsoft</option>";
+        $drop_down.="<option value='Yahoo' >Yahoo</option>";
+        $drop_down.="<option value='Twitter' >Twitter</option>";
+        $drop_down.="<option value='Instagram' >Instagram</option";
+        $drop_down.="<option value='Other'>Other</option>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
     public function get_states_list() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+        //$drop_down.="<div class='dropdown'>
+        //<a href='#' id='state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
+        //<ul class='dropdown-menu'>";
+        $drop_down.="<select id='state' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>State</option>";
         $query = "select * from mdl_states";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $drop_down.="<li><a href='#' id='state_" . $row->id . "' onClick='return false;'>" . $row->state . "</a></li>";
+            $drop_down.="<option value='$row->id'>$row->state</option>";
         } // end while
-        $drop_down.="</ul></div>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
     public function get_register_states_list() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='register_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>All States <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+        //$drop_down.="<div class='dropdown'>
+        //<a href='#' id='register_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>All States <b class='caret'></b></a>
+        //<ul class='dropdown-menu'>";
+
+        $drop_down.="<select id='register_state' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>All States</option>";
         $query = "select * from mdl_states";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $drop_down.="<li><a href='#' id='regiter_state_" . $row->id . "' onClick='return false;'>" . $row->state . "</a></li>";
+            $drop_down.="<option value='$row->id'>$row->state</option>";
         } // end while
-        $drop_down.="</ul></div>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
     public function get_countries_list() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='country' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>United States <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+        //$drop_down.="<div class='dropdown'>
+        //<a href='#' id='country' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>United States <b class='caret'></b></a>
+        //<ul class='dropdown-menu'>";
+        $drop_down.="<select id='country' style='width:120px;'>";
         $query = "select * from mdl_countries";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $drop_down.="<li><a href='#' id='country_" . $row->id . "' onClick='return false;'>" . $row->name . "</a></li>";
+            if ($row->name == 'United States') {
+                $drop_down.="<option value='$row->id' selected>$row->name</option>";
+            } // end if $row->name=='United States'
+            else {
+                $drop_down.="<option value='$row->id'>$row->name</option>";
+            }
         }
-        $drop_down.="</ul></div>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 
@@ -354,7 +379,7 @@ class register_model extends CI_Model {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>How did you hear about us?*</span>";
         $list.="<span class='span2'>$come_from</span>";
-        $list.="<span class='span4'><input type='checkbox' id='policy'> I have read and agree to Terms and Conditions</span>";
+        //$list.="<span class='span4'><input type='checkbox' id='policy'> I have read and agree to Terms and Conditions</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -363,7 +388,7 @@ class register_model extends CI_Model {
 
         // Payment options link
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span8'><a href='#' id='p_options_p' onClick='return false;'>Payment options</a></span>&nbsp;<span style='color:red;' id=''></span>";
+        $list.="<span class='span8'><a href='#' id='p_options_p' onClick='return false;'>Next</a></span>&nbsp;<span style='color:red;' id=''></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
