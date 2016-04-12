@@ -1144,10 +1144,29 @@ $(document).ready(function () {
         }
     }
 
-    // Detect which one button is clicked inside Modal dialog
-    $('#myModal').on('click', function (event) {
-        alert(event.target.id);
-    });
+    function get_schedule_course_state() {
+        var stateid = $('#schedule_states').val();
+        var courseid=$('#schedule_courses').val();
+        var url = "http://" + domain + "/functionality/php/get_schedule_course_state.php";
+        var request = {stateid: stateid,courseid:courseid};
+        $('#ajax_loading_schedule').show();
+        $.post(url, request).done(function (data) {
+            $('#ajax_loading_schedule').hide();
+            $('#course_schedule').html(data);
+        });
+
+    }
+    
+    function get_schedule_course() {
+        var courseid=$('#schedule_courses').val();
+        var url = "http://" + domain + "/functionality/php/get_schedule_course.php";
+        var request = {courseid:courseid};
+        $('#ajax_loading_schedule').show();
+        $.post(url, request).done(function (data) {
+            $('#ajax_loading_schedule').hide();
+            $('#course_schedule').html(data);
+        });
+    }
 
     function fill_billing_address() {
         //var group_status=$('#group').prop('checked');
@@ -1478,7 +1497,7 @@ $(document).ready(function () {
         if (event.target.id.indexOf("regiter_state_") >= 0) {
             get_category_items_in_state();
         }
-        
+
         if (event.target.id == 'policy') {
             $('#policy_checkbox').prop("checked", true);
             show_policy_modal_dialog();
@@ -1530,9 +1549,17 @@ $(document).ready(function () {
 
         if (event.target.id == 'same_address') {
             fill_billing_address();
+        } // end if event.target.i_coursed == 'policy'
+
+        if (event.target.id == 'schedule_states') {
+            get_schedule_course_state();
         } // end if event.target.id == 'policy'
-
-
+        
+        if (event.target.id == 'schedule_courses') {
+            get_schedule_course();
+        } // end if event.target.id == 'policy'
+        
+        
 
     }); // end if ('#page').on('change',  function (event) {
 

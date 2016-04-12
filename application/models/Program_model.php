@@ -280,7 +280,7 @@ class program_model extends CI_Model {
 
     public function get_states_list() {
         $drop_down = "";
-        $drop_down.="<select id='states' style='width:120px;'>";
+        $drop_down.="<select id='schedule_states' style='width:120px;'>";
         $drop_down.="<option value='0' selected>All states</option>";
         $query = "select * from mdl_states order by state";
         $result = $this->db->query($query);
@@ -291,7 +291,7 @@ class program_model extends CI_Model {
         return $drop_down;
     }
 
-    public function get_courses_list() {
+    public function get_courses_list($courseid) {
         $items = array();
         $query = "select id, fullname from mdl_course where cost>0 order by fullname";
         $result = $this->db->query($query);
@@ -303,10 +303,15 @@ class program_model extends CI_Model {
             $items[] = $item;
         } // end foreach
         $drop_down = "";
-        $drop_down.="<select id='courses' style='width:120px;'>";
+        $drop_down.="<select id='schedule_courses' style='width:120px;'>";
         $drop_down.="<option value='0' selected>Programs</option>";
         foreach ($items as $item) {
-            $drop_down.="<option value='$item->id'>$item->fullname</option>";
+            if ($item->id == $courseid) {
+                $drop_down.="<option value='$item->id' selected>$item->fullname</option>";
+            } // end if 
+            else {
+                $drop_down.="<option value='$item->id'>$item->fullname</option>";
+            }
         } // end foreach
         $drop_down.="</select>";
         return $drop_down;
@@ -408,8 +413,8 @@ class program_model extends CI_Model {
                     $human_date = date('m-d-Y', $row->starttime);
                     $hours_num = round($row->duration / 60);
                     $human_start_time = date('m-d-Y H:i', $row->timemodified);
-                    $end_time = $row->timemodified + $hours_num*3600;
-                    $human_end_date=date('m-d-Y H:i', $end_time);
+                    $end_time = $row->timemodified + $hours_num * 3600;
+                    $human_end_date = date('m-d-Y H:i', $end_time);
                     $locations = explode("/", $row->appointmentlocation);
                     $state = $locations[0];
                     $city = $locations[1];
@@ -419,9 +424,9 @@ class program_model extends CI_Model {
                     $list.= "<span class='span2'>$row->appointmentlocation</span>";
                     $list.= "<span class='span3'>$row->notes</span>";
                     $list.= "<span class='span1'>9am -  5pm</span>";
-                    $list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid'><button class='btn btn-primary'>Register</button></a></span>";
+                    $list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
                     $list.="</div>";
-                    
+
                     $list.="<div class='container-fluid' style='text-align:left;'>";
                     $list.= "<span class='span9'><hr/></span>";
                     $list.="</div>";
@@ -431,10 +436,10 @@ class program_model extends CI_Model {
                 $list.="</div>"; // end of panel panel-default           
             } // end if $num > 0 when slots are available at the course
             else {
-                $list.="<div class='container-fluid' style='text-align:left;'>";                
+                $list.="<div class='container-fluid' style='text-align:left;'>";
                 $list.= "<span class='span6'>This program does not have schedule</span>";
                 $list.="</div>";
-                
+
                 $list.="</div>"; // end of panel-body
                 $list.="</div>"; // end of panel panel-default           
             }
@@ -445,7 +450,7 @@ class program_model extends CI_Model {
     public function get_schedule_page($courseid) {
         $list = "";
         $states = $this->get_states_list();
-        $courses = $this->get_courses_list();
+        $courses = $this->get_courses_list($courseid);
         $item = $this->get_all_courses();
         $list.="<br/><div  class='form_div'>";
         $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
@@ -470,7 +475,7 @@ class program_model extends CI_Model {
 
         $list.="</div>"; // end of panel-body
         $list.="</div>"; // end of panel panel-default                
-        $list.= $this->get_course_schedule($courseid);
+        $list.= "<div id='course_schedule'>" . $this->get_course_schedule($courseid) . "</div>";
 
         $list.= "</div>"; // end of form div
         return $list;
