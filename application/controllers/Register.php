@@ -14,11 +14,12 @@ class Register extends CI_Controller {
 
     public function index() {
         $courseid = $this->uri->segment(3);
+        $slotid=$this->uri->segment(4);
         if ($courseid == null) {
             $form = $this->register_model->get_register_form();
         } // end if $courseid==null
         else {
-            $form = $this->register_model->get_register_form($courseid);
+            $form = $this->register_model->get_register_form($courseid,$slotid);
         }
 
         $data = array('form' => $form);

@@ -335,6 +335,7 @@ class Payment {
             $user->city = $group_common_section->city;
             $user->state = $group_common_section->state;
             $user->country = 'US';
+            $user->slotid=$group_common_section->slotid;
             $user->come_from = $group_common_section->come_from;
             $email_exists = $this->enroll->is_email_exists($group_participant->email);
             if ($email_exists == 0) {
@@ -834,6 +835,7 @@ class Payment {
             $user->zip = $group_common_section->zip;
             $user->city = $group_common_section->city;
             $user->state = $group_common_section->state;
+            $user->slotid=$group_common_section->slotid;
             $user->country = 'US';
             $user->come_from = $group_common_section->come_from;
             $email_exists = $this->enroll->is_email_exists($group_participant->email);

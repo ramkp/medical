@@ -184,7 +184,7 @@ class Invoice {
         $list.="<html>";
         $list.="<body>";
         $list.= "<p></p>";
-        $list.="<br/><br/><table border='0' align='center'>";
+        $list.="<br/><br/><table border='0' align='center' style='width:100%;table-layout:fixed}'>";
         $list.="<tr>";
         $list.="<td colspan='2' width='65%' style=''><img src='" . $_SERVER['DOCUMENT_ROOT'] . "/assets/logo/5.png' width='350' height=90></td><td width='35%' style='padding-left:10px;padding-right:10px;border-left:1px solid;'>Phone: $invoice_credentials->phone<br/>Fax: $invoice_credentials->fax</td>";
         $list.="</tr>";
@@ -361,7 +361,7 @@ class Invoice {
         $list.="<html>";
         $list.="<body>";
         $list.= "<p></p>";
-        $list.="<br/><br/><table border='0' align='center'>";
+        $list.="<br/><br/><table border='0' align='center' style='width:100%;table-layout:fixed}'>";
         $list.="<tr>";
         $list.="<td colspan='2' width='65%' style=''><img src='" . $_SERVER['DOCUMENT_ROOT'] . "/assets/logo/5.png' width='350' height=90></td><td width='35%' style='padding-left:10px;padding-right:10px;border-left:1px solid;'>Phone: $invoice_credentials->phone<br/>Fax: $invoice_credentials->fax</td>";
         $list.="</tr>";

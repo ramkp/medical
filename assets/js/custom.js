@@ -112,38 +112,38 @@ $(document).ready(function () {
                     if (data > 0) {
                         // It means we have valid users in file >0	
                         $('#upload_err').html('');
-                        var selected_course = $('#courses').text();
-                        var course_name = selected_course.trim();
-                        var course_url = "http://" + domain + "/functionality/php/get_course_id.php";
-                        var request = {course_name: course_name};
-                        $.post(course_url, request).done(function (courseid) {
+                        var selected_course = $('#register_courses').val();
+                        var courseid = selected_course;
+                        //$.post(course_url, request).done(function (courseid) {
+                        $('#ajax_loading_group_file').hide();
+                        var addr = $('#group_addr').val();
+                        var inst = $('#group_inst').val();
+                        var zip = $('#group_zip').val();
+                        var city = $('#group_city').val();
+                        var state = $('#group_state').val();
+                        var group_name = $('#group_name').val();
+                        var come_from = $('#come_from_group').text().trim();
+                        var slotid=$('#register_state').val();
+                        var grpoup_data = {courseid: courseid,
+                            slotid:slotid,
+                            addr: addr,
+                            inst: inst,
+                            zip: zip,
+                            city: city,
+                            state: state,
+                            come_from: come_from,                            
+                            tot_participants: data,
+                            group_name: group_name};
+                        var group_url = "http://" + domain + "/functionality/php/group_signup_by_file.php";
+                        var request = {group_common_section: JSON.stringify(grpoup_data)};
+                        $.post(group_url, request).done(function (data) {
                             $('#ajax_loading_group_file').hide();
-                            var addr = $('#group_addr').val();
-                            var inst = $('#group_inst').val();
-                            var zip = $('#group_zip').val();
-                            var city = $('#group_city').val();
-                            var state = $('#group_state').val();
-                            var group_name = $('#group_name').val();
-                            var come_from = $('#come_from_group').text().trim();
-                            var grpoup_data = {courseid: courseid,
-                                addr: addr,
-                                inst: inst,
-                                zip: zip,
-                                city: city,
-                                state: state,
-                                come_from: come_from,
-                                tot_participants: data,
-                                group_name: group_name};
-                            var group_url = "http://" + domain + "/functionality/php/group_signup_by_file.php";
-                            var request = {group_common_section: JSON.stringify(grpoup_data)};
-                            $.post(group_url, request).done(function (data) {
-                                $('#ajax_loading_group_file').hide();
-                                var el = $('#personal_payment_details').length;
-                                if (el == 0) {
-                                    $('#group_common_section').append(data);
-                                }
-                            });
-                        }); // end of $.post(course_url, request)
+                            var el = $('#personal_payment_details').length;
+                            if (el == 0) {
+                                $('#group_common_section').append(data);
+                            }
+                        });
+                        //}); // end of $.post(course_url, request)
                     } // end if data > 0
                     else {
                         $('#upload_err').html(data);
@@ -298,7 +298,7 @@ $(document).ready(function () {
 
     function verify_group_general_part() {
 
-        var courseid = $('#courses').val();
+        var courseid = $('#register_courses').val();
         if (courseid != 0) {
             $('#program_err').html('');
             $('#group_common_errors').html('');
@@ -312,6 +312,7 @@ $(document).ready(function () {
             var city = $('#group_city').val();
             var state = $('#group_state').val();
             var group_name = $('#group_name').val();
+            var slotid=$('#register_state').val();
             if (addr == '') {
                 $('#group_common_errors').html('Please provide address');
                 return false;
@@ -385,7 +386,7 @@ $(document).ready(function () {
         var group_budget = $('#group_budget').val();
         var group_company = $('#group_company').val();
         var group_email = $('#group_email').val();
-        var courses = $('#courses').val();
+        var courses = $('#register_courses').val();
         var group_request = $('#group_request').val();
         if (group_fio == '') {
             $('#private_err').html('Please provide firstname and lastname');
@@ -519,6 +520,8 @@ $(document).ready(function () {
         var userid = $('#userid').val();
         var courseid = $('#courseid').val();
         var participants = $('#participants').val();
+        var cvv=$('#bill_cvv').val();
+        var state=$('#bill_state').val();
         if (card_type == 'Card type') {
             $('#personal_payment_err').html('Please select card type');
             return false;
@@ -568,6 +571,16 @@ $(document).ready(function () {
             $('#personal_payment_err').html('Please provide correct contact email');
             return false;
         }
+        
+        if (cvv=='') {
+            $('#personal_payment_err').html('Please provide card cvv code');
+            return false;
+        }
+        
+        if (state==0) {
+            $('#personal_payment_err').html('Please select state');
+            return false;
+        }
 
         var user_group = $('#user_group').val();
         if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_email != '' && validateEmail(bill_email) == true) {
@@ -576,6 +589,7 @@ $(document).ready(function () {
                 email: email,
                 userid: userid,
                 courseid: courseid,
+                cvv:cvv,
                 participants: participants,
                 card_type: card_type,
                 card_no: card_no,
@@ -648,7 +662,7 @@ $(document).ready(function () {
 
         var err = 0;
         var users = new Array();
-        var courseid = $('#courses').val();
+        var courseid = $('#register_courses').val();
         var addr = $('#group_addr').val();
         var inst = $('#group_inst').val();
         var zip = $('#group_zip').val();
@@ -656,6 +670,7 @@ $(document).ready(function () {
         var state = $('#group_state').val();
         var group_name = $('#group_name').val();
         var come_from = $('#come_from_group').val();
+        var slotid=$('#register_state').val();
         for (i = 0; i <= tot_participants; i++) {
 
             var first_name_id = '#first_name_' + i;
@@ -670,7 +685,7 @@ $(document).ready(function () {
                 err++;
             } // end if first_name=='' || last_name==''
             if (first_name != '' && last_name != '' && email != '' && validateEmail(email) == true && phone != '') {
-                var user = {first_name: first_name, last_name: last_name, email: email, phone: phone, come_from: come_from};
+                var user = {first_name: first_name, last_name: last_name, email: email, phone: phone, come_from: come_from,slotid:slotid};
                 users.push(user);
             } // end if first_name != '' && last_name != ''
         } // end for
@@ -688,6 +703,7 @@ $(document).ready(function () {
             console.log('Course id: ' + courseid);
             var group_common_section = {
                 courseid: courseid,
+                slotid:slotid,
                 addr: addr,
                 inst: inst,
                 zip: zip,
@@ -720,7 +736,7 @@ $(document).ready(function () {
 
     function verify_group_common_section() {
         var tot_participants = $('#participants').val();
-        var selected_course = $('#courses').val();
+        var selected_course = $('#register_courses').val();
         var courseid = selected_course;
 
         if (courseid != 0) {
@@ -850,18 +866,21 @@ $(document).ready(function () {
      * 
      *               Verify Manual Group registration form
      * 
-     ************************************************************************/
-
+     ************************************************************************/    
+    
+    
     function validateEmail(email) {
         var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
         return re.test(email);
     }
+    
+    var personal_registration_obj;
 
     function verify_personal_manual_registration_form() {
 
         var come_from = $('#come_from').val();
         console.log('Come from: ' + come_from);
-        var courseid = $('#courses').val();
+        var courseid = $('#register_courses').val();
         console.log('Courses dropdown: ' + courseid);
         if (courseid != 0) {
             $('#program_err').html('');
@@ -876,6 +895,8 @@ $(document).ready(function () {
             var city = $('#city').val();
             var state = $('#state').val();
             var country = $('#country').val();
+            var slotid=$('#register_state').val();
+            
             if (first_name == '') {
                 $('#personal_err').html('Please provide firstname');
                 return false;
@@ -948,10 +969,12 @@ $(document).ready(function () {
                     } // end if data>0
                     else {
                         // Everything is fine post data and show payment section
+                        console.log('Slot ID: '+slotid);
                         $('#personal_err').html('');
                         $('#ajax_loading_personal').show();
                         var user = {
                             courseid: courseid,
+                            slotid: slotid,
                             come_from: come_from,
                             first_name: first_name,
                             last_name: last_name,
@@ -964,6 +987,7 @@ $(document).ready(function () {
                             state: state,
                             country: country};
                         console.log("User: " + JSON.stringify(user));
+                        personal_registration_obj=JSON.stringify(user);
                         var signup_url = "http://" + domain + "/functionality/php/single_signup.php";
                         var signup_request = {user: JSON.stringify(user)};
                         $.post(signup_url, signup_request).done(function (data) {
@@ -1146,9 +1170,9 @@ $(document).ready(function () {
 
     function get_schedule_course_state() {
         var stateid = $('#schedule_states').val();
-        var courseid=$('#schedule_courses').val();
+        var courseid = $('#schedule_courses').val();
         var url = "http://" + domain + "/functionality/php/get_schedule_course_state.php";
-        var request = {stateid: stateid,courseid:courseid};
+        var request = {stateid: stateid, courseid: courseid};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
             $('#ajax_loading_schedule').hide();
@@ -1156,15 +1180,35 @@ $(document).ready(function () {
         });
 
     }
-    
+
     function get_schedule_course() {
-        var courseid=$('#schedule_courses').val();
+        var courseid = $('#schedule_courses').val();
         var url = "http://" + domain + "/functionality/php/get_schedule_course.php";
-        var request = {courseid:courseid};
+        var request = {courseid: courseid};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
             $('#ajax_loading_schedule').hide();
             $('#course_schedule').html(data);
+        });
+    }
+
+    function get_register_course_states() {
+        var courseid = $('#register_courses').val();        
+        var url = "http://" + domain + "/functionality/php/get_register_course_states.php";
+        var request = {courseid:courseid};
+        $.post(url, request).done(function (data) {           
+            $('#register_states_container').html(data);
+        });
+        
+    }
+
+    function get_register_course_cities() {
+        var courseid = $('#register_courses').val();
+        var slotid=$('#register_state').val();
+        var url = "http://" + domain + "/functionality/php/get_register_course_cities.php";
+        var request = {courseid:courseid,slotid:slotid};
+        $.post(url, request).done(function (data) {           
+            $('#register_cities_container').html(data);
         });
     }
 
@@ -1258,6 +1302,11 @@ $(document).ready(function () {
     $('#school').click(function () {
         self.location = $('#school').attr('href');
     });
+    
+    $('#college').click(function () {
+        self.location = $('#college').attr('href');
+    });
+    
     /************************************************************************
      * 
      *                      Show Testimonial page after click
@@ -1401,15 +1450,7 @@ $(document).ready(function () {
                 //console.log('Course ID: ' + courseid);
                 show_scheduled_course(courseid);
             } // end if url.indexOf('schedule') > 0
-        }
-
-        if (event.target.id == 'courses') {
-            $(".dropdown li a").click(function () {
-                $(this).parents(".dropdown").find('.dropdown-toggle').text($(this).text());
-                $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
-                $('#program_err').html('');
-            });
-        }
+        }       
 
         if (event.target.id == 'states') {
             $(".dropdown li a").click(function () {
@@ -1528,9 +1569,9 @@ $(document).ready(function () {
             get_category_course(category_id);
         }
 
-        if (event.target.id == 'register_state') {
-            get_category_items_in_state();
-        }
+        //if (event.target.id == 'register_state') {
+          //  get_category_items_in_state();
+        //}
 
         if (event.target.id == 'participants') {
             $('#type_err').html('');
@@ -1554,12 +1595,19 @@ $(document).ready(function () {
         if (event.target.id == 'schedule_states') {
             get_schedule_course_state();
         } // end if event.target.id == 'policy'
-        
+
         if (event.target.id == 'schedule_courses') {
             get_schedule_course();
         } // end if event.target.id == 'policy'
-        
-        
+
+        if (event.target.id == 'register_courses') {
+            get_register_course_states();
+        } // end if event.target.id == 'policy'
+
+        if (event.target.id == 'register_state') {
+            get_register_course_cities();
+        } // end if event.target.id == 'policy'
+
 
     }); // end if ('#page').on('change',  function (event) {
 

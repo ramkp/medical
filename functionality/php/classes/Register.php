@@ -52,22 +52,22 @@ class Register {
         $drop_down = "";
         if ($group == false) {
             //$drop_down.="<div class='dropdown'>
-        //<a href='#' id='state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
-        //<ul class='dropdown-menu'>";
+            //<a href='#' id='state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
+            //<ul class='dropdown-menu'>";
             $drop_down.="<select id='state' style='width:120px;'>";
         } // end if $group==false
         else {
             //$drop_down.="<div class='dropdown'>
-        //<a href='#' id='group_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
-        //<ul class='dropdown-menu'>";
+            //<a href='#' id='group_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>State <b class='caret'></b></a>
+            //<ul class='dropdown-menu'>";
             $drop_down.="<select id='group_state' style='width:120px;'>";
         }
-        
+
         $query = "select * from mdl_states";
         $result = $this->db->query($query);
         $drop_down.="<option value='0' selected>State</option>";
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $drop_down.="<option value='".$row['id']."'>".$row['state']."</option>";
+            $drop_down.="<option value='" . $row['id'] . "'>" . $row['state'] . "</option>";
         } // end while
         $drop_down.="</select>";
         return $drop_down;
@@ -204,26 +204,27 @@ class Register {
             //<a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
             //<ul class='dropdown-menu'>";
 
-            $drop_down.="<select id='courses' style='width:120px;'>";
+            $drop_down.="<select id='register_courses' style='width:120px;'>";
+            $drop_down.="<option value='0' selected>Program</option>";
             $query = "select id, fullname from mdl_course where category=$cat_id and cost>0";
             $num = $this->db->numrows($query);
             if ($num > 0) {
                 $result = $this->db->query($query);
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $drop_down.="<option value='".$row['id']."'>".$row['fullname']."</option>";
+                    $drop_down.="<option value='" . $row['id'] . "'>" . $row['fullname'] . "</option>";
                 } // end while
             } // end if $num > 0
             $drop_down.="</select>";
         } // end if $num > 0
         else {
-            $drop_down.="<select id='courses' style='width:120px;'></select>";
+            $drop_down.="<select id='register_courses' style='width:120px;'></select>";
         }
         return $drop_down;
     }
 
     public function come_from() {
         $drop_down = "";
-        $drop_down = "<select id='come_from_group' style='width:120px;'>";
+        $drop_down.= "<select id='come_from_group' style='width:120px;'>";
         $drop_down.="<option value='0' selected>Select</option>";
         $drop_down.="<option value='Newspaper'>Newspaper</option>";
         $drop_down.="<option value='Magazine' >Magazine</option>";
@@ -233,7 +234,7 @@ class Register {
         $drop_down.="<option value='Microsoft' >Microsoft</option>";
         $drop_down.="<option value='Yahoo' >Yahoo</option>";
         $drop_down.="<option value='Twitter' >Twitter</option>";
-        $drop_down.="<option value='Instagram' >Instagram</option";
+        $drop_down.="<option value='Instagram' >Instagram</option>";
         $drop_down.="<option value='Other'>Other</option>";
         $drop_down.="</select>";
         return $drop_down;
@@ -309,16 +310,16 @@ class Register {
             $list.="<span class='span8'><hr/></span>";
             $list.="</div>";
         } // end for
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.= "<span style='color:red;' id='group_manual_form_err'></span>";
         $list.="</div>";
 
         $list.= "<div class='container-fluid' style='text-align:center;'";
-        $list.= "<span class='span2'><a href='#' id='proceed_to_group_payment' onClick='return false;'>Next</a></span>";        
+        $list.= "<span class='span2'><a href='#' id='proceed_to_group_payment' onClick='return false;'>Next</a></span>";
         $list.= "</div>";
-        
-        
+
+
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
@@ -451,6 +452,102 @@ class Register {
     </div>
 </div>";
         return $list;
+    }
+
+    function get_schedulerid($courseid) {
+        $schedulerid = 0;
+        $query = "select id from mdl_scheduler where course=$courseid";
+        $result = $this->db->query($query);
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $schedulerid = $row['id'];
+            } // end while
+        } // end if $num > 0
+        return $schedulerid;
+    }
+
+    function get_course_slots($courseid) {
+        $slots = array();
+        $schedulerid = $this->get_schedulerid($courseid);
+        if ($schedulerid > 0) {
+            $query = "select * from mdl_scheduler_slots "
+                    . "where schedulerid=$schedulerid order by starttime";
+            $result = $this->db->query($query);
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $slots[] = $row['id'];
+                } // end while
+            } // end if $num > 0
+        } // $schedulerid>0
+        return $slots;
+    }
+
+    function get_slot_data($id) {
+        $query = "select * from mdl_scheduler_slots where id=$id";
+        $result = $this->db->query($query);
+        $num = $this->db->numrows($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slot = new stdClass();
+            foreach ($row as $key => $value) {
+                $slot->$key = $value;
+            } // end foreach
+        } // end while
+        return $slot;
+    }
+
+    function get_register_course_states($courseid) {
+        $drop_down = "";
+        $drop_down.="<select id='register_state' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>All States</option>";
+        $slots = $this->get_course_slots($courseid);
+        if (count($slots) > 0) {
+            foreach ($slots as $slot) {
+                $slot_data = $this->get_slot_data($slot);
+                $locations = explode("/", $slot_data->appointmentlocation);
+                $state = $locations[0];
+                $drop_down.="<option value='$slot'>$state</option>";
+            } // end foreach
+        } // end if count($slots)>0
+        $drop_down.="</select>";
+        return $drop_down;
+    }
+
+    function get_state_name($stateid) {
+        $query = "select * from mdl_states where id=$stateid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        }
+        return $state;
+    }
+
+    function get_register_course_cities($courseid, $slotid) {
+        $drop_down = "";
+        $drop_down.="<select id='register_cities' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>All Cities</option>";
+        $schedulerid = $this->get_schedulerid($courseid);
+        if ($schedulerid > 0) {
+            $slot_data = $this->get_slot_data($slotid);
+            $locations = explode("/", $slot_data->appointmentlocation);
+            $statename = $locations[0];
+            $query = "select * from mdl_scheduler_slots "
+                    . "where schedulerid=$schedulerid "
+                    . "and appointmentlocation like '%$statename%' "
+                    . "order by starttime";
+            $result = $this->db->query($query);
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $locations2 = explode("/", $row['appointmentlocation']);                    
+                    $cityname = $locations2[1];
+                    $drop_down.="<option value='$statename'>$cityname</option>";
+                } // end while
+            } // end if $num > 0
+        } // end if $schedulerid>0
+        $drop_down.="</select>";
+        return $drop_down;
     }
 
 }

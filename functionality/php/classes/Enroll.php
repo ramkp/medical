@@ -190,10 +190,23 @@ class Enroll {
         $mailer->send_account_confirmation_message($user);
     }
 
+    function add_user_to_course_schedule($userid, $user) {
+        //print_r($user);
+        if ($user->slotid > 0) {
+            $query = "insert into mdl_scheduler_appointment "
+                    . "(slotid,"
+                    . "studentid,"
+                    . "attended) values ($user->slotid,$userid,0)";
+            //echo "Query: ".$query."<br>";
+            $this->db->query($query);
+        } // end if $user->slotid>0
+    }
+
     function enroll_user_to_course($user) {
         $userid = $this->getUserId($user->email);
         $this->assign_roles($userid, $user->courseid);
         $this->update_user_data($userid, $user);
+        $this->add_user_to_course_schedule($userid, $user);
         $this->send_confirmation_email($user);
     }
 

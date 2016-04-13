@@ -41,9 +41,7 @@ class register_model extends CI_Model {
     public function get_selected_program($courseid) {
         $list = "";
         $name = $this->get_coure_name_by_id($courseid);
-        $list.="<a id='courses' class='dropdown-toggle' 
-                onclick='return false;' data-toggle='dropdown' 
-            href='#'>$name</a>";
+        $list.=$name;
         return $list;
     }
 
@@ -81,7 +79,7 @@ class register_model extends CI_Model {
         $drop_down = "";
         if ($cat_id != null) {
             $drop_down.="<div class='dropdown'>
-            <a href='#' id='courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
+            <a href='#' id='register_courses' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>Program <b class='caret'></b></a>
             <ul class='dropdown-menu'>";
 
             $query = "select id, fullname from mdl_course where category=$cat_id";
@@ -95,7 +93,7 @@ class register_model extends CI_Model {
             $drop_down.="</ul></div>";
         } // end if $cat_id != null
         else {
-            $drop_down.="<select id='courses' style='width:120px;'><option value='0'>Program</option></select>";
+            $drop_down.="<select id='register_courses' style='width:120px;'><option value='0'>Program</option></select>";
         }
         return $drop_down;
     }
@@ -212,7 +210,7 @@ class register_model extends CI_Model {
         $drop_down.="<option value='Microsoft' >Microsoft</option>";
         $drop_down.="<option value='Yahoo' >Yahoo</option>";
         $drop_down.="<option value='Twitter' >Twitter</option>";
-        $drop_down.="<option value='Instagram' >Instagram</option";
+        $drop_down.="<option value='Instagram' >Instagram</option>";
         $drop_down.="<option value='Other'>Other</option>";
         $drop_down.="</select>";
         return $drop_down;
@@ -234,21 +232,38 @@ class register_model extends CI_Model {
         return $drop_down;
     }
 
-    public function get_register_states_list() {
+    public function get_register_course_states_list($courseid = null) {
         $drop_down = "";
-        //$drop_down.="<div class='dropdown'>
-        //<a href='#' id='register_state' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>All States <b class='caret'></b></a>
-        //<ul class='dropdown-menu'>";
-
         $drop_down.="<select id='register_state' style='width:120px;'>";
         $drop_down.="<option value='0' selected>All States</option>";
-        $query = "select * from mdl_states";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $drop_down.="<option value='$row->id'>$row->state</option>";
-        } // end while
+        
+        if ($courseid != null) {
+            $query = "";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                //$drop_down.="<option value='$row->id'>$row->state</option>";
+            } // end while
+        } // end if $courseid != null        
+
         $drop_down.="</select>";
         return $drop_down;
+    }
+
+    public function get_register_course_cities_list($courseid = null) {
+        $drop_down = "";
+        $drop_down.="<select id='register_cities' style='width:120px;'>";
+        $drop_down.="<option value='0' selected>All Cities</option>";
+        if ($courseid != null) {
+            $query = "";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                //$drop_down.="<option value='$row->id'>$row->state</option>";
+            } // end while
+        } // end if $courseid != null        
+        
+        $drop_down.="</select>";
+        return $drop_down;
+
     }
 
     public function get_countries_list() {
@@ -271,16 +286,28 @@ class register_model extends CI_Model {
         return $drop_down;
     }
 
-    public function get_register_form($courseid = null) {
+    public function get_program_schedule($slotid) {
+        date_default_timezone_set('Pacific/Wallis');
+        $list = "";
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $hdate=date('m-d-Y', $row->starttime);
+            $list.=$hdate."<br>".$row->appointmentlocation . "<br/>" . $row->notes;
+        }
+        return $list;
+    }
+
+    public function get_register_form($courseid = null, $slotid = null) {
         $list = "";
         $cats = $this->get_course_categories();
         $courses = $this->get_courses_by_category();
         $participants = $this->get_participants_dropbox();
         $come_from = $this->come_from();
         $states = $this->get_states_list();
-        $register_state = $this->get_register_states_list();
-        $countries = $this->get_countries_list();
-        $policy_dialog = $this->get_policy_dialog();
+        $register_state = $this->get_register_course_states_list();
+        //$countries = $this->get_countries_list();   
+        $cities = $this->get_register_course_cities_list();
 
         // ****************** Program information **************************
 
@@ -298,8 +325,8 @@ class register_model extends CI_Model {
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>$cats</span>";
             $list.="<span class='span2' id='cat_course'>$courses</span>";
-            $list.="<span class='span2'>$register_state</span>";
-            $list.="<span class='span2'>$countries</span>";
+            $list.="<span class='span2' id='register_states_container'>$register_state</span>";
+            $list.="<span class='span2' id='register_cities_container'>$cities</span>";
             $list.="<span class='span2' id='program_err' style='color:red;'></span>";
             $list.="</div>"; // end of container-fluid
 
@@ -308,6 +335,7 @@ class register_model extends CI_Model {
         } // end if $courseid==null
         else {
             $selected_program = $this->get_selected_program($courseid);
+            $program_schedule = $this->get_program_schedule($slotid);
             $list.="<br/><div  class='form_div'>";
             $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
             $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program information</h5></div>";
@@ -315,7 +343,10 @@ class register_model extends CI_Model {
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Selected program:</span>";
-            $list.="<span class='span2'>$selected_program</span>";
+            $list.="<span class='span4'>$selected_program</span>";
+            $list.="<span class='span1'><input type='hidden' value='$slotid' id='register_state'></span>";
+            $list.="<span class='span1'><input type='hidden' value='$courseid' id='register_courses'></span>";            
+            $list.="<span class='span3'>$program_schedule</span>";
             $list.="</div>"; // end of container-fluid
 
             $list.="</div>"; // end of panel-body
@@ -359,7 +390,7 @@ class register_model extends CI_Model {
         $list.="<span class='span2'>State*</span>";
         $list.="<span class='span2'>$states</span>";
         $list.="<span class='span2'>Country*</span>";
-        $list.="<span class='span2'>$countries</span>";
+        $list.="<span class='span2' id='register_cities_container'>$cities</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
