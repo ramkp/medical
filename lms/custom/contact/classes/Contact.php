@@ -18,7 +18,7 @@ class Contact extends Util {
             $content = $row['content'];
         }
         $editor = $this->get_editor_instance($content);
-        $list = $list . "<p align='center' style='font-weight:bolder;'>Edit Page - FAQ</p>";
+        $list = $list . "<p align='center' style='font-weight:bolder;'>Edit Page - Contact</p>";
         $list = $list . "<table class='table table-hover' border='0'>";
         $list = $list . "<tr>";
         $list = $list . "</td >&nbsp;&nbsp;$editor</td>";
