@@ -7,6 +7,7 @@
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Late.php';
 
 use Dompdf\Dompdf;
 
@@ -289,11 +290,13 @@ class Invoice {
                 . "'0',"
                 . "'" . $file_path . "',"
                 . "'" . time() . "')";
-        $this->db->query($query);        
+        $this->db->query($query);
         return $invoice_num;
     }
 
     function create_user_invoice($user, $group, $participants) {
+        $late = new Late();
+        $late_fee = $late->get_delay_fee();
         $user_installment_status = $this->is_installment_user($user->id, $user->courseid);
         if ($user_installment_status == 0) {
             if ($group == null) {
@@ -309,6 +312,7 @@ class Invoice {
                 else {
                     $tax = 0;
                 } // end else
+                $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
             } // end if $group==null
             else {
                 $group_data = $_SESSION['group_common_section'];
@@ -323,6 +327,7 @@ class Invoice {
                 else {
                     $tax = 0;
                 } // end else
+                $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
                 // Get invoice user data
                 $user_data = new stdClass();
                 $user_data->group_name = $group_data->group_name;
@@ -345,6 +350,7 @@ class Invoice {
             else {
                 $tax = 0;
             } // end else
+            $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
             // Get invoice user data
             $user_data = $this->get_invoice_user_data($user->id);
         } // end else when installment is active
@@ -361,23 +367,24 @@ class Invoice {
         $list.="<html>";
         $list.="<body>";
         $list.= "<p></p>";
-        $list.="<br/><br/><table border='0' align='center' style='width:100%;table-layout:fixed}'>";
+        $list.="<br/><br/><table border='0' align='center' style='width:100%;table-layout:fixed;'>";
         $list.="<tr>";
-        $list.="<td colspan='2' width='65%' style=''><img src='" . $_SERVER['DOCUMENT_ROOT'] . "/assets/logo/5.png' width='350' height=90></td><td width='35%' style='padding-left:10px;padding-right:10px;border-left:1px solid;'>Phone: $invoice_credentials->phone<br/>Fax: $invoice_credentials->fax</td>";
+        $list.="<td colspan='2' width='55%' style=''><img src='" . $_SERVER['DOCUMENT_ROOT'] . "/assets/logo/5.png' width='350' height=90></td><td  style='padding-left:10px;padding-right:10px;border-left:1px solid;' width='45%'>Phone: $invoice_credentials->phone<br/>Fax: $invoice_credentials->fax</td>";
         $list.="</tr>";
         $list.="<tr>";
         $list.="<td colspan='3' style='border-bottom:1px solid;padding-top:1px;height:10px;'></td>";
         $list.="</tr>";
         $list.="<tr>";
-        $list.="<td style='padding-top:6px;' colspan='2'>No: $invoice_num</td><td width='30%' style='padding-left:10px;'>Date: " . date('Y/m/d', time()) . "</td>";
+        $list.="<td style='padding-top:6px;' colspan='2'>No: $invoice_num</td><td  style='padding-left:10px;'>Date: " . date('Y/m/d', time()) . "</td>";
         $list.="</tr>";
         $list.="<tr style=''>";
         $list.="<td colspan='3' style='padding-top:1px;height:35px;'></td>";
         $list.="</tr>";
         $list.="<tr bgcolor='black'>";
-        $list.="<td style='text-align:center;color:black;' width='15' height='15'>&nbsp;</td><td style='padding-left:15px;text-align:left;' width='10%' bgcolor='white'><span style='color:#ff8000;font-weight:bolder;'>INVOICE TO </span></td><td style='text-align:left;color:black;padding-left:15px;' width='70%'>&nbsp;</td>";
+        $list.="<td style='text-align:center;color:black;' width='15' height='15'>&nbsp;</td><td style='padding-left:15px;text-align:left;' width='10%' bgcolor='white'><span style='color:#ff8000;font-weight:bolder;'>INVOICE TO </span></td><td style='text-align:left;color:black;padding-left:15px;'>&nbsp;</td>";
         $list.="</tr>";
 
+        // Calculate item block
         if ($user_data->group_name == '') {
             // Single registration
             $item_block = "$user_data->firstname $user_data->lastname<br/> payment for $item_name";
@@ -403,28 +410,36 @@ class Invoice {
         $list.="</tr>";
 
         $list.="<tr bgcolor='#FAF7F5'>";
-        $list.="<td style='text-align:center;color:black;' width='10%' height='55'>1</td><td style='padding-left:15px;text-align:left;color:black' width='60%'>$item_block</td><td style='text-align:left;color:black;padding-left:15px;' width='5%'>$amount</td>";
+        $grand_total = ($apply_delay_fee == true) ? $cost['cost'] + $late_fee : $cost['cost'];
+        if ($apply_delay_fee) {
+            $list.="<td style='text-align:center;color:black;' width='10%' height='55'>1</td><td style='padding-left:15px;text-align:left;color:black' width='60%'>$item_block</td><td style='text-align:left;color:black;padding-left:15px;' width='5%'>$$grand_total (late fee of $$late_fee is applied)</td>";
+        } // end if $apply_delay_fee
+        else {
+            $list.="<td style='text-align:center;color:black;' width='10%' height='55'>1</td><td style='padding-left:15px;text-align:left;color:black' width='60%'>$item_block</td><td style='text-align:left;color:black;padding-left:15px;' width='5%'>$$grand_total </td>";
+        }
+
         $list.="</tr>";
 
         $list.="<tr>";
-        $list.="<td></td><td style='padding:10px;' align='right'>Subtotal</td><td bgcolor='black' style='color:white;padding-left:15px;'>$" . $cost['cost'] . "</td>";
+        $list.="<td></td><td style='padding:10px;' align='right'>Subtotal</td><td bgcolor='black' style='color:white;padding-left:15px;'>$" . $grand_total . "</td>";
         $list.="</tr>";
         if ($tax == 0) {
             $list.="<tr>";
             $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$0</td>";
             $list.="</tr>";
             $list.="<tr>";
-            $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $cost['cost'] . "</td>";
+            $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $grand_total . "</td>";
             $list.="</tr>";
         } // end if $tax==0
         else {
             $tax_sum = round(($cost['cost'] * $tax) / 100, 2);
             $grand_total = round(($cost['cost'] + $tax_sum), 2);
+            $grand_total2 = ($apply_delay_fee == true) ? $grand_total + $late_fee : $grand_total;
             $list.="<tr>";
             $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$$tax_sum</td>";
             $list.="</tr>";
             $list.="<tr>";
-            $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $grand_total . "</td>";
+            $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $grand_total2 . "</td>";
             $list.="</tr>";
         } // end else when tax is not null
         $list.="<tr>";
