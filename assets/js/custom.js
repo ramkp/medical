@@ -581,6 +581,11 @@ $(document).ready(function () {
             $('#personal_payment_err').html('Please select state');
             return false;
         }
+        
+        if (!$('#policy_checkbox').prop('checked')) {
+            $('#personal_payment_err').html('Please Agree with Terms and Conditions');
+            return false;
+        }
 
         var user_group = $('#user_group').val();
         if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_email != '' && validateEmail(bill_email) == true) {

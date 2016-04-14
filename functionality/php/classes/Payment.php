@@ -5,6 +5,7 @@
  *
  * @author sirromas
  */
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Late.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Upload.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Classes/ProcessPayment.php';
@@ -335,7 +336,7 @@ class Payment {
             $user->city = $group_common_section->city;
             $user->state = $group_common_section->state;
             $user->country = 'US';
-            $user->slotid=$group_common_section->slotid;
+            $user->slotid = $group_common_section->slotid;
             $user->come_from = $group_common_section->come_from;
             $email_exists = $this->enroll->is_email_exists($group_participant->email);
             if ($email_exists == 0) {
@@ -615,7 +616,7 @@ class Payment {
         $query = "select * from mdl_states";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $drop_down.="<option value='".$row['id']."'>".$row['state']."</option>";
+            $drop_down.="<option value='" . $row['id'] . "'>" . $row['state'] . "</option>";
         } // end while
         $drop_down.="</select>";
         return $drop_down;
@@ -633,6 +634,7 @@ class Payment {
           print_r($group_data);
           echo "<pre>";
           echo "<br/>-------------<br/>";
+          die();
          */
 
         $list = "";
@@ -641,6 +643,8 @@ class Payment {
         $card_year = $this->get_year_drop_box();
         $card_month = $this->get_month_drop_box();
         $states = $this->get_states_list();
+        $late = new Late();
+        $late_fee = $late->get_delay_fee();
 
         if ($from_email != null) {
             $list.="<br/><div  class='form_div'>";
@@ -667,6 +671,7 @@ class Payment {
                 else {
                     $tax = 0;
                 } // end else
+                $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
             } // end if $group==''
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
@@ -681,6 +686,7 @@ class Payment {
                 else {
                     $tax = 0;
                 } // end else
+                $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
             } // end else when group_data are not null
             // Discount block
             if ($course_cost['discount'] == 0) {
@@ -689,25 +695,36 @@ class Payment {
             else {
                 $cost_block.="$" . $course_cost['cost'] . "&nbsp; (discount is " . $course_cost['discount'] . "%)";
             }
-
+            $grand_total = ($apply_delay_fee == true) ? $course_cost['cost'] + $late_fee : $course_cost['cost'];
             //echo "Tax: " . $tax . "<br>";
             if ($tax == 0) {
                 $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                 $list.="<span class='span2'>Selected program</span>";
                 $list.="<span class='span2'>$course_name</span>";
                 $list.="<span class='span2'>Fee</span>";
-                $list.="<span class='span2'>$cost_block</span>";
-                $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='payment_sum' />";
+                if ($apply_delay_fee) {
+                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)</span>";
+                } // end if $apply_delay_fee
+                else {
+                    $list.="<span class='span2'>$cost_block</span>";
+                } // end else                 
+                $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
                 $list.="</div>";
             } // end if $tax==0
             else {
                 $tax_sum = round(($course_cost['cost'] * $tax) / 100, 2);
                 $grand_total = round(($course_cost['cost'] + $tax_sum), 2);
+                $grand_total2 = ($apply_delay_fee == true) ? $grand_total + $late_fee : $grand_total;
                 $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                 $list.="<span class='span2'>Selected program</span>";
                 $list.="<span class='span2'>$course_name</span>";
                 $list.="<span class='span2'>Subtotal</span>";
-                $list.="<span class='span2'>$cost_block</span>";
+                if ($apply_delay_fee) {
+                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)</span>";
+                } // end if $apply_delay_fee
+                else {
+                    $list.="<span class='span2'>$cost_block</span>";
+                }
                 $list.="</div>";
 
                 $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
@@ -721,8 +738,8 @@ class Payment {
                 $list.="<span class='span2'></span>";
                 $list.="<span class='span2'></span>";
                 $list.="<span class='span2'>Total</span>";
-                $list.="<span class='span2'>$$grand_total</span>";
-                $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
+                $list.="<span class='span2'>$$grand_total2</span>";
+                $list.= "<input type='hidden' value='" . $grand_total2 . "' id='payment_sum' />";
                 $list.="</div>";
             } // end else when tax is not null
         } // end if $installment==null
@@ -733,6 +750,7 @@ class Payment {
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$users->courseid' id='courseid' name='courseid' />";
+                $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
             } // end if $group==NULL 
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
@@ -740,18 +758,24 @@ class Payment {
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
+                $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
             } // end else when group is not null
 
             $first_payment = round(($course_cost['cost'] / $installment['num_payments']));
             $period = $installment['period'];
             $num_payments = $installment['num_payments'];
-
+            $grand_total = ($apply_delay_fee == true) ? $first_payment + $late_fee : $first_payment;
             $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
             $list.="<span class='span2'>Selected program</span>";
             $list.="<span class='span2'>$course_name</span>";
             $list.="<span class='span2'>Fee</span>";
-            $list.="<span class='span2'>$$first_payment &nbsp; (discount is " . $course_cost['discount'] . "%)</span>";
-            $list.= "<input type='hidden' value='" . $first_payment . "' id='payment_sum' />";
+            if ($apply_delay_fee) {
+                $list.="<span class='span2'>$$first_payment &nbsp; (discount is " . $course_cost['discount'] . "%)+ $$late_fee (late fee)</span>";
+            } // end if $apply_delay_fee
+            else {
+                $list.="<span class='span2'>$$first_payment &nbsp; (discount is " . $course_cost['discount'] . "%)</span>";
+            } // end else 
+            $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -771,11 +795,11 @@ class Payment {
         $list.="<span class='span2'><input type='text' id='card_holder' name='card_holder'  ></span>";
         $list.="<span class='span2'>CVV*</span>";
         $list.="<span class='span2'><input type='text' id='bill_cvv' name='bill_cvv'  ></span>";
-        $list.="</div>";        
+        $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
-        $list.="<span class='span2'><input type='text' id='bill_addr' name='bill_addr'  ></span>";        
+        $list.="<span class='span2'><input type='text' id='bill_addr' name='bill_addr'  ></span>";
         $list.="<span class='span2'>Expiration Date*</span>";
         $list.="<span class='span2'>" . $card_year . "&nbsp;&nbsp;&nbsp;" . $card_month . "</span>";
         $list.="</div>";
@@ -784,21 +808,21 @@ class Payment {
         $list.="<span class='span2'>State*</span>";
         $list.="<span class='span2'>$states</span>";
         $list.="<span class='span2'>City*</span>";
-        $list.="<span class='span2'><input type='text' id='bill_city' name='bill_city'  ></span>";        
+        $list.="<span class='span2'><input type='text' id='bill_city' name='bill_city'  ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Zip code*</span>";
-        $list.="<span class='span2'><input type='text' id='bill_zip' name='bill_zip'  ></span>";        
+        $list.="<span class='span2'><input type='text' id='bill_zip' name='bill_zip'  ></span>";
         $list.="<span class='span2'>Contact email*</span>";
-        $list.="<span class='span2'><input type='text' id='bill_email' name='bill_email'  ></span>";        
+        $list.="<span class='span2'><input type='text' id='bill_email' name='bill_email'  ></span>";
         $list.="</div>";
-        
-        $list.="<div class='container-fluid' style='text-align:center;'>";        
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span2'>&nbsp;</span><span class='span4'><a href='#' onClick='return false;' id='policy'>Click Here to View Terms And Conditions</a></span>";
         $list.="</div>";
-        
-        $list.="<div class='container-fluid' style='text-align:left;'>";        
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>&nbsp;</span><span class='span4'><input type='checkbox' id='policy_checkbox'> I have read and agree to Terms and Conditions</span>";
         $list.="</div>";
 
@@ -835,7 +859,7 @@ class Payment {
             $user->zip = $group_common_section->zip;
             $user->city = $group_common_section->city;
             $user->state = $group_common_section->state;
-            $user->slotid=$group_common_section->slotid;
+            $user->slotid = $group_common_section->slotid;
             $user->country = 'US';
             $user->come_from = $group_common_section->come_from;
             $email_exists = $this->enroll->is_email_exists($group_participant->email);
