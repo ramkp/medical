@@ -844,6 +844,11 @@ $(document).ready(function () {
         if (event.target.id == 'update_renew_fee') {
             update_renew_fee();
         }
+        
+        if (event.target.id.indexOf("_contact") >= 0) {
+            var data = CKEDITOR.instances.editor1.getData();
+	    update_contact_page (data);
+        }
 
 
     }); // end of #region-main click', 'button',
@@ -931,12 +936,35 @@ $(document).ready(function () {
         if (event.target.id == 'states') {
             get_state_workshops();
         }
-
-
-
-
-
+        
     }); // end of $('#region-main').on('change', 'select',
+    
+    function get_contact_page() {
+        var url = "/lms/custom/contact/index.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+    
+    function update_contact_page (data) {
+         var url = "/lms/custom/contact/edit.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully updated. </p>");
+        });
+    }
+    
+    function get_late_fee_page() {
+        var url = "/lms/custom/late/index.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+    
+    function update_late_fee () {
+        var url = "/lms/custom/late/edit.php";
+        
+        
+    }
 
     /************************************************************************
      * 
@@ -1092,7 +1120,17 @@ $(document).ready(function () {
         update_navigation_status__menu('Renew Fee');
         get_renew_fee_page();
     });
-
-
+    
+    $("#contact_page").click(function (event) {
+        update_navigation_status__menu('Contact page');
+        get_contact_page();
+    });
+    
+    $("#late_fee").click(function (event) {
+        update_navigation_status__menu('Late Fee Settings');
+        get_late_fee_page();
+    });
+    
+    
 }); // end of $(document).ready(function()
 
