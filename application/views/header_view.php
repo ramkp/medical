@@ -1,3 +1,30 @@
+<?php
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php');
+
+class Menu {
+
+    public $db;
+
+    function __construct() {
+        $db = new pdo_db();
+        $this->db = $db;
+    }
+
+    function get_categories_menu() {
+        $list = "";
+        $query = "select * from mdl_course_categories";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $list.="<li><a href=http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/program/" . $row['id'] . " id='' title='Online Exams' class='menu_items'>" . $row['name'] . "</a></li>";
+        } // end while
+        return $list;
+    }
+
+}
+
+$menu = new Menu();
+$categories = $menu->get_categories_menu();
+?>
 <!DOCTYPE html>
 <html  dir="ltr" lang="en" xml:lang="en">
     <head>
@@ -46,14 +73,14 @@
 
         </noscript>
         <!-- Google web fonts -->
-        
+
 
     </head>
 
     <body  id="page-site-index" class="format-site course path-site safari dir-ltr lang-en yui-skin-sam yui3-skin-sam mycodebusters-com--medical-lms pagelayout-frontpage course-1 context-2 notloggedin two-column has-region-side-pre used-region-side-pre has-region-side-post used-region-side-post has-region-footer-left empty-region-footer-left has-region-footer-middle empty-region-footer-middle has-region-footer-right empty-region-footer-right has-region-hidden-dock empty-region-hidden-dock layout-option-nonavbar">
 
         <div class="skiplinks"><a class="skip" href="#maincontent">Skip to main content</a></div>
-        
+
         <script type="text/javascript" src="http://cnausa.com/lms/theme/yui_combo.php?rollup/3.17.2/yui-moodlesimple-min.js&amp;rollup/1451892663/mcore-min.js"></script><script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/core/jquery-1.11.3.min.js"></script>
         <script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/theme_lambda/jquery.easing.1.3.js"></script>
         <script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/theme_lambda/camera.min.1.11.js"></script>
@@ -92,12 +119,15 @@
                             <div class="nav-collapse collapse">
                                 <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Programs<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
+                                            <?php echo $categories; ?>
+                                            <!--
                                             <li><a class="dropdown-toggle" href="http://cnausa.com/index.php/programs/program/workshops" id="ws"  title="Workshops">Workshops/Seminars</a></li>
                                             <li><a href="http://cnausa.com/index.php/programs/program/courses" id="cs" title="Online & CEU’s Courses">CEU & Online Courses</a></li>
                                             <li><a href="http://cnausa.com/index.php/programs/program/exams/" id="exam" title="Online Exams">Online Certification Exams</a></li>
                                             <li><a href="http://cnausa.com/index.php/programs/program/college/" id="college" title="Online Exams">Career College Programs</a></li>
                                             <li><a href="http://cnausa.com/index.php/programs/program/nursing" id="school" title="MS Medical School">Nursing programs</a></li>                                     
-                                            
+                                            -->
+
                                         </ul>
                                     </li>                                    
                                     <li><a href="http://cnausa.com/index.php/register"  id="register_item" title="Register">Register</a></li>

@@ -16,6 +16,7 @@ class program_model extends CI_Model {
         $query = "select id, name "
                 . "from mdl_course_categories "
                 . "where name like '%$cat_name%'";
+        //echo $query;
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
             $id = $row->id;
@@ -23,9 +24,19 @@ class program_model extends CI_Model {
         return $id;
     }
 
-    public function get_category_items($cat_name) {
+    public function get_category_name($cat_id) {
+        $query = "select name from mdl_course_categories where id=$cat_id";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $name = $row->name;
+        }
+        return $name;
+    }
+
+    public function get_category_items($cat_id) {
         $items = array();
-        $cat_id = $this->get_category_id($cat_name);
+        //$cat_id = $this->get_category_id($cat_name);
+        $cat_name = $this->get_category_name($cat_id);
         $query = "select id,fullname,summary,startdate,cost,discount_size "
                 . "from mdl_course where category=$cat_id and cost>0";
         $result = $this->db->query($query);

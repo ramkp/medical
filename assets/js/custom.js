@@ -1561,7 +1561,10 @@ $(document).ready(function () {
 
     }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
 
-
+    $('.menu_items').click(function () {
+        self.location = $(this).attr('href');        
+    });
+    
     $('.form_div').on('change', function (event) {
         //alert(event.target.id);
         if (event.target.id == 'categories') {

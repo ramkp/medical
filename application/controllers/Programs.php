@@ -13,8 +13,10 @@ class Programs extends CI_Controller {
     }
 
     public function program() {
-        $cat_name = $this->uri->segment(3);        
-        $program_items = $this->program_model->get_category_items($cat_name);
+        //$cat_name = $this->uri->segment(3); 
+        $catid=$this->uri->segment(3); 
+        //$program_items = $this->program_model->get_category_items($cat_name);
+        $program_items = $this->program_model->get_category_items($catid);
         $data = array('items' => $program_items);
         $this->load->view('header_view');
         $this->load->view('program_view', $data);
