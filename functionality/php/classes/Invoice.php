@@ -445,8 +445,14 @@ class Invoice {
         $list.="<tr>";
         $list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:55px;'></td>";
         $list.="</tr>";
+        
+        /*
         $list.="<tr bgcolor='#ff8000'>";
-        $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>email: " . $invoice_credentials->email . "&nbsp;&nbsp;&nbsp; " . $invoice_credentials->site . " </td>";
+        $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>Mailing Address: Medical2 1830A North Gloster St,  Tupelo, MS 38804 </td>";
+        $list.="</tr>";
+        */
+        $list.="<tr bgcolor='#ff8000'>";
+        $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>email: " . $invoice_credentials->email . "&nbsp;&nbsp;&nbsp; " . $invoice_credentials->site . "<br>Mailing Address: Medical2 1830A North Gloster St,  Tupelo, MS 38804 </td>";
         $list.="</tr>";
         $list.="</table>";
         $list.="</body>";
