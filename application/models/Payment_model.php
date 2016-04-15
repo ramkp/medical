@@ -11,7 +11,7 @@
  *
  * @author sirromas
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes//Payment.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
 
 class Payment_model extends CI_Model {
 
@@ -41,7 +41,7 @@ class Payment_model extends CI_Model {
     }
 
     public function get_user_data($userid) {
-        $query = "select id, firstname, lastname, username "
+        $query = "select * "
                 . "from mdl_user where id=$userid";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
@@ -93,19 +93,31 @@ class Payment_model extends CI_Model {
         return $name;
     }
 
+    public function get_user_slot($userid) {
+        $query = "select * from mdl_scheduler_appointment "
+                . "where studentid=$userid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $slotid = $row->slotid;
+        }
+        return $slotid;
+    }
+
     public function get_payment_section($userid = null) {
         $list = "";
         if ($userid != NULL) {
             $user = $this->get_user_data($userid);
             $courseid = $this->get_user_course($userid);
+            $slotid = $this->get_user_slot($userid);
             $user->courseid = $courseid;
+            $user->slotid = $slotid;
             $group_status = $this->is_group_member($userid);
             $installment = $this->get_course_payment_options($courseid);
             if ($group_status == 0) {
                 // Personal signup
                 $group_data = '';
                 $participants = 1;
-                $list.=$this->payment->get_payment_section($group_data, $user, $participants, $installment, 1);
+                $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, 1);
             } // end if $group_status==0
             else {
                 // Group member signup
@@ -114,7 +126,7 @@ class Payment_model extends CI_Model {
                 $group_data->group_name = $group_name;
                 $group_data->courseid = $courseid;
                 $participants = 1;
-                $list.=$this->payment->get_payment_section($group_data, $user, $participants, $installment, 1);
+                $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, 1);
             } // end else 
         }  // end if $userid != NULL
         return $list;

@@ -611,6 +611,7 @@ class Payment {
     }
 
     function get_states_list() {
+        $drop_down="";
         $drop_down.="<select id='bill_state' style='width:140px;' name='bill_state'>";
         $drop_down.="<option value='0' selected>State</option>";
         $query = "select * from mdl_states";
@@ -654,7 +655,9 @@ class Payment {
         $list.="<div class='panel-body'>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
+        if ($from_email == null) {
         $list.="<span class='span8'><input type='checkbox' id='same_address'>Click here if billing Address is same as Contact</span>";
+        }
         $list.="</div>";
 
         if ($installment == null) {

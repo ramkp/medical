@@ -37,7 +37,7 @@
 error_reporting('E_ALL');
 require_once(dirname(__FILE__) . '/../config.php');
 require_once($CFG->dirroot . '/my/lib.php');
-require_once($CFG->dirroot . '/custom/my/classes/Dashboard.php');
+
 
 redirect_if_major_upgrade_required();
 
