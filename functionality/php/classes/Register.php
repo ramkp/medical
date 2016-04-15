@@ -524,8 +524,9 @@ class Register {
     }
 
     function get_register_course_cities($courseid, $slotid) {
+        date_default_timezone_set('Pacific/Wallis');
         $drop_down = "";
-        $drop_down.="<select id='register_cities' style='width:120px;'>";
+        $drop_down.="<select id='register_cities' style='width:140px;'>";
         $drop_down.="<option value='0' selected>All Cities</option>";
         $schedulerid = $this->get_schedulerid($courseid);
         if ($schedulerid > 0) {
@@ -540,9 +541,13 @@ class Register {
             $num = $this->db->numrows($query);
             if ($num > 0) {
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $locations2 = explode("/", $row['appointmentlocation']);                    
+                    $hdate=date('m-d-Y', $row['starttime']);
+                    $locations2 = explode("/", $row['appointmentlocation']);
+                    if (count($locations2) == 0) {
+                        $locations2 = explode(",", $row['appointmentlocation']);
+                    }               
                     $cityname = $locations2[1];
-                    $drop_down.="<option value='$statename'>$cityname</option>";
+                    $drop_down.="<option value='".$row['id']."'>$cityname - $hdate</option>";
                 } // end while
             } // end if $num > 0
         } // end if $schedulerid>0

@@ -426,13 +426,17 @@ class program_model extends CI_Model {
                     $human_start_time = date('m-d-Y H:i', $row->timemodified);
                     $end_time = $row->timemodified + $hours_num * 3600;
                     $human_end_date = date('m-d-Y H:i', $end_time);
+                    //$locations = preg_split("/\W|_/", $row->appointmentlocation);
                     $locations = explode("/", $row->appointmentlocation);
+                    if (count($locations) == 0) {
+                        $locations = explode(",", $row->appointmentlocation);
+                    }
                     $state = $locations[0];
                     $city = $locations[1];
-
+                    $location = $city . " , " . $state;
                     $list.="<div class='container-fluid' style='text-align:left;'>";
                     $list.= "<span class='span1'>$human_date</span>";
-                    $list.= "<span class='span2'>$row->appointmentlocation</span>";
+                    $list.= "<span class='span2'>$location</span>";
                     $list.= "<span class='span3'>$row->notes</span>";
                     $list.= "<span class='span1'>9am -  5pm</span>";
                     $list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";

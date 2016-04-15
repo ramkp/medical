@@ -123,7 +123,7 @@ $(document).ready(function () {
                         var state = $('#group_state').val();
                         var group_name = $('#group_name').val();
                         var come_from = $('#come_from_group').text().trim();
-                        var slotid=$('#register_state').val();
+                        var slotid=$('#register_cities').val();
                         var grpoup_data = {courseid: courseid,
                             slotid:slotid,
                             addr: addr,
@@ -312,7 +312,7 @@ $(document).ready(function () {
             var city = $('#group_city').val();
             var state = $('#group_state').val();
             var group_name = $('#group_name').val();
-            var slotid=$('#register_state').val();
+            var slotid=$('#register_cities').val();
             if (addr == '') {
                 $('#group_common_errors').html('Please provide address');
                 return false;
@@ -675,7 +675,7 @@ $(document).ready(function () {
         var state = $('#group_state').val();
         var group_name = $('#group_name').val();
         var come_from = $('#come_from_group').val();
-        var slotid=$('#register_state').val();
+        var slotid=$('#register_cities').val();
         for (i = 0; i <= tot_participants; i++) {
 
             var first_name_id = '#first_name_' + i;
@@ -841,7 +841,7 @@ $(document).ready(function () {
     function get_category_items_in_state() {
         var selected_category = $('#categories').val();
         var category_name = selected_category.trim();
-        var selected_state = $('#register_state').val();
+        var selected_state = $('#register_cities').val();
         var state_name = selected_state.trim();
         console.log('Course category: ' + category_name);
         console.log('Course state: ' + state_name);
@@ -900,7 +900,7 @@ $(document).ready(function () {
             var city = $('#city').val();
             var state = $('#state').val();
             var country = $('#country').val();
-            var slotid=$('#register_state').val();
+            var slotid=$('#register_cities').val();
             
             if (first_name == '') {
                 $('#personal_err').html('Please provide firstname');

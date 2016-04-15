@@ -251,7 +251,8 @@ class register_model extends CI_Model {
 
     public function get_register_course_cities_list($courseid = null) {
         $drop_down = "";
-        $drop_down.="<select id='register_cities' style='width:120px;'>";
+        $drop_down.="<select id='register_cities' style='width:140px;'>";
+        //$drop_down.="<select id='register_cities'>";
         $drop_down.="<option value='0' selected>All Cities</option>";
         if ($courseid != null) {
             $query = "";
@@ -292,8 +293,16 @@ class register_model extends CI_Model {
         $query = "select * from mdl_scheduler_slots where id=$slotid";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
+            $locations = explode("/", $row->appointmentlocation);
+                    if (count($locations) == 0) {
+                        $locations = explode(",", $row->appointmentlocation);
+                    }
+                    $state = $locations[0];
+                    $city = $locations[1];
+                    $location = $city . " , " . $state;
+            
             $hdate=date('m-d-Y', $row->starttime);
-            $list.=$hdate."<br>".$row->appointmentlocation . "<br/>" . $row->notes;
+            $list.=$hdate."<br>".$location . "<br/>" . $row->notes;
         }
         return $list;
     }

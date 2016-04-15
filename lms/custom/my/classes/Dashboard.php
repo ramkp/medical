@@ -17,7 +17,6 @@ class Dashboard extends Util {
 
         //echo "Course ID: " . $courseid . "<br>";
         //echo "User ID: " . $userid . "<br>";
-
         // 1. Check among card payments
         $query = "select * from mdl_card_payments "
                 . "where userid=$userid and courseid=$courseid";
@@ -34,19 +33,28 @@ class Dashboard extends Util {
     }
 
     function get_user_status() {
-        $roleid = $this->get_user_role($this->user->id);
-        if ($roleid == 5) {
-            $status = $this->is_user_paid();
-        } // end if $roleid == 5
+        //print_r($this->user);
+        //echo "Username: ".$this->user->username."<br>";
+        $username = $this->user->username;
+        if ($username != 'manager') {
+            $roleid = $this->get_user_role($this->user->id);
+            if ($roleid == 5) {
+                $status = $this->is_user_paid();
+            } // end if $roleid == 5
+        } // end if $username != 'manager'
+        else {
+            // It is Manager 
+            $status = 1;
+        }
         return $status;
     }
 
     function get_user_warning_message() {
-        $list = "";        
+        $list = "";
         $userid = $this->user->id;
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='http://".$_SERVER['SERVER_NAME']."/index.php/payments/index/$userid' target='_blank'>click</a> here to pay by card. </span>";
-        $list.="</div>";                
+        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid' target='_blank'>click</a> here to pay by card. </span>";
+        $list.="</div>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span12' >If you need help please contact support team.</span>";
         $list.="</div>";
