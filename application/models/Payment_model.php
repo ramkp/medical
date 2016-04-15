@@ -97,8 +97,14 @@ class Payment_model extends CI_Model {
         $query = "select * from mdl_scheduler_appointment "
                 . "where studentid=$userid";
         $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $slotid = $row->slotid;
+        $num = $result->num_rows();
+        if ($num > 0) {
+            foreach ($result->result() as $row) {
+                $slotid = $row->slotid;
+            }
+        } // end if $num>0
+        else {
+            $slotid = 0;
         }
         return $slotid;
     }
