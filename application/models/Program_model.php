@@ -260,9 +260,9 @@ class program_model extends CI_Model {
 
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
         if ($state == false) {
-            $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
+            $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
         } else {
-            $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id/$state' class='btn btn-primary'>Register</button></a></span>";
+            $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button id='program_$item->id/$state' class='btn btn-primary'>Schedule/Register</button></a></span>";
         }
         $list.="</div>";
 

@@ -19,6 +19,9 @@ class Register extends CI_Controller {
             $form = $this->register_model->get_register_form();
         } // end if $courseid==null
         else {
+            if ($slotid=='') {
+                $slotid=0;
+            }
             $form = $this->register_model->get_register_form($courseid,$slotid);
         }
 
