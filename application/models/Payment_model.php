@@ -134,7 +134,7 @@ class Payment_model extends CI_Model {
 
     public function is_user_exissts($userid) {
         $query = "select * from mdl_user where id=$userid";
-        echo $query."<br>";
+        //echo $query."<br>";
         $result = $this->db->query($query);
         $num = $result->num_rows();
         return $num;

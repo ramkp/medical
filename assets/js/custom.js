@@ -123,15 +123,15 @@ $(document).ready(function () {
                         var state = $('#group_state').val();
                         var group_name = $('#group_name').val();
                         var come_from = $('#come_from_group').text().trim();
-                        var slotid=$('#register_cities').val();
+                        var slotid = $('#register_cities').val();
                         var grpoup_data = {courseid: courseid,
-                            slotid:slotid,
+                            slotid: slotid,
                             addr: addr,
                             inst: inst,
                             zip: zip,
                             city: city,
                             state: state,
-                            come_from: come_from,                            
+                            come_from: come_from,
                             tot_participants: data,
                             group_name: group_name};
                         var group_url = "http://" + domain + "/functionality/php/group_signup_by_file.php";
@@ -312,7 +312,7 @@ $(document).ready(function () {
             var city = $('#group_city').val();
             var state = $('#group_state').val();
             var group_name = $('#group_name').val();
-            var slotid=$('#register_cities').val();
+            var slotid = $('#register_cities').val();
             if (addr == '') {
                 $('#group_common_errors').html('Please provide address');
                 return false;
@@ -520,8 +520,8 @@ $(document).ready(function () {
         var userid = $('#userid').val();
         var courseid = $('#courseid').val();
         var participants = $('#participants').val();
-        var cvv=$('#bill_cvv').val();
-        var state=$('#bill_state').val();
+        var cvv = $('#bill_cvv').val();
+        var state = $('#bill_state').val();
         if (card_type == 'Card type') {
             $('#personal_payment_err').html('Please select card type');
             return false;
@@ -571,17 +571,17 @@ $(document).ready(function () {
             $('#personal_payment_err').html('Please provide correct contact email');
             return false;
         }
-        
-        if (cvv=='') {
+
+        if (cvv == '') {
             $('#personal_payment_err').html('Please provide card cvv code');
             return false;
         }
-        
-        if (state==0) {
+
+        if (state == 0) {
             $('#personal_payment_err').html('Please select state');
             return false;
         }
-        
+
         if (!$('#policy_checkbox').prop('checked')) {
             $('#personal_payment_err').html('Please Agree with Terms and Conditions');
             return false;
@@ -594,7 +594,7 @@ $(document).ready(function () {
                 email: email,
                 userid: userid,
                 courseid: courseid,
-                cvv:cvv,
+                cvv: cvv,
                 participants: participants,
                 card_type: card_type,
                 card_no: card_no,
@@ -675,7 +675,7 @@ $(document).ready(function () {
         var state = $('#group_state').val();
         var group_name = $('#group_name').val();
         var come_from = $('#come_from_group').val();
-        var slotid=$('#register_cities').val();
+        var slotid = $('#register_cities').val();
         for (i = 0; i <= tot_participants; i++) {
 
             var first_name_id = '#first_name_' + i;
@@ -690,7 +690,7 @@ $(document).ready(function () {
                 err++;
             } // end if first_name=='' || last_name==''
             if (first_name != '' && last_name != '' && email != '' && validateEmail(email) == true && phone != '') {
-                var user = {first_name: first_name, last_name: last_name, email: email, phone: phone, come_from: come_from,slotid:slotid};
+                var user = {first_name: first_name, last_name: last_name, email: email, phone: phone, come_from: come_from, slotid: slotid};
                 users.push(user);
             } // end if first_name != '' && last_name != ''
         } // end for
@@ -708,7 +708,7 @@ $(document).ready(function () {
             console.log('Course id: ' + courseid);
             var group_common_section = {
                 courseid: courseid,
-                slotid:slotid,
+                slotid: slotid,
                 addr: addr,
                 inst: inst,
                 zip: zip,
@@ -871,14 +871,14 @@ $(document).ready(function () {
      * 
      *               Verify Manual Group registration form
      * 
-     ************************************************************************/    
-    
-    
+     ************************************************************************/
+
+
     function validateEmail(email) {
         var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
         return re.test(email);
     }
-    
+
     var personal_registration_obj;
 
     function verify_personal_manual_registration_form() {
@@ -900,8 +900,8 @@ $(document).ready(function () {
             var city = $('#city').val();
             var state = $('#state').val();
             var country = $('#country').val();
-            var slotid=$('#register_cities').val();
-            
+            var slotid = $('#register_cities').val();
+
             if (first_name == '') {
                 $('#personal_err').html('Please provide firstname');
                 return false;
@@ -974,7 +974,7 @@ $(document).ready(function () {
                     } // end if data>0
                     else {
                         // Everything is fine post data and show payment section
-                        console.log('Slot ID: '+slotid);
+                        console.log('Slot ID: ' + slotid);
                         $('#personal_err').html('');
                         $('#ajax_loading_personal').show();
                         var user = {
@@ -992,7 +992,7 @@ $(document).ready(function () {
                             state: state,
                             country: country};
                         console.log("User: " + JSON.stringify(user));
-                        personal_registration_obj=JSON.stringify(user);
+                        personal_registration_obj = JSON.stringify(user);
                         var signup_url = "http://" + domain + "/functionality/php/single_signup.php";
                         var signup_request = {user: JSON.stringify(user)};
                         $.post(signup_url, signup_request).done(function (data) {
@@ -1198,21 +1198,21 @@ $(document).ready(function () {
     }
 
     function get_register_course_states() {
-        var courseid = $('#register_courses').val();        
+        var courseid = $('#register_courses').val();
         var url = "http://" + domain + "/functionality/php/get_register_course_states.php";
-        var request = {courseid:courseid};
-        $.post(url, request).done(function (data) {           
+        var request = {courseid: courseid};
+        $.post(url, request).done(function (data) {
             $('#register_states_container').html(data);
         });
-        
+
     }
 
     function get_register_course_cities() {
         var courseid = $('#register_courses').val();
-        var slotid=$('#register_state').val();
+        var slotid = $('#register_state').val();
         var url = "http://" + domain + "/functionality/php/get_register_course_cities.php";
-        var request = {courseid:courseid,slotid:slotid};
-        $.post(url, request).done(function (data) {           
+        var request = {courseid: courseid, slotid: slotid};
+        $.post(url, request).done(function (data) {
             $('#register_cities_container').html(data);
         });
     }
@@ -1307,11 +1307,11 @@ $(document).ready(function () {
     $('#school').click(function () {
         self.location = $('#school').attr('href');
     });
-    
+
     $('#college').click(function () {
         self.location = $('#college').attr('href');
     });
-    
+
     /************************************************************************
      * 
      *                      Show Testimonial page after click
@@ -1455,7 +1455,7 @@ $(document).ready(function () {
                 //console.log('Course ID: ' + courseid);
                 show_scheduled_course(courseid);
             } // end if url.indexOf('schedule') > 0
-        }       
+        }
 
         if (event.target.id == 'states') {
             $(".dropdown li a").click(function () {
@@ -1545,7 +1545,6 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'policy') {
-            $('#policy_checkbox').prop("checked", true);
             show_policy_modal_dialog();
         } // end if event.target.id == 'policy'
 
@@ -1567,9 +1566,9 @@ $(document).ready(function () {
     }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
 
     $('.menu_items').click(function () {
-        self.location = $(this).attr('href');        
+        self.location = $(this).attr('href');
     });
-    
+
     $('.form_div').on('change', function (event) {
         //alert(event.target.id);
         if (event.target.id == 'categories') {
@@ -1578,7 +1577,7 @@ $(document).ready(function () {
         }
 
         //if (event.target.id == 'register_state') {
-          //  get_category_items_in_state();
+        //  get_category_items_in_state();
         //}
 
         if (event.target.id == 'participants') {
@@ -1660,5 +1659,12 @@ $(document).ready(function () {
             map.fitBounds(bounds);
         }); // post(url, request).done(function (data)
     } // end if url.indexOf("school") >= 0
+
+    $("body").click(function (event) {
+        console.log('Element clicked: ' + event.target.id);
+        if (event.target.id == 'ok') {
+            $('#policy_checkbox').prop("checked", true);
+        }
+    });
 
 }); // end of (document).ready(function ()
