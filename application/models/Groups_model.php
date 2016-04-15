@@ -14,17 +14,19 @@ class Groups_model extends CI_Model {
     
         function get_courses_list() {
         $drop_down = "";
-        $drop_down.="<div class='dropdown'>
-        <a href='#' id='courses' data-toggle='dropdown' 
-        class='dropdown-toggle'>Program 
-        <b class='caret'></b></a>
-        <ul class='dropdown-menu'>";
+        //$drop_down.="<div class='dropdown'>
+        //<a href='#' id='courses' data-toggle='dropdown' 
+        //class='dropdown-toggle'>Program 
+        //<b class='caret'></b></a>
+        //<ul class='dropdown-menu'>";
         $query = "select id, fullname from mdl_course where id>1";
         $result = $this->db->query($query);
+        $drop_down.="<select id='courses' style='width:160px;'>";
+        $drop_down.="<option value='0' selected>Program</option>";
         foreach ($result->result() as $row) {
-            $drop_down.="<li><a href='#' id='course_" . $row->id . "'>" . $row->fullname . "</a></li>";
+            $drop_down.="<option value='$row->id'>$row->fullname </option>";
         }
-        $drop_down.="</ul></div>";
+        $drop_down.="</select>";
         return $drop_down;
     }
 

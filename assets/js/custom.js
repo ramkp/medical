@@ -386,7 +386,7 @@ $(document).ready(function () {
         var group_budget = $('#group_budget').val();
         var group_company = $('#group_company').val();
         var group_email = $('#group_email').val();
-        var courses = $('#register_courses').val();
+        var courses = $('#courses').val();
         var group_request = $('#group_request').val();
         if (group_fio == '') {
             $('#private_err').html('Please provide firstname and lastname');
@@ -422,7 +422,7 @@ $(document).ready(function () {
             $('#private_err').html('Please provide valid email ');
         }
 
-        if (courses == '') {
+        if (courses == 0) {
             $('#private_err').html('Please select program ');
             return false;
         }

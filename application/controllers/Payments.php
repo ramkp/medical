@@ -13,12 +13,30 @@ class Payments extends CI_Controller {
     }
 
     public function index() {
+        $form = "";
         $userid = $this->uri->segment(3);
         if ($userid != null) {
-            $form = $this->payment_model->get_payment_section($userid);
+            if (is_numeric($userid)) {
+                $user_exists = $this->payment_model->is_user_exissts($userid);                
+                if ($user_exists > 0) {
+                    $form = $this->payment_model->get_payment_section($userid);
+                } // end if $user_exists>0
+                else {
+                    $form.="<br><div class='container-fluid' style='text-align:center;'>";
+                    $form.= "<span class='span12'>Invalid data provided</span>";
+                    $form.="</div><br>";
+                }
+            } // end if is_int($userid)
+            else {
+                $form.="<br><div class='container-fluid' style='text-align:center;'>";
+                $form.= "<span class='span12'>Invalid data provided</span>";
+                $form.="</div><br>";
+            }
         } // end if $userid!=null
         else {
-            $form = "<p align='center'>Invalid data provided</p>";
+            $form.="<br><div class='container-fluid' style='text-align:center;'>";
+            $form.= "<span class='span12'>Invalid data provided</span>";
+            $form.="</div><br>";
         }
 
         $data = array('form' => $form);
