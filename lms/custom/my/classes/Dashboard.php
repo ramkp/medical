@@ -34,18 +34,23 @@ class Dashboard extends Util {
 
     function get_user_status() {
         //print_r($this->user);
-        //echo "Username: ".$this->user->username."<br>";
+        //echo "Username: " . $this->user->username . "<br>";
         $username = $this->user->username;
+        //echo "Username: " . $username . "<br>";
         if ($username != 'manager') {
             $roleid = $this->get_user_role($this->user->id);
             if ($roleid == 5) {
                 $status = $this->is_user_paid();
             } // end if $roleid == 5
+            else {
+                // It is Manager 
+                $status = 1;
+            }
         } // end if $username != 'manager'
         else {
-            // It is Manager 
             $status = 1;
         }
+
         return $status;
     }
 
