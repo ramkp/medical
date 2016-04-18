@@ -3,7 +3,7 @@
     <div class="footerlinks">
         <div class="row-fluid">
             <p class="helplink"></p><br/>
-            <div class="footnote"  style="display:inline-block;">
+            <div class="footnote"  style="display:inline-block;vertical-align: middle;">
                 <p>(c) 2016 | <a href="#" target="_blank">
                         <img src="http://cnausa.com/assets/icons/heart.gif" alt="heart" width="15" height="15">
                     </a> Powered  By Z&S &nbsp;&nbsp;                                                                
@@ -20,13 +20,14 @@
                     </div>
                     -->
                     <!-- Social sharing buttons -->
-                    <span class='st_facebook' displayText='Facebook'></span>
-                    <span class='st_twitter' displayText='Tweet'></span>
-                    <span class='st_linkedin' displayText='LinkedIn'></span>
-                    <span class='st_instagram' displayText='Instagram Badge'></span>
-
-
+                    <span class='st_facebook_large' displayText='Facebook'></span>
+                    <span class='st_twitter_large' displayText='Tweet'></span>
+                    <span class='st_linkedin_large' displayText='LinkedIn'></span>
+                    <span class='st_googleplus_large' displayText='Google +'></span>
+                    <span class='st_instagram_large' displayText='Instagram Badge'></span>
+                    <span class='st__large' displayText=''></span>
                 </p>
+
             </div>
 
             <script type="text/javascript">
