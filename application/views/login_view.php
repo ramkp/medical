@@ -19,7 +19,7 @@ $list.="<div  class='form_div'>"
         . "<td align='left'><button class='btn btn-primary' id='login_button'>Submit</button></td>"
         . "</tr>"
         . "<tr><td align='center' colspan='2'>Forgot password? Click<a href='http://".$_SERVER['SERVER_NAME']."/lms/login/forgot_password.php' target='_blank'> here.</a></td></tr>"
-        . "<tr><td align='center' colspan='2'>You still don't have an account?? Click<a href='http://".$_SERVER['SERVER_NAME']."/lms/index.php/register' target='_blank'> here.</a></td></tr>"
+        . "<tr><td align='center' colspan='2'>You still don't have an account?? Click<a href='http://".$_SERVER['SERVER_NAME']."/index.php/register' target='_blank'> here.</a></td></tr>"
         . "</table>"
         . "</div></form>";
 echo $list;

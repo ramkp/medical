@@ -117,16 +117,13 @@ $categories = $menu->get_categories_menu();
                             </ul>
 
                             <div class="nav-collapse collapse">
-                                <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Programs<b class="caret"></b></a>
-                                        <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
-                                            <?php echo $categories; ?>
-                                            <!--
-                                            <li><a class="dropdown-toggle" href="http://cnausa.com/index.php/programs/program/workshops" id="ws"  title="Workshops">Workshops/Seminars</a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/program/courses" id="cs" title="Online & CEU’s Courses">CEU & Online Courses</a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/program/exams/" id="exam" title="Online Exams">Online Certification Exams</a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/program/college/" id="college" title="Online Exams">Career College Programs</a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/program/nursing" id="school" title="MS Medical School">Nursing programs</a></li>                                     
-                                            -->
+                                <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Courses<b class="caret"></b></a>
+                                        <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">                                            
+                                            
+                                            <li><a class="dropdown-toggle" href="http://cnausa.com/index.php/programs/program/5" id="ws"  title="">Healthcare Career Courses </a></li>
+                                            <li><a href="http://cnausa.com/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>
+                                            <li><a href="http://cnausa.com/index.php/programs/program/3/" id="exam" title="">CEUs & Online Courses</a></li>
+                                            <li><a href="http://cnausa.com/index.php/programs/program/4/" id="college" title="">Online Certification Exams</a></li>                                                                                       
 
                                         </ul>
                                     </li>                                    

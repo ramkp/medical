@@ -90,7 +90,6 @@ class Groups {
 
     function submit_private_group_request($request) {
         $list = "";
-        $courseid = $this->get_course_id($request->courses);
         $query = "insert into mdl_private_groups "
                 . "(group_fio,"
                 . "group_city,"
@@ -102,6 +101,8 @@ class Groups {
                 . "group_request,"
                 . "request_date,"
                 . "status,"
+                . "people_num,"
+                . "group_state,"
                 . "group_reply) "
                 . "values ('$request->group_fio' ,"
                 . "'$request->group_city', "
@@ -109,11 +110,14 @@ class Groups {
                 . "'$request->group_email', "
                 . "'$request->group_budget', "
                 . "'$request->group_company', "
-                . "'$courseid', "
+                . "'$request->courses', "
                 . "'$request->group_request', "
                 . "'" . time() . "', "
                 . "'0',"
+                . "'$request->people_num',"
+                . "'$request->state',"
                 . "'')";
+        //echo "Query: ".$query."<br>";
         $this->db->query($query);
 
         $list.="<br/><div  class='form_div'>";
@@ -126,7 +130,7 @@ class Groups {
         $list.="</div>"; // end of container-fluid
 
         $list.="</div>"; // end of panel-body
-        $list.="</div>"; // end of panel panel-default
+        $list.="</div><br>"; // end of panel panel-default
 
         return $list;
     }

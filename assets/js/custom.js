@@ -388,6 +388,9 @@ $(document).ready(function () {
         var group_email = $('#group_email').val();
         var courses = $('#courses').val();
         var group_request = $('#group_request').val();
+        var people_num = $('#people_num').val();
+        var state = $('#group_state').val();
+
         if (group_fio == '') {
             $('#private_err').html('Please provide firstname and lastname');
             return false;
@@ -403,13 +406,25 @@ $(document).ready(function () {
             return false;
         }
 
+
         if (group_budget == '') {
-            $('#private_err').html('Please provide estimate budget ');
+            //$('#private_err').html('Please provide estimate budget ');
+            group_budget = 0;
+            //return false;
+        }
+
+        if (people_num == 0) {
+            $('#private_err').html('Please provide people num in the group ');
             return false;
         }
 
         if (group_company == '') {
             $('#private_err').html('Please provide company ');
+            return false;
+        }
+
+        if (state == 0) {
+            $('#private_err').html('Please select state ');
             return false;
         }
 
@@ -440,6 +455,8 @@ $(document).ready(function () {
             group_company: group_company,
             group_email: group_email,
             courses: courses,
+            people_num: people_num,
+            state: state,
             group_request: group_request};
         $('#private_err').html('');
         var request = {request: JSON.stringify(group_request)};
