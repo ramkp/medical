@@ -44,7 +44,7 @@ class navClass extends Util {
         $list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
-                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
+                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Career College</a>
                 <a class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
                     <span class='icon-bar'></span>
                     <span class='icon-bar'></span>
@@ -57,7 +57,7 @@ class navClass extends Util {
                     </ul>
                     <div class='nav-collapse collapse'>
                         <ul class='nav'>
-                            <li class='dropdown'><a title='Programs' class='dropdown-toggle' href='#'>Programs<b class='caret'></b></a>                                
+                            <li class='dropdown'><a title='Programs' class='dropdown-toggle' href='#'>Courses<b class='caret'></b></a>                                
                             $price_items
                             </li>                            
                             <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Invoices<b class='caret'></b></a>
@@ -121,7 +121,7 @@ class navClass extends Util {
         $list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
-                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
+                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Career College</a>
                 <a class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
                     <span class='icon-bar'></span>
                     <span class='icon-bar'></span>
@@ -134,7 +134,7 @@ class navClass extends Util {
                     </ul>
                     <div class='nav-collapse collapse'>
                         <ul class='nav'>
-                            <li class='dropdown'><a title='Programs' class='dropdown-toggle' href='#'>Programs<b class='caret'></b></a>                                
+                            <li class='dropdown'><a title='Programs' class='dropdown-toggle' href='#'>Courses<b class='caret'></b></a>                                
                             $price_items
                             </li>                            
                             <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Invoices<b class='caret'></b></a>

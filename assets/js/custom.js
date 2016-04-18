@@ -1060,21 +1060,33 @@ $(document).ready(function () {
         var email = $('#email').val();
         var phone = $('#phone').val();
         var message = $('#message').val();
-        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && message != '') {
-            $('#contact_result').html('');
-            $('#firstname').val('');
-            $('#lastname').val('');
-            $('#email').val('');
-            $('#phone').val('');
-            $('#message').val('');
-            var url = "http://" + domain + "/functionality/php/send_contact_request.php";
-            var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message};
+        var captcha = $('#captcha').val();
+        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && message != '' && captcha != '') {
+            var url = "http://" + domain + "/functionality/php/verify_captcha.php";
+            var request = {captcha: captcha};
             $.post(url, request).done(function (data) {
-                $('#contact_result').html(data);
-            })
+                if (data > 0) {
+                    // Captcha is correct we can submit data
+                    $('#contact_result').html('');
+                    $('#firstname').val('');
+                    $('#lastname').val('');
+                    $('#email').val('');
+                    $('#phone').val('');
+                    $('#message').val('');
+                    $('#captcha').val('');
+                    var url = "http://" + domain + "/functionality/php/send_contact_request.php";
+                    var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message};
+                    $.post(url, request).done(function (data) {
+                        $('#contact_result').html(data);
+                    });
+                } // end if data>0
+                else {
+                    $('#contact_result').html('Captcha is incorrect');
+                }
+            });
         } // end if firstname!='' && lastname!=''
         else {
-            $('#contact_result').html("<span style='colore:red;'>Please provide all fields and correct email address</span>");
+            $('#contact_result').html("<span style='colore:red;'>Please provide all fields and correct email address and captcha</span>");
         }
     }
 
@@ -1661,7 +1673,7 @@ $(document).ready(function () {
     } // end if url.indexOf("school") >= 0
 
     $("body").click(function (event) {
-        console.log('Element clicked: ' + event.target.id);
+        //console.log('Element clicked: ' + event.target.id);
         if (event.target.id == 'ok') {
             $('#policy_checkbox').prop("checked", true);
         }

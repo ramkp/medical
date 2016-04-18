@@ -5830,7 +5830,8 @@ function send_confirmation_email($user) {
     $user->mailformat = 1;  // Always send HTML version as well.
 
     // Directly email rather than using the messaging system to ensure its not routed to a popup or jabber.
-    return email_to_user($user, $supportuser, $subject, $message, $messagehtml);
+    //return email_to_user($user, $supportuser, $subject, $message, $messagehtml);
+    return true;
 }
 
 /**

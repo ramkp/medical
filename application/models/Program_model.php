@@ -33,11 +33,29 @@ class program_model extends CI_Model {
         return $name;
     }
 
+    public function get_course_image_path($cat_id) {
+        switch ($cat_id) {
+            case 2:
+                $path="http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/chemistry.png";
+                break;
+            case 3:
+                $path="http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/it.png";
+                break;
+            case 4:
+                $path="http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/math.png";
+                break;
+            case 5:
+                $path="http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/it.png";
+                break;
+        }
+        return $path;
+    }
+
     public function get_category_items($cat_id) {
         $items = array();
         //$cat_id = $this->get_category_id($cat_name);
         $cat_name = $this->get_category_name($cat_id);
-        $query = "select id,fullname,summary,startdate,cost,discount_size "
+        $query = "select * "
                 . "from mdl_course where category=$cat_id and cost>0";
         $result = $this->db->query($query);
         $num = $result->num_rows();
@@ -47,6 +65,7 @@ class program_model extends CI_Model {
                 foreach ($row as $key => $value) {
                     $item->$key = $value;
                 }
+                $item->path=$this->get_course_image_path($cat_id);
                 $items[] = $item;
             } // end foreach
         } // end if $num>0
@@ -143,27 +162,35 @@ class program_model extends CI_Model {
         $list.="<br/><div  class='form_div'>";
 
         if (count($items) > 0) {
+            $list.="<div class='courses category-browse category-browse-3'>";
             foreach ($items as $item) {
                 $blocks = $this->get_item_cost_blocks($item);
-                $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
-                $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$item->fullname</h5></div>";
-                $list.="<div class='panel-body'>";
-                $list.="<div class='container-fluid' style='text-align:left;'>";
-                //$list.= "<span class='span4'>&nbsp;</span><span class='span4' style='text-align:right;'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></span>";
-                $list.= "<span class='span4'>Start date <strong>" . date('m-d-Y', $item->startdate) . "</strong></span><span class='span4' style='text-align:right;'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span6'>" . $blocks['item_cost'] . "</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span6'>" . $blocks['item_group_cost'] . "</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span6'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></span>";
-                $list.="</div>";
-                $list.="</div>"; // end of panel-body
-                $list.="</div>"; // end of panel panel-default                
+
+                /*
+                  $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+                  $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$item->fullname</h5></div>";
+                  $list.="<div class='panel-body'>";
+                  $list.="<div class='container-fluid' style='text-align:left;'>";
+                  //$list.= "<span class='span4'>&nbsp;</span><span class='span4' style='text-align:right;'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></span>";
+                  $list.= "<span class='span4'>Start date <strong>" . date('m-d-Y', $item->startdate) . "</strong></span><span class='span4' style='text-align:right;'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></span>";
+                  $list.="</div>";
+                  $list.="<div class='container-fluid' style='text-align:left;'>";
+                  $list.= "<span class='span6'>" . $blocks['item_cost'] . "</span>";
+                  $list.="</div>";
+                  $list.="<div class='container-fluid' style='text-align:left;'>";
+                  $list.= "<span class='span6'>" . $blocks['item_group_cost'] . "</span>";
+                  $list.="</div>";
+                  $list.="<div class='container-fluid' style='text-align:left;'>";
+                  $list.= "<span class='span6'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></span>";
+                  $list.="</div>";
+                  $list.="</div>"; // end of panel-body
+                  $list.="</div>"; // end of panel panel-default
+                 */
+                $summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . '...' : strip_tags($item->summary);
+                $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='http://lambda.redpithemes.com/course/view.php?id=12'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a></div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
+                <p><img src='$item->path' alt='chemistry' style='vertical-align:text-bottom; margin: 0 .5em;' class='img-responsive' height='110' width='300'></p></div></div><ul class='teachers'><p align='justify'>$summary_string</p><p align='left'>" . $blocks['item_cost'] . "</p><p align='left'>" . $blocks['item_group_cost'] . "</p><p align='left'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></p></ul></div></div>";
             } // end foreach            
+            $list.="</div>";
         } //end if count($items) > 0)
         else {
             $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";

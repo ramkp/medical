@@ -5,6 +5,7 @@ class Contact_model extends CI_Model {
     public function __construct() {
         parent::__construct();
         $this->load->database();
+        $this->load->helper('captcha');
     }
 
     public function get_contact_page_data() {
@@ -21,6 +22,21 @@ class Contact_model extends CI_Model {
     }
 
     public function get_contact_form() {
+        $vals = array(
+            'img_path' => './captcha/',
+            'img_url' => 'http://'.$_SERVER['SERVER_NAME'].'/captcha/'
+        );
+
+        $cap = create_captcha($vals);
+        $data = array(
+            'captcha_time' => $cap['time'],
+            'ip_address' => $this->input->ip_address(),
+            'word' => $cap['word']
+        );
+
+        $query = $this->db->insert_string('mdl_captcha', $data);
+        $this->db->query($query);
+        
         $list = "";
         $list.="<br/><div  class='form_div'>";
 
@@ -34,30 +50,10 @@ class Contact_model extends CI_Model {
         $list.="<span class='span9'>&nbsp;</span>";
         $list.="</div>";
 
-        
-        /*
-         * 
-          $list.="<div>";
-          $list.="<div class='container-fluid' style='text-align:center;'>";
-          $list.="<span class='span2'>Email: </span><span class='span2'>info@medical2.com</span><span class='span2'>International and Local:</span><span class='span2'>Toll Free:1-877-741-1996  Phone: 1-662--844-9400</span>";
-          $list.="</div>";
-
-          $list.="<div>";
-          $list.="<div class='container-fluid' style='text-align:center;'>";
-          $list.="<span class='span2'>Fax: </span><span class='span2'>1 407 233-1192</span><span class='span2'> Mailing Address:</span><span class='span2'>Medical2 Inc 1830 North Gloster St. Suite-A.  Tupelo, MS 38804 </span>";
-          $list.="</div>";
-
-          $list.="<div class='container-fluid' style='text-align:center;'>";
-          $list.="<span class='span2'>Office Hours: </span><span class='span7' style='text-align:left;'> Mon-Fri  9 am To 5 pm CST</span>";
-          $list.="</div>";
-         * 
-         */
-
         $list.="<div>";
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span9'>&nbsp;</span>";
         $list.="</div>";
-
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>First name*</span>";
@@ -75,9 +71,14 @@ class Contact_model extends CI_Model {
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Message*</span>";
-        //$list.="<span class='span6' style='text-align:left;'>&nbsp;&nbsp;<textarea id='message' name='message' rows='4' cols='75'></textarea></span>";
         $list.="<span  class='span2'><textarea id='message' name='message' rows='4' ></textarea></span>";
         $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'>Please submit the captcha*:</span>";
+        $list.="<span class='span2'>".$cap['image']."</span>";
+        $list.="<span class='span2'><input type='text' id='captcha' name='captcha' value=''></span>";
+        $list.="</div>";        
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'><button class='btn btn-primary' id='contact_button'>Submit</button></span>";
@@ -86,7 +87,7 @@ class Contact_model extends CI_Model {
 
         $list.="</div>"; // end of panel-body
         $list.="</div>"; // end of panel panel-default
-        $list.="</div>"; // end of form div
+        $list.="</div></div>"; // end of form div
 
         return $list;
     }
