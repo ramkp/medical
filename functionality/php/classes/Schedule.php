@@ -176,6 +176,7 @@ class Schedule extends Programs {
         $query = "select id from mdl_scheduler where course=$courseid";
         $result = $this->db->query($query);
         $num = $this->db->numrows($query);
+        $now=time()+86400;
         if ($num > 0) {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $schedulerid = $row['id'];
@@ -183,7 +184,8 @@ class Schedule extends Programs {
             // 2. Get slots list
             if ($state == null) {
                 $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid order by starttime";
+                        . "where schedulerid=$schedulerid "
+                        . "and starttime>$now order by starttime";
             } // end if $state==null
             else {
                 $statename = $this->get_state_name($state);
@@ -232,7 +234,7 @@ class Schedule extends Programs {
             } // end if $num > 0 when slots are available at the course
             else {
                 $list.="<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span6'>This program does not have schedule</span>";
+                $list.= "<span class='span6'>This program does not have schedule in selected state</span>";
                 $list.="</div>";
 
                 $list.="</div>"; // end of panel-body

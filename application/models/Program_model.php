@@ -166,12 +166,12 @@ class program_model extends CI_Model {
             foreach ($items as $item) {
                 //echo "Item id: ".$item->id."<br>";
                 $blocks = $this->get_item_cost_blocks($item);
-                $has_schedule=$this->is_course_has_schedule($item->id);
-                if ($has_schedule>0) {
-                    $register_button="<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a>";
+                $has_schedule = $this->is_course_has_schedule($item->id);
+                if ($has_schedule > 0) {
+                    $register_button = "<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a>";
                 } // end if $has_schedule>0
-                else {                 
-                    $register_button="<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button class='btn btn-primary'>Register</button></a>";
+                else {
+                    $register_button = "<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button class='btn btn-primary'>Register</button></a>";
                 } // end else    
                 if ($cat_name == 'Hands-On Certification Workshops') {
                     if ($item->id == 45) {
@@ -197,7 +197,7 @@ class program_model extends CI_Model {
                 } // end if $cat_name == 'Hands-On Certification Workshops'                
                 else {
                     $summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . ' ...' : strip_tags($item->summary);
-                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
+                    $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
                     <p><img src='$item->path' alt='chemistry' style='vertical-align:text-bottom; margin: 0 .5em;' class='img-responsive' height='110' width='300'></p></div></div><ul class='teachers'><p align='justify'>$summary_string</p><p align='left'>" . $blocks['item_cost'] . "</p><p align='left'>" . $blocks['item_group_cost'] . "</p><p align='left'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></p></ul></div></div>";
                 }
             } // end foreach            
@@ -324,8 +324,8 @@ class program_model extends CI_Model {
         $list.="</div>";
 
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
-        $has_schedule=$this->is_course_has_schedule($item->id);
-        if ($has_schedule>0) {
+        $has_schedule = $this->is_course_has_schedule($item->id);
+        if ($has_schedule > 0) {
             $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
         } // end if $has_schedule>0
         else {
@@ -378,7 +378,10 @@ class program_model extends CI_Model {
             foreach ($row as $key => $value) {
                 $item->$key = $value;
             }
-            $items[] = $item;
+            $has_schedule = $this->is_course_has_schedule($item->id);
+            if ($has_schedule > 0) {
+                $items[] = $item;
+            }
         } // end foreach
         $drop_down = "";
         $drop_down.="<select id='schedule_courses' style='width:120px;'>";
@@ -462,6 +465,7 @@ class program_model extends CI_Model {
         $query = "select id from mdl_scheduler where course=$courseid";
         $result = $this->db->query($query);
         $num = $result->num_rows();
+        $now = time() + 86400;
         if ($num > 0) {
             foreach ($result->result() as $row) {
                 $schedulerid = $row->id;
@@ -469,7 +473,8 @@ class program_model extends CI_Model {
             // 2. Get slots list
             if ($state == null) {
                 $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid order by starttime";
+                        . "where schedulerid=$schedulerid "
+                        . "and starttime>$now order by starttime";
             } // end if $state==null
             else {
                 $statename = $this->get_state_name();
@@ -518,8 +523,8 @@ class program_model extends CI_Model {
                 $list.="</div>"; // end of panel panel-default           
             } // end if $num > 0 when slots are available at the course
             else {
-                $list.="<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span6'>This program does not have schedule</span>";
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.= "<span class='span6'>This program does not have schedule in selected state</span>";
                 $list.="</div>";
 
                 $list.="</div>"; // end of panel-body
