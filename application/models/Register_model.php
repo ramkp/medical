@@ -338,6 +338,10 @@ class register_model extends CI_Model {
             $list.="<span class='span2' id='register_cities_container'>$cities</span>";
             $list.="<span class='span2' id='program_err' style='color:red;'></span>";
             $list.="</div>"; // end of container-fluid
+            
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span9'>Already have an account? Please <a href='/index.php/login' target='_blank'>sign-in</a> and apply for course you need.</span>";
+            $list.="</div>"; // end of container-fluid
 
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default

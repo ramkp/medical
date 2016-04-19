@@ -477,7 +477,7 @@ class program_model extends CI_Model {
                         . "and starttime>$now order by starttime";
             } // end if $state==null
             else {
-                $statename = $this->get_state_name();
+                $statename = $this->get_state_name($state);
                 $query = "select * from mdl_scheduler_slots "
                         . "where schedulerid=$schedulerid "
                         . "and appointmentlocation like '%$statename%' "

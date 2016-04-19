@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,17 +34,16 @@
  * @author     Olav Jordan <olav.jordan@remote-learner.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 error_reporting('E_ALL');
 require_once(dirname(__FILE__) . '/../config.php');
 require_once($CFG->dirroot . '/my/lib.php');
-
+require_once($CFG->dirroot . '/custom/my/classes/Dashboard.php');
 
 redirect_if_major_upgrade_required();
 
 // TODO Add sesskey check to edit
-$edit   = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off
-$reset  = optional_param('reset', null, PARAM_BOOL);
+$edit = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off
+$reset = optional_param('reset', null, PARAM_BOOL);
 
 require_login();
 
@@ -66,7 +66,6 @@ if (isguestuser()) {  // Force them to see system default, no editing allowed
     $PAGE->set_blocks_editing_capability('moodle/my:configsyspages');  // unlikely :)
     $header = "$SITE->shortname: $strmymoodle (GUEST)";
     $pagetitle = $header;
-
 } else {        // We are trying to view or edit our own My Moodle page
     $userid = $USER->id;  // Owner of the page
     $context = context_user::instance($USER->id);
@@ -98,8 +97,7 @@ if (!isguestuser()) {   // Skip default home page for guests
         } else if (!empty($CFG->defaulthomepage) && $CFG->defaulthomepage == HOMEPAGE_USER) {
             $frontpagenode = $PAGE->settingsnav->add(get_string('frontpagesettings'), null, navigation_node::TYPE_SETTING, null);
             $frontpagenode->force_open();
-            $frontpagenode->add(get_string('makethismyhome'), new moodle_url('/my/', array('setdefaulthome' => true)),
-                    navigation_node::TYPE_SETTING);
+            $frontpagenode->add(get_string('makethismyhome'), new moodle_url('/my/', array('setdefaulthome' => true)), navigation_node::TYPE_SETTING);
         }
     }
 }
@@ -158,12 +156,18 @@ if (empty($CFG->forcedefaultmymoodle) && $PAGE->user_allowed_editing()) {
     $url = new moodle_url("$CFG->wwwroot/my/index.php", $params);
     $button = $OUTPUT->single_button($url, $editstring);
     $PAGE->set_button($resetbutton . $button);
-
 } else {
     $USER->editing = $edit = 0;
 }
 
 echo $OUTPUT->header();
+
+$ds = new Dashboard();
+$roleid = $ds->get_user_role($USER->id);
+if ($roleid == 5) {
+    $list = $ds->get_programs_panel();
+    echo $list;
+}
 
 echo $OUTPUT->custom_block_region('content');
 

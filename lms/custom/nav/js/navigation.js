@@ -1,5 +1,7 @@
 
 $(document).ready(function () {
+
+    var domain = 'cnausa.com';
     console.log("ready!");
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
@@ -854,7 +856,7 @@ $(document).ready(function () {
             update_late_fee();
         }
 
-        
+
 
     }); // end of #region-main click', 'button',
 
@@ -1144,6 +1146,92 @@ $(document).ready(function () {
         get_late_fee_page();
     });
 
+    /************************************************************************
+     * 
+     *      Code related to courses selection by logged students
+     * 
+     ***********************************************************************/
+
+    function get_category_course(category_id) {
+        var url = "http://" + domain + "/functionality/php/get_selected_course.php";
+        var request = {cat_id: category_id};
+        $.post(url, request).done(function (data) {
+            $("#cat_course").html(data);
+        });
+    }
+
+    function get_register_course_states() {
+        var courseid = $('#register_courses').val();
+        var url = "http://" + domain + "/functionality/php/get_register_course_states.php";
+        var request = {courseid: courseid};
+        $.post(url, request).done(function (data) {
+            $('#register_states_container').html(data);
+        });
+
+    }
+
+    function get_register_course_cities() {
+        var courseid = $('#register_courses').val();
+        var slotid = $('#register_state').val();
+        var url = "http://" + domain + "/functionality/php/get_register_course_cities.php";
+        var request = {courseid: courseid, slotid: slotid};
+        $.post(url, request).done(function (data) {
+            $('#register_cities_container').html(data);
+        });
+    }
+
+    $('#program_section').on('change', function (event) {
+
+        if (event.target.id == 'categories') {
+            var category_id = $('#categories').val();
+            console.log('Category ID: ' + category_id);
+            get_category_course(category_id);
+        }
+
+        if (event.target.id == 'register_courses') {
+            get_register_course_states();
+        } // end if event.target.id == 'policy'
+
+        if (event.target.id == 'register_state') {
+            get_register_course_cities();
+        } // end if event.target.id == 'policy'
+
+    });
+
+    function assign_user_to_course() {
+        var courseid = $('#register_courses').val();
+        var slotid = $('#register_cities').val();
+        console.log('Selected course: ' + courseid);
+        if (courseid > 0) {
+            $('#program_err').html('');
+            var url = "/lms/custom/my/get_course_schedule.php";
+            var request = {courseid: courseid};
+            $.post(url, request).done(function (data) {
+                if (data > 0) {
+                    if (slotid == 0) {
+                        $('#program_err').html('Please select state and city');
+                    } // end if slotid==0
+                    else {
+
+                    } // end else 
+                } // end if data>0
+                else {
+
+                }
+            });
+
+        } // end if courseid>0
+        else {
+            $('#program_err').html('Please select program');
+        }
+    }
+
+    $('#program_section').on('click', function (event) {
+        //console.log('Item clicked: ' + event.target.id);
+        if (event.target.id == 'internal_apply') {
+            assign_user_to_course();
+        }
+    });
 
 }); // end of $(document).ready(function()
 
