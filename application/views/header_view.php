@@ -87,7 +87,7 @@ $categories = $menu->get_categories_menu();
         <script type="text/javascript" src="http://cnausa.com/lms/theme/jquery.php/theme_lambda/jquery.bxslider.js"></script>
         <!--<script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>-->        
         <script type="text/javascript" src="http://cnausa.com/assets/js/custom.js"></script>        
-        <!--<script type="text/javascript" src="http://cnausa.com/assets/js/bootstrap.min.js"></script>-->        
+        <script type="text/javascript" src="http://cnausa.com/assets/js/selectbox/jquery.selectBox.js"></script>        
         <script type="text/javascript">
             //<![CDATA[
             document.body.className += ' jsenabled';
@@ -119,7 +119,7 @@ $categories = $menu->get_categories_menu();
                             <div class="nav-collapse collapse">
                                 <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Courses<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">                                            
-                                            
+
                                             <li><a class="dropdown-toggle" href="http://cnausa.com/index.php/programs/program/5" id="ws"  title="">Healthcare Career Courses </a></li>
                                             <li><a href="http://cnausa.com/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>
                                             <li><a href="http://cnausa.com/index.php/programs/program/3/" id="exam" title="">CEUs & Online Courses</a></li>
@@ -145,17 +145,63 @@ $categories = $menu->get_categories_menu();
                             </div>                      
                             <ul class="nav pull-right">                                
                                 <li class="dropdown"><a href="http://cnausa.com/index.php/search"><img src="/lms/theme/image.php/lambda/theme/1453287272/bg/icon-search" style="cursor: pointer;" alt="search" id='search_item' /></a></li>
-                                <li class="dropdown"><a href="#">Select Language<span style="color: rgb(155, 155, 155);">▼</span></a></li>
+                                <!--<li class="dropdown"><a href="#">Select Language<span style="color: rgb(155, 155, 155);">▼</span></a></li>-->
 
 
-                                <!-- Google translation widget 
-                                <li class="dropdown"><a><div id="google_translate_element" style="vertical-align:middle;"></div><script type="text/javascript">
+                                <!-- Google translation widget -->
+                                <!--<li class="dropdown"><a><div id="google_translate_element" style="vertical-align:middle;"></div>-->
+                                <!--<li class="dropdown"><span id="google_translate_element" style="vertical-align:middle;"></span></li>-->        
+
+                                <script type="text/javascript">
+                                    var width = $(window).width();
+                                    var height = $(window).height();
+                                    //alert ('Screen width: '+width);
+                                    //alert ('Screen height: '+height);
+                                    if (width >= 1024) {
+                                        document.write('<li class="dropdown" id="translator_container"><span id="google_translate_element" style="vertical-align:middle;"></span></li>');
+                                    }
+                                    else {
+                                        document.write('<li class="dropdown" id="translator_container"><a><span id="google_translate_element" style="vertical-align:middle;"></span></a><br></li>');
+                                    }
                                     function googleTranslateElementInit() {
                                         new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
-                                    }                                    
-                                    $('#google_translate_element').css({"height":"15"});
-                                </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script></a></li>
-                                -->
+                                    }
+
+                                    /*
+                                    $(window).on("orientationchange", function () {
+                                        $('#translator_container').remove();
+                                        var width = $(window).width();
+                                        if (width >= 1024) {
+                                            document.write('<li class="dropdown" id="translator_container"><span id="google_translate_element" style="vertical-align:middle;"></span></li>');
+                                        }
+                                        else {
+                                            document.write('<li class="dropdown" id="translator_container"><a><span id="google_translate_element" style="vertical-align:middle;"></span></a><br></li>');
+                                        }
+                                        function googleTranslateElementInit() {
+                                            new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+                                        }
+
+                                    });
+                                    */
+
+                                </script>                                        
+
+                                <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+                                <style>
+
+                                    div.skiptranslate.goog-te-gadget {
+                                        height:15px;
+                                        padding-top: 7px;
+
+                                    }
+                                    div#:0.targetLanguage {
+                                        padding-bottom:  3px;
+                                    }
+
+                                </style>
+
+
                                 <!-- Sharethis buttons -->
                                 <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
                                 <script type="text/javascript">stLight.options({publisher: "eda8d1a9-031a-4879-9550-5afd52ee1ddf", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>

@@ -1,5 +1,7 @@
 <?php
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/application/libraries/antispam.php';
+
 class Contact_model extends CI_Model {
 
     public function __construct() {
@@ -21,13 +23,17 @@ class Contact_model extends CI_Model {
         return $list;
     }
 
-    public function get_contact_form() {
-        $vals = array(
+    public function get_contact_form() {   
+        $antispam = new Antispam();
+        $configs = array(
             'img_path' => './captcha/',
-            'img_url' => 'http://'.$_SERVER['SERVER_NAME'].'/captcha/'
+            'img_url' => 'http://'.$_SERVER['SERVER_NAME'] . '/captcha/',            
+            'font_path' => $_SERVER['DOCUMENT_ROOT'].'/application/fonts/',
+            'img_height' => '50',
+            'font_size' => 16
         );
+        $cap = $antispam->get_antispam_image($configs);
 
-        $cap = create_captcha($vals);
         $data = array(
             'captcha_time' => $cap['time'],
             'ip_address' => $this->input->ip_address(),
@@ -36,7 +42,7 @@ class Contact_model extends CI_Model {
 
         $query = $this->db->insert_string('mdl_captcha', $data);
         $this->db->query($query);
-        
+
         $list = "";
         $list.="<br/><div  class='form_div'>";
 
@@ -76,9 +82,9 @@ class Contact_model extends CI_Model {
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Please submit the captcha*:</span>";
-        $list.="<span class='span2'>".$cap['image']."</span>";
+        $list.="<span class='span2'>" . $cap['image'] . "</span>";
         $list.="<span class='span2'><input type='text' id='captcha' name='captcha' value=''></span>";
-        $list.="</div>";        
+        $list.="</div>";
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'><button class='btn btn-primary' id='contact_button'>Submit</button></span>";
