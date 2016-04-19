@@ -31,7 +31,7 @@ class Groups extends Util {
     }
 
     function render_requests_list($requests, $wrap = 1) {
-        $list = "";        
+        $list = "";
         if (count($requests) > 0) {
             $list.="<div id='group_items' >";
             foreach ($requests as $request) {
@@ -84,28 +84,65 @@ class Groups extends Util {
         return $name;
     }
 
+    function get_state_name($id) {
+        $query = "select * from mdl_states where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $name = $row['state'];
+        }
+        return $name;
+    }
+
     function get_request_detailed_view($id) {
         $request = $this->get_request_detailes($id);
         $coursename = $this->get_course_name_by_id($request->courseid);
+        $statename = $this->get_state_name($request->group_state);
         $list = "";
-        $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
-        $list.="<span class='span1'>Contact</span>";
-        $list.="<span class='span2'>Course</span>";
-        $list.="<span class='span2'>Phone</span>";
-        $list.="<span class='span2'>Email</span>";
-        $list.="<span class='span2'>Company</span>";
-        $list.="<span class='span2'>City</span>";
-        $list.="<span class='span1'>Budget</span>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Contact</span>";
+        $list.="<span class='span2'>$request->group_fio</span>";
         $list.="</div>";
 
-        $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span1'>$request->group_fio</span>";
-        $list.="<span class='span2'>$coursename</span>";
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Course</span>";
+        $list.="<span class='span6'>$coursename</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Phone</span>";
         $list.="<span class='span2'>$request->group_phone</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Email</span>";
         $list.="<span class='span2'>$request->group_email</span>";
+        $list.="</div>";
+
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Company</span>";
         $list.="<span class='span2'>$request->group_company</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>State</span>";
+        $list.="<span class='span2'>$statename</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>City</span>";
         $list.="<span class='span2'>$request->group_city</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Budget</span>";
         $list.="<span class='span1'>$$request->group_budget</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>People num</span>";
+        $list.="<span class='span2'>$request->people_num</span>";
         $list.="</div>";
         return $list;
     }
@@ -150,9 +187,9 @@ class Groups extends Util {
         $list = $this->render_requests_list($requests, 0);
         return $list;
     }
-    
-    function get_total_group_items () {
-        $query="select * from mdl_private_groups order by request_date desc";
+
+    function get_total_group_items() {
+        $query = "select * from mdl_private_groups order by request_date desc";
         $num = $this->db->numrows($query);
         return $num;
     }
