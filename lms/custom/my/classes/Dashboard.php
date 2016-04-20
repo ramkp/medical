@@ -10,6 +10,15 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php
 
 class Dashboard extends Util {
 
+    public $resolution_path;
+    public $resolution_path2;
+
+    function __construct() {
+        parent::__construct();
+        $this->resolution_path = 'http://' . $_SERVER['SERVER_NAME'] . '/lms/custom/my/get_screen_resolution.php';
+        $this->resolution_path2 = $_SERVER['SERVER_NAME'];
+    }
+
     function is_user_paid() {
         $status = 0;
         $courseid = $this->course->id;
@@ -118,7 +127,7 @@ class Dashboard extends Util {
 
     public function get_register_course_cities_list($courseid = null) {
         $drop_down = "";
-        $drop_down.="<select id='register_cities' style='width:140px;'>";
+        $drop_down.="<select id='register_cities' style='width:120px;'>";
         //$drop_down.="<select id='register_cities'>";
         $drop_down.="<option value='0' selected>All Cities</option>";
         if ($courseid != null) {
@@ -133,31 +142,54 @@ class Dashboard extends Util {
     }
 
     function get_programs_panel() {
-
+        $userid = $this->user->id;
         $cats = $this->get_course_categories();
         $courses = $this->get_courses_by_category();
         $register_state = $this->get_register_course_states_list();
         $cities = $this->get_register_course_cities_list();
-
+        $screen_width = trim(file_get_contents($this->resolution_path));
         $list = "";
         $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
         $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Available courses</h5></div>";
         $list.="<div class='panel-body' style='text-align:center;'>";
+        $list.="<input type='hidden' value='$userid' id='userid'>";
+        //echo "Width: " . htmlentities($screen_width) . "<br>";
+        //echo "Screen type: " . gettype($screen_width) . "<br>";
+        if ($screen_width > 1024) {
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span3'>$cats</span>";
+            $list.="<span class='span3' id='cat_course'>$courses</span>";
+            $list.="<span class='span3' id='register_states_container'>$register_state</span>";
+            $list.="<span class='span3' id='register_cities_container'>$cities</span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span3'>$cats</span>";
-        $list.="<span class='span3' id='cat_course'>$courses</span>";
-        $list.="<span class='span3' id='register_states_container'>$register_state</span>";
-        $list.="<span class='span3' id='register_cities_container'>$cities</span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'><button type='button' class='btn btn-primary' id='internal_apply'>Apply</button></span>";
+            $list.="<span class='span4' id='program_err' style='color:red;'></span>";
+            $list.="</div>";
+        } // end if $screen_width > 1024
+        else {
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span3'>$cats</span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="</div>";
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span3' id='cat_course'>$courses</span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'><button type='button' class='btn btn-primary' id='internal_apply'>Apply</button></span>";
-        $list.="<span class='span4' id='program_err' style='color:red;'></span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span3' id='register_states_container'>$register_state</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span3' id='register_cities_container'>$cities</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span3'><button type='button' class='btn btn-primary' id='internal_apply'>Apply</button></span>";
+            $list.="<span class='span9' id='program_err' style='color:red;'></span>";
+            $list.="</div>";
+        } // end else
 
         $list.="</div>"; // end of panel-body
         $list.="</div><br>"; // end of panel panel-default
@@ -175,9 +207,9 @@ class Dashboard extends Util {
     }
 
     function is_course_has_schedule($courseid, $stateid = null) {
-        $num=0;
+        $num = 0;
         //echo "Function course id: $courseid";
-        $query = "select id from mdl_scheduler where course=$courseid";        
+        $query = "select id from mdl_scheduler where course=$courseid";
         $num = $this->db->numrows($query);
         //echo "Scheduler num: $num";
         if ($num > 0) {
@@ -200,6 +232,85 @@ class Dashboard extends Util {
             $num = $this->db->numrows($query);
         } // end if $num > 0
         return $num;
+    }
+
+    function is_user_already_enrolled($courseid, $userid) {
+        $contextid = $this->get_course_context($courseid);
+        //echo "Context id: ".$contextid."<br>";
+        $query = "select * from mdl_role_assignments "
+                . "where roleid=5 "
+                . "and contextid=$contextid "
+                . "and userid=$userid";
+        //echo "Query: ".$query."<br>";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+    
+    function getEnrolId($courseid) {
+        $query = "select id from mdl_enrol
+                     where courseid=" . $courseid . " and enrol='manual'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $enrolid = $row['id'];
+        }
+        return $enrolid;
+    }
+
+    function enroll_user($courseid, $userid) {
+        $contextid = $this->get_course_context($courseid);
+        $enrolid=$this->getEnrolId($courseid);
+        
+        $query = "insert into mdl_user_enrolments
+             (enrolid,
+              userid,
+              timestart,
+              modifierid,
+              timecreated,
+              timemodified)
+               values ('" . $enrolid . "',
+                       '" . $userid . "',
+                        '" . time() . "',   
+                        '2',
+                         '" . time() . "',
+                         '" . time() . "')";
+        //echo "Query: ".$query."<br/>";
+        $this->db->query($query);
+        
+        $query = "insert into mdl_role_assignments"
+                . " (roleid,"
+                . "contextid,"
+                . "userid,"
+                . "timemodified,"
+                . "modifierid) "
+                . "values('5',"
+                . "'$contextid',"
+                . "'$userid',"
+                . "'" . time() . "','2')";
+        $this->db->query($query);
+    }
+
+    function add_user_to_slot($userid, $slotid) {
+        $query = "insert into mdl_scheduler_appointment "
+                . "(slotid,"
+                . "studentid,"
+                . "attended) "
+                . "values($slotid,"
+                . "$userid,"
+                . "0)";
+        $this->db->query($query);
+    }
+
+    function enrol_user_to_course($courseid, $slotid, $userid) {
+        $enrolled = $this->is_user_already_enrolled($courseid, $userid);
+        //echo "Enrolled status: ".$enrolled."<br>";
+        if ($enrolled == 0) {
+            $this->enroll_user($courseid, $userid);
+        } // end if $enrolled==0
+        if ($slotid > 0) {
+            $this->add_user_to_slot($userid, $slotid);
+        } // end if $slotid>0
+        $list = "You was successfully enrolled into selected course/schedule.Please re-login so changes take effect.";
+        return $list;
     }
 
 }

@@ -1201,6 +1201,7 @@ $(document).ready(function () {
     function assign_user_to_course() {
         var courseid = $('#register_courses').val();
         var slotid = $('#register_cities').val();
+        var userid = $('#userid').val();
         console.log('Selected course: ' + courseid);
         if (courseid > 0) {
             $('#program_err').html('');
@@ -1212,12 +1213,22 @@ $(document).ready(function () {
                         $('#program_err').html('Please select state and city');
                     } // end if slotid==0
                     else {
-
+                        var url = "/lms/custom/my/enrol_user_to_course.php";
+                        var request = {courseid: courseid, slotid: slotid, userid: userid};
+                        $.post(url, request).done(function (data) {
+                            $('#program_err').html("<span style='color:black;'>" + data + "</span>");
+                            //window.location.reload();
+                        });
                     } // end else 
                 } // end if data>0
                 else {
-
-                }
+                    var url = "/lms/custom/my/enrol_user_to_course.php";
+                    var request = {courseid: courseid, slotid: slotid, userid: userid};
+                    $.post(url, request).done(function (data) {
+                        $('#program_err').html("<span style='color:black;'>" + data + "</span>");
+                        //window.location.reload();
+                    });
+                } // end else when there is no course schedule
             });
 
         } // end if courseid>0

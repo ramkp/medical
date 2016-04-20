@@ -5,6 +5,7 @@
  *
  * @author sirromas
  */
+session_start();
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/config.php');
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php');
 
@@ -21,6 +22,21 @@ class Util {
         $this->db = $db;
         $this->user = $USER;
         $this->course = $COURSE;
+        //$this->get_screen_resolution();
+    }
+
+    function get_screen_resolution() {
+        if (isset($_SESSION['screen_width']) AND isset($_SESSION['screen_height'])) {
+            
+        }  // end if isset($_SESSION['screen_width']) AND isset($_SESSION['screen_height'])
+        else if (isset($_REQUEST['width']) AND isset($_REQUEST['height'])) {
+          //  $_SESSION['screen_width'] = $_REQUEST['width'];
+          //  $_SESSION['screen_height'] = $_REQUEST['height'];
+          //  header('Location: ' . $_SERVER['PHP_SELF']);
+        } // end else if        
+        else {
+            echo '<script type="text/javascript">window.location = "' . $_SERVER['PHP_SELF'] . '?width="+$(window).width()+"&height="+$(window).height();</script>';
+        }
     }
 
     function get_course_context($courseid) {

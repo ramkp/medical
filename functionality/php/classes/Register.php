@@ -526,17 +526,18 @@ class Register {
     function get_register_course_cities($courseid, $slotid) {
         date_default_timezone_set('Pacific/Wallis');
         $drop_down = "";
-        $drop_down.="<select id='register_cities' style='width:140px;'>";
+        $drop_down.="<select id='register_cities' style='width:120px;'>";
         $drop_down.="<option value='0' selected>All Cities</option>";
         $schedulerid = $this->get_schedulerid($courseid);
         if ($schedulerid > 0) {
             $slot_data = $this->get_slot_data($slotid);
             $locations = explode("/", $slot_data->appointmentlocation);
             $statename = $locations[0];
+            $now=time()+86400;
             $query = "select * from mdl_scheduler_slots "
                     . "where schedulerid=$schedulerid "
                     . "and appointmentlocation like '%$statename%' "
-                    . "order by starttime";
+                    . "and starttime>$now order by starttime";
             $result = $this->db->query($query);
             $num = $this->db->numrows($query);
             if ($num > 0) {

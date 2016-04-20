@@ -251,7 +251,7 @@ class register_model extends CI_Model {
 
     public function get_register_course_cities_list($courseid = null) {
         $drop_down = "";
-        $drop_down.="<select id='register_cities' style='width:140px;'>";
+        $drop_down.="<select id='register_cities' style='width:120px;'>";
         //$drop_down.="<select id='register_cities'>";
         $drop_down.="<option value='0' selected>All Cities</option>";
         if ($courseid != null) {

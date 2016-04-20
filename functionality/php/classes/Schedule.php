@@ -170,7 +170,7 @@ class Schedule extends Programs {
     }
 
     function get_course_schedule($courseid, $state = null) {
-
+        date_default_timezone_set('Pacific/Wallis');
         $list = "";
         // 1.Get scheduler id
         $query = "select id from mdl_scheduler where course=$courseid";
@@ -192,7 +192,7 @@ class Schedule extends Programs {
                 $query = "select * from mdl_scheduler_slots "
                         . "where schedulerid=$schedulerid "
                         . "and appointmentlocation like '%$statename%' "
-                        . "order by starttime";
+                        . "and starttime>$now order by starttime";
             } // end else 
             $coursename = $this->get_course_name($courseid);
             $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
