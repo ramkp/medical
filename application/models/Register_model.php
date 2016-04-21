@@ -315,7 +315,7 @@ class register_model extends CI_Model {
         $come_from = $this->come_from();
         $states = $this->get_states_list();
         $register_state = $this->get_register_course_states_list();
-        //$countries = $this->get_countries_list();   
+        $countries = $this->get_countries_list();   
         $cities = $this->get_register_course_cities_list();
 
         // ****************** Program information **************************
@@ -403,7 +403,7 @@ class register_model extends CI_Model {
         $list.="<span class='span2'>State*</span>";
         $list.="<span class='span2'>$states</span>";
         $list.="<span class='span2'>Country*</span>";
-        $list.="<span class='span2' id='register_cities_container'>$cities</span>";
+        $list.="<span class='span2' id='register_cities_container'>$countries</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";

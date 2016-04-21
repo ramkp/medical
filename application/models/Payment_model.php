@@ -109,16 +109,15 @@ class Payment_model extends CI_Model {
         return $slotid;
     }
 
-    public function get_payment_section($userid = null) {
+    public function get_payment_section($userid,$courseid) {
         $list = "";
         if ($userid != NULL) {
             $user = $this->get_user_data($userid);
-            $courseid = $this->get_user_course($userid);
+            //$courseid = $this->get_user_course($userid);
             $slotid = $this->get_user_slot($userid);
             $user->courseid = $courseid;
             $user->slotid = $slotid;
-            $group_status = $this->is_group_member($userid);
-            $installment = $this->get_course_payment_options($courseid);
+            $group_status = $this->is_group_member($userid);            
             if ($group_status == 0) {
                 // Personal signup
                 $group_data = '';

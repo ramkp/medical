@@ -66,8 +66,9 @@ class Dashboard extends Util {
     function get_user_warning_message() {
         $list = "";
         $userid = $this->user->id;
+        $courseid=$this->course->id;
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid' target='_blank'>click</a> here to pay by card. </span>";
+        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid' target='_blank'>click</a> here to pay by card. </span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span12' >If you need help please contact support team.</span>";
