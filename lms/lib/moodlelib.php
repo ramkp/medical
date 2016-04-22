@@ -3564,6 +3564,9 @@ function get_user_field_name($field) {
         }
         case 'msn' : {
             return get_string('msnid');
+        }        
+        case 'phone1' : {
+            return 'Phone';
         }
     }
     // Otherwise just use the same lang string.
