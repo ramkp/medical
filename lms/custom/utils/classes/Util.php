@@ -5,7 +5,7 @@
  *
  * @author sirromas
  */
-session_start();
+//session_start();
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/config.php');
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php');
 
