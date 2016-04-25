@@ -5837,6 +5837,30 @@ function send_confirmation_email($user) {
     return true;
 }
 
+function email_to_user2 ($user, $supportuser, $subject, $message) {
+    
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
+    global $CFG;
+
+    if (empty($user) or empty($user->id)) {
+        debugging('Can not send email to null user', DEBUG_DEVELOPER);
+        return false;
+    }
+
+    if (empty($user->email)) {
+        debugging('Can not send email to user without email: '.$user->id, DEBUG_DEVELOPER);
+        return false;
+    }
+
+    if (!empty($user->deleted)) {
+        debugging('Can not send email to deleted user: '.$user->id, DEBUG_DEVELOPER);
+        return false;
+    }
+    
+    $mailer=new Mailer();
+    $mailer->send_password_recovery_email($user, $supportuser, $subject, $message);    
+}
+
 /**
  * Sends a password change confirmation email.
  *
@@ -5864,7 +5888,8 @@ function send_password_change_confirmation_email($user, $resetrecord) {
     $subject = get_string('emailresetconfirmationsubject', '', format_string($site->fullname));
 
     // Directly email rather than using the messaging system to ensure its not routed to a popup or jabber.
-    return email_to_user($user, $supportuser, $subject, $message);
+    email_to_user2($user, $supportuser, $subject, $message);
+    return "Email has been sent to $user->email";
 
 }
 

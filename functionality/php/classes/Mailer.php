@@ -178,5 +178,38 @@ class Mailer {
             //echo 'Message has been sent to ' . $recipient;
         }
     }
+    
+    function send_password_recovery_email ($user, $supportuser, $subject, $message) {
+        
+        $mail = new PHPMailer;
+        //$recipient = 'sirromas@gmail.com'; // temp workaround
+        //$mail->SMTPDebug = 3;                                
+
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $mail->setFrom($this->mail_smtp_user, 'Support team');
+        $mail->addAddress($user->email);
+        $mail->addReplyTo($this->mail_smtp_user, 'Support team');
+        
+        $mail->isHTML(true);
+
+        $mail->Subject = $subject;
+        $mail->Body = $message;
+
+        if (!$mail->send()) {
+            echo 'Message could not be sent.';
+            echo 'Mailer Error: ' . $mail->ErrorInfo;
+        } // end if !$mail->send()        
+        else {
+            //echo 'Message has been sent to ' . $user->email;
+        }
+        
+    }
 
 }

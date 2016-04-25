@@ -25,18 +25,17 @@
  * @copyright  1999 onwards Martin Dougiamas  http://dougiamas.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Returned when the login was successful.
  */
-define('AUTH_OK',     0);
+define('AUTH_OK', 0);
 
 /**
  * Returned when the login was unsuccessful.
  */
-define('AUTH_FAIL',   1);
+define('AUTH_FAIL', 1);
 
 /**
  * Returned when the login was denied (a reason for AUTH_FAIL).
@@ -46,7 +45,7 @@ define('AUTH_DENIED', 2);
 /**
  * Returned when some error occurred (a reason for AUTH_FAIL).
  */
-define('AUTH_ERROR',  4);
+define('AUTH_ERROR', 4);
 
 /**
  * Authentication - error codes for user confirm
@@ -145,7 +144,7 @@ class auth_plugin_base {
      * @return bool Authentication success or failure.
      */
     function user_login($username, $password) {
-        print_error('mustbeoveride', 'debug', '', 'user_login()' );
+        print_error('mustbeoveride', 'debug', '', 'user_login()');
     }
 
     /**
@@ -253,7 +252,7 @@ class auth_plugin_base {
      * @return bool                  True on success
      */
     function user_update_password($user, $newpassword) {
-        //override if needed
+        //override if needed        
         return true;
     }
 
@@ -312,9 +311,9 @@ class auth_plugin_base {
      * @param object $user new user object
      * @param boolean $notify print notice with link and terminate
      */
-    function user_signup($user, $notify=true) {
+    function user_signup($user, $notify = true) {
         //override when can signup
-        print_error('mustbeoveride', 'debug', '', 'user_signup()' );
+        print_error('mustbeoveride', 'debug', '', 'user_signup()');
     }
 
     /**
@@ -325,8 +324,8 @@ class auth_plugin_base {
     function signup_form() {
         global $CFG;
 
-        require_once($CFG->dirroot.'/login/signup_form.php');
-        return new login_signup_form(null, null, 'post', '', array('autocomplete'=>'on'));
+        require_once($CFG->dirroot . '/login/signup_form.php');
+        return new login_signup_form(null, null, 'post', '', array('autocomplete' => 'on'));
     }
 
     /**
@@ -347,7 +346,7 @@ class auth_plugin_base {
      */
     function user_confirm($username, $confirmsecret) {
         //override when can confirm
-        print_error('mustbeoveride', 'debug', '', 'user_confirm()' );
+        print_error('mustbeoveride', 'debug', '', 'user_confirm()');
     }
 
     /**
@@ -373,6 +372,7 @@ class auth_plugin_base {
     function password_expire($username) {
         return 0;
     }
+
     /**
      * Sync roles for this user - usually creator
      *
@@ -416,7 +416,7 @@ class auth_plugin_base {
      * @param object object with submitted configuration settings (without system magic quotes)
      * @param array $err array of error messages
      */
-     function validate_form($form, &$err) {
+    function validate_form($form, &$err) {
         //override if needed
     }
 
@@ -440,7 +440,6 @@ class auth_plugin_base {
     function loginpage_hook() {
         global $frm;  // can be used to override submitted login form
         global $user; // can be used to replace authenticate_user_login()
-
         //override if needed
     }
 
@@ -484,7 +483,6 @@ class auth_plugin_base {
      */
     function prelogout_hook() {
         global $USER; // use $USER->auth to find the plugin used for login
-
         //override if needed
     }
 
@@ -498,7 +496,6 @@ class auth_plugin_base {
     function logoutpage_hook() {
         global $USER;     // use $USER->auth to find the plugin used for login
         global $redirect; // can be used to override redirect after logout
-
         //override if needed
     }
 
@@ -594,7 +591,7 @@ class auth_plugin_base {
         $this->customfields = array();
         if ($proffields = $DB->get_records('user_info_field')) {
             foreach ($proffields as $proffield) {
-                $this->customfields[] = 'profile_field_'.$proffield->shortname;
+                $this->customfields[] = 'profile_field_' . $proffield->shortname;
             }
         }
         unset($proffields);
@@ -610,7 +607,9 @@ class auth_plugin_base {
      * @param stdClass $user clone of USER object before the user session was terminated
      */
     public function postlogout_hook($user) {
+        
     }
+
 }
 
 /**
@@ -709,7 +708,7 @@ function login_attempt_failed($user) {
         $count = 0;
     }
 
-    $count = $count+1;
+    $count = $count + 1;
 
     set_user_preference('login_failed_count', $count, $user);
     set_user_preference('login_failed_last', time(), $user);
@@ -754,11 +753,11 @@ function login_lock_account($user) {
 
         $data = new stdClass();
         $data->firstname = $user->firstname;
-        $data->lastname  = $user->lastname;
-        $data->username  = $user->username;
-        $data->sitename  = format_string($site->fullname);
-        $data->link      = $CFG->wwwroot.'/login/unlock_account.php?u='.$user->id.'&s='.$secret;
-        $data->admin     = generate_email_signoff();
+        $data->lastname = $user->lastname;
+        $data->username = $user->username;
+        $data->sitename = format_string($site->fullname);
+        $data->link = $CFG->wwwroot . '/login/unlock_account.php?u=' . $user->id . '&s=' . $secret;
+        $data->admin = generate_email_signoff();
 
         $message = get_string('lockoutemailbody', 'admin', $data);
         $subject = get_string('lockoutemailsubject', 'admin', format_string($site->fullname));

@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -28,6 +29,7 @@ define('PWRESET_STATUS_NOEMAILSENT', 1);
 define('PWRESET_STATUS_TOKENSENT', 2);
 define('PWRESET_STATUS_OTHEREMAILSENT', 3);
 define('PWRESET_STATUS_ALREADYSENT', 4);
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php');
 
 /**
  *  Processes a user's request to set a new password in the event they forgot the old one.
@@ -41,7 +43,6 @@ function core_login_process_password_reset_request() {
 
     if ($mform->is_cancelled()) {
         redirect(get_login_url());
-
     } else if ($data = $mform->get_data()) {
         // Requesting user has submitted form data.
         // Next find the user account in the database which the requesting user claims to own.
@@ -65,10 +66,10 @@ function core_login_process_password_reset_request() {
         // Target user details have now been identified, or we know that there is no such account.
         // Send email address to account's email address if appropriate.
         $pwresetstatus = PWRESET_STATUS_NOEMAILSENT;
-        if ($user and !empty($user->confirmed)) {
+        if ($user and ! empty($user->confirmed)) {
             $userauth = get_auth_plugin($user->auth);
-            if (!$userauth->can_reset_password() or !is_enabled_auth($user->auth)
-              or !has_capability('moodle/user:changeownpassword', $systemcontext, $user->id)) {
+            if (!$userauth->can_reset_password() or ! is_enabled_auth($user->auth)
+                    or ! has_capability('moodle/user:changeownpassword', $systemcontext, $user->id)) {
                 if (send_password_change_info($user)) {
                     $pwresetstatus = PWRESET_STATUS_OTHEREMAILSENT;
                 } else {
@@ -120,22 +121,22 @@ function core_login_process_password_reset_request() {
         if (!empty($CFG->protectusernames)) {
             // Neither confirm, nor deny existance of any username or email address in database.
             // Print general (non-commital) message.
-            notice(get_string('emailpasswordconfirmmaybesent'), $CFG->wwwroot.'/index.php');
+            notice(get_string('emailpasswordconfirmmaybesent'), $CFG->wwwroot . '/index.php');
             die; // Never reached.
         } else if (empty($user)) {
             // Protect usernames is off, and we couldn't find the user with details specified.
             // Print failure advice.
-            notice(get_string('emailpasswordconfirmnotsent'), $CFG->wwwroot.'/forgot_password.php');
+            notice(get_string('emailpasswordconfirmnotsent'), $CFG->wwwroot . '/forgot_password.php');
             die; // Never reached.
         } else if (empty($user->email)) {
             // User doesn't have an email set - can't send a password change confimation email.
-            notice(get_string('emailpasswordconfirmnoemail'), $CFG->wwwroot.'/index.php');
+            notice(get_string('emailpasswordconfirmnoemail'), $CFG->wwwroot . '/index.php');
             die; // Never reached.
         } else if ($pwresetstatus == PWRESET_STATUS_ALREADYSENT) {
             // User found, protectusernames is off, but user has already (re) requested a reset.
             // Don't send a 3rd reset email.
             $stremailalreadysent = get_string('emailalreadysent');
-            notice($stremailalreadysent, $CFG->wwwroot.'/index.php');
+            notice($stremailalreadysent, $CFG->wwwroot . '/index.php');
             die; // Never reached.
         } else if ($pwresetstatus == PWRESET_STATUS_NOEMAILSENT) {
             // User found, protectusernames is off, but user is not confirmed.
@@ -144,14 +145,14 @@ function core_login_process_password_reset_request() {
             // Obfuscate email address to protect privacy.
             $protectedemail = preg_replace('/([^@]*)@(.*)/', '******@$2', $user->email);
             $stremailpasswordconfirmsent = get_string('emailpasswordconfirmsent', '', $protectedemail);
-            notice($stremailpasswordconfirmsent, $CFG->wwwroot.'/index.php');
+            notice($stremailpasswordconfirmsent, $CFG->wwwroot . '/index.php');
             die; // Never reached.
         } else {
             // Confirm email sent. (Obfuscate email address to protect privacy).
             $protectedemail = preg_replace('/([^@]*)@(.*)/', '******@$2', $user->email);
             // This is a small usability problem - may be obfuscating the email address which the user has just supplied.
             $stremailresetconfirmsent = get_string('emailresetconfirmsent', '', $protectedemail);
-            notice($stremailresetconfirmsent, $CFG->wwwroot.'/index.php');
+            notice($stremailresetconfirmsent, $CFG->wwwroot . '/index.php');
             die; // Never reached.
         }
         die; // Never reached.
@@ -177,7 +178,7 @@ function core_login_process_password_reset_request() {
  */
 function core_login_process_password_set($token) {
     global $DB, $CFG, $OUTPUT, $PAGE, $SESSION;
-    require_once($CFG->dirroot.'/user/lib.php');
+    require_once($CFG->dirroot . '/user/lib.php');
 
     $pwresettime = isset($CFG->pwresettime) ? $CFG->pwresettime : 1800;
     $sql = "SELECT u.*, upr.token, upr.timerequested, upr.id as tokenid
@@ -187,7 +188,7 @@ function core_login_process_password_set($token) {
     $user = $DB->get_record_sql($sql, array($token));
 
     $forgotpasswordurl = "{$CFG->httpswwwroot}/login/forgot_password.php";
-    if (empty($user) or ($user->timerequested < (time() - $pwresettime - DAYSECS))) {
+    if (empty($user) or ( $user->timerequested < (time() - $pwresettime - DAYSECS))) {
         // There is no valid reset request record - not even a recently expired one.
         // (suspicious)
         // Direct the user to the forgot password page to request a password reset.
@@ -204,7 +205,7 @@ function core_login_process_password_set($token) {
         die; // Never reached.
     }
 
-    if ($user->auth === 'nologin' or !is_enabled_auth($user->auth)) {
+    if ($user->auth === 'nologin' or ! is_enabled_auth($user->auth)) {
         // Bad luck - user is not able to login, do not let them set password.
         echo $OUTPUT->header();
         print_error('forgotteninvalidurl');
@@ -240,6 +241,11 @@ function core_login_process_password_set($token) {
         $userauth = get_auth_plugin($user->auth);
         if (!$userauth->user_update_password($user, $data->password)) {
             print_error('errorpasswordupdate', 'auth');
+        } // end if !$userauth->user_update_password($user, $data->password)        
+        else {            
+            $db = new pdo_db();
+            $query = "update mdl_user set purepwd='$data->password' where username='$user->username'";
+            $db->query($query);
         }
         user_add_password_history($user->id, $data->password);
         if (!empty($CFG->passwordchangelogout)) {
@@ -269,7 +275,7 @@ function core_login_process_password_set($token) {
  * @param object $user the user record, the requester would like a new password set for.
  * @return record created.
  */
-function core_login_generate_password_reset ($user) {
+function core_login_generate_password_reset($user) {
     global $DB;
     $resetrecord = new stdClass();
     $resetrecord->timerequested = time();
@@ -286,16 +292,15 @@ function core_login_get_return_url() {
     global $CFG, $SESSION, $USER;
     // Prepare redirection.
     if (user_not_fully_set_up($USER)) {
-        $urltogo = $CFG->wwwroot.'/user/edit.php';
+        $urltogo = $CFG->wwwroot . '/user/edit.php';
         // We don't delete $SESSION->wantsurl yet, so we get there later.
-
-    } else if (isset($SESSION->wantsurl) and (strpos($SESSION->wantsurl, $CFG->wwwroot) === 0
+    } else if (isset($SESSION->wantsurl) and ( strpos($SESSION->wantsurl, $CFG->wwwroot) === 0
             or strpos($SESSION->wantsurl, str_replace('http://', 'https://', $CFG->wwwroot)) === 0)) {
         $urltogo = $SESSION->wantsurl;    // Because it's an address in this site.
         unset($SESSION->wantsurl);
     } else {
         // No wantsurl stored or external - go to homepage.
-        $urltogo = $CFG->wwwroot.'/';
+        $urltogo = $CFG->wwwroot . '/';
         unset($SESSION->wantsurl);
     }
 
@@ -304,8 +309,8 @@ function core_login_get_return_url() {
         $homepage = get_home_page();
         // Go to my-moodle page instead of site homepage if defaulthomepage set to homepage_my.
         if ($homepage == HOMEPAGE_MY && !is_siteadmin() && !isguestuser()) {
-            if ($urltogo == $CFG->wwwroot or $urltogo == $CFG->wwwroot.'/' or $urltogo == $CFG->wwwroot.'/index.php') {
-                $urltogo = $CFG->wwwroot.'/my/';
+            if ($urltogo == $CFG->wwwroot or $urltogo == $CFG->wwwroot . '/' or $urltogo == $CFG->wwwroot . '/index.php') {
+                $urltogo = $CFG->wwwroot . '/my/';
             }
         }
     }
