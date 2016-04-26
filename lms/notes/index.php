@@ -29,59 +29,59 @@ $filtertype   = optional_param('filtertype', '', PARAM_ALPHA);
 $filterselect = optional_param('filterselect', 0, PARAM_INT);
 
 if (empty($CFG->enablenotes)) {
-    print_error('notesdisabled', 'notes');
+	print_error('notesdisabled', 'notes');
 }
 
 $url = new moodle_url('/notes/index.php');
 if ($courseid != SITEID) {
-    $url->param('course', $courseid);
+	$url->param('course', $courseid);
 }
 if ($userid !== 0) {
-    $url->param('user', $userid);
+	$url->param('user', $userid);
 }
 $PAGE->set_url($url);
 
 // Tabs compatibility.
 switch($filtertype) {
-    case 'course':
-        $courseid = $filterselect;
-        break;
-    case 'site':
-        $courseid = SITEID;
-        break;
+	case 'course':
+		$courseid = $filterselect;
+		break;
+	case 'site':
+		$courseid = SITEID;
+		break;
 }
 
 if (empty($courseid)) {
-    $courseid = SITEID;
+	$courseid = SITEID;
 }
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
 if ($userid) {
-    $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
-    $filtertype = 'user';
-    $filterselect = $user->id;
+	$user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
+	$filtertype = 'user';
+	$filterselect = $user->id;
 
-    if ($user->deleted) {
-        echo $OUTPUT->header();
-        echo $OUTPUT->heading(get_string('userdeleted'));
-        echo $OUTPUT->footer();
-        die;
-    }
+	if ($user->deleted) {
+		echo $OUTPUT->header();
+		echo $OUTPUT->heading(get_string('userdeleted'));
+		echo $OUTPUT->footer();
+		die;
+	}
 
 } else {
-    $filtertype = 'course';
-    $filterselect = $course->id;
-    $user = $USER;
+	$filtertype = 'course';
+	$filterselect = $course->id;
+	$user = $USER;
 }
 
 require_login($course);
 
 // Output HTML.
 if ($course->id == SITEID) {
-    $coursecontext = context_system::instance();
+	$coursecontext = context_system::instance();
 } else {
-    $coursecontext = context_course::instance($course->id);
+	$coursecontext = context_course::instance($course->id);
 }
 
 require_capability('moodle/notes:view', $coursecontext);
@@ -92,49 +92,49 @@ note_view($coursecontext, $userid);
 
 $strnotes = get_string('notes', 'notes');
 if ($userid && $course->id == SITEID) {
-    $PAGE->set_context(context_user::instance($user->id));
-    $PAGE->navigation->extend_for_user($user);
-    // If we are looking at our own notes, then change focus to 'my notes'.
-    if ($userid == $USER->id) {
-        $notenode = $PAGE->navigation->find('notes', null)->make_inactive();
-    }
+	$PAGE->set_context(context_user::instance($user->id));
+	$PAGE->navigation->extend_for_user($user);
+	// If we are looking at our own notes, then change focus to 'my notes'.
+	if ($userid == $USER->id) {
+		$notenode = $PAGE->navigation->find('notes', null)->make_inactive();
+	}
 
-    $notesurl = new moodle_url('/notes/index.php', array('user' => $userid));
-    $PAGE->navbar->add(get_string('notes', 'notes'), $notesurl);
+	$notesurl = new moodle_url('/notes/index.php', array('user' => $userid));
+	$PAGE->navbar->add(get_string('notes', 'notes'), $notesurl);
 } else if ($course->id != SITEID) {
-    $notenode = $PAGE->navigation->find('currentcoursenotes', null)->make_inactive();
-    $participantsurl = new moodle_url('/user/view.php', array('id' => $userid, 'course' => $course->id));
-    $currentcoursenode = $PAGE->navigation->find('currentcourse', null);
-    $participantsnode = $currentcoursenode->find('participants', null);
-    $usernode = $participantsnode->add(fullname($user), $participantsurl);
-    $usernode->make_active();
+	$notenode = $PAGE->navigation->find('currentcoursenotes', null)->make_inactive();
+	$participantsurl = new moodle_url('/user/view.php', array('id' => $userid, 'course' => $course->id));
+	$currentcoursenode = $PAGE->navigation->find('currentcourse', null);
+	$participantsnode = $currentcoursenode->find('participants', null);
+	$usernode = $participantsnode->add(fullname($user), $participantsurl);
+	$usernode->make_active();
 
-    $notesurl = new moodle_url('/notes/index.php', array('user' => $userid, 'course' => $courseid));
-    $PAGE->navbar->add(get_string('notes', 'notes'), $notesurl);
+	$notesurl = new moodle_url('/notes/index.php', array('user' => $userid, 'course' => $courseid));
+	$PAGE->navbar->add(get_string('notes', 'notes'), $notesurl);
 
-    $PAGE->set_context(context_course::instance($courseid));
+	$PAGE->set_context(context_course::instance($courseid));
 } else {
-    $link = null;
-    if (has_capability('moodle/course:viewparticipants', $coursecontext)
-        || has_capability('moodle/site:viewparticipants', $systemcontext)) {
+	$link = null;
+	if (has_capability('moodle/course:viewparticipants', $coursecontext)
+	|| has_capability('moodle/site:viewparticipants', $systemcontext)) {
 
-        $link = new moodle_url('/user/index.php', array('id' => $course->id));
-    }
+		$link = new moodle_url('/user/index.php', array('id' => $course->id));
+	}
 }
 
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_title($course->fullname);
 if ($course->id == SITEID) {
-    $PAGE->set_heading(fullname($user));
+	$PAGE->set_heading(fullname($user));
 } else {
-    $PAGE->set_heading($course->fullname);
+	$PAGE->set_heading($course->fullname);
 }
 
 echo $OUTPUT->header();
 
 if ($course->id != SITEID) {
-    $headerinfo = array('heading' => fullname($user), 'user' => $user);
-    echo $OUTPUT->context_header($headerinfo, 2);
+	$headerinfo = array('heading' => fullname($user), 'user' => $user);
+	echo $OUTPUT->context_header($headerinfo, 2);
 }
 
 echo $OUTPUT->heading($strnotes);
@@ -145,60 +145,78 @@ $strpersonalnotes = get_string('personalnotes', 'notes');
 $straddnewnote = get_string('addnewnote', 'notes');
 
 echo $OUTPUT->box_start();
-
+//echo "User ID: ".$USER->id."<br>";
 if ($courseid != SITEID) {
-    $context = context_course::instance($courseid);
-    $addid = has_capability('moodle/notes:manage', $context) ? $courseid : 0;
-    $view = has_capability('moodle/notes:view', $context);
-    $fullname = format_string($course->fullname, true, array('context' => $context));
-    note_print_notes(
+	//echo "Inside when courseid != SITEID";
+	$context = context_course::instance($courseid);
+	$addid = has_capability('moodle/notes:manage', $context) ? $courseid : 0;
+	$view = has_capability('moodle/notes:view', $context);
+	$fullname = format_string($course->fullname, true, array('context' => $context));
+	note_print_notes(
         '<a name="sitenotes"></a>' . $strsitenotes,
-        $addid,
-        $view,
-        0,
-        $userid,
-        NOTES_STATE_SITE,
-        0
-    );
-    note_print_notes(
+	$addid,
+	$view,
+	0,
+	$userid,
+	NOTES_STATE_SITE,
+	0
+	);
+	note_print_notes(
         '<a name="coursenotes"></a>' . $strcoursenotes. ' ('.$fullname.')',
-        $addid,
-        $view,
-        $courseid,
-        $userid,
-        NOTES_STATE_PUBLIC,
-        0
-    );
-    note_print_notes(
-        '<a name="personalnotes"></a>' . $strpersonalnotes,
-        $addid,
-        $view,
-        $courseid,
-        $userid,
-        NOTES_STATE_DRAFT,
-        $USER->id
-    );
+	$addid,
+	$view,
+	$courseid,
+	$userid,
+	NOTES_STATE_PUBLIC,
+	0
+	);
+	note_print_notes(
+    '<a name="personalnotes"></a>' . $strpersonalnotes,
+	$addid,
+	$view,
+	$courseid,
+	$userid,
+	NOTES_STATE_DRAFT,
+	$USER->id
+	);
 
-} else {  // Normal course.
-    $view = has_capability('moodle/notes:view', context_system::instance());
-    note_print_notes('<a name="sitenotes"></a>' . $strsitenotes, 0, $view, 0, $userid, NOTES_STATE_SITE, 0);
-    echo '<a name="coursenotes"></a>';
+}  // end if $courseid != SITEID
 
-    if (!empty($userid)) {
-        $courses = enrol_get_users_courses($userid);
-        foreach ($courses as $c) {
-            $ccontext = context_course::instance($c->id);
-            $cfullname = format_string($c->fullname, true, array('context' => $ccontext));
-            $header = '<a href="' . $CFG->wwwroot . '/course/view.php?id=' . $c->id . '">' . $cfullname . '</a>';
-            if (has_capability('moodle/notes:manage', context_course::instance($c->id))) {
-                $addid = $c->id;
-            } else {
-                $addid = 0;
-            }
-            note_print_notes($header, $addid, $view, $c->id, $userid, NOTES_STATE_PUBLIC, 0);
-        }
-    }
-}
+else {  // Normal course.
+	$view = has_capability('moodle/notes:view', context_system::instance());
+	note_print_notes('<a name="sitenotes"></a>' . $strsitenotes, 0, $view, 0, $userid, NOTES_STATE_SITE, 0);
+	echo '<a name="coursenotes"></a>';
+
+	if (!empty($userid)) {
+		$courses = enrol_get_users_courses($userid);
+		if (count($courses)>0) {
+			foreach ($courses as $c) {
+				$ccontext = context_course::instance($c->id);
+				$cfullname = format_string($c->fullname, true, array('context' => $ccontext));
+				$header = '<a href="' . $CFG->wwwroot . '/course/view.php?id=' . $c->id . '">' . $cfullname . '</a>';
+				if (has_capability('moodle/notes:manage', context_course::instance($c->id))) {
+					$addid = $c->id;
+				} // end if has_capability('moodle/notes:manage'
+
+				else {
+					$addid = 0;
+				}
+				note_print_notes($header, $addid, $view, $c->id, $userid, NOTES_STATE_DRAFT, 0);
+			} // end foreach
+		} // end id count($courses)>0
+		else {
+			echo "<p>This user is not enrolled into any course, so you could not add notes.</p>";
+		} //  end else when no enrolled courses ...
+	} // end if !empty($userid)
+	//}
+
+} // end else when normal course
+
+
+// ************************ Custom code *****************************************
+
+
+
 
 echo $OUTPUT->box_end();
 

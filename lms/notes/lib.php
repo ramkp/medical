@@ -304,7 +304,12 @@ function note_print_list($notes, $detail = NOTES_SHOW_FULL) {
  */
 function note_print_notes($header, $addcourseid = 0, $viewnotes = true, $courseid = 0, $userid = 0, $state = '', $author = 0) {
     global $CFG;
-
+	
+     $arg_list = func_get_args();
+     //echo "<pre>";
+     //print_r($arg_list);
+     //echo "</pre>";	
+     
     if ($header) {
         echo '<h3 class="notestitle">' . $header . '</h3>';
         echo '<div class="notesgroup">';
