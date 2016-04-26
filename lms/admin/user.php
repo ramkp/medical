@@ -21,14 +21,17 @@ $suspend = optional_param('suspend', 0, PARAM_INT);
 $unsuspend = optional_param('unsuspend', 0, PARAM_INT);
 $unlock = optional_param('unlock', 0, PARAM_INT);
 
-function get_user_phone($id) {
+function get_user_data($id) {
     $db = new pdo_db();
-    $query = "select phone1 from mdl_user where id=$id";
+    $query = "select address, city, phone1, state, zip from mdl_user where id=$id";
     $result = $db->query($query);
     while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        $phone = $row['phone1'];
+        $user = new stdClass();
+        foreach ($row as $key => $value) {
+            $user->$key = $value;
+        }
     }
-    return $phone;
+    return $user;
 }
 
 admin_externalpage_setup('editusers');
@@ -174,7 +177,7 @@ $extracolumns = get_extra_user_fields($context);
 // Get all user name fields as an array.
 $allusernamefields = get_all_user_name_fields(false, null, null, null, true);
 //$columns = array_merge($allusernamefields, $extracolumns, array('city', 'country', 'lastaccess'));
-$columns = array_merge($allusernamefields, $extracolumns, array('phone1', 'country', 'lastaccess'));
+$columns = array_merge($allusernamefields, $extracolumns, array('phone1', 'address', 'lastaccess'));
 //print_r($columns);
 
 foreach ($columns as $column) {
@@ -285,8 +288,9 @@ if (!$users) {
     }
     //$table->head[] = $city;
     $table->head[] = "<span style='color:#966b00'>Phone</span>";
-    $table->head[] = $country;
-    $table->head[] = $lastaccess;
+    $table->head[] = "<span style='color:#966b00'>Address</span>";
+    //$table->head[] = $country;
+    //$table->head[] = $lastaccess;
     $table->head[] = get_string('edit');
     $table->colclasses[] = 'centeralign';
     $table->head[] = "";
@@ -369,9 +373,11 @@ if (!$users) {
         foreach ($extracolumns as $field) {
             $row[] = $user->{$field};
         }
-        $row[] = get_user_phone($user->id);
-        $row[] = $user->country;
-        $row[] = $strlastaccess;
+        $user_data=  get_user_data($user->id);
+        $row[] = $user_data->phone1;
+        //$row[] = $user->country;
+        $row[] = $user->address."&nbsp;".$user_data->address."&nbsp;".$user_data->state."&nbsp;".$user_data->zip;
+        //$row[] = $strlastaccess;
         if ($user->suspended) {
             foreach ($row as $k => $v) {
                 $row[$k] = html_writer::tag('span', $v, array('class' => 'usersuspended'));
