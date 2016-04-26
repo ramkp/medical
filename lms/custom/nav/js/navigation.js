@@ -856,7 +856,13 @@ $(document).ready(function () {
             update_late_fee();
         }
 
+        if (event.target.id == 'search_user') {
+            search_user_by_email();
+        }
 
+        if (event.target.id == 'clear_user') {
+            clear_user_filter();
+        }
 
     }); // end of #region-main click', 'button',
 
@@ -901,8 +907,6 @@ $(document).ready(function () {
         if (event.target.id == 'send_invoice_renew') {
             send_invoice_renew();
         }
-
-
 
     }); // end of $('#region-main').on('click', 'a'
 
@@ -979,6 +983,37 @@ $(document).ready(function () {
         else {
             $('#late_err').html('Please provide values for amount and delay period');
         } // end else 
+    }
+
+    function get_user_credentials_page() {
+        var url = "/lms/custom/users/get_users_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function search_user_by_email() {
+        var email = $('#search_user_input').val();
+        if (email != '') {
+            $('#user_search_err').html('');
+            var url = "/lms/custom/users/search_user.php";
+            $.post(url, {email: email}).done(function (data) {
+                $('#users_container').html(data);
+            });
+            $('#pagination').hide();
+        } // end if email != ''
+        else {
+            $('#user_search_err').html('Please provide search criteria');
+        }
+        
+    }
+
+    function clear_user_filter() {
+        var url = "/lms/custom/users/get_users_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            console.log('Server response: ' + data);
+            $('#region-main').html(data);
+        });
     }
 
     /************************************************************************
@@ -1144,6 +1179,11 @@ $(document).ready(function () {
     $("#late_fee").click(function (event) {
         update_navigation_status__menu('Late Fee Settings');
         get_late_fee_page();
+    });
+
+    $("#user_cred").click(function (event) {
+        update_navigation_status__menu('User credentials');
+        get_user_credentials_page();
     });
 
     /************************************************************************

@@ -21,10 +21,8 @@ class navClass extends Util {
         else {
             $roleid = $this->get_user_role($userid);
             //echo "Role ID: ".$roleid."<br>";
-            if ($roleid == 1) {
-                // Manager
-                $top_menu = $this->get_manager_menu();
-            } // end if $roleid==1
+            $username=$this->user->username;
+            //echo "Username: ".$username."<br>";            
             if ($roleid == 3 || $roleid == 4) {
                 // Tutors
                 $top_menu = $this->get_tutors_menu_items();
@@ -33,6 +31,10 @@ class navClass extends Util {
                 // Students
                 $top_menu = $this->get_students_menu_items();
             } // end if $roleid == 5
+            if ($roleid == 1 || $username=='manager') {
+                // Manager
+                $top_menu = $this->get_manager_menu();
+            } // end if $roleid==1
         }
         return $top_menu;
     }
@@ -81,11 +83,12 @@ class navClass extends Util {
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='About' id='about'>About page</a></li>
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
+                                    <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
                                     <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>                                    
                                     <li><a href='#' title='Google Map' id='contact_page'>Contact Page</a></li>
-                                    <li><a href='#' title='Google Map' id='late_fee'>Late Fee</a></li>
+                                    <li><a href='#' title='Google Map' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
                                     <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li> 
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
@@ -167,12 +170,13 @@ class navClass extends Util {
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='About' id='about'>About page</a></li>
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
+                                    <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>
                                     <li><a href='#' title='Renew fee' id='renew_fee'>Renew Fee</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
                                     <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>
-                                    <li><a href='#' title='Google Map' id='contact_page'>Contact Page</a></li>
-                                    <li><a href='#' title='Google Map' id='late_fee'>Late Fee</a></li>                                   
+                                    <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
+                                    <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
                                     <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li> 
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
