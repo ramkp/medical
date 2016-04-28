@@ -321,7 +321,7 @@ class Invoice {
                 $item_name = $this->get_course_name($group_data->courseid);
                 $tax_status = $this->is_course_taxable($group_data->courseid);
                 if ($tax_status == 1) {
-                    $user_state = $group_data->state;
+                    $user_state = $group_data->statename;
                     $tax = $this->get_state_taxes($user_state);
                 } // end if $tax_status == 1
                 else {
@@ -333,7 +333,7 @@ class Invoice {
                 $user_data->group_name = $group_data->group_name;
                 $user_data->address = $group_data->addr;
                 $user_data->city = $group_data->city;
-                $user_data->state = $group_data->state;
+                $user_data->state = $group_data->statename;
                 $user_data->zip = $group_data->zip;
             } // end else when it is group members
         } // end if $user_installment_status==0

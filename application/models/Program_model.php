@@ -171,7 +171,7 @@ class program_model extends CI_Model {
                     $register_button = "<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a>";
                 } // end if $has_schedule>0
                 else {
-                    $register_button = "<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button class='btn btn-primary'>Register</button></a>";
+                    $register_button = "<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
                 } // end else    
                 if ($cat_name == 'Hands-On Certification Workshops') {
                     if ($item->id == 45) {

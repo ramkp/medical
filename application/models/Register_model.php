@@ -357,7 +357,7 @@ class register_model extends CI_Model {
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Selected program:</span>";
             $list.="<span class='span4'>$selected_program</span>";
-            $list.="<span class='span1'><input type='hidden' value='$slotid' id='register_state'></span>";
+            $list.="<span class='span1'><input type='hidden' value='$slotid' id='register_cities'></span>";
             $list.="<span class='span1'><input type='hidden' value='$courseid' id='register_courses'></span>";            
             $list.="<span class='span3'>$program_schedule</span>";
             $list.="</div>"; // end of container-fluid

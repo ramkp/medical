@@ -334,7 +334,8 @@ class Payment {
             $user->inst = $group_common_section->inst;
             $user->zip = $group_common_section->zip;
             $user->city = $group_common_section->city;
-            $user->state = $group_common_section->state;
+            $statename = $this->get_state_name_by_id($group_common_section->state);
+            $user->state = $statename;
             $user->country = 'US';
             $user->slotid = $group_common_section->slotid;
             $user->come_from = $group_common_section->come_from;
@@ -346,7 +347,7 @@ class Payment {
                 $user->id = $userid;
             } // end if $email_exists==0
         } // end foreach
-        //$list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
+        $group_common_section->statename = $statename;
         $_SESSION['group_common_section'] = $group_common_section;
         $_SESSION['users'] = $users;
         $_SESSION['tot_participants'] = $tot_participants;
@@ -380,6 +381,7 @@ class Payment {
 
     function is_course_taxable($courseid) {
         $query = "select taxes from mdl_course where id=$courseid";
+        //echo "Query: ".$query."<br>";                
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $status = $row['taxes'];
@@ -490,7 +492,7 @@ class Payment {
         $group_data = $_SESSION['group_common_section'];
 
         /*
-         * 
+         *  
           echo "<pre>----------Group data<br>";
           print_r($group_data);
           echo "<pre>--------------------<br>";
@@ -498,6 +500,8 @@ class Payment {
          */
 
         $users = $_SESSION['users'];
+        //print_r($users);
+        //echo "<br>";
         $participants = $_SESSION['tot_participants'];
         if ($participants == 1) {
             // Single registration
@@ -611,7 +615,7 @@ class Payment {
     }
 
     function get_states_list() {
-        $drop_down="";
+        $drop_down = "";
         $drop_down.="<select id='bill_state' style='width:140px;' name='bill_state'>";
         $drop_down.="<option value='0' selected>State</option>";
         $query = "select * from mdl_states";
@@ -635,8 +639,9 @@ class Payment {
           print_r($group_data);
           echo "<pre>";
           echo "<br/>-------------<br/>";
-          die();
          */
+
+
 
         $list = "";
         $cost_block = "";
@@ -656,7 +661,7 @@ class Payment {
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
         if ($from_email == null) {
-        $list.="<span class='span8'><input type='checkbox' id='same_address'>Click here if billing Address is same as Contact</span>";
+            $list.="<span class='span8'><input type='checkbox' id='same_address'>Click here if billing Address is same as Contact</span>";
         }
         $list.="</div>";
 
@@ -668,6 +673,7 @@ class Payment {
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$users->courseid' id='courseid' name='courseid' />";
                 $tax_status = $this->is_course_taxable($users->courseid);
+                //echo "Tax status: ".$tax_status."<br>";
                 if ($tax_status == 1) {
                     $tax = $this->get_state_taxes($users->state);
                 } // end if $tax_status == 1
@@ -683,8 +689,9 @@ class Payment {
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
                 $tax_status = $this->is_course_taxable($group_data->courseid);
+                //echo "Tax status: ".$tax_status."<br>";
                 if ($tax_status == 1) {
-                    $tax = $this->get_state_taxes($group_data->state);
+                    $tax = $this->get_state_taxes($group_data->statename);
                 } // end if $tax_status == 1
                 else {
                     $tax = 0;
@@ -698,15 +705,37 @@ class Payment {
             else {
                 $cost_block.="$" . $course_cost['cost'] . "&nbsp; (discount is " . $course_cost['discount'] . "%)";
             }
-            $grand_total = ($apply_delay_fee == true) ? $course_cost['cost'] + $late_fee : $course_cost['cost'];
+
+            if ($apply_delay_fee) {
+                if ($group_data == '') {
+                    $grand_total = $course_cost['cost'] + $late_fee;
+                } // end if $group_data == ''
+                else {
+                    $grand_total = $course_cost['cost'] + $late_fee * $participants;
+                } // end else 
+            } // end if $apply_delay_fee
+            else {
+                $grand_total = $course_cost['cost'];
+            } // end else when no delay fee applied ...
             //echo "Tax: " . $tax . "<br>";
+            //echo "Group data: ";
+            //print_r($group_data);
+            //echo "<br>";
+            //echo "Participants: ".$participants."<br>";
+
             if ($tax == 0) {
                 $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                 $list.="<span class='span2'>Selected program</span>";
-                $list.="<span class='span2'>$course_name</span>";
+                //$list.="<span class='span2' style='white-space: nowrap;overflow:hidden;'>$course_name</span>";
+                $list.="<span class='span2' style=''>$course_name</span>";
                 $list.="<span class='span2'>Fee</span>";
                 if ($apply_delay_fee) {
-                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)</span>";
+                    if ($group_data == '') {
+                        $list.="<span class='span2'>$cost_block+$$late_fee (late fee)<br>Total: $grand_total</span>";
+                    } // end if $group_data == ''
+                    else {
+                        $list.="<span class='span2'>$cost_block+$" . $late_fee * $participants . " (late fee)<br>Total: $grand_total</span>";
+                    } // end else                    
                 } // end if $apply_delay_fee
                 else {
                     $list.="<span class='span2'>$cost_block</span>";
@@ -717,13 +746,31 @@ class Payment {
             else {
                 $tax_sum = round(($course_cost['cost'] * $tax) / 100, 2);
                 $grand_total = round(($course_cost['cost'] + $tax_sum), 2);
-                $grand_total2 = ($apply_delay_fee == true) ? $grand_total + $late_fee : $grand_total;
+
+                if ($apply_delay_fee) {
+                    if ($group_data == '') {
+                        $grand_total2 = $grand_total + $late_fee;
+                    } // end if $group_data == ''
+                    else {
+                        $grand_total2 = $grand_total + $late_fee * $participants;
+                    } // end else
+                } // end if $apply_delay_fee
+                else {
+                    $grand_total2 = $grand_total;
+                } // end else when no delay fee is applied
+                //$grand_total2 = ($apply_delay_fee == true) ? $grand_total + $late_fee : $grand_total;
+
                 $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                 $list.="<span class='span2'>Selected program</span>";
                 $list.="<span class='span2'>$course_name</span>";
                 $list.="<span class='span2'>Subtotal</span>";
                 if ($apply_delay_fee) {
-                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)</span>";
+                    if ($group_data == '') {
+                        $list.="<span class='span2'>$cost_block+$$late_fee (late fee)</span>";
+                    } // end if $group_data == ''
+                    else {
+                        $list.="<span class='span2'>$cost_block+$" . $late_fee * $participants . " (late fee)</span>";
+                    } // end else                    
                 } // end if $apply_delay_fee
                 else {
                     $list.="<span class='span2'>$cost_block</span>";
@@ -848,6 +895,15 @@ class Payment {
         return $list;
     }
 
+    function get_state_name_by_id($stateid) {
+        $query = "select * from mdl_states where id=$stateid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        }
+        return $state;
+    }
+
     function get_group_payment_section($group_common_section, $users, $tot_participants) {
         $groupid = $this->enroll->create_course_group($group_common_section->courseid, $group_common_section->group_name);
 
@@ -861,7 +917,8 @@ class Payment {
             $user->inst = $group_common_section->inst;
             $user->zip = $group_common_section->zip;
             $user->city = $group_common_section->city;
-            $user->state = $group_common_section->state;
+            $statename = $this->get_state_name_by_id($group_common_section->state);
+            $user->state = $statename;
             $user->slotid = $group_common_section->slotid;
             $user->country = 'US';
             $user->come_from = $group_common_section->come_from;
@@ -873,7 +930,7 @@ class Payment {
                 $user->id = $userid;
             } // end if $email_exists==0
         } // end foreach
-        //$list = $this->get_payment_section_personal($group_common_section, 1, $tot_participants);
+        $group_common_section->statename = $statename;
         $_SESSION['group_common_section'] = $group_common_section;
         $_SESSION['users'] = $users;
         $_SESSION['tot_participants'] = $tot_participants;

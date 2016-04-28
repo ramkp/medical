@@ -34,6 +34,7 @@ class Late {
 
     function get_course_start_date($slotid) {
         $query = "select * from mdl_scheduler_slots where id=$slotid";
+        //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $start = $row['starttime'];

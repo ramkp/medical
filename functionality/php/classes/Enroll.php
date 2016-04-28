@@ -101,11 +101,16 @@ class Enroll {
     }
 
     function get_state_name($id) {
-        $query = "select * from mdl_states where id=$id";
-        //echo "Query: ".$query."<br>";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $state = $row['state'];
+
+        if (is_numeric($id)) {
+            $query = "select * from mdl_states where id=$id";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $state = $row['state'];
+            }
+        } // end if !is_nan($id)
+        else {
+            $state=$id;
         }
         return $state;
     }
