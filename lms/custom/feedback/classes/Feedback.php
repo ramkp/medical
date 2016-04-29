@@ -88,7 +88,8 @@ class Feedback extends Util {
 			$page = $page - 1;
 			$offset = $rec_limit * $page;
 		}
-		$query = "select * from mdl_contact order by id desc LIMIT $offset, $rec_limit";		
+		$query = "select * from mdl_contact order by id desc LIMIT $offset, $rec_limit";	
+                //echo "Query: ".$query."<br>";
 		$result = $this->db->query($query);
 		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
 			$feedback = new stdClass();
@@ -97,6 +98,7 @@ class Feedback extends Util {
 			} // end foreach
 			$feedbacks[] = $feedback;
 		} // end while
+                //print_r($feedbacks);
 		$list = $this->create_feedbacks_list($feedbacks, false);
 		return $list;
 	}

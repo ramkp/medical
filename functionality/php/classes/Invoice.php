@@ -312,6 +312,9 @@ class Invoice {
                 else {
                     $tax = 0;
                 } // end else
+                if (!property_exists($user, 'slotid')) {
+                    $user->slotid=0;
+                }
                 $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
             } // end if $group==null
             else {
@@ -327,6 +330,9 @@ class Invoice {
                 else {
                     $tax = 0;
                 } // end else
+                if (!property_exists($group_data, 'slotid')) {
+                    $group_data->slotid=0;
+                }
                 $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
                 // Get invoice user data
                 $user_data = new stdClass();
@@ -350,6 +356,7 @@ class Invoice {
             else {
                 $tax = 0;
             } // end else
+            $user->slotid=0; // It is always 0 for installment users
             $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
             // Get invoice user data
             $user_data = $this->get_invoice_user_data($user->id);

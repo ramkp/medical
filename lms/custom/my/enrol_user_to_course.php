@@ -7,3 +7,7 @@ $slotid = $_POST['slotid'];
 $userid=$_POST['userid'];
 $list = $ds->enrol_user_to_course($courseid,$slotid,$userid);
 echo $list;
+
+?>
+
+<script type="text/javascript">document.location.reload(); </script>

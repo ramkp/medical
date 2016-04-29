@@ -4,6 +4,7 @@ require_once "./classes/Feedback.php";
 $feedback = new Feedback();
 $list = $feedback->get_feedback_list();
 $total = $feedback->get_total_feedbacks();
+//echo "Total items: ".$total."<br>";
 echo $list;
 ?>
 

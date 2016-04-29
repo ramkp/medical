@@ -310,7 +310,7 @@ class Dashboard extends Util {
         if ($slotid > 0) {
             $this->add_user_to_slot($userid, $slotid);
         } // end if $slotid>0
-        $list = "You was successfully enrolled into selected course/schedule.Please re-login so changes take effect.";
+        $list = "You was successfully enrolled into selected course/schedule.The page will be reloaded ....";
         return $list;
     }
 
