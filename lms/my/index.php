@@ -164,7 +164,7 @@ echo $OUTPUT->header();
 
 $ds = new Dashboard();
 $roleid = $ds->get_user_role($USER->id);
-if ($roleid == 5) {
+if ($USER->id!=2 && ($roleid == 5 || $roleid=='')) {
     $list = $ds->get_programs_panel();
     echo $list;
 }
