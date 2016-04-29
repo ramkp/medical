@@ -7,12 +7,12 @@ use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
 
 class ProcessPayment {
-    
+
     private $AUTHORIZENET_LOG_FILE;
     private $LOGIN_ID = '6cUTfQ5238'; // sandbox data
-    private $TRANSACTION_KEY = '4qNhCM92j6h6g69Z'; // sandbox data
+    private $TRANSACTION_KEY = '5bN8q5WT3qa257p9'; // sandbox data
 
-    function __construct() {       
+    function __construct() {
         $this->AUTHORIZENET_LOG_FILE = 'phplog';
     }
 
@@ -46,7 +46,7 @@ class ProcessPayment {
         $order = new AnetAPI\OrderType();
         $order->setInvoiceNumber($invoiceNo);
         if ($order->group == 0) {
-            $order->setDescription("Payment for tuition $post_order->item");            
+            $order->setDescription("Payment for tuition $post_order->item");
             $lineitem = new AnetAPI\LineItemType();
             $lineitem->setItemId(time());
             $lineitem->setName("$post_order->item");
@@ -56,7 +56,7 @@ class ProcessPayment {
             $lineitem->setTaxable("N");
         } // end if $order==0
         else {
-            $order->setDescription("Payment for group tuition $post_order->item");            
+            $order->setDescription("Payment for group tuition $post_order->item");
             $lineitem = new AnetAPI\LineItemType();
             $lineitem->setItemId(time());
             $lineitem->setName("$post_order->item");
@@ -65,7 +65,6 @@ class ProcessPayment {
             $lineitem->setUnitPrice($post_order->sum);
             $lineitem->setTaxable("N");
         } // end else
-        
         // Customer info 
         $custID = round(time() / 3785);
         $customer = new AnetAPI\CustomerDataType();
@@ -114,13 +113,16 @@ class ProcessPayment {
         $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
-            
+
               /*
+               * 
               echo "<pre>";
               print_r($tresponse);
               echo "</pre>";
-              */
+               * 
+               */
             
+
             if (($tresponse != null) && ($tresponse->getResponseCode() == "1")) {
                 //echo "Charge Credit Card AUTH CODE : " . $tresponse->getAuthCode() . "\n";
                 //echo "Charge Credit Card TRANS ID  : " . $tresponse->getTransId() . "\n";
@@ -129,11 +131,13 @@ class ProcessPayment {
                     'auth_code' => $tresponse->getResponseCode(),
                     'sum' => $post_order->sum);
                 return $status;
-            } else {
+            } // end if ($tresponse != null) && ($tresponse->getResponseCode() == "1")
+            else {
                 //echo "Charge Credit Card ERROR :  Invalid response\n";
                 return false;
             }
-        } else {
+        } // end if $response != null        
+        else {
             //echo "Charge Credit card Null response returned";
             return false;
         }
