@@ -18,7 +18,7 @@ class Payments extends Util {
         $invoice_payments = array();
         $query = "select * from mdl_invoice "
                 . "where i_status=1 and "
-                . "i_ptype=$payment_type limit 0, $this->limit";
+                . "i_ptype=$payment_type order by i_pdate desc limit 0, $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -53,9 +53,12 @@ class Payments extends Util {
         }
         return $id;
     }
+    
+    
 
     function get_invoice_payments_page($invoice_payments, $toolbar = true) {
         $list = "";
+        $invoice=new Invoices();
         if (count($invoice_payments) > 0) {
             $list.="<div id='payment_container'>";
             foreach ($invoice_payments as $payment) {
@@ -68,8 +71,9 @@ class Payments extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span1'>Program</span><span class='span3'>$course</span>";
                 $list.="</div>";
+                $sum=$invoice->get_invoice_sum($payment->courseid, $payment->userid, $payment->i_sum);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span1'>Payment</span><span class='span7'>Invoice # $payment->i_num for $$payment->i_sum payment date $date</span>";
+                $list.="<span class='span1'>Payment</span><span class='span7'>Invoice # $payment->i_num for $$sum payment date $date</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span6'><hr/></span>";
@@ -110,7 +114,7 @@ class Payments extends Util {
         }
         $query = "select * from mdl_invoice "
                 . "where i_status=1 and "
-                . "i_ptype=$typeid LIMIT $offset, $rec_limit";
+                . "i_ptype=$typeid order by i_pdate desc LIMIT $offset, $rec_limit";
         //echo "Query: ".$query ."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -146,7 +150,7 @@ class Payments extends Util {
     function create_payment_log_page($payments, $toolbar = true) {
         $list = "";
         if (count($payments) > 0) {
-            $invoice = new Invoices();
+            $invoice = new Invoices();            
             $list.="<div id='payment_log_container'>";
             foreach ($payments as $payment) {
                 $user = $this->get_user_details($payment->userid);
@@ -154,6 +158,9 @@ class Payments extends Util {
                 $course = $this->get_course_name($payment->courseid);
                 $invoice_id = $this->get_invoice_id($payment->date_added);
                 $invoice_detailes = $invoice->get_invoice_detailes($invoice_id);
+                
+                //print_r($invoice_detailes);
+                //echo "<br>";
                 $date = date('Y-m-d', $invoice_detailes->i_date);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>User</span><span class='span3'>$user->firstname &nbsp $user->lastname</span>";
@@ -161,8 +168,10 @@ class Payments extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program</span><span class='span3'>$course </span>";
                 $list.="</div>";
+                $sum=$invoice->get_invoice_sum($invoice_detailes->courseid, $invoice_detailes->userid, $invoice_detailes->i_sum);
+                //echo "Invoice sum: ".$sum."<br>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Invoice</span><span class='span5'>Invoice # $invoice_detailes->i_num for $$invoice_detailes->i_sum &nbsp; from $date</span>";
+                $list.="<span class='span2'>Invoice</span><span class='span5'>Invoice # $invoice_detailes->i_num for $$sum &nbsp; from $date</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Access granted by</span><span class='span3'>$modifier->firstname &nbsp; $modifier->lastname</span>";
