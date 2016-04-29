@@ -14,15 +14,15 @@ class navClass extends Util {
 
     function get_navigation_items($userid) {
         $top_menu = "";
+        $roleid = $this->get_user_role($userid);
+        $username = $this->user->username;
         if ($userid == 2) {
             // This is Admin
             $top_menu = $this->get_admin_menu_items($userid);
         }// end if $userid==2
         else {
-            if ($roleid != '') {
-                $roleid = $this->get_user_role($userid);
-                //echo "Role ID: ".$roleid."<br>";
-                $username = $this->user->username;
+            if ($roleid != '') {                
+                //echo "Role ID: ".$roleid."<br>";                
                 //echo "Username: ".$username."<br>";            
                 if ($roleid == 3 || $roleid == 4) {
                     // Tutors
