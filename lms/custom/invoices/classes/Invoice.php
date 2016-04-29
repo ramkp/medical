@@ -8,6 +8,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Late.php';
 
 class Invoices extends Util {
 
@@ -169,7 +170,7 @@ class Invoices extends Util {
      * ******************************************************* */
 
     function get_open_invoices() {
-        //echo "<br/>Current user: $this->user->id<br/>";
+        //echo "<br/>Current user: $this->user->id<br/>";        
         $invoices = array();
         $query = "select * from mdl_invoice "
                 . "where i_status=0 and i_ptype=0 order by i_date desc limit 0,$this->limit";
@@ -189,9 +190,42 @@ class Invoices extends Util {
         return $list;
     }
 
+    function get_invoice_sum($courseid, $userid, $i_sum) {
+        $late = new Late();
+        $late_fee = $late->get_delay_fee();
+        $query = "select * from mdl_scheduler_appointment where studentid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['slotid'];
+            }
+        } // end if $num > 0
+        else {
+            $slotid = 0;
+        } // end else        
+        
+        if ($slotid > 0) {
+            $is_apply_late_fee = $late->is_apply_delay_fee($courseid, $slotid);
+        } // end if $slotid>0
+        else {
+            $is_apply_late_fee = false;
+        } // end else 
+
+        if ($is_apply_late_fee) {
+            $sum = $i_sum + $late_fee;
+        } // end if $is_apply_late_fee
+        else {
+            $sum = $i_sum;
+        } // end else         
+        return $sum;
+    }
+
     function create_open_invoices_page($invoices, $toolbar = true, $paid = false) {
         $list = "";
         //print_r($invoices);
+
+
         if (count($invoices) > 0) {
             $list.="<div id='open_invoices_container'>";
             foreach ($invoices as $invoice) {
@@ -207,9 +241,9 @@ class Invoices extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program applied</span><span class='span6'>$coursename</span>";
                 $list.="</div>";
-
+                $sum=$this->get_invoice_sum($invoice->courseid, $invoice->userid, $invoice->i_sum);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Invoice</span><span class='span6'>Invoice # $invoice->i_num for $$invoice->i_sum $prefix $date (<a href='$link' target='_blank'>link</a>)</span>";
+                $list.="<span class='span2'>Invoice</span><span class='span6'>Invoice # $invoice->i_num for $$sum $prefix $date (<a href='$link' target='_blank'>link</a>)</span>";
                 $list.="</div>";
 
                 if ($paid == false) {
@@ -429,8 +463,8 @@ class Invoices extends Util {
                 $this->db->query($query);
             } // end else 
         } // end if $invoice->renew==1
-        
         //5. Add log entry
+        $sum=$this->get_invoice_sum($invoice->courseid, $invoice->userid, $invoice->i_sum);
         $query = "insert into "
                 . "mdl_payments_log "
                 . "(userid,"
@@ -442,7 +476,7 @@ class Invoices extends Util {
                 . "values('" . $invoice->userid . "', "
                 . "'" . $invoice->courseid . "',"
                 . "'" . $modifierid . "',"
-                . "'" . $invoice->i_sum . "',"
+                . "'" . $sum . "',"
                 . "'" . $payment_type . "',"
                 . "'" . $payment_date . "')";
         $this->db->query($query);
@@ -451,7 +485,7 @@ class Invoices extends Util {
         $mailer = new Mailer();
         $user->bill_email = $user->email;
         $user->card_holder = $user->firstname . "&nbsp;" . $user->lastname;
-        $user->sum = $invoice->i_sum;
+        $user->sum = $sum;
         if ($payment_type != 3) {
             $mailer->send_payment_confirmation_message($user, null, null);
         } // end if $payment_type!=3
