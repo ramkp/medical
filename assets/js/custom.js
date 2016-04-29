@@ -473,10 +473,12 @@ $(document).ready(function () {
     function submit_verify_cert_from() {
         var cert_fio = $('#cert_fio').val();
         var cert_no = $('#cert_no').val();
+        /*
         if (cert_fio == '') {
             $('#cert_err').html('Please provide Firstname and Lastname');
             return false;
         }
+        */
 
         if (cert_no == '') {
             $('#cert_err').html('Please provide Certificate No');

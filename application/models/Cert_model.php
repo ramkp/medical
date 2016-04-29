@@ -20,11 +20,13 @@ class Cert_model extends CI_Model {
         $list.="<div class='panel-body'>";
 
 
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>Firstname Lastname*</span>";
-        $list.="<span class='span2'><input type='text' id='cert_fio' name='cert_fio' ></span>";
-        $list.="<span class='span2'>Certificate No*</span>";
-        $list.="<span class='span2'><input type='text' id='cert_no' name='cert_no' ></span>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        
+        //$list.="<span class='span2'>Firstname Lastname*</span>";
+        //$list.="<span class='span2'><input type='text' id='cert_fio' name='cert_fio' ></span>";
+        
+        $list.="<span class='span4'>Certificate No*</span>";
+        $list.="<span class='span4'><input type='text' id='cert_no' name='cert_no' ></span>";
         $list.="</div>"; // end of container-fluid
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
