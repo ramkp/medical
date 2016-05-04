@@ -7,7 +7,7 @@ function browser() {
     var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
     // At least Safari 3+: "[object HTMLElementConstructor]"
     var isChrome = !isSafari && testCSS('WebkitTransform');  // Chrome 1+
-    //var isIE = /*@cc_on!@*/false || testCSS('msTransform');  // At least IE6
+    // var isIE = /*@cc_on!@*/false || testCSS('msTransform'); // At least IE6
 
     function testCSS(prop) {
         return prop in document.documentElement.style;
@@ -33,7 +33,7 @@ function browser() {
 $(document).ready(function () {
 
 
-    /* ---------- Add class .active to current link  ---------- */
+    /* ---------- Add class .active to current link ---------- */
     $('ul.main-menu li a').each(function () {
 
         if ($($(this))[0].href == String(window.location)) {
@@ -49,44 +49,77 @@ $(document).ready(function () {
         }
 
     });
-    /* ---------- Submenu  ---------- */
+    /* ---------- Submenu ---------- */
 
     $('.dropmenu').click(function (e) {
 
         e.preventDefault();
         $(this).parent().find('ul').slideToggle();
     });
-    /**************************************************************************
-     * 
-     * 
-     *                  Service & rendeting functions
-     *      
-     * 
-     * 
-     **************************************************************************/
+    /***************************************************************************
+	 * 
+	 * 
+	 * Service & rendeting functions
+	 * 
+	 * 
+	 * 
+	 **************************************************************************/
 
     var domain = 'cnausa.com';
-    /************************************************************************
-     * 
-     *                Login form verification
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Login form verification
+	 * 
+	 **************************************************************************/
+    
+    
     function check_login_form() {
-        var login = $('#login_box').val();
-        var password = $('#passsword_box').val();
+    	var login = $('#login_box').val();
+        var password = $('#password_box').val();
+         console.log('Login: '+login);
+         console.log('Password: '+password);
         if (login == '' || password == '') {
             $('#login_err').html('*all fields required');
         }
         if (login != '' && password != '') {
-            $('#login_form').submit();
-        }
+        	//$('#login_form').submit();       	
+        	
+        	var url = "http://" + domain + "/functionality/php/login.php";
+        	$.post( url, { login: login, password: password })
+        	  .done(function( data ) {
+        	    if (data>0) {
+        	    	console.log('Server response: '+data);
+        	        $('#login_form').submit();        	    	
+        	    } // end if data>0
+        	    else {
+        	    	$('#login_err').html('Incorrect login or password');
+        	    	 // event.preventDefault();
+        	    } // end else
+        	  });       	
+        	
+        } // end if login != '' && password != ''
     }
-
-    /************************************************************************
-     * 
-     *             Verify users upload form and start if any
-     * 
-     ************************************************************************/
+    
+    
+    /*
+	 * $( "#login_form" ).submit(function( event ) { var login =
+	 * $('#login_box').val(); var password = $('#passsword_box').val();
+	 * console.log('Login: '+login); console.log('Password: '+password); if
+	 * (login == '' || password == '') { $('#login_err').html('*all fields
+	 * required'); } if (login != '' && password != '') { var url = "http://" +
+	 * domain + "/functionality/php/login.php"; $.post( url, { login: login,
+	 * password: password }) .done(function( data ) { if (data>0) {
+	 * $('#login_form').submit(); } // end if data>0 else {
+	 * $('#login_err').html('Incorrect login or password');
+	 * event.preventDefault(); } // end else }); } // end if login != '' &&
+	 * password != '' }); // end of $( "#login_form" ).submit(function( event )
+	 */
+    
+    /***************************************************************************
+	 * 
+	 * Verify users upload form and start if any
+	 * 
+	 **************************************************************************/
 
     function verify_users_upload_form() {
         var url = "http://" + domain + "/functionality/php/upload_users_file.php";
@@ -110,11 +143,12 @@ $(document).ready(function () {
                 success: function (data) {
                     console.log(data);
                     if (data > 0) {
-                        // It means we have valid users in file >0	
+                        // It means we have valid users in file >0
                         $('#upload_err').html('');
                         var selected_course = $('#register_courses').val();
                         var courseid = selected_course;
-                        //$.post(course_url, request).done(function (courseid) {
+                        // $.post(course_url, request).done(function (courseid)
+						// {
                         $('#ajax_loading_group_file').hide();
                         var addr = $('#group_addr').val();
                         var inst = $('#group_inst').val();
@@ -143,7 +177,7 @@ $(document).ready(function () {
                                 $('#group_common_section').append(data);
                             }
                         });
-                        //}); // end of $.post(course_url, request)
+                        // }); // end of $.post(course_url, request)
                     } // end if data > 0
                     else {
                         $('#upload_err').html(data);
@@ -153,11 +187,11 @@ $(document).ready(function () {
         } // end else
     }
 
-    /************************************************************************
-     * 
-     *                     Show Gallery page
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show Gallery page
+	 * 
+	 **************************************************************************/
 
     function get_gallery_page() {
         $.post("http://" + domain + "/functionality/php/gallery.php", function (data) {
@@ -166,26 +200,26 @@ $(document).ready(function () {
         });
     }
 
-    /************************************************************************
-     * 
-     *                   Show program items
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show program items
+	 * 
+	 **************************************************************************/
     function show_program_items(cat_name) {
         $.post("http://" + domain + "/functionality/php/get_programs_list.php", {cat_name: cat_name})
                 .done(function (data) {
                     $('#instructions').hide();
                     $("#page").html(data);
                 });
-        //console.log('Triggered click on btn-navbar');
+        // console.log('Triggered click on btn-navbar');
         $(".btn-navbar").trigger("click");
     }
 
-    /************************************************************************
-     * 
-     *                Show school page and Google Map
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show school page and Google Map
+	 * 
+	 **************************************************************************/
 
     function show_school_page(cat_name) {
         $.post("http://" + domain + "/functionality/php/get_school_page.php", {cat_name: cat_name})
@@ -196,11 +230,11 @@ $(document).ready(function () {
                 });
     }
 
-    /************************************************************************
-     * 
-     *                   Show Google Map
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show Google Map
+	 * 
+	 **************************************************************************/
 
     function refresh_map() {
         var url = "/lms/custom/google_map/refresh.php";
@@ -212,7 +246,7 @@ $(document).ready(function () {
             var map = new google.maps.Map(document.getElementById('map'), {
                 scrollwheel: false,
                 zoom: 8
-            }); // end var map            
+            }); // end var map
             var latLngs = [];
             var bounds = new google.maps.LatLngBounds();
             $.each($obj_data, function (i, m) {
@@ -223,7 +257,7 @@ $(document).ready(function () {
                     map: map,
                     title: m.marker_text,
                     zIndex: i
-                }); // end marker                
+                }); // end marker
                 bounds.extend(marker.position);
                 google.maps.event.addListener(marker, 'click', (function (marker, i) {
                     return function () {
@@ -234,16 +268,16 @@ $(document).ready(function () {
                         infowindow.open(map, marker);
                     }
                 })(marker, i));
-            }) // end each            
+            }) // end each
             map.fitBounds(bounds);
         }); // post(url, request).done(function (data)
     }
 
-    /************************************************************************
-     * 
-     *                        Show FAQ page
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show FAQ page
+	 * 
+	 **************************************************************************/
     function get_faq_page() {
         $.post("http://" + domain + "/functionality/php/get_faq_page.php", function (data) {
             $('#instructions').hide();
@@ -251,11 +285,11 @@ $(document).ready(function () {
         });
     }
 
-    /************************************************************************
-     * 
-     *                        Show Testimonial page
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show Testimonial page
+	 * 
+	 **************************************************************************/
 
     function get_testimonial_page() {
         $.post("http://" + domain + "/functionality/php/get_testimonial_page.php", function (data) {
@@ -264,11 +298,11 @@ $(document).ready(function () {
         });
     }
 
-    /************************************************************************
-     * 
-     *                 Certificate verification form
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Certificate verification form
+	 * 
+	 **************************************************************************/
 
     function get_certificate_verification_form() {
         $.post("http://" + domain + "/functionality/php/get_certificate_verification_form.php", function (data) {
@@ -277,11 +311,11 @@ $(document).ready(function () {
         });
     }
 
-    /************************************************************************
-     * 
-     *                   Get users upload form
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Get users upload form
+	 * 
+	 **************************************************************************/
 
     function get_users_upload_form() {
         $.post("http://" + domain + "/functionality/php/get_users_upload_form.php", function (data) {
@@ -290,11 +324,11 @@ $(document).ready(function () {
         });
     }
 
-    /************************************************************************
-     * 
-     *      Verify group general part and proceed to file upload
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Verify group general part and proceed to file upload
+	 * 
+	 **************************************************************************/
 
     function verify_group_general_part() {
 
@@ -302,9 +336,10 @@ $(document).ready(function () {
         if (courseid != 0) {
             $('#program_err').html('');
             $('#group_common_errors').html('');
-            //var course_url = "http://" + domain + "/functionality/php/get_course_id.php";
-            //var request = {course_name: course_name};
-            //$.post(course_url, request).done(function (courseid) {
+            // var course_url = "http://" + domain +
+			// "/functionality/php/get_course_id.php";
+            // var request = {course_name: course_name};
+            // $.post(course_url, request).done(function (courseid) {
             console.log('Course id: ' + courseid);
             var addr = $('#group_addr').val();
             var inst = $('#group_inst').val();
@@ -359,12 +394,12 @@ $(document).ready(function () {
                         $('#group_common_errors').html('Group name already exists');
                     }
                     else {
-                        // Everything is fine - show participants section                            
+                        // Everything is fine - show participants section
                         get_users_upload_form();
                     }
                 });
             } // end if addr!='' && inst!=''
-            //}); // end if $.post
+            // }); // end if $.post
         } // end if course_name != 'Program' && course_name != '' ...
         else {
             $('#program_err').html('Please select program');
@@ -372,11 +407,11 @@ $(document).ready(function () {
         }
     }
 
-    /************************************************************************
-     * 
-     *               Private group request form verification
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Private group request form verification
+	 * 
+	 **************************************************************************/
 
     function submit_private_group() {
 
@@ -408,9 +443,9 @@ $(document).ready(function () {
 
 
         if (group_budget == '') {
-            //$('#private_err').html('Please provide estimate budget ');
+            // $('#private_err').html('Please provide estimate budget ');
             group_budget = 0;
-            //return false;
+            // return false;
         }
 
         if (people_num == 0) {
@@ -465,20 +500,18 @@ $(document).ready(function () {
         });
     }
 
-    /************************************************************************
-     * 
-     *                    Submit verify certification form
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Submit verify certification form
+	 * 
+	 **************************************************************************/
     function submit_verify_cert_from() {
         var cert_fio = $('#cert_fio').val();
         var cert_no = $('#cert_no').val();
         /*
-        if (cert_fio == '') {
-            $('#cert_err').html('Please provide Firstname and Lastname');
-            return false;
-        }
-        */
+		 * if (cert_fio == '') { $('#cert_err').html('Please provide Firstname
+		 * and Lastname'); return false; }
+		 */
 
         if (cert_no == '') {
             $('#cert_err').html('Please provide Certificate No');
@@ -494,15 +527,15 @@ $(document).ready(function () {
         } // end if cert_fio!='' && cert_no!=''
         else {
             $('#cert_err').html('Please provide your First and Last name and Certificate # as well');
-        } // end else 
+        } // end else
     }
 
 
-    /************************************************************************
-     * 
-     *                    Show courses inside category
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show courses inside category
+	 * 
+	 **************************************************************************/
     function get_category_course(category_id) {
         var url = "http://" + domain + "/functionality/php/get_selected_course.php";
         var request = {cat_id: category_id};
@@ -511,11 +544,11 @@ $(document).ready(function () {
         });
     }
 
-    /************************************************************************
-     * 
-     *                    Show Register page w/o params
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show Register page w/o params
+	 * 
+	 **************************************************************************/
     function get_register_page() {
         $.post("http://" + domain + "/functionality/php/get_register_page.php", function (data) {
             $('#instructions').hide();
@@ -635,11 +668,11 @@ $(document).ready(function () {
         } // end if card_type != 'Card type' && card_no!='' ...
     }
 
-    /************************************************************************
-     * 
-     *                  Group registration block
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Group registration block
+	 * 
+	 **************************************************************************/
     var group_selected;
     var dialog_loaded;
     function get_group_registration_block() {
@@ -661,11 +694,11 @@ $(document).ready(function () {
         }
     }
 
-    /************************************************************************
-     * 
-     *                  Manual Group registration form
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Manual Group registration form
+	 * 
+	 **************************************************************************/
 
     function get_manual_group_registration_form(tot_participants) {
         var url = "http://" + domain + "/functionality/php/get_group_manual_registration_form.php";
@@ -676,11 +709,11 @@ $(document).ready(function () {
         });
     }
 
-    /************************************************************************
-     * 
-     *               Verify Manual Group registration form
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Verify Manual Group registration form
+	 * 
+	 **************************************************************************/
 
     function very_participants_form(tot_participants) {
 
@@ -718,12 +751,13 @@ $(document).ready(function () {
             $('#group_manual_form_err').html('Please provide all required fields and valid emails');
         } // end if err > 0
         else {
-            // Everything is fine  - show payment form
+            // Everything is fine - show payment form
             $('#group_manual_form_err').html('');
-            //var course_url = "http://" + domain + "/functionality/php/get_course_id.php";
-            //var request = {course_name: course_name};
+            // var course_url = "http://" + domain +
+			// "/functionality/php/get_course_id.php";
+            // var request = {course_name: course_name};
             $('#ajax_loading_group').show();
-            //$.post(course_url, request).done(function (courseid) {
+            // $.post(course_url, request).done(function (courseid) {
             console.log('Course id: ' + courseid);
             var group_common_section = {
                 courseid: courseid,
@@ -740,21 +774,19 @@ $(document).ready(function () {
                 users: JSON.stringify(users),
                 tot_participants: tot_participants};
             $.post(signup_url, signup_request).done(function (data) {
-                //console.log(data);
+                // console.log(data);
                 // Show payment section
                 $('#ajax_loading_group').hide();
                 /*
-                 var el = $('#personal_payment_details').length;
-                 if (el == 0) {
-                 $('#participants_details').append(data);
-                 }
-                 */
+				 * var el = $('#personal_payment_details').length; if (el == 0) {
+				 * $('#participants_details').append(data); }
+				 */
                 $('#participants_details').append(data);
             }).fail(function (data) {
                 console.log(data);
                 $('#personal_err').html('Ops something goes wrong ...');
             }); // end of fail(function (data)
-            //}); // end of $.post(course_url, request)            
+            // }); // end of $.post(course_url, request)
         } // end else
     }
 
@@ -821,7 +853,7 @@ $(document).ready(function () {
                         get_manual_group_registration_form(tot_participants, courseid);
                     }
                 });
-            } // end if addr!='' && inst!=''            
+            } // end if addr!='' && inst!=''
         } // end if courseid!=0
         else {
             $('#program_err').html('Please select program');
@@ -829,11 +861,11 @@ $(document).ready(function () {
         }
     }
 
-    /************************************************************************
-     * 
-     *                  Get private group form
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Get private group form
+	 * 
+	 **************************************************************************/
 
     function get_private_group_form() {
         $.post("http://" + domain + "/functionality/php/get_private_groups_form.php", function (data) {
@@ -842,11 +874,11 @@ $(document).ready(function () {
         });
     }
 
-    /************************************************************************
-     * 
-     *               Show register form with selected program
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show register form with selected program
+	 * 
+	 **************************************************************************/
 
     function get_selected_program_register_form(courseid) {
         console.log('Course id: ' + courseid);
@@ -870,7 +902,7 @@ $(document).ready(function () {
             $.post(url, request).done(function (data) {
                 $('#cat_course').html(data);
             });
-        } // end if category_name!='Program type' && state_name!='State/City'        
+        } // end if category_name!='Program type' && state_name!='State/City'
     }
 
     function show_state_programs(stateid) {
@@ -886,11 +918,11 @@ $(document).ready(function () {
         } // end if page.indexOf("schedule") > 0
     }
 
-    /************************************************************************
-     * 
-     *               Verify Manual Group registration form
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Verify Manual Group registration form
+	 * 
+	 **************************************************************************/
 
 
     function validateEmail(email) {
@@ -1026,13 +1058,13 @@ $(document).ready(function () {
                             console.log(data);
                             $('#personal_err').html('Ops something goes wrong ...');
                         }); // end of fail(function (data)
-                    } // end else when email is not used 
-                }); // end if $.post(url, request))  
-            } // end if first_name != '' && last_name != '' ...            
+                    } // end else when email is not used
+                }); // end if $.post(url, request))
+            } // end if first_name != '' && last_name != '' ...
         } // end if courseid!=0
         else {
             $('#program_err').html('Please select program');
-            //$('#personal_err').html('Please select program');
+            // $('#personal_err').html('Please select program');
         } // end else
     }
 
@@ -1122,7 +1154,7 @@ $(document).ready(function () {
         } // end if cert_fio!='' && cert_no!=''
         else {
             $('#verify_cert_err').html('Please provide your First and Last name and Certificate # as well');
-        } // end else 
+        } // end else
     }
 
     function get_option_payment_personal() {
@@ -1143,16 +1175,16 @@ $(document).ready(function () {
                 $('#payment_detailes').remove();
                 $('#payment_options').append(data);
             }
-            //$('#program_section').html(data);
-            //console.log(data);
+            // $('#program_section').html(data);
+            // console.log(data);
         });
     }
 
-    /************************************************************************
-     * 
-     *                  Show scheduled course
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show scheduled course
+	 * 
+	 **************************************************************************/
     function show_scheduled_course(courseid) {
         var url = "http://" + domain + "/functionality/php/show_scheduled_course.php";
         var request = {courseid: courseid};
@@ -1249,7 +1281,7 @@ $(document).ready(function () {
     }
 
     function fill_billing_address() {
-        //var group_status=$('#group').prop('checked');
+        // var group_status=$('#group').prop('checked');
         console.log("Group status: " + group_selected);
         if (group_selected) {
             console.log('Group registration');
@@ -1258,7 +1290,7 @@ $(document).ready(function () {
             var city = $('#group_city').val();
             var zip = $('#group_zip').val();
 
-            //$("#bill_state").val(state);
+            // $("#bill_state").val(state);
             $('select[name^="bill_state"] option[value=' + state + ']').attr("selected", "selected");
             $('#bill_addr').val(addr);
             $('#bill_city').val(city);
@@ -1271,69 +1303,69 @@ $(document).ready(function () {
             var city = $('#city').val();
             var zip = $('#zip').val();
 
-            //$("#bill_state").val(state);
+            // $("#bill_state").val(state);
             $('select[name^="bill_state"] option[value=' + state + ']').attr("selected", "selected");
             $('#bill_addr').val(addr);
             $('#bill_city').val(city);
             $('#bill_zip').val(zip);
 
-        } // end else 
+        } // end else
     }
 
 
-    /************************************************************************
-     * 
-     *                  Individual registration block
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Individual registration block
+	 * 
+	 **************************************************************************/
     function get_individual_registration_block() {
         $('#personal_section').show();
         $('#group_common_section').hide();
         $('#participants_details').hide();
     }
 
-    /**************************************************************************
-     * 
-     * 
-     *                  Top menu items processing           
-     * 
-     * 
-     **************************************************************************/
+    /***************************************************************************
+	 * 
+	 * 
+	 * Top menu items processing
+	 * 
+	 * 
+	 **************************************************************************/
 
-    /************************************************************************
-     * 
-     *                      Show workshops list after click
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show workshops list after click
+	 * 
+	 **************************************************************************/
 
     $('#ws').click(function () {
         self.location = $('#ws').attr('href');
     });
-    /************************************************************************
-     * 
-     *                      Show courses list after click
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show courses list after click
+	 * 
+	 **************************************************************************/
 
 
     $('#cs').click(function () {
         self.location = $('#cs').attr('href');
     });
-    /************************************************************************
-     * 
-     *                      Show exams list after click
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show exams list after click
+	 * 
+	 **************************************************************************/
 
 
     $('#exam').click(function () {
         self.location = $('#exam').attr('href');
     });
-    /************************************************************************
-     * 
-     *                      Show school's list after click
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show school's list after click
+	 * 
+	 **************************************************************************/
 
     $('#school').click(function () {
         self.location = $('#school').attr('href');
@@ -1343,67 +1375,76 @@ $(document).ready(function () {
         self.location = $('#college').attr('href');
     });
 
-    /************************************************************************
-     * 
-     *                      Show Testimonial page after click
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show Testimonial page after click
+	 * 
+	 **************************************************************************/
 
     $('#testimonial').click(function () {
         self.location = $('#testimonial').attr('href');
     });
-    /************************************************************************
-     * 
-     *                     Show priviate group page after click
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show priviate group page after click
+	 * 
+	 **************************************************************************/
 
     $('#group').click(function () {
         self.location = $('#group').attr('href');
     });
-    /************************************************************************
-     * 
-     *                   Show certificate verification form
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show certificate verification form
+	 * 
+	 **************************************************************************/
 
     $('#cert').click(function () {
         self.location = $('#cert').attr('href');
     });
-    /************************************************************************
-     * 
-     *                   Show Gallery page
-     * 
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * Show Gallery page
+	 * 
+	 **************************************************************************/
 
     $('#gallery').click(function () {
         self.location = $('#gallery').attr('href');
     });
-    /************************************************************************
-     * 
-     *
-     *                   Events processing block
-     *
-     *  
-     ************************************************************************/
+    /***************************************************************************
+	 * 
+	 * 
+	 * Events processing block
+	 * 
+	 * 
+	 **************************************************************************/
 
+    
+    /*
     $('#login_button').click(function (event) {
         event.preventDefault();
         check_login_form();
     });
-    /********************************************************************
-     * 
-     *         Section for dynamically created elements
-     * 
-     *******************************************************************/
+    */
+    
+    
+    /***************************************************************************
+	 * 
+	 * Section for dynamically created elements
+	 * 
+	 **************************************************************************/
 
     // **************** Buttons processing events ***********************
     $('.form_div').on('click', 'button', function (event) {
-        //alert(event.target.id);
-        if (event.target.id == 'login_button') {
-            event.preventDefault();
-            check_login_form();
-        }
+        // alert(event.target.id);
+    	
+    	
+		 if (event.target.id == 'login_button') { 
+			 event.preventDefault();
+			 check_login_form(); 
+		 }
+		 
+        
 
         if (event.target.id == 'make_payment_personal') {
             verify_personal_payment_section();
@@ -1426,7 +1467,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'start_upload') {
-            //console.log();
+            // console.log();
             verify_users_upload_form();
         }
 
@@ -1470,7 +1511,7 @@ $(document).ready(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
             });
             var stateid = event.target.id.replace('state_', '');
-            //console.log('State ID: ' + stateid);
+            // console.log('State ID: ' + stateid);
             show_state_programs(stateid);
         }
 
@@ -1480,10 +1521,10 @@ $(document).ready(function () {
                 $(this).parents(".dropdown").find('.dropdown-toggle').val($(this).text());
             });
             var url = window.location.href;
-            //console.log('Url: ' + url);
+            // console.log('Url: ' + url);
             if (url.indexOf('schedule') >= 0) {
                 var courseid = event.target.id.replace('course_', '');
-                //console.log('Course ID: ' + courseid);
+                // console.log('Course ID: ' + courseid);
                 show_scheduled_course(courseid);
             } // end if url.indexOf('schedule') > 0
         }
@@ -1510,7 +1551,7 @@ $(document).ready(function () {
                 $('#type_err').html('');
                 // Verify is group registration selected?
                 var group_status = $('#group').is(':checked');
-                //console.log('Group status:' + group_status);
+                // console.log('Group status:' + group_status);
                 if (group_status != false || group_selected == true) {
                     get_group_registration_block();
                 }
@@ -1539,7 +1580,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'manual_group_registration') {
-            //console.log('Manual registration ...');
+            // console.log('Manual registration ...');
             var tot_participants = $('#participants').val();
             $('#upload_section').hide();
             verify_group_common_section();
@@ -1584,7 +1625,7 @@ $(document).ready(function () {
 
 
     $('.form_div').on('change', 'input[type=radio][name=type]', function (event) {
-        //alert(event.target.id);
+        // alert(event.target.id);
         if (event.target.id == 'group') {
             get_group_registration_block();
             $('#group_common_section').show();
@@ -1594,22 +1635,23 @@ $(document).ready(function () {
             get_individual_registration_block();
         }
 
-    }); // end if ('#page').on('change', 'input[type=radio][name=type]', function (event) {
+    }); // end if ('#page').on('change', 'input[type=radio][name=type]',
+		// function (event) {
 
     $('.menu_items').click(function () {
         self.location = $(this).attr('href');
     });
 
     $('.form_div').on('change', function (event) {
-        //alert(event.target.id);
+        // alert(event.target.id);
         if (event.target.id == 'categories') {
             var category_id = $('#categories').val();
             get_category_course(category_id);
         }
 
-        //if (event.target.id == 'register_state') {
-        //  get_category_items_in_state();
-        //}
+        // if (event.target.id == 'register_state') {
+        // get_category_items_in_state();
+        // }
 
         if (event.target.id == 'participants') {
             $('#type_err').html('');
@@ -1647,7 +1689,7 @@ $(document).ready(function () {
         } // end if event.target.id == 'policy'
 
 
-    }); // end if ('#page').on('change',  function (event) {
+    }); // end if ('#page').on('change', function (event) {
 
     $("#search_button").click(function () {
         submit_search_form();
@@ -1664,7 +1706,7 @@ $(document).ready(function () {
             var map = new google.maps.Map(document.getElementById('map'), {
                 scrollwheel: false,
                 zoom: 8
-            }); // end var map            
+            }); // end var map
             var latLngs = [];
             var bounds = new google.maps.LatLngBounds();
             $.each($obj_data, function (i, m) {
@@ -1675,7 +1717,7 @@ $(document).ready(function () {
                     map: map,
                     title: m.marker_text,
                     zIndex: i
-                }); // end marker                
+                }); // end marker
                 bounds.extend(marker.position);
                 google.maps.event.addListener(marker, 'click', (function (marker, i) {
                     return function () {
@@ -1686,13 +1728,13 @@ $(document).ready(function () {
                         infowindow.open(map, marker);
                     }
                 })(marker, i));
-            }) // end each            
+            }) // end each
             map.fitBounds(bounds);
         }); // post(url, request).done(function (data)
     } // end if url.indexOf("school") >= 0
 
     $("body").click(function (event) {
-        //console.log('Element clicked: ' + event.target.id);
+        // console.log('Element clicked: ' + event.target.id);
         if (event.target.id == 'ok') {
             $('#policy_checkbox').prop("checked", true);
         }
