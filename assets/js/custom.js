@@ -81,15 +81,13 @@ $(document).ready(function () {
         if (login == '' || password == '') {
             $('#login_err').html('*all fields required');
         }
-        if (login != '' && password != '') {
-        	//$('#login_form').submit();       	
-        	
+        if (login != '' && password != '') {   	
         	var url = "http://" + domain + "/functionality/php/login.php";
         	$.post( url, { login: login, password: password })
         	  .done(function( data ) {
         	    if (data>0) {
-        	    	console.log('Server response: '+data);
-        	        $('#login_form').submit();        	    	
+        	    	$('#login_err').html('');
+        	    	$('#login_form').submit();        	    	
         	    } // end if data>0
         	    else {
         	    	$('#login_err').html('Incorrect login or password');
@@ -1421,11 +1419,9 @@ $(document).ready(function () {
 
     
     /*
-    $('#login_button').click(function (event) {
-        event.preventDefault();
-        check_login_form();
-    });
-    */
+	 * $('#login_button').click(function (event) { event.preventDefault();
+	 * check_login_form(); });
+	 */
     
     
     /***************************************************************************
