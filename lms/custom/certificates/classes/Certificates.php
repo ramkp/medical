@@ -225,6 +225,21 @@ class Certificates extends Util {
         $code = "$month$day$year-$result$userid";
         return $code;
     }
+    
+    function get_certificate_title ($courseid) {
+        $query="select category from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $category=$row['category'];
+        }
+        if ($category==2 || $category==4) {
+            $title="Medical2 Certification Agency";
+        }
+        else {
+            $title="Medical2 Career College";
+        }
+        return $title;
+    }
 
     function prepare_ceriticate($courseid, $userid, $date = 0) {
         $list = "";
@@ -239,6 +254,7 @@ class Certificates extends Util {
         $month = date('M', $date);
         $year = date('Y', $date);
         $renew_status = $this->get_course_renew_status($courseid);
+        $title=$this->get_certificate_title($courseid);
         $code = $this->get_course_code($courseid, $userid);
         //echo "Certificate code: ".$code."<br>";
         if ($renew_status == 1) {
@@ -252,7 +268,7 @@ class Certificates extends Util {
         $list.="</head>";
         $list.="<body>";
         $list.="<div class='cert'>";
-        $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>Medical2 Career College ";
+        $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
         $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
         $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
         $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
