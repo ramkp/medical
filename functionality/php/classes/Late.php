@@ -51,8 +51,8 @@ class Late {
         return $delay_period;
     }
 
-    function get_delay_fee() {
-        $query = "select * from mdl_late_fee where id=1";
+    function get_delay_fee($courseid) {
+        $query = "select * from mdl_late_fee where courseid=$courseid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $fee = $row['fee_amount'];

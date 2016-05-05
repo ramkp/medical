@@ -852,8 +852,8 @@ $(document).ready(function () {
             update_contact_page(data);
         }
 
-        if (event.target.id == 'update_late') {
-            update_late_fee();
+        if (event.target.id.indexOf('update_late') >= 0) {
+            update_late_fee(event.target.id);
         }
 
         if (event.target.id == 'search_user') {
@@ -971,18 +971,31 @@ $(document).ready(function () {
         });
     }
 
-    function update_late_fee() {
+    function update_late_fee(item) {
+
+        var courseid = item.replace("update_late_", "");
+        var delay_id = "#fee_delay_" + courseid;
+        var amount_id = "#fee_amount_" + courseid;
+        var err_id = '#late_err_' + courseid;
+
         var url = "/lms/custom/late/edit.php";
-        var fee_delay = $('#fee_delay').val();
-        var fee_amount = $('#fee_amount').val();
+        var fee_delay = $(delay_id).val();
+        var fee_amount = $(amount_id).val();
+
+        //console.log('Course id: '+courseid);
+        //console.log('Fee delay: '+fee_delay);
+        //console.log('Fee amount: '+fee_amount);        
+
         if (fee_delay > 0 && fee_amount > 0) {
-            $.post(url, {period: fee_delay, amount: fee_amount}).done(function (data) {
-                $('#region-main').html(data);
+            $.post(url, {period: fee_delay, amount: fee_amount, courseid: courseid}).done(function (data) {
+                $(err_id).html("<span style='color:black;'>" + data + "</span>");
             });
         } // end if fee_delay>0 && fee_amount>0
         else {
-            $('#late_err').html('Please provide values for amount and delay period');
+            $(err_id).html('Please provide values for amount and delay period');
         } // end else 
+
+
     }
 
     function get_user_credentials_page() {
@@ -1005,7 +1018,7 @@ $(document).ready(function () {
         else {
             $('#user_search_err').html('Please provide search criteria');
         }
-        
+
     }
 
     function clear_user_filter() {
