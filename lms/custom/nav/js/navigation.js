@@ -70,16 +70,33 @@ $(document).ready(function () {
     function upload_files() {
         var url = "/lms/custom/gallery/upload.php";
         var file_data = $('#files').prop('files');
+        var state = $('#state').val();
+        var month = $('#month').val();
+        var year = $('#year').val();
+        var comment = $('#comment').val();
+
         if (file_data == '' || file_data.length == 0) {
             $('#gallery_err').html('Please select files to be upload ...');
+            return false;
         }
-        else {
-            console.log('File data: ' + file_data);
+
+        if (state == 0 || month == 0 || year == 0) {
+            $('#gallery_err').html('Please select state, month and year');
+            return false;
+        } // end if state==0 || month==0 || year==0
+
+        if (file_data != '' && file_data.length != 0 && state > 0 && month > 0 && year > 0) {
+            //console.log('File data: ' + file_data);
             $('#gallery_err').html('');
+            $('#comment').val('');
             var form_data = new FormData();
             $.each(file_data, function (key, value) {
                 form_data.append(key, value);
             });
+            form_data.append('state', state);
+            form_data.append('month', month);
+            form_data.append('year', year);
+            form_data.append('comment', comment);
             $('#loader').show();
             $.ajax({
                 url: url,
@@ -92,7 +109,7 @@ $(document).ready(function () {
                     refresh_gallery_thumbs();
                 }
             });
-        }
+        } // end if file_data != '' && file_data.length != 0 && state > 0 && month > 0 && year > 0
     }
 
     function refresh_gallery_thumbs() {
@@ -100,6 +117,18 @@ $(document).ready(function () {
         $.post(url, {id: 1}).done(function (data) {
             $('#thumb_list').html(data);
         });
+    }
+
+    function filter() {
+        var state = $('#state').val();
+        var month = $('#month').val();
+        var year = $('#year').val();        
+
+        var url = "/lms/custom/gallery/filter.php";
+        $.post(url, {state: state, month: month, year: year}).done(function (data) {
+            $('#thumb_list').html(data);
+        });
+
     }
 
     function delete_gallery_img() {
@@ -862,6 +891,10 @@ $(document).ready(function () {
 
         if (event.target.id == 'clear_user') {
             clear_user_filter();
+        }
+
+        if (event.target.id == 'filter') {
+            filter();
         }
 
     }); // end of #region-main click', 'button',
