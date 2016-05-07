@@ -207,22 +207,10 @@ class Gallery extends Util {
         imagedestroy($jpg_image);
     }
 
-    function get_galllery_thumbs($state = null, $month = null, $year = null) {
-
-        /*
-         *          
-          echo "State: " . $state . "<br>";
-          echo "Month: " . $month . "<br>";
-          echo "Year: " . $year . "<br>";
-         * 
-         */
-
-        $list = "";
-        $list = $list . "<span class='thumbnails' style='margin-left: 90px;'>";
-
+    function get_image_sql_criteria($state = null, $month = null, $year = null) {
         if ($state == null && $month == null && $year == null) {
             $query = "select * from mdl_gallery";
-        } // end if $state==null && $month==null && $year==null
+        }
 
         if ($state != null && $month == null && $year == null) {
             $query = "select * from mdl_gallery "
@@ -262,9 +250,23 @@ class Gallery extends Util {
             $query = "select * from mdl_gallery "
                     . "where month=$month";
         }
-
         //echo "Query: " . $query . "<br>";
+        return $query;
+    }
 
+    function get_galllery_thumbs($state = null, $month = null, $year = null) {
+
+        /*
+         *          
+          echo "State: " . $state . "<br>";
+          echo "Month: " . $month . "<br>";
+          echo "Year: " . $year . "<br>";
+         * 
+         */
+
+        $list = "";
+        $list = $list . "<span class='thumbnails' style='margin-left: 90px;'>";
+        $query=$this->get_image_sql_criteria($state, $month, $year);
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
