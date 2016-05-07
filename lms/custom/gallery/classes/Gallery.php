@@ -208,12 +208,12 @@ class Gallery extends Util {
     }
 
     function get_galllery_thumbs($state = null, $month = null, $year = null) {
-        
+
         /*
          *          
-        echo "State: " . $state . "<br>";
-        echo "Month: " . $month . "<br>";
-        echo "Year: " . $year . "<br>";
+          echo "State: " . $state . "<br>";
+          echo "Month: " . $month . "<br>";
+          echo "Year: " . $year . "<br>";
          * 
          */
 
@@ -249,18 +249,18 @@ class Gallery extends Util {
 
         if ($state != null && $month == null && $year != null) {
             $query = "select * from mdl_gallery "
-                    . "where  stateid=$state " 
+                    . "where  stateid=$state "
                     . "and year=$year";
         }
-        
+
         if ($state == null && $month == null && $year != null) {
             $query = "select * from mdl_gallery "
-                    . "where year=$year";            
+                    . "where year=$year";
         }
-        
+
         if ($state == null && $month != null && $year == null) {
             $query = "select * from mdl_gallery "
-                    . "where month=$month";            
+                    . "where month=$month";
         }
 
         //echo "Query: " . $query . "<br>";
@@ -298,9 +298,9 @@ class Gallery extends Util {
             $list = $list . "</ul>";
         } // end if $num>0
         else {
-            $list = $list . "<ul class='thumbnails'>";
-            $list = $list . "<li class='span6'>There are no images </li>";
-            $list = $list . "</ul>";
+            $list .= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
+            $list.="<span class='span10' style='text-align:center;'>There are no images matched criteria</span>";
+            $list.= "</div>";
         }
         return $list;
     }
