@@ -268,6 +268,8 @@ class Price extends Util {
                 $list.="<span class='span3'>Item group discount %</span><span class='span1'>$group_discount</span>";
                 $list.= "</div>";
 
+                /*
+                 * 
                 $list.= "<div class='container-fluid'>";
                 $list.="<span class='span3'>Installment payment</span><span class='span1'>$installment_checkbox</span>";
                 $list.= "</div>";
@@ -275,6 +277,8 @@ class Price extends Util {
                 $list.= "<div class='container-fluid'>";
                 $list.="<span class='span3'>Num of payments</span><span class='span1'>$installment_payments</span>";
                 $list.= "</div>";
+                 * 
+                 */
 
                 $list.= "<div class='container-fluid'>";
                 $list.="<span class='span3'>Item states</span><span class='span1'>$states</span>";
