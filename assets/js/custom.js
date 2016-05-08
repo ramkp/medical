@@ -57,67 +57,67 @@ $(document).ready(function () {
         $(this).parent().find('ul').slideToggle();
     });
     /***************************************************************************
-	 * 
-	 * 
-	 * Service & rendeting functions
-	 * 
-	 * 
-	 * 
-	 **************************************************************************/
+     * 
+     * 
+     * Service & rendeting functions
+     * 
+     * 
+     * 
+     **************************************************************************/
 
     var domain = 'cnausa.com';
     /***************************************************************************
-	 * 
-	 * Login form verification
-	 * 
-	 **************************************************************************/
-    
-    
+     * 
+     * Login form verification
+     * 
+     **************************************************************************/
+
+
     function check_login_form() {
-    	var login = $('#login_box').val();
+        var login = $('#login_box').val();
         var password = $('#password_box').val();
-         console.log('Login: '+login);
-         console.log('Password: '+password);
+        console.log('Login: ' + login);
+        console.log('Password: ' + password);
         if (login == '' || password == '') {
             $('#login_err').html('*all fields required');
         }
-        if (login != '' && password != '') {   	
-        	var url = "http://" + domain + "/functionality/php/login.php";
-        	$.post( url, { login: login, password: password })
-        	  .done(function( data ) {
-        	    if (data>0) {
-        	    	$('#login_err').html('');
-        	    	$('#login_form').submit();        	    	
-        	    } // end if data>0
-        	    else {
-        	    	$('#login_err').html('Incorrect login or password');
-        	    	 // event.preventDefault();
-        	    } // end else
-        	  });       	
-        	
+        if (login != '' && password != '') {
+            var url = "http://" + domain + "/functionality/php/login.php";
+            $.post(url, {login: login, password: password})
+                    .done(function (data) {
+                        if (data > 0) {
+                            $('#login_err').html('');
+                            $('#login_form').submit();
+                        } // end if data>0
+                        else {
+                            $('#login_err').html('Incorrect login or password');
+                            // event.preventDefault();
+                        } // end else
+                    });
+
         } // end if login != '' && password != ''
     }
-    
-    
+
+
     /*
-	 * $( "#login_form" ).submit(function( event ) { var login =
-	 * $('#login_box').val(); var password = $('#passsword_box').val();
-	 * console.log('Login: '+login); console.log('Password: '+password); if
-	 * (login == '' || password == '') { $('#login_err').html('*all fields
-	 * required'); } if (login != '' && password != '') { var url = "http://" +
-	 * domain + "/functionality/php/login.php"; $.post( url, { login: login,
-	 * password: password }) .done(function( data ) { if (data>0) {
-	 * $('#login_form').submit(); } // end if data>0 else {
-	 * $('#login_err').html('Incorrect login or password');
-	 * event.preventDefault(); } // end else }); } // end if login != '' &&
-	 * password != '' }); // end of $( "#login_form" ).submit(function( event )
-	 */
-    
+     * $( "#login_form" ).submit(function( event ) { var login =
+     * $('#login_box').val(); var password = $('#passsword_box').val();
+     * console.log('Login: '+login); console.log('Password: '+password); if
+     * (login == '' || password == '') { $('#login_err').html('*all fields
+     * required'); } if (login != '' && password != '') { var url = "http://" +
+     * domain + "/functionality/php/login.php"; $.post( url, { login: login,
+     * password: password }) .done(function( data ) { if (data>0) {
+     * $('#login_form').submit(); } // end if data>0 else {
+     * $('#login_err').html('Incorrect login or password');
+     * event.preventDefault(); } // end else }); } // end if login != '' &&
+     * password != '' }); // end of $( "#login_form" ).submit(function( event )
+     */
+
     /***************************************************************************
-	 * 
-	 * Verify users upload form and start if any
-	 * 
-	 **************************************************************************/
+     * 
+     * Verify users upload form and start if any
+     * 
+     **************************************************************************/
 
     function verify_users_upload_form() {
         var url = "http://" + domain + "/functionality/php/upload_users_file.php";
@@ -146,7 +146,7 @@ $(document).ready(function () {
                         var selected_course = $('#register_courses').val();
                         var courseid = selected_course;
                         // $.post(course_url, request).done(function (courseid)
-						// {
+                        // {
                         $('#ajax_loading_group_file').hide();
                         var addr = $('#group_addr').val();
                         var inst = $('#group_inst').val();
@@ -186,10 +186,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Show Gallery page
-	 * 
-	 **************************************************************************/
+     * 
+     * Show Gallery page
+     * 
+     **************************************************************************/
 
     function get_gallery_page() {
         $.post("http://" + domain + "/functionality/php/gallery.php", function (data) {
@@ -199,10 +199,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Show program items
-	 * 
-	 **************************************************************************/
+     * 
+     * Show program items
+     * 
+     **************************************************************************/
     function show_program_items(cat_name) {
         $.post("http://" + domain + "/functionality/php/get_programs_list.php", {cat_name: cat_name})
                 .done(function (data) {
@@ -214,10 +214,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Show school page and Google Map
-	 * 
-	 **************************************************************************/
+     * 
+     * Show school page and Google Map
+     * 
+     **************************************************************************/
 
     function show_school_page(cat_name) {
         $.post("http://" + domain + "/functionality/php/get_school_page.php", {cat_name: cat_name})
@@ -229,10 +229,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Show Google Map
-	 * 
-	 **************************************************************************/
+     * 
+     * Show Google Map
+     * 
+     **************************************************************************/
 
     function refresh_map() {
         var url = "/lms/custom/google_map/refresh.php";
@@ -272,10 +272,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Show FAQ page
-	 * 
-	 **************************************************************************/
+     * 
+     * Show FAQ page
+     * 
+     **************************************************************************/
     function get_faq_page() {
         $.post("http://" + domain + "/functionality/php/get_faq_page.php", function (data) {
             $('#instructions').hide();
@@ -284,10 +284,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Show Testimonial page
-	 * 
-	 **************************************************************************/
+     * 
+     * Show Testimonial page
+     * 
+     **************************************************************************/
 
     function get_testimonial_page() {
         $.post("http://" + domain + "/functionality/php/get_testimonial_page.php", function (data) {
@@ -297,10 +297,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Certificate verification form
-	 * 
-	 **************************************************************************/
+     * 
+     * Certificate verification form
+     * 
+     **************************************************************************/
 
     function get_certificate_verification_form() {
         $.post("http://" + domain + "/functionality/php/get_certificate_verification_form.php", function (data) {
@@ -310,10 +310,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Get users upload form
-	 * 
-	 **************************************************************************/
+     * 
+     * Get users upload form
+     * 
+     **************************************************************************/
 
     function get_users_upload_form() {
         $.post("http://" + domain + "/functionality/php/get_users_upload_form.php", function (data) {
@@ -323,10 +323,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Verify group general part and proceed to file upload
-	 * 
-	 **************************************************************************/
+     * 
+     * Verify group general part and proceed to file upload
+     * 
+     **************************************************************************/
 
     function verify_group_general_part() {
 
@@ -335,7 +335,7 @@ $(document).ready(function () {
             $('#program_err').html('');
             $('#group_common_errors').html('');
             // var course_url = "http://" + domain +
-			// "/functionality/php/get_course_id.php";
+            // "/functionality/php/get_course_id.php";
             // var request = {course_name: course_name};
             // $.post(course_url, request).done(function (courseid) {
             console.log('Course id: ' + courseid);
@@ -406,10 +406,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Private group request form verification
-	 * 
-	 **************************************************************************/
+     * 
+     * Private group request form verification
+     * 
+     **************************************************************************/
 
     function submit_private_group() {
 
@@ -499,17 +499,17 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Submit verify certification form
-	 * 
-	 **************************************************************************/
+     * 
+     * Submit verify certification form
+     * 
+     **************************************************************************/
     function submit_verify_cert_from() {
         var cert_fio = $('#cert_fio').val();
         var cert_no = $('#cert_no').val();
         /*
-		 * if (cert_fio == '') { $('#cert_err').html('Please provide Firstname
-		 * and Lastname'); return false; }
-		 */
+         * if (cert_fio == '') { $('#cert_err').html('Please provide Firstname
+         * and Lastname'); return false; }
+         */
 
         if (cert_no == '') {
             $('#cert_err').html('Please provide Certificate No');
@@ -530,10 +530,10 @@ $(document).ready(function () {
 
 
     /***************************************************************************
-	 * 
-	 * Show courses inside category
-	 * 
-	 **************************************************************************/
+     * 
+     * Show courses inside category
+     * 
+     **************************************************************************/
     function get_category_course(category_id) {
         var url = "http://" + domain + "/functionality/php/get_selected_course.php";
         var request = {cat_id: category_id};
@@ -543,10 +543,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Show Register page w/o params
-	 * 
-	 **************************************************************************/
+     * 
+     * Show Register page w/o params
+     * 
+     **************************************************************************/
     function get_register_page() {
         $.post("http://" + domain + "/functionality/php/get_register_page.php", function (data) {
             $('#instructions').hide();
@@ -667,10 +667,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Group registration block
-	 * 
-	 **************************************************************************/
+     * 
+     * Group registration block
+     * 
+     **************************************************************************/
     var group_selected;
     var dialog_loaded;
     function get_group_registration_block() {
@@ -693,10 +693,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Manual Group registration form
-	 * 
-	 **************************************************************************/
+     * 
+     * Manual Group registration form
+     * 
+     **************************************************************************/
 
     function get_manual_group_registration_form(tot_participants) {
         var url = "http://" + domain + "/functionality/php/get_group_manual_registration_form.php";
@@ -708,10 +708,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Verify Manual Group registration form
-	 * 
-	 **************************************************************************/
+     * 
+     * Verify Manual Group registration form
+     * 
+     **************************************************************************/
 
     function very_participants_form(tot_participants) {
 
@@ -752,7 +752,7 @@ $(document).ready(function () {
             // Everything is fine - show payment form
             $('#group_manual_form_err').html('');
             // var course_url = "http://" + domain +
-			// "/functionality/php/get_course_id.php";
+            // "/functionality/php/get_course_id.php";
             // var request = {course_name: course_name};
             $('#ajax_loading_group').show();
             // $.post(course_url, request).done(function (courseid) {
@@ -776,9 +776,9 @@ $(document).ready(function () {
                 // Show payment section
                 $('#ajax_loading_group').hide();
                 /*
-				 * var el = $('#personal_payment_details').length; if (el == 0) {
-				 * $('#participants_details').append(data); }
-				 */
+                 * var el = $('#personal_payment_details').length; if (el == 0) {
+                 * $('#participants_details').append(data); }
+                 */
                 $('#participants_details').append(data);
             }).fail(function (data) {
                 console.log(data);
@@ -860,10 +860,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Get private group form
-	 * 
-	 **************************************************************************/
+     * 
+     * Get private group form
+     * 
+     **************************************************************************/
 
     function get_private_group_form() {
         $.post("http://" + domain + "/functionality/php/get_private_groups_form.php", function (data) {
@@ -873,10 +873,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Show register form with selected program
-	 * 
-	 **************************************************************************/
+     * 
+     * Show register form with selected program
+     * 
+     **************************************************************************/
 
     function get_selected_program_register_form(courseid) {
         console.log('Course id: ' + courseid);
@@ -917,10 +917,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Verify Manual Group registration form
-	 * 
-	 **************************************************************************/
+     * 
+     * Verify Manual Group registration form
+     * 
+     **************************************************************************/
 
 
     function validateEmail(email) {
@@ -1179,10 +1179,10 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * Show scheduled course
-	 * 
-	 **************************************************************************/
+     * 
+     * Show scheduled course
+     * 
+     **************************************************************************/
     function show_scheduled_course(courseid) {
         var url = "http://" + domain + "/functionality/php/show_scheduled_course.php";
         var request = {courseid: courseid};
@@ -1310,12 +1310,27 @@ $(document).ready(function () {
         } // end else
     }
 
+    function show_gallery_pics() {
+        var state = $('#state').val();
+        var month = $('#month').val();
+        var year = $('#year').val();
+        /*
+        var url = "http://" + domain + "/functionality/php/show_gallery_pics.php";
+        var request = {state: state, month: month, year: year};
+        $.post(url, request).done(function (data) {
+            //console.log('Gallery response: '+data);
+            $('#gallery_container').html(data);
+        });
+        */
+       var url="http://cnausa.com/index.php/gallery/matched/"+state+"/"+month+"/"+year;
+       window.location=url;       
+    }
 
     /***************************************************************************
-	 * 
-	 * Individual registration block
-	 * 
-	 **************************************************************************/
+     * 
+     * Individual registration block
+     * 
+     **************************************************************************/
     function get_individual_registration_block() {
         $('#personal_section').show();
         $('#group_common_section').hide();
@@ -1323,47 +1338,47 @@ $(document).ready(function () {
     }
 
     /***************************************************************************
-	 * 
-	 * 
-	 * Top menu items processing
-	 * 
-	 * 
-	 **************************************************************************/
+     * 
+     * 
+     * Top menu items processing
+     * 
+     * 
+     **************************************************************************/
 
     /***************************************************************************
-	 * 
-	 * Show workshops list after click
-	 * 
-	 **************************************************************************/
+     * 
+     * Show workshops list after click
+     * 
+     **************************************************************************/
 
     $('#ws').click(function () {
         self.location = $('#ws').attr('href');
     });
     /***************************************************************************
-	 * 
-	 * Show courses list after click
-	 * 
-	 **************************************************************************/
+     * 
+     * Show courses list after click
+     * 
+     **************************************************************************/
 
 
     $('#cs').click(function () {
         self.location = $('#cs').attr('href');
     });
     /***************************************************************************
-	 * 
-	 * Show exams list after click
-	 * 
-	 **************************************************************************/
+     * 
+     * Show exams list after click
+     * 
+     **************************************************************************/
 
 
     $('#exam').click(function () {
         self.location = $('#exam').attr('href');
     });
     /***************************************************************************
-	 * 
-	 * Show school's list after click
-	 * 
-	 **************************************************************************/
+     * 
+     * Show school's list after click
+     * 
+     **************************************************************************/
 
     $('#school').click(function () {
         self.location = $('#school').attr('href');
@@ -1374,73 +1389,73 @@ $(document).ready(function () {
     });
 
     /***************************************************************************
-	 * 
-	 * Show Testimonial page after click
-	 * 
-	 **************************************************************************/
+     * 
+     * Show Testimonial page after click
+     * 
+     **************************************************************************/
 
     $('#testimonial').click(function () {
         self.location = $('#testimonial').attr('href');
     });
     /***************************************************************************
-	 * 
-	 * Show priviate group page after click
-	 * 
-	 **************************************************************************/
+     * 
+     * Show priviate group page after click
+     * 
+     **************************************************************************/
 
     $('#group').click(function () {
         self.location = $('#group').attr('href');
     });
     /***************************************************************************
-	 * 
-	 * Show certificate verification form
-	 * 
-	 **************************************************************************/
+     * 
+     * Show certificate verification form
+     * 
+     **************************************************************************/
 
     $('#cert').click(function () {
         self.location = $('#cert').attr('href');
     });
     /***************************************************************************
-	 * 
-	 * Show Gallery page
-	 * 
-	 **************************************************************************/
+     * 
+     * Show Gallery page
+     * 
+     **************************************************************************/
 
     $('#gallery').click(function () {
         self.location = $('#gallery').attr('href');
     });
     /***************************************************************************
-	 * 
-	 * 
-	 * Events processing block
-	 * 
-	 * 
-	 **************************************************************************/
+     * 
+     * 
+     * Events processing block
+     * 
+     * 
+     **************************************************************************/
 
-    
+
     /*
-	 * $('#login_button').click(function (event) { event.preventDefault();
-	 * check_login_form(); });
-	 */
-    
-    
+     * $('#login_button').click(function (event) { event.preventDefault();
+     * check_login_form(); });
+     */
+
+
     /***************************************************************************
-	 * 
-	 * Section for dynamically created elements
-	 * 
-	 **************************************************************************/
+     * 
+     * Section for dynamically created elements
+     * 
+     **************************************************************************/
 
     // **************** Buttons processing events ***********************
     $('.form_div').on('click', 'button', function (event) {
         // alert(event.target.id);
-    	
-    	
-		 if (event.target.id == 'login_button') { 
-			 event.preventDefault();
-			 check_login_form(); 
-		 }
-		 
-        
+
+
+        if (event.target.id == 'login_button') {
+            event.preventDefault();
+            check_login_form();
+        }
+
+
 
         if (event.target.id == 'make_payment_personal') {
             verify_personal_payment_section();
@@ -1477,6 +1492,10 @@ $(document).ready(function () {
 
         if (event.target.id == 'search_button') {
             submit_search_form();
+        }
+
+        if (event.target.id == 'filter') {
+            show_gallery_pics();
         }
 
 
@@ -1632,7 +1651,7 @@ $(document).ready(function () {
         }
 
     }); // end if ('#page').on('change', 'input[type=radio][name=type]',
-		// function (event) {
+    // function (event) {
 
     $('.menu_items').click(function () {
         self.location = $(this).attr('href');

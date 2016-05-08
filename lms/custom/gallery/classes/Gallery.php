@@ -254,7 +254,29 @@ class Gallery extends Util {
         return $query;
     }
 
-    function get_galllery_thumbs($state = null, $month = null, $year = null) {
+    function get_gallery_pics($state = null, $month = null, $year = null) {
+        $list = "";
+        $query = $this->get_image_sql_criteria($state, $month, $year);
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $files[] = $row['path'];
+            }
+            foreach ($files as $file) {
+                $file_path = 'http://' . $_SERVER['SERVER_NAME'] . '/lms/custom/gallery/files/' . $file;
+                $list.="<img src='$file_path' alt='image' width='300px;' height='200px;'>";
+            } // end foreach
+        } // end if $num > 0
+        else {
+            $list .= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
+            $list.="<span class='span10' style='text-align:center;'>There are no images matched criteria</span>";
+            $list.= "</div>";
+        } // end else
+        return $list;
+    }
+
+    function get_galllery_thumbs($state = null, $month = null, $year = null, $full = false) {
 
         /*
          *          
@@ -266,7 +288,7 @@ class Gallery extends Util {
 
         $list = "";
         $list = $list . "<span class='thumbnails' style='margin-left: 90px;'>";
-        $query=$this->get_image_sql_criteria($state, $month, $year);
+        $query = $this->get_image_sql_criteria($state, $month, $year);
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -278,7 +300,12 @@ class Gallery extends Util {
             //print_r($files);
             for ($i = 0; $i <= count($files) - 1; $i++) {
                 if ($files[$i] != '.' && $files[$i] != '..') {
-                    $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/thumbs/" . $files[$i];
+                    if ($full == false) {
+                        $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/thumbs/" . $files[$i];
+                    } // end if $full==false
+                    else {
+                        $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/" . $files[$i];
+                    } // end else                
                     if ($i % 2 == 0) {
                         $list = $list . "<ul class='thumbnails'>";
                         $list = $list . "<li class='span6'>

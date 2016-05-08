@@ -30,4 +30,75 @@ class Gallery {
         return $list;
     }
 
+    function get_image_sql_criteria($state = null, $month = null, $year = null) {
+        if ($state == null && $month == null && $year == null) {
+            $query = "select * from mdl_gallery";
+        }
+
+        if ($state != null && $month == null && $year == null) {
+            $query = "select * from mdl_gallery "
+                    . "where stateid=$state";
+        }
+
+        if ($state != null && $month != null && $year == null) {
+            $query = "select * from mdl_gallery "
+                    . "where stateid=$state and month=$month";
+        }
+
+        if ($state != null && $month != null && $year != null) {
+            $query = "select * from mdl_gallery "
+                    . "where stateid=$state "
+                    . "and month=$month "
+                    . "and year=$year";
+        }
+
+        if ($state == null && $month != null && $year != null) {
+            $query = "select * from mdl_gallery "
+                    . "where  month=$month "
+                    . "and year=$year";
+        }
+
+        if ($state != null && $month == null && $year != null) {
+            $query = "select * from mdl_gallery "
+                    . "where  stateid=$state "
+                    . "and year=$year";
+        }
+
+        if ($state == null && $month == null && $year != null) {
+            $query = "select * from mdl_gallery "
+                    . "where year=$year";
+        }
+
+        if ($state == null && $month != null && $year == null) {
+            $query = "select * from mdl_gallery "
+                    . "where month=$month";
+        }
+        //echo "Query: " . $query . "<br>";
+        return $query;
+    }
+    
+    function get_gallery_pics($state = null, $month = null, $year = null) {
+        $list = "";
+        $query = $this->get_image_sql_criteria($state, $month, $year);
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $files[] = $row['path'];
+            }
+            $list.="<div class='fotorama' id='fotorama'>";
+            foreach ($files as $file) {
+                $file_path = 'http://' . $_SERVER['SERVER_NAME'] . '/lms/custom/gallery/files/' . $file;
+                $list.="<img src='$file_path' alt='image' width='300px;' height='200px;'>";
+            } // end foreach
+            $list.= "</div>";
+        } // end if $num > 0
+        else {
+            $list .= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
+            $list.="<span class='span10' style='text-align:center;'>There are no images matched criteria</span>";
+            $list.= "</div>";
+        } // end else
+        return $list;
+    }
+
 }
