@@ -192,7 +192,7 @@ class Invoices extends Util {
 
     function get_invoice_sum($courseid, $userid, $i_sum) {
         $late = new Late();
-        $late_fee = $late->get_delay_fee();
+        $late_fee = $late->get_delay_fee($courseid);
         $query = "select * from mdl_scheduler_appointment where studentid=$userid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -235,7 +235,7 @@ class Invoices extends Util {
                 $prefix = ($paid == false) ? "from " : "paid date ";
                 $link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $invoice->i_file));
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User</span><span class='span6'>$user->firstname $user->lastname</span>";
+                $list.="<span class='span2'>User</span><span class='span6'><a href='http://".$_SERVER['SERVER_NAME']."/lms/user/profile.php?id=$invoice->userid' target='_blank'>$user->firstname $user->lastname</a></span>";
                 $list.="</div>";
 
                 $list.="<div class='container-fluid'>";

@@ -251,10 +251,12 @@ class Invoice {
         } // end else when tax is not null
         $list.="<tr>";
         $list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:55px;'></td>";
-        $list.="</tr>";
+        $list.="</tr>";        
+        
         $list.="<tr bgcolor='#ff8000'>";
-        $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>email: " . $invoice_credentials->email . "&nbsp;&nbsp;&nbsp; " . $invoice_credentials->site . " </td>";
+        $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>email: " . $invoice_credentials->email . "&nbsp;&nbsp;&nbsp; " . $invoice_credentials->site . "<br>Mailing Address: Medical2 1830A North Gloster St,  Tupelo, MS 38804 </td>";
         $list.="</tr>";
+        
         $list.="</table>";
         $list.="</body>";
         $list.="</html>";
@@ -295,8 +297,7 @@ class Invoice {
     }
 
     function create_user_invoice($user, $group, $participants) {
-        $late = new Late();
-        $late_fee = $late->get_delay_fee();
+        $late = new Late();        
         $user_installment_status = $this->is_installment_user($user->id, $user->courseid);
         if ($user_installment_status == 0) {
             if ($group == null) {
@@ -316,6 +317,7 @@ class Invoice {
                     $user->slotid=0;
                 }
                 $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
+                $late_fee = $late->get_delay_fee($user->courseid);
             } // end if $group==null
             else {
                 $group_data = $_SESSION['group_common_section'];
@@ -334,6 +336,7 @@ class Invoice {
                     $group_data->slotid=0;
                 }
                 $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
+                $late_fee = $late->get_delay_fee($group_data->courseid);
                 // Get invoice user data
                 $user_data = new stdClass();
                 $user_data->group_name = $group_data->group_name;
@@ -358,6 +361,7 @@ class Invoice {
             } // end else
             $user->slotid=0; // It is always 0 for installment users
             $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
+            $late_fee = $late->get_delay_fee($user->courseid);
             // Get invoice user data
             $user_data = $this->get_invoice_user_data($user->id);
         } // end else when installment is active
