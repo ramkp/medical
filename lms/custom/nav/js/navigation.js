@@ -1042,8 +1042,10 @@ $(document).ready(function () {
         var email = $('#search_user_input').val();
         if (email != '') {
             $('#user_search_err').html('');
+            $('#ajax_loader').show();
             var url = "/lms/custom/users/search_user.php";
             $.post(url, {email: email}).done(function (data) {
+                $('#ajax_loader').hide();
                 $('#users_container').html(data);
             });
             $('#pagination').hide();
