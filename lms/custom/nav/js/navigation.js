@@ -122,7 +122,7 @@ $(document).ready(function () {
     function filter() {
         var state = $('#state').val();
         var month = $('#month').val();
-        var year = $('#year').val();        
+        var year = $('#year').val();
 
         var url = "/lms/custom/gallery/filter.php";
         $.post(url, {state: state, month: month, year: year}).done(function (data) {
@@ -786,6 +786,40 @@ $(document).ready(function () {
         }
     }
 
+    function search_open_invoice_user() {
+        var item = $('#search_invoice_input').val();
+        var url = "/lms/custom/invoices/search_open_invoice.php";
+        if (item == '') {
+            $('#invoice_err').html('Please provide search criteria');
+        } // end if item==''
+        else {
+            $('#invoice_err').html('');
+            $('#ajax_loader').show();
+            $.post(url, {item: item}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#open_invoices_container').html(data);
+                $('#pagination').hide();
+            });
+        } // end else 
+    }
+
+    function search_paid_invoice_user() {
+        var item = $('#search_invoice_input').val();
+        var url = "/lms/custom/invoices/search_paid_invoice.php";
+        if (item == '') {
+            $('#invoice_err').html('Please provide search criteria');
+        } // end if item==''
+        else {
+            $('#invoice_err').html('');
+            $('#ajax_loader').show();
+            $.post(url, {item: item}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#open_invoices_container').html(data);
+                $('#pagination').hide();
+            });
+        } // end else 
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -896,6 +930,26 @@ $(document).ready(function () {
         if (event.target.id == 'filter') {
             filter();
         }
+
+        if (event.target.id == 'search_open_invoice_user') {
+            search_open_invoice_user();
+        }
+
+        if (event.target.id == 'search_paid_invoice_user') {
+            search_paid_invoice_user();
+        }
+
+        if (event.target.id == 'clear_open_invoice') {
+            get_open_invoices_page();
+        }
+
+        if (event.target.id == 'clear_paid_invoice') {
+            get_paid_invoice_page();
+        }
+
+        //search_open_invoice_user
+        //search_paid_invoice_user
+        //clear_invoice
 
     }); // end of #region-main click', 'button',
 

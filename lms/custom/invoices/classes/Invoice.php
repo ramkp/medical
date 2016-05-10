@@ -204,7 +204,7 @@ class Invoices extends Util {
         else {
             $slotid = 0;
         } // end else        
-        
+
         if ($slotid > 0) {
             $is_apply_late_fee = $late->is_apply_delay_fee($courseid, $slotid);
         } // end if $slotid>0
@@ -221,13 +221,44 @@ class Invoices extends Util {
         return $sum;
     }
 
-    function create_open_invoices_page($invoices, $toolbar = true, $paid = false) {
+    function create_open_invoices_page($invoices, $toolbar = true, $paid = false, $seacrh=false) {
         $list = "";
         //print_r($invoices);
-
+        if ($toolbar == TRUE) {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span2'>Search</span>";
+            $list.="<span class='span2'><input type='text' id='search_invoice_input' style='width:125px;' /></span>";
+            if ($paid == false) {
+                $list.="<span class='span3'><button class='btn btn-primary' id='search_open_invoice_user'>Search</button></span>";
+                $list.="<span class='span2'><button class='btn btn-primary' id='clear_open_invoice'>Clear filter</button></span>";
+            } // end if $paid==false
+            else {
+                $list.="<span class='span3'><button class='btn btn-primary' id='search_paid_invoice_user'>Search</button></span>";
+                $list.="<span class='span2'><button class='btn btn-primary' id='clear_paid_invoice'>Clear filter</button></span>";
+            } // end else             
+            $list.="</div>";
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8' style='color:red;' id='invoice_err'></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+            $list.="<span class='span8'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+            $list.="</div>";
+        } // end if $toolbar == TRUE
 
         if (count($invoices) > 0) {
             $list.="<div id='open_invoices_container'>";
+            $total = count($invoices);
+            if ($total == $this->limit && $seacrh==false) {
+                if ($paid == false) {
+                    $total = $this->get_open_invoices_total();
+                } // end if $paid==false
+                else {
+                    $total = $this->get_paid_invoices_total();
+                } // end else 
+            }
+            $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
+            $list.="<span class='span8'>Total invoices: $total</span>";
+            $list.="</div>";
             foreach ($invoices as $invoice) {
                 $user = $this->get_user_details($invoice->userid);
                 $date = date('Y-m-d', time());
@@ -235,13 +266,13 @@ class Invoices extends Util {
                 $prefix = ($paid == false) ? "from " : "paid date ";
                 $link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $invoice->i_file));
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User</span><span class='span6'><a href='http://".$_SERVER['SERVER_NAME']."/lms/user/profile.php?id=$invoice->userid' target='_blank'>$user->firstname $user->lastname</a></span>";
+                $list.="<span class='span2'>User</span><span class='span6'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$invoice->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
 
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program applied</span><span class='span6'>$coursename</span>";
                 $list.="</div>";
-                $sum=$this->get_invoice_sum($invoice->courseid, $invoice->userid, $invoice->i_sum);
+                $sum = $this->get_invoice_sum($invoice->courseid, $invoice->userid, $invoice->i_sum);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Invoice</span><span class='span6'>Invoice # $invoice->i_num for $$sum $prefix $date (<a href='$link' target='_blank'>link</a>)</span>";
                 $list.="</div>";
@@ -464,7 +495,7 @@ class Invoices extends Util {
             } // end else 
         } // end if $invoice->renew==1
         //5. Add log entry
-        $sum=$this->get_invoice_sum($invoice->courseid, $invoice->userid, $invoice->i_sum);
+        $sum = $this->get_invoice_sum($invoice->courseid, $invoice->userid, $invoice->i_sum);
         $query = "insert into "
                 . "mdl_payments_log "
                 . "(userid,"
@@ -494,6 +525,83 @@ class Invoices extends Util {
         } // end else
 
         $list = "Invoice made as paid. Please reload the page";
+        return $list;
+    }
+
+    function search_invoice_users($item) {
+        $users = array();
+        $query = "select id from mdl_user "
+                . "where firstname "
+                . "like '%$item%' "
+                . "or lastname like '%$item%' "
+                . "or email like '%$item%'";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $users[] = $row['id'];
+            } // end while
+        } // end if $num > 0
+        return $users;
+    }
+
+    function search_invoice_courses($item) {
+        $courses = array();
+        $query = "select id from mdl_course where fullname like '%$item%'";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courses[] = $row['id'];
+            } // end while
+        } // end if $num > 0
+        return $courses;
+    }
+
+    function search_invoice($item, $paid = false) {
+        $list = "";
+        $invoices = array();
+        $users_list = implode(",", $this->search_invoice_users($item));
+        $courses_list = implode(",", $this->search_invoice_courses($item));
+        $status = ($paid == false) ? 0 : 1;
+        if ($users_list != '') {
+            $query = "select * from mdl_invoice "
+                    . "where i_status=$status "
+                    . "and userid in ($users_list) order by i_date desc ";
+        } // end if $users_list != ''
+        if ($courses_list != '') {
+            $query = "select * from mdl_invoice "
+                    . "where i_status=$status "
+                    . "and courseid in ($courses_list) order by i_date desc ";
+        } // end if $courses_list != ''
+        if ($users_list != '' && $courses_list != '') {
+            $query = "select * from mdl_invoice "
+                    . "where i_status=$status "
+                    . "and (courseid in ($courses_list) "
+                    . "or userid in ($users_list)) order by i_date desc ";
+        } // end if $users_list != '' && $courses_list != ''
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $invoice = new stdClass();
+                foreach ($row as $key => $value) {
+                    $invoice->$key = $value;
+                }
+                $invoices[] = $invoice;
+            } // end while
+            if ($paid == false) {
+                $list.= $this->create_open_invoices_page($invoices, false, false, true);
+            } // end if $paid==false
+            else {
+                $list.= $this->create_open_invoices_page($invoices, false, true, true);
+            } // end else 
+        } // end if $num > 0
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span6'>No invoices found</span>";
+            $list.="</div>";
+        } // end else 
         return $list;
     }
 

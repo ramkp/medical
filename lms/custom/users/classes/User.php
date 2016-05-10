@@ -64,7 +64,7 @@ class User extends Util {
         $list.="<input type='hidden' value='$search_criteria' id='item'>";
         $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
         $total = count($users);
-        if ($total == 3) {
+        if ($total <= $this->limit && $search_criteria==null) {
             $total = $this->get_users_total();
         }
         $list.="<span class='span8' style=''>Total users found: " . $total . "</span>";
