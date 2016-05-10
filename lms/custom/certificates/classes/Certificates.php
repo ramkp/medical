@@ -9,6 +9,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/classes/Invoice.php');
 
 class Certificates extends Util {
 
@@ -71,11 +72,31 @@ class Certificates extends Util {
         return $list;
     }
 
-    function create_certificates_list($certificates, $toolbar = true) {
+    function create_certificates_list($certificates, $toolbar = true, $search = false) {
         $list = "";
         if (count($certificates) > 0) {
-            $pagination = $this->get_pagination_bar();
+            if ($toolbar == true) {
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span2'>Search</span>";
+                $list.="<span class='span2'><input type='text' id='search_certificate' style='width:125px;' /></span>";
+                $list.="<span class='span3'><button class='btn btn-primary' id='search_certificate_button'>Search</button></span>";
+                $list.="<span class='span2'><button class='btn btn-primary' id='clear_certificate_button'>Clear filter</button></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span8' style='color:red;' id='cert_err'></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+                $list.="<span class='span10'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+                $list.="</div>";
+            } // end if $toolbar==true            
             $list.="<div id='certificates_container'>";
+            $total = count($certificates);
+            if ($total <= $this->limit && $search == false) {
+                $total = $this->get_total_certificates();
+            } // end if $total<=$this->limit && $search==false
+            $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
+            $list.="<span class='span10'>Total certificates: $total</span>";
+            $list.="</div>";
             foreach ($certificates as $certificate) {
                 $user = $this->get_user_details($certificate->userid);
                 $coursename = $this->get_course_name($certificate->courseid);
@@ -225,18 +246,17 @@ class Certificates extends Util {
         $code = "$month$day$year-$result$userid";
         return $code;
     }
-    
-    function get_certificate_title ($courseid) {
-        $query="select category from mdl_course where id=$courseid";
+
+    function get_certificate_title($courseid) {
+        $query = "select category from mdl_course where id=$courseid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $category=$row['category'];
+            $category = $row['category'];
         }
-        if ($category==2 || $category==4) {
-            $title="Medical2 Certification Agency";
-        }
-        else {
-            $title="Medical2 Career College";
+        if ($category == 2 || $category == 4) {
+            $title = "Medical2 Certification Agency";
+        } else {
+            $title = "Medical2 Career College";
         }
         return $title;
     }
@@ -254,7 +274,7 @@ class Certificates extends Util {
         $month = date('M', $date);
         $year = date('Y', $date);
         $renew_status = $this->get_course_renew_status($courseid);
-        $title=$this->get_certificate_title($courseid);
+        $title = $this->get_certificate_title($courseid);
         $code = $this->get_course_code($courseid, $userid);
         //echo "Certificate code: ".$code."<br>";
         if ($renew_status == 1) {
@@ -280,8 +300,8 @@ class Certificates extends Util {
         //$list.="<div align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Shahid Malik, President</span> &nbsp; <span align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Donna Steele, Director</span></span></div>";
         //$list.="</div>";        
         $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
-        $list.="</div>";        
-        
+        $list.="</div>";
+
         $list.="</body>";
         $list.="</html>";
 
@@ -447,6 +467,25 @@ class Certificates extends Util {
         } // end if !is_dir($dir_path)
         $path = $dir_path . "/label.pdf";
         $pdf->Output($path, 'F');
+    }
+
+    function get_certificate_classes($item) {
+        $query = "select * from mdl_scheduler_slots where notes like '%$item%'";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                
+            } // end while
+        } // end if $num > 0
+    }
+
+    function search_certificate($item) {
+        $list = "";
+        $certificates = array();
+        $invoice = new Invoices();
+        $users_list = implode(",", $invoice->search_invoice_users($item));
+        $courses_list = implode(",", $invoice->search_invoice_courses($item));
     }
 
 }

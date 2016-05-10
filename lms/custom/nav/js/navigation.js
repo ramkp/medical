@@ -854,6 +854,18 @@ $(document).ready(function () {
         }
     }
 
+    function search_certificate() {
+        var item = $('#search_certificate').val();
+        if (item == '') {
+            $('#cert_err').html('Please provide search criteria');
+        } // end if item==''
+        else {
+            $('#cert_err').html('');
+            $('#ajax_loader').show();
+            var url = "/lms/custom/certificates/search_certificate.php";
+        } // end else 
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -1008,6 +1020,14 @@ $(document).ready(function () {
 
         if (event.target.id == 'clear_card_payment_button') {
             get_credit_card_payments_page();
+        }
+
+        if (event.target.id == 'search_certificate_button') {
+            search_certificate();
+        }
+
+        if (event.target.id == 'clear_certificate_button') {
+            get_certificates_page();
         }
 
     }); // end of #region-main click', 'button',
