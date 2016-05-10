@@ -530,6 +530,23 @@ $(document).ready(function () {
         } // end else
     }
 
+    function search_payment(typeid) {
+        var item = $('#search_payment').val();
+        var url = "/lms/custom/payments/search_payment.php";
+        if (item == '') {
+            $('#payment_err').html('Please provide search criteria');
+        } // end if item==''
+        else {
+            $('#payment_err').html('');
+            $('#ajax_loader').show();
+            $.post(url, {item: item, typeid: typeid}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#pagination').hide();
+                $('#payment_container').html(data);
+            });
+        } // end else        
+    }
+
     function add_installment_user() {
         var userid = $('#users').val();
         console.log('User id: ' + userid);
@@ -820,6 +837,23 @@ $(document).ready(function () {
         } // end else 
     }
 
+    function search_credit_card_payment() {
+        var item = $('#search_payment').val();
+        if (item == '') {
+            $('#payment_err').html('Please provide search criteria');
+        }
+        else {
+            $('#payment_err').html('');
+            $('#ajax_loader').show();
+            var url = "/lms/custom/payments/search_credit_card_payment.php";
+            $.post(url, {item: item}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#card_payments_container').html(data);
+                $('#pagination').hide();
+            });
+        }
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -947,9 +981,34 @@ $(document).ready(function () {
             get_paid_invoice_page();
         }
 
-        //search_open_invoice_user
-        //search_paid_invoice_user
-        //clear_invoice
+        if (event.target.id == 'search_payment_button') {
+            var typeid = $('#ptype').val();
+            search_payment(typeid);
+        }
+
+        if (event.target.id == 'clear_payment_button') {
+            var typeid = $('#ptype').val();
+            console.log('Payment type: ' + typeid);
+            switch (typeid) {
+                case "1":
+                    get_cash_payments_page();
+                    break;
+                case "2":
+                    get_check_payments_page();
+                    break;
+                case "3":
+                    get_free_payments();
+                    break;
+            } // end swutch
+        }  // end of event.target.id == 'clear_payment_button'
+
+        if (event.target.id == 'search_card_payment_button') {
+            search_credit_card_payment();
+        }
+
+        if (event.target.id == 'clear_card_payment_button') {
+            get_credit_card_payments_page();
+        }
 
     }); // end of #region-main click', 'button',
 
@@ -1124,7 +1183,7 @@ $(document).ready(function () {
      * 
      ************************************************************************/
 
-    // Show price items
+// Show price items
     $("#prices").click(function (event) {
         get_price_items_from_category(event.target.id);
     });
@@ -1385,6 +1444,5 @@ $(document).ready(function () {
             assign_user_to_course();
         }
     });
-
 }); // end of $(document).ready(function()
 

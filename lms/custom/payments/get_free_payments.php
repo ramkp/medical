@@ -1,7 +1,7 @@
 <?php
 
 require_once './classes/Payments.php';
-$payments = new Payments();
+$payments = new Payments(3);
 $payments_type = 3;
 $list = $payments->get_invoice_payments($payments_type);
 $total=$payments->get_total_payments();

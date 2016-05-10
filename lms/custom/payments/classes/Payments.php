@@ -14,6 +14,11 @@ class Payments extends Util {
     public $typeid;
     public $limit = 3;
 
+    function __construct($payment_type) {
+        parent::__construct();
+        $this->typeid = $payment_type;
+    }
+
     function get_invoice_payments($payment_type) {
         $invoice_payments = array();
         $query = "select * from mdl_invoice "
@@ -53,25 +58,45 @@ class Payments extends Util {
         }
         return $id;
     }
-    
-    
 
-    function get_invoice_payments_page($invoice_payments, $toolbar = true) {
+    function get_invoice_payments_page($invoice_payments, $toolbar = true, $search = false) {
         $list = "";
-        $invoice=new Invoices();
+        $invoice = new Invoices();
         if (count($invoice_payments) > 0) {
+            if ($toolbar == true) {
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span2'>Search</span>";
+                $list.="<input type='hidden' id='ptype' value='$this->typeid'>";
+                $list.="<span class='span2'><input type='text' id='search_payment' style='width:125px;' /></span>";
+                $list.="<span class='span3'><button class='btn btn-primary' id='search_payment_button'>Search</button></span>";
+                $list.="<span class='span2'><button class='btn btn-primary' id='clear_payment_button'>Clear filter</button></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span8' style='color:red;' id='payment_err'></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+                $list.="<span class='span10'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+                $list.="</div>";
+            } // end if $toolbar==true
             $list.="<div id='payment_container'>";
+            $total = count($invoice_payments);
+            if ($total <= $this->limit && $search == false) {
+                $total = $this->get_total_payments($this->typeid);
+            }
+            $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
+            $list.="<span class='span10'>Total invoice payments: $total</span>";
+            $list.="</div>";
             foreach ($invoice_payments as $payment) {
                 $user = $this->get_user_details($payment->userid);
                 $course = $this->get_course_name($payment->courseid);
                 $date = date('Y-m-d', $payment->i_pdate);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span1'>User</span><span class='span3'><a href='http://".$_SERVER['SERVER_NAME']."/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname $user->lastname</a></span>";
+                $list.="<span class='span1'>User</span><span class='span3'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span1'>Program</span><span class='span3'>$course</span>";
                 $list.="</div>";
-                $sum=$invoice->get_invoice_sum($payment->courseid, $payment->userid, $payment->i_sum);
+                $sum = $invoice->get_invoice_sum($payment->courseid, $payment->userid, $payment->i_sum);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span1'>Payment</span><span class='span7'>Invoice # $payment->i_num for $$sum payment date $date</span>";
                 $list.="</div>";
@@ -95,9 +120,16 @@ class Payments extends Util {
         return $list;
     }
 
-    function get_total_payments() {
+    function get_total_payments($ptype = null) {
+        if ($ptype == null) {
+            $type = $this->typeid;
+        } // end if $ptype==null
+        else {
+            $type = $ptype;
+        } // end else 
         $query = "select * from mdl_invoice "
-                . "where i_status=1 and i_ptype=$this->typeid";
+                . "where i_status=1 and i_ptype=$type";
+        //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
         return $num;
     }
@@ -150,7 +182,7 @@ class Payments extends Util {
     function create_payment_log_page($payments, $toolbar = true) {
         $list = "";
         if (count($payments) > 0) {
-            $invoice = new Invoices();            
+            $invoice = new Invoices();
             $list.="<div id='payment_log_container'>";
             foreach ($payments as $payment) {
                 $user = $this->get_user_details($payment->userid);
@@ -158,7 +190,7 @@ class Payments extends Util {
                 $course = $this->get_course_name($payment->courseid);
                 $invoice_id = $this->get_invoice_id($payment->date_added);
                 $invoice_detailes = $invoice->get_invoice_detailes($invoice_id);
-                
+
                 //print_r($invoice_detailes);
                 //echo "<br>";
                 $date = date('Y-m-d', $invoice_detailes->i_date);
@@ -168,7 +200,7 @@ class Payments extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program</span><span class='span3'>$course </span>";
                 $list.="</div>";
-                $sum=$invoice->get_invoice_sum($invoice_detailes->courseid, $invoice_detailes->userid, $invoice_detailes->i_sum);
+                $sum = $invoice->get_invoice_sum($invoice_detailes->courseid, $invoice_detailes->userid, $invoice_detailes->i_sum);
                 //echo "Invoice sum: ".$sum."<br>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Invoice</span><span class='span5'>Invoice # $invoice_detailes->i_num for $$sum &nbsp; from $date</span>";
@@ -247,16 +279,37 @@ class Payments extends Util {
         return $list;
     }
 
-    function create_card_payments_page($payments, $toolbar = true) {
+    function create_card_payments_page($payments, $toolbar = true, $search = false) {
         $list = "";
         if (count($payments) > 0) {
+            if ($toolbar == true) {
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span2'>Search</span>";
+                $list.="<span class='span2'><input type='text' id='search_payment' style='width:125px;' /></span>";
+                $list.="<span class='span3'><button class='btn btn-primary' id='search_card_payment_button'>Search</button></span>";
+                $list.="<span class='span2'><button class='btn btn-primary' id='clear_card_payment_button'>Clear filter</button></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span8' style='color:red;' id='payment_err'></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+                $list.="<span class='span10'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+                $list.="</div>";
+            } // end if $toolbar==true            
             $list.="<div id='card_payments_container'>";
+            $total = count($payments);
+            if ($total <= $this->limit && $search == false) {
+                $total = $this->get_total_card_payments();
+            }
+            $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
+            $list.="<span class='span10'>Total payments: $total</span>";
+            $list.="</div>";
             foreach ($payments as $payment) {
                 $user = $this->get_user_details($payment->userid);
                 $course = $this->get_course_name($payment->courseid);
                 $date = date('Y-m-d', $payment->pdate);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User</span><span class='span3'><a href='http://".$_SERVER['SERVER_NAME']."/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname</a></span>";
+                $list.="<span class='span2'>User</span><span class='span3'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program</span><span class='span3'>$course </span>";
@@ -330,11 +383,98 @@ class Payments extends Util {
         $list.="</div>";
         return $list;
     }
-    
-    function update_renew_fee ($fee) {
-        $query="update mdl_renew_fee set fee_sum='$fee' where id=1";
+
+    function update_renew_fee($fee) {
+        $query = "update mdl_renew_fee set fee_sum='$fee' where id=1";
         $this->db->query($query);
-        $list="Item successfully updated";
+        $list = "Item successfully updated";
+        return $list;
+    }
+
+    function search_item($item, $typeid) {
+        $list="";
+        $invoices = array();
+        $invoice = new Invoices();
+        $users_list = implode(",", $invoice->search_invoice_users($item));
+        $courses_list = implode(",", $invoice->search_invoice_courses($item));
+        if ($users_list != '') {
+            $query = "select * from mdl_invoice "
+                    . "where i_status=1 and i_ptype=$typeid "
+                    . "and userid in ($users_list) order by i_date desc ";
+        } // end if $users_list != ''
+        if ($courses_list != '') {
+            $query = "select * from mdl_invoice "
+                    . "where i_status=1 and i_ptype=$typeid "
+                    . "and courseid in ($courses_list) order by i_date desc ";
+        } // end if $courses_list != ''
+        if ($users_list != '' && $courses_list != '') {
+            $query = "select * from mdl_invoice "
+                    . "where i_status=1 and i_ptype=$typeid "
+                    . "and (courseid in ($courses_list) "
+                    . "or userid in ($users_list)) order by i_date desc ";
+        } // end if $users_list != '' && $courses_list != ''
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $invoice = new stdClass();
+                foreach ($row as $key => $value) {
+                    $invoice->$key = $value;
+                }
+                $invoices[] = $invoice;
+            } // end while
+            $list.=$this->get_invoice_payments_page($invoices, false, true);
+        } // end if $num > 0
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span6'>No invoices found</span>";
+            $list.="</div>";
+        } // end else 
+        return $list;
+    }
+
+    function search_credit_card_payment($item) {
+        $list = "";
+        $payments = array();
+        $invoice = new Invoices();
+        $users_list = implode(",", $invoice->search_invoice_users($item));
+        $courses_list = implode(",", $invoice->search_invoice_courses($item));
+        if ($users_list != '' || $courses_list != '') {
+            if ($users_list != '') {
+                $query = "select * from mdl_card_payments "
+                        . "where userid in ($users_list) order by pdate desc ";
+            } // end if $users_list != ''
+            if ($courses_list != '') {
+                $query = "select * from mdl_card_payments "
+                        . "where courseid in ($courses_list) order by pdate desc ";
+            } // end if $courses_list != ''
+            if ($users_list != '' && $courses_list != '') {
+                $query = "select * from mdl_card_payments "
+                        . "where courseid in ($courses_list) "
+                        . "or userid in ($users_list) order by pdate desc ";
+            } // end if $users_list != '' && $courses_list != ''        
+            //echo "Query: ".$query."<br>";
+            $num = $this->db->numrows($query);
+        } // end if $users_list!='' || $courses_list!=''
+        else {
+            $num = 0;
+        }
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                }
+                $payments[] = $payment;
+            } // end while
+            $list.=$this->create_card_payments_page($payments, false, true);
+        } // end if $num > 0
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span6'>No payments found</span>";
+            $list.="</div>";
+        } // end else 
         return $list;
     }
 

@@ -1,6 +1,6 @@
 <?php
 require_once './classes/Payments.php';
-$payments = new Payments();
+$payments = new Payments(0);
 $total = $payments->get_total_card_payments();
 $list = $payments->get_card_payments_page();
 echo $list;
