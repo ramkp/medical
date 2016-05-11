@@ -42,8 +42,8 @@ class Late {
         return $start;
     }
 
-    function get_signup_delay_period() {
-        $query = "select * from mdl_late_fee where id=1";
+    function get_signup_delay_period($courseid) {
+        $query = "select * from mdl_late_fee where courseid=$courseid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $delay_period = $row['fee_delay'] * 86400;
@@ -66,7 +66,7 @@ class Late {
         $course_scheduled = $this->is_course_scheduled($courseid);
         if ($course_scheduled > 0) {
             $course_start = $this->get_course_start_date($slotid);
-            $delay_period = $this->get_signup_delay_period();
+            $delay_period = $this->get_signup_delay_period($courseid);
             $late_date = $course_start - $delay_period;
             if ($signup_date > $late_date) {
                 $apply = true;

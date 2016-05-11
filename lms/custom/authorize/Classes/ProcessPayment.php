@@ -111,6 +111,7 @@ class ProcessPayment {
         $request->setTransactionRequest($transactionRequestType);
         $controller = new AnetController\CreateTransactionController($request);
         $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        //print_r($response);
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
 

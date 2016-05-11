@@ -649,7 +649,7 @@ class Payment {
         $card_year = $this->get_year_drop_box();
         $card_month = $this->get_month_drop_box();
         $states = $this->get_states_list();
-        $late = new Late();        
+        $late = new Late();
 
         if ($from_email != null) {
             $list.="<br/><div  class='form_div'>";
@@ -667,7 +667,7 @@ class Payment {
         if ($installment == null) {
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
-                $course_cost = $this->get_personal_course_cost($users->courseid);                
+                $course_cost = $this->get_personal_course_cost($users->courseid);
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$users->courseid' id='courseid' name='courseid' />";
@@ -684,7 +684,7 @@ class Payment {
             } // end if $group==''
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
-                $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);                
+                $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
@@ -1040,7 +1040,7 @@ class Payment {
         $mailer = new Mailer();
         $user_group = $card->user_group;
         $userid = $card->userid;
-        $item = $this->get_course_name($card->courseid);
+        $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
 
         // Personal online payment
