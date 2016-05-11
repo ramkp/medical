@@ -470,22 +470,89 @@ class Certificates extends Util {
     }
 
     function get_certificate_classes($item) {
+        $schedulers = array();
+        $courses = array();
         $query = "select * from mdl_scheduler_slots where notes like '%$item%'";
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
+        //echo "Slots num: ".$num."<br>";
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                
+                $schedulers[] = $row['schedulerid'];
             } // end while
+            //echo "<br>----------Schedulers--------------------<br>";
+            //print_r($schedulers);
+            //echo "<br>";
+            foreach ($schedulers as $scheduler) {
+                $query = "select * from mdl_scheduler where id=$scheduler";
+                //echo "Scheduler Query: ".$query."<br>";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $courses[] = $row['course'];
+                } // end while
+            } // end foreach
         } // end if $num > 0
+        return $courses;
     }
 
     function search_certificate($item) {
         $list = "";
         $certificates = array();
         $invoice = new Invoices();
-        $users_list = implode(",", $invoice->search_invoice_users($item));
-        $courses_list = implode(",", $invoice->search_invoice_courses($item));
+        $users_array = array_unique($invoice->search_invoice_users($item));
+        $courses_array = array_unique($invoice->search_invoice_courses($item));
+        $classes_array = array_unique($this->get_certificate_classes($item));
+        $programs_array = array_unique(array_merge($courses_array, $classes_array));
+        $users_list = implode(",", $users_array);
+        $courses_list = implode(",", $programs_array);
+        
+        /*
+         * 
+        echo "<br>--------------Users array--------------<br>";
+        print_r($users_array);
+        echo "<br>--------------Classes array--------------<br>";
+        print_r($classes_array);
+        echo "<br>--------------Courses array--------------<br>";
+        print_r($courses_array);
+        echo "<br>--------------Programs array--------------<br>";
+        print_r($programs_array);
+        echo "<br>";
+         * 
+         */
+
+        if ($users_list != '') {
+            $query = "select * from mdl_certificates "
+                    . "where userid in ($users_list) order by issue_date desc ";
+        } // end if $users_list != ''
+        if ($courses_list != '') {
+            $query = "select * from mdl_certificates "
+                    . "where courseid in ($courses_list) order by issue_date desc ";
+        } // end if $courses_list != ''
+        if ($users_list != '' && $courses_list != '') {
+            $query = "select * from mdl_certificates "
+                    . "where  (courseid in ($courses_list) "
+                    . "or userid in ($users_list)) order by issue_date desc ";
+        } // end if $users_list != '' && $courses_list != ''
+        //echo "Certificates query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $certificate = new stdClass();
+                foreach ($row as $key => $value) {
+                    $certificate->$key = $value;
+                }
+                $certificates[] = $certificate;
+            } // end while
+            $list.=$this->create_certificates_list($certificates, false, true);
+        } // end if num>0
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span6'>No Ecrtificates found</span>";
+            $list.="</div>";
+        }
+        return $list;
     }
 
 }

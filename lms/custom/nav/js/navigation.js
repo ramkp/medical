@@ -863,6 +863,11 @@ $(document).ready(function () {
             $('#cert_err').html('');
             $('#ajax_loader').show();
             var url = "/lms/custom/certificates/search_certificate.php";
+            $.post(url, {item: item}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#certificates_container').html(data);
+                $('#pagination').hide();
+            });
         } // end else 
     }
 
