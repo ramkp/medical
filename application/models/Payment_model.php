@@ -138,15 +138,10 @@ class Payment_model extends CI_Model {
                 } // end else 
             } // end if $installment_status==0
             else {
-                // It is installment user 
-                
-                // Create subscription for current user
-                
-                // Make first installment payment
-                $installment_obj=$invoice->get_user_installment_payments($userid, $courseid);
-                $installment=array();
-                $installment['period']=28; // days
-                $installment['num_payments']=$installment_obj->num;
+                $installment_obj = $invoice->get_user_installment_payments($userid, $courseid);
+                $installment = array();
+                $installment['period'] = 28; // days
+                $installment['num_payments'] = $installment_obj->num;
                 if ($group_status == 0) {
                     // Personal signup
                     $group_data = '';
@@ -161,11 +156,8 @@ class Payment_model extends CI_Model {
                     $group_data->courseid = $courseid;
                     $participants = 1;
                     $list.=$this->payment->get_payment_section($group_data, $user, $participants, $installment, 1);
-                } // end else 
-                
-                
-                
-            }
+                } // end else            
+            } // end else when it is installment user
         }  // end if $userid != NULL
         return $list;
     }
