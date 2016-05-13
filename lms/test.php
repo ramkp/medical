@@ -1,9 +1,12 @@
 <?php
 
 //require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
-//phpinfo();
+phpinfo();
 
  //Set the Content Type
+
+
+/*
   header('Content-type: image/jpeg');
 
   $path=$_SERVER['DOCUMENT_ROOT'].'/lms/custom/gallery/files/145509434474.jpg';
@@ -31,3 +34,15 @@
 
   // Clear Memory
   imagedestroy($jpg_image);
+*/
+
+/*
+ * 
+if($ph = printer_open()) {     
+    echo "Connected to default printer ...";    
+}
+else {
+    echo "Couldn't connect to printer..."; 
+}
+ * 
+ */
