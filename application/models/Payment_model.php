@@ -12,7 +12,7 @@
  * @author sirromas
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
+
 
 class Payment_model extends CI_Model {
 
@@ -111,7 +111,7 @@ class Payment_model extends CI_Model {
     }
 
     public function get_payment_section($userid, $courseid) {
-        $list = "";
+        $list = "";                
         if ($userid != NULL) {
             $invoice = new Invoice();
             $user = $this->get_user_data($userid);
@@ -119,7 +119,7 @@ class Payment_model extends CI_Model {
             $user->courseid = $courseid;
             $user->slotid = $slotid;
             $group_status = $this->is_group_member($userid);
-            $installment_status = $invoice->is_installment_user($userid, $courseid);
+            $installment_status = $invoice->is_installment_user($userid, $courseid);            
             if ($installment_status == 0) {
                 if ($group_status == 0) {
                     // Personal signup

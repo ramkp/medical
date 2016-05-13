@@ -3,6 +3,9 @@
 ini_set('display_errors', '1');
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Api/vendor/autoload.php');
 
+//require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
+//require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+
 use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
 
@@ -11,6 +14,7 @@ class ProcessPayment {
     private $AUTHORIZENET_LOG_FILE;
     private $LOGIN_ID = '6cUTfQ5238'; // sandbox data
     private $TRANSACTION_KEY = '5bN8q5WT3qa257p9'; // sandbox data
+    public $period = 28; // 28 days of installment 
 
     function __construct() {
         $this->AUTHORIZENET_LOG_FILE = 'phplog';
@@ -115,14 +119,12 @@ class ProcessPayment {
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
 
-              /*
-               * 
-              echo "<pre>";
+            /*
+              echo "--------Card payment response <pre>";
               print_r($tresponse);
-              echo "</pre>";
-               * 
-               */
-            
+              echo "</pre><br>";
+             */
+
 
             if (($tresponse != null) && ($tresponse->getResponseCode() == "1")) {
                 //echo "Charge Credit Card AUTH CODE : " . $tresponse->getAuthCode() . "\n";
@@ -142,6 +144,73 @@ class ProcessPayment {
             //echo "Charge Credit card Null response returned";
             return false;
         }
+    }
+
+    function createSubscription($post_order) {
+
+        // Common Set Up for API Credentials
+        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+        $merchantAuthentication->setName($this->LOGIN_ID);
+        $merchantAuthentication->setTransactionKey($this->TRANSACTION_KEY);
+        $intervalLength = round($this->period/$post_order->payments_num);
+        $refId = 'ref' . time();
+        $start_date_h = date('Y-m-d', time()); // first subscription payment today
+        $total_occurences = $post_order->payments_num;
+        $expiration = $post_order->cds_cc_year . "-" . $post_order->cd_cc_month;
+        $names = explode(" ", $post_order->cds_name);
+        $firstname = $names[0];
+        $lastname = $names[1];
+
+        // Subscription Type Info
+        $subscription = new AnetAPI\ARBSubscriptionType();
+        $subscription->setName("Subscription for $post_order->item");
+        $interval = new AnetAPI\PaymentScheduleType\IntervalAType();
+        $interval->setLength($intervalLength);
+        $interval->setUnit("days");
+        $paymentSchedule = new AnetAPI\PaymentScheduleType();
+        $paymentSchedule->setInterval($interval);
+        $paymentSchedule->setStartDate(new DateTime($start_date_h));
+        $paymentSchedule->setTotalOccurrences($total_occurences);
+        $paymentSchedule->setTrialOccurrences("1");
+        $subscription->setPaymentSchedule($paymentSchedule);
+        $subscription->setAmount($post_order->sum);
+        $subscription->setTrialAmount("0.00");
+
+        $creditCard = new AnetAPI\CreditCardType();
+        $creditCard->setCardNumber($post_order->cds_cc_number);
+        $creditCard->setExpirationDate($expiration);
+        $payment = new AnetAPI\PaymentType();
+        $payment->setCreditCard($creditCard);
+        $subscription->setPayment($payment);
+        $billTo = new AnetAPI\NameAndAddressType();
+        $billTo->setFirstName($firstname);
+        $billTo->setLastName($lastname);
+        $subscription->setBillTo($billTo);
+        $request = new AnetAPI\ARBCreateSubscriptionRequest();
+        $request->setmerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setSubscription($subscription);
+        $controller = new AnetController\ARBCreateSubscriptionController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
+        /*
+         * 
+          echo "--------Subscription response <pre>";
+          print_r($response);
+          echo "<br>-------------------------<br>";
+          //die('Stopped ....');
+         * 
+         */
+
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+            $msg = $response->getSubscriptionId();
+            //echo "Message: ".$msg."<br>";
+        }  // end if ($response != null) && ($response->getMessages()->getResultCode() == "Ok")        
+        else {
+            $errorMessages = $response->getMessages()->getMessage();
+            $msg = $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText();
+        } // end else
+        return $msg;
     }
 
 }

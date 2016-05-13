@@ -5,11 +5,13 @@
  *
  * @author sirromas
  */
-require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+//require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+require_once ('/home/cnausa/public_html/lms/custom/utils/classes/Util.php');
 
 class Installment extends Util {
 
     public $limit = 3;
+    public $period = 28; // installment period in days
 
     function get_installment_page() {
         $users = array();
@@ -61,31 +63,47 @@ class Installment extends Util {
                 $list.="<span class='span4' id='inst_status_$user->id'></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User firstname</span><span class='span2'>$userdata->firstname</span>";
+                $list.="<span class='span3'>User firstname</span><span class='span2'>$userdata->firstname</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User lastname</span><span class='span2'>$userdata->lastname</span>";
+                $list.="<span class='span3'>User lastname</span><span class='span2'>$userdata->lastname</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User email</span><span class='span2'>$userdata->email</span>";
+                $list.="<span class='span3'>User email</span><span class='span2'>$userdata->email</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User program</span><span class='span2'>$coursename</span>";
+                $list.="<span class='span3'>User program</span><span class='span4'>$coursename</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Installment sum</span><span class='span2'>$$user->sum</span>";
+                $list.="<span class='span3'>Installment duration</span><span class='span2'>$this->period days</span>";
+                $list.="</div>";                
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span3'>Installment payments num</span><span class='span2'>$user->num</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Payments num</span><span class='span2'>$user->num</span>";
+                $list.="<span class='span3'>Installment Interval</span><span class='span2'>".round($this->period/$user->num)." days</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Created by</span><span class='span2'>$modifier->firstname &nbsp;$modifier->lastname</span>";
+                $list.="<span class='span3'>Installment sum</span><span class='span2'>$$user->sum</span>";
+                $list.="</div>";                
+
+                if ($user->subscription_id != '') {
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span3'>Subscription ID</span><span class='span2'>$user->subscription_id</span>";
+                    $list.="</div>";
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span3'>Subscription start date</span><span class='span2'>" . date('Y-m-d', $user->subscription_start) . "</span>";
+                    $list.="</div>";
+                } // end if $user->subscription_id!=''
+
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span3'>Created by</span><span class='span2'>$modifier->firstname &nbsp;$modifier->lastname</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Creation date</span><span class='span2'>$date_created</span>";
+                $list.="<span class='span3'>Creation date</span><span class='span2'>$date_created</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span6'><hr/></span>";
+                $list.="<span class='span7'><hr/></span>";
                 $list.="</div>";
             } // end foreach 
             $list.="</div>";
@@ -209,6 +227,56 @@ class Installment extends Util {
         $this->db->query($query);
         $list = "User successfully added";
         return $list;
+    }
+
+    function get_course_cost($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cost = $row['cost'];
+        }
+        return $cost;
+    }
+
+    function get_user_card_payments($userid, $courseid) {
+        $sum = 0;
+        $query = "select * from mdl_card_payments "
+                . "where "
+                . "userid=$userid "
+                . "and courseid=$courseid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $sum = $sum + $row['psum'];
+            } // end while 
+        } // end if $num > 0
+        return $sum;
+    }
+
+    function verify_installment_users() {
+        $query = "select * from mdl_installment_users";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $course_cost = $this->get_course_cost($row['courseid']);
+                $paid_sum = $this->get_user_card_payments($row['userid'], $row['courseid']);
+                if ($paid_sum == $course_cost) {
+                    $query = "delete from mdl_installment_users "
+                            . "where  userid=" . $row['userid'] . ""
+                            . " and courseid=" . $row['courseid'] . "";
+                    $this->db->numrows($query);
+                    echo "User with ID (" . $row['userid'] . ") hase been deleted from installment users \n";
+                } // end if $paid_sum == $course_cost
+                else {
+                    echo "User with ID (" . $row['userid'] . ") is not yet paid in full for course with ID (" . $row['courseid'] . ")";
+                } // end elese 
+            } // end while
+        } // end if $num>0
+        else {
+            echo "There are no installment users available ....\n";
+        }
     }
 
 }

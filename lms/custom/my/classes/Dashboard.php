@@ -7,6 +7,7 @@
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 
 class Dashboard extends Util {
 
@@ -23,21 +24,47 @@ class Dashboard extends Util {
         $status = 0;
         $courseid = $this->course->id;
         $userid = $this->user->id;
+        $invoice = new Invoice();
+        $installment_status = $invoice->is_installment_user($userid, $courseid);
+        if ($installment_status == 0) {
+            // 1. Check among card payments
+            $query = "select * from mdl_card_payments "
+                    . "where userid=$userid and courseid=$courseid";
+            $card_payments_num = $this->db->numrows($query);
 
-        //echo "Course ID: " . $courseid . "<br>";
-        //echo "User ID: " . $userid . "<br>";
-        // 1. Check among card payments
-        $query = "select * from mdl_card_payments "
-                . "where userid=$userid and courseid=$courseid";
-        $card_payments_num = $this->db->numrows($query);
-
-        // 2. Check among invoice payments
-        $query = "select * from mdl_invoice "
-                . "where userid=$userid and courseid=$courseid and i_status=1";
-        $invoice_payments_num = $this->db->numrows($query);
-        if ($card_payments_num > 0 || $invoice_payments_num > 0) {
-            $status = 1;
-        } // end if $card_payments_num>0 || $invoice_payments_num>0
+            // 2. Check among invoice payments
+            $query = "select * from mdl_invoice "
+                    . "where userid=$userid and courseid=$courseid and i_status=1";
+            $invoice_payments_num = $this->db->numrows($query);
+            if ($card_payments_num > 0 || $invoice_payments_num > 0) {
+                $status = 1;
+            } // end if $card_payments_num>0 || $invoice_payments_num>0
+        } // end if $installment_status==0
+        else {
+            $interval = 604800; // 7 days in sec
+            $query = "select * from mdl_installment_users "
+                    . "where userid=$userid "
+                    . "and courseid=$courseid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $subscription_id = $row['subscription_id'];
+                $subscription_start = $row['subscription_start'];
+            }
+            if (is_numeric($subscription_id)) {
+                $user_interval = time() - $subscription_start;
+                if ($user_interval <= $interval) {
+                    $status = 1;
+                } // end if $user_interval<=$interval
+                else {
+                    $query = "select * from mdl_card_payments "
+                            . "where userid=$userid and courseid=$courseid and pdate>$subscription_start";
+                    $status = $this->db->numrows($query);
+                } // end else
+            } // end if is_numeric($subscription_id)
+            else {
+                $status = 0;
+            }
+        } // end else when it is installment user
         return $status;
     }
 
@@ -66,7 +93,7 @@ class Dashboard extends Util {
     function get_user_warning_message() {
         $list = "";
         $userid = $this->user->id;
-        $courseid=$this->course->id;
+        $courseid = $this->course->id;
         $list.="<div class='container-fluid'>";
         $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid' target='_blank'>click</a> here to pay by card. </span>";
         $list.="</div>";
@@ -246,7 +273,7 @@ class Dashboard extends Util {
         $num = $this->db->numrows($query);
         return $num;
     }
-    
+
     function getEnrolId($courseid) {
         $query = "select id from mdl_enrol
                      where courseid=" . $courseid . " and enrol='manual'";
@@ -259,8 +286,8 @@ class Dashboard extends Util {
 
     function enroll_user($courseid, $userid) {
         $contextid = $this->get_course_context($courseid);
-        $enrolid=$this->getEnrolId($courseid);
-        
+        $enrolid = $this->getEnrolId($courseid);
+
         $query = "insert into mdl_user_enrolments
              (enrolid,
               userid,
@@ -276,7 +303,7 @@ class Dashboard extends Util {
                          '" . time() . "')";
         //echo "Query: ".$query."<br/>";
         $this->db->query($query);
-        
+
         $query = "insert into mdl_role_assignments"
                 . " (roleid,"
                 . "contextid,"

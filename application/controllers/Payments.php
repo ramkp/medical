@@ -15,7 +15,8 @@ class Payments extends CI_Controller {
     public function index() {
         $form = "";
         $userid = $this->uri->segment(3);
-        $courseid=$this->uri->segment(4);
+        $courseid=$this->uri->segment(4);        
+        //die('It is payment controller :)');        
         if ($userid != null) {
             if (is_numeric($userid)) {
                 $user_exists = $this->payment_model->is_user_exissts($userid);                

@@ -1035,162 +1035,228 @@ class Payment {
         return $card_type;
     }
 
+    function add_subscription($userid, $courseid, $subsid) {
+        $query = "update mdl_installment_users "
+                . "set subscription_id='$subsid' , "
+                . "subscription_start='".time()."' "
+                . "where userid=$userid "
+                . "and courseid=$courseid";
+        $this->db->query($query);
+    }
+
     function make_stub_payment($card) {
         $list = "";
-        $mailer = new Mailer();
+        $mailer = new Mailer();        
+        $invoice = new Invoice();
         $user_group = $card->user_group;
         $userid = $card->userid;
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
+        $installment_status = $invoice->is_installment_user($card->userid, $card->courseid);
+        //echo "Installment status: ".$installment_status."<br>";
+        if ($installment_status == 0) {
+            // Personal online payment
+            if ($user_group == '' && $userid != '') {
+                $user_payment_data = $this->get_user_payment_credentials($userid);
+                $order = new stdClass();
+                $order->cds_name = "$user_payment_data->firstname $user_payment_data->lastname";
+                $order->cds_address_1 = $card->bill_addr;
+                $order->cds_city = $card->bill_city;
+                $order->cds_state = "$user_payment_data->state_code";
+                $order->cds_zip = $card->bill_zip;
+                $order->cds_email = $card->email;
+                $order->cds_pay_type = $cart_type_num;
+                $order->cds_cc_number = $card->card_no;
+                $order->cds_cc_exp_month = $card->card_month;
+                $order->cds_cc_exp_year = $card->card_year;
+                $order->sum = $card->sum;
+                $order->item = $item;
+                $order->group = 0;
 
-        // Personal online payment
-        if ($user_group == '' && $userid != '') {
-            $user_payment_data = $this->get_user_payment_credentials($userid);
-            $order = new stdClass();
-            $order->cds_name = "$user_payment_data->firstname $user_payment_data->lastname";
-            $order->cds_address_1 = $card->bill_addr;
-            $order->cds_city = $card->bill_city;
-            $order->cds_state = "$user_payment_data->state_code";
-            $order->cds_zip = $card->bill_zip;
-            $order->cds_email = $card->email;
-            $order->cds_pay_type = $cart_type_num;
-            $order->cds_cc_number = $card->card_no;
-            $order->cds_cc_exp_month = $card->card_month;
-            $order->cds_cc_exp_year = $card->card_year;
-            $order->sum = $card->sum;
-            $order->item = $item;
-            $order->group = 0;
-
-            $pr = new ProcessPayment();
-            $status = $pr->make_transaction($order);
-            if ($status === false) {
-                $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
-                $list.="<div class='panel-body'>";
-                $list.= "<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span8'>Transaction failed, please contact your bank for detailes.</span>";
-                $list.="</div>";
-                $list.="</div>";
-                $list.="</div>";
-            } // end if $status === false
-            else {
-                $card->transid = $status['trans_id'];
-                $card->auth_code = $status['auth_code'];
-                $this->confirm_user($card->email);
-                $this->add_payment_to_db($card); // adds payment result to DB
-                $mailer->send_payment_confirmation_message($card);
-                $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
-                $list.="<div class='panel-body'>";
-                $list.= "<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span8'>Payment is successfull. Confirmation email is sent to $card->email.</span>";
-                $list.="</div>";
-                $list.="</div>";
-                $list.="</div>";
-            }
-        } // end if $user_group==''        
-        // Installment online payment?
-        if ($user_group != '' && $userid != '') {
-            $user_payment_data = $this->get_user_payment_credentials($userid);
-            $order = new stdClass();
-            $order->cds_name = "$user_payment_data->firstname $user_payment_data->lastname";
-            $order->cds_address_1 = $card->bill_addr;
-            $order->cds_city = $card->bill_city;
-            $order->cds_state = "$user_payment_data->state_code";
-            $order->cds_zip = $card->bill_zip;
-            $order->cds_email = $card->email;
-            $order->cds_pay_type = $cart_type_num;
-            $order->cds_cc_number = $card->card_no;
-            $order->cds_cc_exp_month = $card->card_month;
-            $order->cds_cc_exp_year = $card->card_year;
-            $order->sum = $card->sum;
-            $order->item = $item;
-            $order->group = 0;
-
-            $pr = new ProcessPayment();
-            $status = $pr->make_transaction($order);
-            if ($status === false) {
-                $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
-                $list.="<div class='panel-body'>";
-                $list.= "<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span8'>Transaction failed, please contact your bank for detailes.</span>";
-                $list.="</div>";
-                $list.="</div>";
-                $list.="</div>";
-            } // end if $status === false
-            else {
-                $card->transid = $status['trans_id'];
-                $card->auth_code = $status['auth_code'];
-                $this->confirm_user($card->email);
-                $this->add_payment_to_db($card); // adds payment result to DB
-                $mailer->send_payment_confirmation_message($card);
-                $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
-                $list.="<div class='panel-body'>";
-                $list.= "<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span8'>Payment is successfull. Confirmation email is sent to $card->email.</span>";
-                $list.="</div>";
-                $list.="</div>";
-                $list.="</div>";
-            } // end else             
-        } // end if $user_group!='' && $userid!=''
-        // Group online payment
-        if ($user_group != '' && $userid == '') {
-
-            $group_users = $this->get_group_users($user_group);
-            $group_sum = $card->sum;
-
-            $order = new stdClass();
-            $order->cds_name = $card->card_holder;
-            $order->cds_address_1 = $card->bill_addr;
-            $order->cds_city = $card->bill_city;
-            $order->cds_state = "CA";
-            $order->cds_zip = $card->bill_zip;
-            $order->cds_email = $card->email;
-            $order->cds_pay_type = $cart_type_num;
-            $order->cds_cc_number = $card->card_no;
-            $order->cds_cc_exp_month = $card->card_month;
-            $order->cds_cc_exp_year = $card->card_year;
-            $order->sum = $group_sum;
-            $order->item = $item;
-            $order->group = 1;
-
-            $pr = new ProcessPayment();
-            $status = $pr->make_transaction($order);
-            if ($status === false) {
-                $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
-                $list.="<div class='panel-body'>";
-                $list.= "<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span8'>Transaction failed, please contact your bank for detailes.</span>";
-                $list.="</div>";
-                $list.="</div>";
-                $list.="</div>";
-            } // end if $status === false
-            else {
-                $card->transid = $status['trans_id'];
-                $card->auth_code = $status['auth_code'];
-                $mailer->send_payment_confirmation_message($card, 1); // payment confrnation email to group owner
-                $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
-                $list.="<div class='panel-body'>";
-                $list.= "<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span8'>Payment is successfull. Confirmation email is sent to $card->email.</span>";
-                $list.="</div>";
-                $list.="</div>";
-                $list.="</div>";
-
-                foreach ($group_users as $userid) {
-                    $user = $this->get_user_detailes($userid);
-                    $card->userid = $userid;
-                    $card->sum = round(($group_sum / count($group_users)), 2); // Sum for every group participant 
+                $pr = new ProcessPayment();
+                $status = $pr->make_transaction($order);
+                if ($status === false) {
+                    $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-body'>";
+                    $list.= "<div class='container-fluid' style='text-align:left;'>";
+                    $list.= "<span class='span8'>Transaction failed, please contact your bank for detailes.</span>";
+                    $list.="</div>";
+                    $list.="</div>";
+                    $list.="</div>";
+                } // end if $status === false
+                else {
+                    $card->transid = $status['trans_id'];
+                    $card->auth_code = $status['auth_code'];
+                    $this->confirm_user($card->email);
                     $this->add_payment_to_db($card); // adds payment result to DB
-                    $this->confirm_user($user->username);
-                    $mailer->send_group_payment_confirmation_message($user);
-                } // end foreach
-            } // end else             
-        } // end if $user_group!='' && $userid==''
+                    $mailer->send_payment_confirmation_message($card);
+                    $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-body'>";
+                    $list.= "<div class='container-fluid' style='text-align:left;'>";
+                    $list.= "<span class='span8'>Payment is successfull. Confirmation email is sent to $card->email.</span>";
+                    $list.="</div>";
+                    $list.="</div>";
+                    $list.="</div>";
+                }
+            } // end if $user_group==''        
+            // Installment online payment?
+            if ($user_group != '' && $userid != '') {
+                $user_payment_data = $this->get_user_payment_credentials($userid);
+                $order = new stdClass();
+                $order->cds_name = "$user_payment_data->firstname $user_payment_data->lastname";
+                $order->cds_address_1 = $card->bill_addr;
+                $order->cds_city = $card->bill_city;
+                $order->cds_state = "$user_payment_data->state_code";
+                $order->cds_zip = $card->bill_zip;
+                $order->cds_email = $card->email;
+                $order->cds_pay_type = $cart_type_num;
+                $order->cds_cc_number = $card->card_no;
+                $order->cds_cc_exp_month = $card->card_month;
+                $order->cds_cc_exp_year = $card->card_year;
+                $order->sum = $card->sum;
+                $order->item = $item;
+                $order->group = 0;
+
+                $pr = new ProcessPayment();
+                $status = $pr->make_transaction($order);
+                if ($status === false) {
+                    $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-body'>";
+                    $list.= "<div class='container-fluid' style='text-align:left;'>";
+                    $list.= "<span class='span8'>Transaction failed, please contact your bank for detailes.</span>";
+                    $list.="</div>";
+                    $list.="</div>";
+                    $list.="</div>";
+                } // end if $status === false
+                else {
+                    $card->transid = $status['trans_id'];
+                    $card->auth_code = $status['auth_code'];
+                    $this->confirm_user($card->email);
+                    $this->add_payment_to_db($card); // adds payment result to DB
+                    $mailer->send_payment_confirmation_message($card);
+                    $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-body'>";
+                    $list.= "<div class='container-fluid' style='text-align:left;'>";
+                    $list.= "<span class='span8'>Payment is successfull. Confirmation email is sent to $card->email.</span>";
+                    $list.="</div>";
+                    $list.="</div>";
+                    $list.="</div>";
+                } // end else             
+            } // end if $user_group!='' && $userid!=''
+            // Group online payment
+            if ($user_group != '' && $userid == '') {
+
+                $group_users = $this->get_group_users($user_group);
+                $group_sum = $card->sum;
+
+                $order = new stdClass();
+                $order->cds_name = $card->card_holder;
+                $order->cds_address_1 = $card->bill_addr;
+                $order->cds_city = $card->bill_city;
+                $order->cds_state = "CA";
+                $order->cds_zip = $card->bill_zip;
+                $order->cds_email = $card->email;
+                $order->cds_pay_type = $cart_type_num;
+                $order->cds_cc_number = $card->card_no;
+                $order->cds_cc_exp_month = $card->card_month;
+                $order->cds_cc_exp_year = $card->card_year;
+                $order->sum = $group_sum;
+                $order->item = $item;
+                $order->group = 1;
+
+                $pr = new ProcessPayment();
+                $status = $pr->make_transaction($order);
+                if ($status === false) {
+                    $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-body'>";
+                    $list.= "<div class='container-fluid' style='text-align:left;'>";
+                    $list.= "<span class='span8'>Transaction failed, please contact your bank for detailes.</span>";
+                    $list.="</div>";
+                    $list.="</div>";
+                    $list.="</div>";
+                } // end if $status === false
+                else {
+                    $card->transid = $status['trans_id'];
+                    $card->auth_code = $status['auth_code'];
+                    $mailer->send_payment_confirmation_message($card, 1); // payment confrnation email to group owner
+                    $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-body'>";
+                    $list.= "<div class='container-fluid' style='text-align:left;'>";
+                    $list.= "<span class='span8'>Payment is successfull. Confirmation email is sent to $card->email.</span>";
+                    $list.="</div>";
+                    $list.="</div>";
+                    $list.="</div>";
+
+                    foreach ($group_users as $userid) {
+                        $user = $this->get_user_detailes($userid);
+                        $card->userid = $userid;
+                        $card->sum = round(($group_sum / count($group_users)), 2); // Sum for every group participant 
+                        $this->add_payment_to_db($card); // adds payment result to DB
+                        $this->confirm_user($user->username);
+                        $mailer->send_group_payment_confirmation_message($user);
+                    } // end foreach
+                } // end else             
+            } // end if $user_group!='' && $userid==''
+        } // end if $installment_status==0
+        else {
+            // It is installment user - create subscription
+            $user_payment_data = $this->get_user_payment_credentials($card->userid);
+            $installmentobj = $invoice->get_user_installment_payments($card->userid, $card->courseid);
+            $order = new stdClass();
+            $order->cds_name = "$user_payment_data->firstname $user_payment_data->lastname";
+            $order->cds_address_1 = $card->bill_addr;
+            $order->cds_city = $card->bill_city;
+            $order->cds_state = "$user_payment_data->state_code";
+            $order->cds_zip = $card->bill_zip;
+            $order->cds_email = $card->email;
+            $order->cds_pay_type = $cart_type_num;
+            $order->cds_cc_number = $card->card_no;
+            $order->cd_cc_month = $card->card_month;
+            $order->cds_cc_year = $card->card_year;
+            $order->sum = $card->sum;
+            $order->item = $item;
+            $order->group = 0;
+            $order->userid = $card->userid;
+            $order->courseid = $card->courseid;
+            $order->payments_num = $installmentobj->num;
+
+            $pr = new ProcessPayment();
+            $subscriptionID = $pr->createSubscription($order);
+            //echo "Subscription  ID: ".$subscriptionID."<br>";
+            //die ('Stopped ...');
+            if (is_numeric($subscriptionID)) {
+                $this->add_subscription($card->userid, $card->courseid, $subscriptionID);              
+                    $card->transid = $status['trans_id'];
+                    $card->auth_code = $status['auth_code'];
+                    $this->confirm_user($card->email);
+                    $this->add_payment_to_db($card); // adds payment result to DB                    
+                    $mailer->send_payment_confirmation_message($card);
+                    $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-body'>";
+                    $list.= "<div class='container-fluid' style='text-align:left;'>";
+                    $list.= "<span class='span8'>Installment payment is successfull. Thank you!.</span>";
+                    $list.="</div>";
+                    $list.="</div>";
+                    $list.="</div>";                
+            } // end if is_numeric($subscriptionID)
+            else {
+                $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                $list.="<div class='panel-body'>";
+                $list.= "<div class='container-fluid' style='text-align:left;'>";
+                $list.= "<span class='span8'>Installment payment failed, please contact your bank for detailes.</span>";
+                $list.="</div>";
+                $list.="</div>";
+                $list.="</div>";
+            } // end else
+        } // end else
 
         return $list;
     }
