@@ -114,7 +114,7 @@ class Import extends Util {
         $zip = $line_arr[5];
         $regdate = $line_arr[8];
 
-        if ($firstname != '' && $lastname != '' && $email != '' && $phone != '' && $address != '' && $city != '' && $zip != '') {
+        if ($firstname != '' && $lastname != '' && $email != '' && $this->valid_email($email) && $phone != '' && $address != '' && $city != '' && $zip != '') {
             if ($this->valid_email($email)) {
                 $user = new stdClass();
                 $user->confirmed = 1;
@@ -242,7 +242,7 @@ class Import extends Util {
                 $clean_buffer = str_replace(',,', ',', $buffer);
                 $data = explode(",", $clean_buffer);
                 $uid = $data[0];
-                $username = trim(strtolower($data[1]));
+                $username = trim(strtolower($data[7]));
                 $user = $this->get_user_data($username);
                 if ($user) {
                     echo "File username: " . $username . "<br>";
@@ -293,7 +293,7 @@ class Import extends Util {
 
     function is_user_uid_exists($email) {
         $query = "select * from mdl_user where email='$email'";
-        echo "Query: " . $query . "<br>";
+        //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
         return $num;
     }
