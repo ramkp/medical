@@ -318,9 +318,9 @@ $(document).ready(function () {
         var num_payments_id = '#num_payments_' + courseid;
         var num_payments = $(num_payments_id).val();
         var taxes_num = '#taxes_' + courseid;
-        var taxes;
+        var taxes; // checkbox status
         var expire_num = '#expire_' + courseid;
-        var expire
+        var expire // checkbox status
 
         if ($(taxes_num).is(':checked')) {
             taxes = 1;
@@ -328,6 +328,7 @@ $(document).ready(function () {
         else {
             taxes = 0;
         }
+        console.log('Taxes status: '+taxes);
 
         if ($(expire_num).is(':checked')) {
             expire = 1;
@@ -335,6 +336,7 @@ $(document).ready(function () {
         else {
             expire = 0;
         }
+        console.log ('Expiration status: '+expire);
 
         if ($(installment_id).is(':checked')) {
             installment = 1;

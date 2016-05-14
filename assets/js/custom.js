@@ -146,8 +146,7 @@ $(document).ready(function () {
                         var selected_course = $('#register_courses').val();
                         var courseid = selected_course;
                         // $.post(course_url, request).done(function (courseid)
-                        // {
-                        $('#ajax_loading_group_file').hide();
+                        // {                        
                         var addr = $('#group_addr').val();
                         var inst = $('#group_inst').val();
                         var zip = $('#group_zip').val();

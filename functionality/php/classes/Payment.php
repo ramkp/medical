@@ -679,8 +679,10 @@ class Payment {
                 else {
                     $tax = 0;
                 } // end else
-                $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
-                $late_fee = $late->get_delay_fee($users->courseid);
+                if ($users->slotid != '') {
+                    $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
+                    $late_fee = $late->get_delay_fee($users->courseid);
+                }
             } // end if $group==''
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
@@ -696,8 +698,10 @@ class Payment {
                 else {
                     $tax = 0;
                 } // end else
-                $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
-                $late_fee = $late->get_delay_fee($group_data->courseid);
+                if ($group_data->slotid != '') {
+                    $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
+                    $late_fee = $late->get_delay_fee($group_data->courseid);
+                }
             } // end else when group_data are not null
             // Discount block
             if ($course_cost['discount'] == 0) {
@@ -801,7 +805,10 @@ class Payment {
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$users->courseid' id='courseid' name='courseid' />";
-                $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
+                if ($users->slotid != '') {
+                    $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
+                    $late_fee = $late->get_delay_fee($group_data->courseid);
+                }
             } // end if $group==NULL 
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
@@ -809,7 +816,10 @@ class Payment {
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
-                $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
+                if ($group_data->slotid != '') {
+                    $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $group_data->slotid);
+                    $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
+                }
             } // end else when group is not null
 
             $first_payment = round(($course_cost['cost'] / $installment['num_payments']));
@@ -1038,7 +1048,7 @@ class Payment {
     function add_subscription($userid, $courseid, $subsid) {
         $query = "update mdl_installment_users "
                 . "set subscription_id='$subsid' , "
-                . "subscription_start='".time()."' "
+                . "subscription_start='" . time() . "' "
                 . "where userid=$userid "
                 . "and courseid=$courseid";
         $this->db->query($query);
@@ -1046,7 +1056,7 @@ class Payment {
 
     function make_stub_payment($card) {
         $list = "";
-        $mailer = new Mailer();        
+        $mailer = new Mailer();
         $invoice = new Invoice();
         $user_group = $card->user_group;
         $userid = $card->userid;
@@ -1151,6 +1161,15 @@ class Payment {
             if ($user_group != '' && $userid == '') {
 
                 $group_users = $this->get_group_users($user_group);
+
+                /*
+                 * 
+                  echo "<br>-----Group users:----------------<br>";
+                  print_r($group_users);
+                  echo "<br>---------------------------------<br>";
+                 * 
+                 */
+
                 $group_sum = $card->sum;
 
                 $order = new stdClass();
@@ -1231,20 +1250,20 @@ class Payment {
             //echo "Subscription  ID: ".$subscriptionID."<br>";
             //die ('Stopped ...');
             if (is_numeric($subscriptionID)) {
-                $this->add_subscription($card->userid, $card->courseid, $subscriptionID);              
-                    $card->transid = $status['trans_id'];
-                    $card->auth_code = $status['auth_code'];
-                    $this->confirm_user($card->email);
-                    $this->add_payment_to_db($card); // adds payment result to DB                    
-                    $mailer->send_payment_confirmation_message($card);
-                    $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
-                    $list.="<div class='panel-body'>";
-                    $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Installment payment is successfull. Thank you!.</span>";
-                    $list.="</div>";
-                    $list.="</div>";
-                    $list.="</div>";                
+                $this->add_subscription($card->userid, $card->courseid, $subscriptionID);
+                $card->transid = $status['trans_id'];
+                $card->auth_code = $status['auth_code'];
+                $this->confirm_user($card->email);
+                $this->add_payment_to_db($card); // adds payment result to DB                    
+                $mailer->send_payment_confirmation_message($card);
+                $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                $list.="<div class='panel-body'>";
+                $list.= "<div class='container-fluid' style='text-align:left;'>";
+                $list.= "<span class='span8'>Installment payment is successfull. Thank you!.</span>";
+                $list.="</div>";
+                $list.="</div>";
+                $list.="</div>";
             } // end if is_numeric($subscriptionID)
             else {
                 $list.="<div class='panel panel-default' id='personal_payment_details'>";

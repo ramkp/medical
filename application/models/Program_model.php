@@ -360,7 +360,7 @@ class program_model extends CI_Model {
             $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
         } // end if $has_schedule>0
         else {
-            $list.="<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button class='btn btn-primary'>Register</button></a>";
+            $list.="<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
         } // end else         
         $list.="</div>";
 

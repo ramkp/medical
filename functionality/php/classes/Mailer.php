@@ -182,7 +182,7 @@ class Mailer {
     function send_password_recovery_email ($user, $supportuser, $subject, $message) {
         
         $mail = new PHPMailer;
-        //$recipient = 'sirromas@gmail.com'; // temp workaround
+        $user->email = 'sirromas@gmail.com'; // temp workaround
         //$mail->SMTPDebug = 3;                                
 
         $mail->isSMTP();

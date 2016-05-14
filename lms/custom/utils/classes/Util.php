@@ -6,8 +6,8 @@
  * @author sirromas
  */
 //session_start();
-require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/config.php');
-require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php');
+require_once ('/home/cnausa/public_html/lms/config.php');
+require_once ('/home/cnausa/public_html/lms/class.pdo.database.php');
 
 class Util {
 

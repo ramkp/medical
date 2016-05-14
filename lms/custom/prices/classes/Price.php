@@ -353,7 +353,8 @@ class Price extends Util {
     }
 
     function update_item_price($course_id, $course_cost, $course_discount, $course_group_discount, $installment, $num_payments, $states, $taxes,$expire) {
-        // Update mdl_course table
+        // Update mdl_course table        
+        $num_payments = ($num_payments=='') ? 0 : $num_payments;
         $query = "update mdl_course "
                 . "set cost=$course_cost ,"
                 . "discount_size=$course_discount , "
@@ -361,7 +362,7 @@ class Price extends Util {
                 . "num_payments=$num_payments, expired=$expire, "
                 . "taxes=$taxes "
                 . "where id=$course_id";
-                //echo $query;
+                echo $query;
         $this->db->query($query);
 
         // Update mdl_group_discount table

@@ -312,13 +312,13 @@ class Payments extends Util {
                 $list.="<span class='span2'>User</span><span class='span3'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Program</span><span class='span3'>$course </span>";
+                $list.="<span class='span2'>Program</span><span class='span6'>$course </span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Paid sum</span><span class='span3'>$$payment->psum from $date</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span5'><hr/></span>";
+                $list.="<span class='span7'><hr/></span>";
                 $list.="</div>";
             } // end foreach
             $list.="</div>";
