@@ -28,10 +28,10 @@ $categories = $menu->get_categories_menu();
 <!DOCTYPE html>
 <html  dir="ltr" lang="en" xml:lang="en">
     <head>
-        <title>Medical2 Institute</title>
+        <title>Medical2</title>
         <link rel="shortcut icon" href="http://cnausa.com/lms/theme/image.php/lambda/theme/1451892772/favicon" />
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="keywords" content="moodle, Medical2 Institute" />
+        <meta name="keywords" content="moodle, Medical2" />
         <link rel="stylesheet" type="text/css" href="http://cnausa.com/lms/theme/yui_combo.php?rollup/3.17.2/yui-moodlesimple-min.css" /><script id="firstthemesheet" type="text/css">/** Required in order to fix style inclusion problems in IE with YUI **/</script><link rel="stylesheet" type="text/css" href="http://cnausa.com/lms/theme/styles.php/lambda/1451892772/all" />
         <link href="http://cnausa.com/assets/css/full-slider.css" rel="stylesheet">
         <script type="text/javascript">
@@ -96,15 +96,14 @@ $categories = $menu->get_categories_menu();
 
 
         <div id="wrapper">
-            <header id="page-header" class="clearfix">
-                <!-- <div class="container-fluid"><div class="text-center"><a href="http://cnausa.com/"><img src="http://cnausa.com/assets/logo/logo_site.jpg" width="300" height="90"/></a></div></div> -->
-                <div class="container-fluid"><div class="text-center"><a href="http://cnausa.com/"><img src="http://cnausa.com/assets/logo/5.png" width="350" height="90"/></a></div></div>
+            <header id="page-header" class="clearfix">                
+                <div class="container-fluid"><div class="text-center"><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/"><img src="http://<?php echo $_SERVER['SERVER_NAME']; ?>/assets/logo/5.png" width="350" height="90"/></a></div></div>
             </header>
 
             <header  class="navbar">
                 <nav class="navbar-inner">
                     <div class="container-fluid">
-                        <a class="brand" href="http://cnausa.com" style="height: 30;"><img src="http://cnausa.com/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2 Career College</a>
+                        <a class="brand" href="http://<?php echo $_SERVER['SERVER_NAME']; ?>" style="height: 30;"><img src="http://<?php echo $_SERVER['SERVER_NAME'];  ?>/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2 Career College</a>
                         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
@@ -120,23 +119,24 @@ $categories = $menu->get_categories_menu();
                                 <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Courses<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">                                            
 
-                                            <li><a class="dropdown-toggle" href="http://cnausa.com/index.php/programs/program/5" id="ws"  title="">Healthcare Career Courses </a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/program/3/" id="exam" title="">CEUs & Online Courses</a></li>
-                                            <li><a href="http://cnausa.com/index.php/programs/program/4/" id="college" title="">Online Certification Exams</a></li>                                                                                       
+                                            <li><a class="dropdown-toggle" href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/programs/program/5" id="ws"  title="">Healthcare Career Courses </a></li>
+                                            <li><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>
+                                            <!--<li><a href="http://medical2.com/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>-->                                           
+                                            <li><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/programs/program/3/" id="exam" title="">CEUs & Online Courses</a></li>
+                                            <li><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/programs/program/4/" id="college" title="">Online Certification Exams</a></li>                                                                                       
 
                                         </ul>
                                     </li>                                    
-                                    <li><a href="http://cnausa.com/index.php/register"  id="register_item" title="Register">Register</a></li>
-                                    <li><a href="http://cnausa.com/index.php/faq"  id="faq_item" title="FAQ’s">FAQ’s</a></li>
+                                    <li><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/register"  id="register_item" title="Register">Register</a></li>
+                                    <li><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/faq"  id="faq_item" title="FAQ’s">FAQ’s</a></li>
 
-                                    <li id='login_link'><a href="http://cnausa.com/index.php/login" title="Login">Login</a></li>                                    
+                                    <li id='login_link'><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/login" title="Login">Login</a></li>                                    
                                     <li class="dropdown"><a title="More" class="dropdown-toggle" href="#cm_submenu_2">More<b class="caret"></b></a>
                                         <ul class="dropdown-menu">                                            
-                                            <li><a href="http://cnausa.com/index.php/certs"  id="cert" title="Verify Certification">Verify Certification</a></li>
-                                            <li><a href="http://cnausa.com/index.php/groups"  id="group" title="Private Groups">Private Groups</a></li>
-                                            <li><a href="http://cnausa.com/index.php/testimonial"  id="testimonial" title="Testimonial">Testimonial</a></li>
-                                            <li><a href="http://cnausa.com/index.php/gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>                                            
+                                            <li><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/certs"  id="cert" title="Verify Certification">Verify Certification</a></li>
+                                            <li><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/groups"  id="group" title="Private Groups">Private Groups</a></li>
+                                            <li><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/testimonial"  id="testimonial" title="Testimonial">Testimonial</a></li>
+                                            <li><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>                                            
                                         </ul>
                                     </li>
 
@@ -144,7 +144,7 @@ $categories = $menu->get_categories_menu();
                                 <div class="nav-divider-right"></div>                                
                             </div>                      
                             <ul class="nav pull-right">                                
-                                <li class="dropdown"><a href="http://cnausa.com/index.php/search"><img src="/lms/theme/image.php/lambda/theme/1453287272/bg/icon-search" style="cursor: pointer;" alt="search" id='search_item' /></a></li>
+                                <li class="dropdown"><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/search"><img src="http://cnausa.com/assets/logo/icon-search.png" style="cursor: pointer;" alt="search" id='search_item' /></a></li>
                                 <!--<li class="dropdown"><a href="#">Select Language<span style="color: rgb(155, 155, 155);">▼</span></a></li>-->
 
 

@@ -7,9 +7,12 @@
  */
 class register_model extends CI_Model {
 
+    public $host;
+
     public function __construct() {
         parent::__construct();
         $this->load->database();
+        $this->host=$_SERVER['SERVER_NAME'];
     }
 
     public function get_participants_dropbox() {
@@ -172,7 +175,7 @@ class register_model extends CI_Model {
         $list.= "</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>";
@@ -436,7 +439,7 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_personal'><img src='http://cnausa.com/assets/img/ajax.gif' /></span";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_personal'><img src='http://$this->host/assets/img/ajax.gif' /></span";
         $list.="</div>";
 
         $list.="</div>";

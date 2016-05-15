@@ -5,11 +5,11 @@
             <p class="helplink"></p><br/>
             <div class="footnote"  style="display:inline-block;vertical-align: middle;">
                 <p>(c) 2016 | <a href="#" target="_blank">
-                        <img src="http://cnausa.com/assets/icons/heart.gif" alt="heart" width="15" height="15">
+                        <img src="http://<?php echo $_SERVER['SERVER_NAME']; ?>/assets/icons/heart.gif" alt="heart" width="15" height="15">
                     </a> Powered  By Z&S &nbsp;&nbsp;                                                                
-                    <a href="http://cnausa.com/index.php/about">About Us</a>&nbsp;
+                    <a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/about">About Us</a>&nbsp;
                     <!--<a href="#">Chat with US</a>&nbsp;-->
-                    <a href="http://cnausa.com/index.php/contact">Contact US</a>&nbsp;
+                    <a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/contact">Contact US</a>&nbsp;
                     <!--<i class="fa fa-mobile fa-lg"></i>&nbsp; Phone: (007) 123-456    
                     <i class="fa fa-envelope-o"></i>&nbsp; E-mail:
                     <a href="mailto:info@medical-training.com">info@medical-training.com</a>

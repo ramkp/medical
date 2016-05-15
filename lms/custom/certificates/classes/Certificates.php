@@ -15,10 +15,12 @@ class Certificates extends Util {
 
     public $cert_path;
     public $limit = 3;
+    public $host;
 
     function __construct() {
         parent::__construct();
         $this->cert_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates';
+        $this->host=$_SERVER['SERVER_NAME'];
     }
 
     function get_course_name($id) {
@@ -86,7 +88,7 @@ class Certificates extends Util {
                 $list.="<span class='span8' style='color:red;' id='cert_err'></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
-                $list.="<span class='span10'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+                $list.="<span class='span10'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
                 $list.="</div>";
             } // end if $toolbar==true            
             $list.="<div id='certificates_container'>";
@@ -293,7 +295,7 @@ class Certificates extends Util {
         $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
         $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
         $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
-        $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION #: $code<br>";
+        $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
         if ($renew_status == true) {
             $list.="EXPIRATION DATE $expiration_date</p>";
         }
@@ -506,18 +508,18 @@ class Certificates extends Util {
         $programs_array = array_unique(array_merge($courses_array, $classes_array));
         $users_list = implode(",", $users_array);
         $courses_list = implode(",", $programs_array);
-        
+
         /*
          * 
-        echo "<br>--------------Users array--------------<br>";
-        print_r($users_array);
-        echo "<br>--------------Classes array--------------<br>";
-        print_r($classes_array);
-        echo "<br>--------------Courses array--------------<br>";
-        print_r($courses_array);
-        echo "<br>--------------Programs array--------------<br>";
-        print_r($programs_array);
-        echo "<br>";
+          echo "<br>--------------Users array--------------<br>";
+          print_r($users_array);
+          echo "<br>--------------Classes array--------------<br>";
+          print_r($classes_array);
+          echo "<br>--------------Courses array--------------<br>";
+          print_r($courses_array);
+          echo "<br>--------------Programs array--------------<br>";
+          print_r($programs_array);
+          echo "<br>";
          * 
          */
 

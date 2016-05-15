@@ -11,6 +11,7 @@ require_once ('/home/cnausa/public_html/lms/class.pdo.database.php');
 
 class Util {
 
+    public $host;
     public $db;
     public $user;
     public $course;
@@ -22,7 +23,7 @@ class Util {
         $this->db = $db;
         $this->user = $USER;
         $this->course = $COURSE;
-        //$this->get_screen_resolution();
+        $this->host=$_SERVER['SERVER_NAME'];
     }
 
     function get_screen_resolution() {

@@ -75,7 +75,7 @@ class Payments extends Util {
                 $list.="<span class='span8' style='color:red;' id='payment_err'></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
-                $list.="<span class='span10'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+                $list.="<span class='span10'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
                 $list.="</div>";
             } // end if $toolbar==true
             $list.="<div id='payment_container'>";
@@ -293,7 +293,7 @@ class Payments extends Util {
                 $list.="<span class='span8' style='color:red;' id='payment_err'></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
-                $list.="<span class='span10'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+                $list.="<span class='span10'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
                 $list.="</div>";
             } // end if $toolbar==true            
             $list.="<div id='card_payments_container'>";

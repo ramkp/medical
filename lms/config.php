@@ -18,6 +18,7 @@ $CFG->dboptions = array (
 );
 
 $CFG->wwwroot   = 'http://cnausa.com/lms';
+//$CFG->wwwroot   = 'http://medical2.com/lms';
 $CFG->dataroot  = '/home/cnausa/public_html/moodledata';
 $CFG->admin     = 'admin';
 

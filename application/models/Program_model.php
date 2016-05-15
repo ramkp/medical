@@ -7,9 +7,13 @@
  */
 class program_model extends CI_Model {
 
+    public $host;
+
+
     public function __construct() {
         parent::__construct();
         $this->load->database();
+        $this->host=$_SERVER['SERVER_NAME'];
     }
 
     public function get_category_id($cat_name) {
@@ -36,23 +40,22 @@ class program_model extends CI_Model {
     public function get_course_image_path($courseid) {
         switch ($courseid) {
             case 41:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/other.jpg";
+                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/chemistry.png";
                 break;
             case 44:
                 $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
                 break;
-            case 45:
-                //$path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy_ekg.jpg";
+            case 45:                
                 $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ekg.jpg";
                 break;
             case 46:
                 $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/picc line.jpg";
                 break;
             case 47:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/other.jpg";
+                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/chemistry.png";
                 break;
             case 48:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/other.jpg";
+                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/chemistry.png";
                 break;
             case 49:
                 $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ob tech.jpg";
@@ -64,13 +67,13 @@ class program_model extends CI_Model {
                 $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
                 break;
             case 52:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/other.jpg";
+                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/chemistry.png";
                 break;
             case 53:
                 $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ob tech.jpg";
                 break;
             case 54:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/other.jpg";
+                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/chemistry.png";
                 break;
         }
         return $path;
@@ -588,7 +591,7 @@ class program_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_schedule'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_schedule'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>"; // end of panel-body

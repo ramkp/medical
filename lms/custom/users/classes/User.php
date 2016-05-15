@@ -55,7 +55,7 @@ class User extends Util {
             $list.="<span class='span2'>Passsword</span>";
             $list.="</div>";
             $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
-            $list.="<span class='span10'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+            $list.="<span class='span10'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
             $list.="</div>";
         } // end if $toolbar==true
         $list.="<div id='users_container'>";

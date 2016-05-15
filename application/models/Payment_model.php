@@ -110,7 +110,7 @@ class Payment_model extends CI_Model {
         return $slotid;
     }
 
-    public function get_payment_section($userid, $courseid) {
+    public function get_payment_section($userid, $courseid, $slotid) {
         $list = "";                
         if ($userid != NULL) {
             $invoice = new Invoice();

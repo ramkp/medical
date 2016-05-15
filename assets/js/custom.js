@@ -65,6 +65,7 @@ $(document).ready(function () {
      * 
      **************************************************************************/
 
+    //var domain = 'medical2.com';
     var domain = 'cnausa.com';
     /***************************************************************************
      * 
@@ -1322,7 +1323,7 @@ $(document).ready(function () {
             $('#gallery_container').html(data);
         });
         */
-       var url="http://cnausa.com/index.php/gallery/matched/"+state+"/"+month+"/"+year;
+       var url="http://"+domain+"/index.php/gallery/matched/"+state+"/"+month+"/"+year;
        window.location=url;       
     }
 

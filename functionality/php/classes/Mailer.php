@@ -8,12 +8,13 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/mailer/vendor/PHPMailerAutoload.php';
 
 class Mailer {
-
-    public $mail_smtp_host = 'mail.cnausa.com';
+    
+    public $mail_smtp_host = 'mail.medical2.com';
     public $mail_smtp_port = 25;
-    public $mail_smtp_user = 'support@cnausa.com';
-    public $mail_smtp_pwd = 'aK6SKymc*';
+    public $mail_smtp_user = 'info@medical2.com';
+    public $mail_smtp_pwd = 'aK6SKymc';
     public $invoice_path;
+    
 
     function __construct() {
         $this->invoice_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices';
@@ -153,9 +154,9 @@ class Mailer {
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
 
-        $mail->setFrom($this->mail_smtp_user, 'Support team');
+        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
         $mail->addAddress($recipient);
-        $mail->addReplyTo($this->mail_smtp_user, 'Support team');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
 
         if ($attachment != null) {
             $invoice = $this->invoice_path . "/$attachment.pdf";
@@ -193,9 +194,9 @@ class Mailer {
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
 
-        $mail->setFrom($this->mail_smtp_user, 'Support team');
+        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
         $mail->addAddress($user->email);
-        $mail->addReplyTo($this->mail_smtp_user, 'Support team');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
         
         $mail->isHTML(true);
 

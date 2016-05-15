@@ -16,11 +16,13 @@ class Payment {
     public $enroll;
     public $invoice;
     public $user;
+    public $host;
 
     function __construct() {
         $this->db = new pdo_db();
         $this->enroll = new Enroll();
         $this->invoice = new Invoice();
+        $this->host=$_SERVER['SERVER_NAME'];
     }
 
     function get_payment_options($courseid, $group = null) {
@@ -301,7 +303,7 @@ class Payment {
         $list.= "</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>";
@@ -799,6 +801,7 @@ class Payment {
             } // end else when tax is not null
         } // end if $installment==null
         else {
+            $users->slotid=0; // There is no delay fee for installment users            
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
                 $course_cost = $this->get_personal_course_cost($users->courseid);
@@ -811,6 +814,7 @@ class Payment {
                 }
             } // end if $group==NULL 
             else {
+                $group_data->slotid=0; // There is no delay fee for installment users            
                 $course_name = $this->get_course_name($group_data->courseid);
                 $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
@@ -893,7 +897,7 @@ class Payment {
         $list.= "</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>";
@@ -1105,7 +1109,7 @@ class Payment {
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Payment is successfull. Confirmation email is sent to $card->email.</span>";
+                    $list.= "<span class='span8'>Payment is successfull. Thank you!</span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
@@ -1151,7 +1155,7 @@ class Payment {
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Payment is successfull. Confirmation email is sent to $card->email.</span>";
+                    $list.= "<span class='span8'>Payment is successfull. Thank you!</span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
@@ -1207,7 +1211,7 @@ class Payment {
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Payment is successfull. Confirmation email is sent to $card->email.</span>";
+                    $list.= "<span class='span8'>Payment is successfull. Thank you!</span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";

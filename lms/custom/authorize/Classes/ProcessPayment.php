@@ -73,13 +73,26 @@ class ProcessPayment {
         $custID = round(time() / 3785);
         $customer = new AnetAPI\CustomerDataType();
         $customer->setId($custID);
-        $customer->setEmail($post_order->cds_email);
-
+        $customer->setEmail($post_order->cds_email);        
+                
+        $names = explode(" ", $post_order->cds_name);           
+        
+        /*
+         * 
+        echo "<br>--------------------<br>";
+        print_r($names);
+        echo "<br>--------------------<br>";
+        die ();        
+         * 
+         */        
+        
+        $firstname = ($names[0]=='') ? "Loyal" : $names[0];
+        $lastname=($names[1]=='')? 'Client':$names[1];       
+        
         //Ship To Info
-        $names = explode(" ", $post_order->cds_name);
         $shipto = new AnetAPI\NameAndAddressType();
-        $shipto->setFirstName($names[0]);
-        $shipto->setLastName($names[1]);
+        $shipto->setFirstName($firstname);
+        $shipto->setLastName($lastname);
         $shipto->setCompany('Student');
         $shipto->setAddress($post_order->cds_address_1);
         $shipto->setCity($post_order->cds_city);
@@ -89,8 +102,8 @@ class ProcessPayment {
 
         // Bill To
         $billto = new AnetAPI\CustomerAddressType();
-        $billto->setFirstName($names[0]);
-        $billto->setLastName($names[1]);
+        $billto->setFirstName($firstname);
+        $billto->setLastName($lastname);
         $billto->setCompany("Student");
         $billto->setAddress($post_order->cds_address_1);
         $billto->setCity($post_order->cds_city);
@@ -158,8 +171,29 @@ class ProcessPayment {
         $total_occurences = $post_order->payments_num;
         $expiration = $post_order->cds_cc_year . "-" . $post_order->cd_cc_month;
         $names = explode(" ", $post_order->cds_name);
+        
+          // Customer info 
+        $custID = round(time() / 3785);
+        $customer = new AnetAPI\CustomerDataType();
+        $customer->setId($custID);
+        $customer->setEmail($post_order->cds_email);
+        
+        /*
+         * 
+        echo "<br>--------------------<br>";
+        print_r($names);
+        echo "<br>--------------------<br>";
+        
+        echo "First name: ".$firstname."<br>";
+        echo "Last name: ".$lastname."<br>";
+         * 
+         */
+        
         $firstname = $names[0];
-        $lastname = $names[1];
+        $lastname = $names[2];
+        
+        $firstname = ($names[0]=='') ? "Loyal" : $names[0];
+        $lastname=($names[2]=='')? 'Client':$names[2];       
 
         // Subscription Type Info
         $subscription = new AnetAPI\ARBSubscriptionType();
@@ -192,16 +226,16 @@ class ProcessPayment {
         $request->setSubscription($subscription);
         $controller = new AnetController\ARBCreateSubscriptionController($request);
         $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
-
-        /*
-         * 
+        
+          /*
+           * 
           echo "--------Subscription response <pre>";
           print_r($response);
           echo "<br>-------------------------<br>";
-          //die('Stopped ....');
-         * 
-         */
-
+          die('Stopped ....');
+           * 
+           */
+        
         if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
             $msg = $response->getSubscriptionId();
             //echo "Message: ".$msg."<br>";

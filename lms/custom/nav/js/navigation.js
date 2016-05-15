@@ -1,11 +1,12 @@
 
 $(document).ready(function () {
 
+    //var domain = 'medical2.com';
     var domain = 'cnausa.com';
     console.log("ready!");
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
-        $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='http://cnausa.com/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
+        $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='http://"+domain+"/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
     }
 
     function get_price_items_from_category(id) {

@@ -11,10 +11,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Enroll.php'
 
 class Upload {
 
+    public $host;
     public $dir_path;
 
     function __construct() {
         $this->dir_path = $_SERVER['DOCUMENT_ROOT'] . '/upload';
+        $this->host=$_SERVER['SERVER_NAME'];
     }
 
     function get_upload_block() {
@@ -50,7 +52,7 @@ class Upload {
         $list.="</div>"; // end of container-fluid
         
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group_file'><img src='http://cnausa.com/assets/img/ajax.gif' /></span";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group_file'><img src='http://$this->host/assets/img/ajax.gif' /></span";
         $list.="</div>";
 
         $list.="</div>"; // end of panel-body

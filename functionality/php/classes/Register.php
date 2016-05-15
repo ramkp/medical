@@ -9,10 +9,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
 
 class Register {
 
+    public $host;
     public $db;
 
     function __construct() {
         $this->db = new pdo_db();
+        $this->host=$_SERVER['SERVER_NAME'];
     }
 
     function get_participants_dropbox() {
@@ -172,7 +174,7 @@ class Register {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_personal'><img src='http://cnausa.com/assets/img/ajax.gif' /></span";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_personal'><img src='http://$this->host/assets/img/ajax.gif' /></span";
         $list.="</div>";
 
         $list.="</div>";
@@ -322,7 +324,7 @@ class Register {
 
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>";

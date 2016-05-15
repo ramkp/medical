@@ -241,7 +241,7 @@ class Invoices extends Util {
             $list.="<span class='span8' style='color:red;' id='invoice_err'></span>";
             $list.="</div>";
             $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
-            $list.="<span class='span8'><img src='http://cnausa.com/assets/img/ajax.gif' /></span>";
+            $list.="<span class='span8'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
             $list.="</div>";
         } // end if $toolbar == TRUE
 
