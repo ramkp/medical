@@ -1,7 +1,7 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
 // Redirect to front-end site 
-header('Location: http://cnausa.com/');
+header('Location: http://medical2.com/');
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

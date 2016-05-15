@@ -65,8 +65,7 @@ $(document).ready(function () {
      * 
      **************************************************************************/
 
-    //var domain = 'medical2.com';
-    var domain = 'cnausa.com';
+    var domain = 'medical2.com';    
     /***************************************************************************
      * 
      * Login form verification

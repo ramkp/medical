@@ -1,8 +1,7 @@
 
 $(document).ready(function () {
 
-    //var domain = 'medical2.com';
-    var domain = 'cnausa.com';
+    var domain = 'medical2.com';    
     console.log("ready!");
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');

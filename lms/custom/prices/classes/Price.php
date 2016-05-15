@@ -362,7 +362,7 @@ class Price extends Util {
                 . "num_payments=$num_payments, expired=$expire, "
                 . "taxes=$taxes "
                 . "where id=$course_id";
-                echo $query;
+                //echo $query;
         $this->db->query($query);
 
         // Update mdl_group_discount table
