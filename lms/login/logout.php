@@ -62,5 +62,5 @@ foreach($authsequence as $authname) {
 require_logout();
 
 // Override default config value
-$redirect="http://http://medical2.com/";
+$redirect="http://medical2.com/";
 redirect($redirect);
