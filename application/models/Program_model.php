@@ -40,7 +40,7 @@ class program_model extends CI_Model {
     public function get_course_image_path($courseid) {
         switch ($courseid) {
             case 41:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/CNA%20Picture.jpg";
+                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/cna best.jpg";
                 break;
             case 44:
                 $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
@@ -73,7 +73,7 @@ class program_model extends CI_Model {
                 $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ob tech.jpg";
                 break;
             case 54:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/chemistry.png";
+                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/IV%20Picture.jpg";
                 break;
             case 55:
                 $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/Med%20asst%201.jpg";

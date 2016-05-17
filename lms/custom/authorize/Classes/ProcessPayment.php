@@ -12,8 +12,10 @@ use net\authorize\api\controller as AnetController;
 class ProcessPayment {
 
     private $AUTHORIZENET_LOG_FILE;
-    private $LOGIN_ID = '6cUTfQ5238'; // sandbox data
-    private $TRANSACTION_KEY = '5bN8q5WT3qa257p9'; // sandbox data
+    //private $LOGIN_ID = '6cUTfQ5238'; // sandbox data
+    //private $TRANSACTION_KEY = '5bN8q5WT3qa257p9'; // sandbox data
+    private $LOGIN_ID = '83uKk2VcBBsC'; // production data
+    private $TRANSACTION_KEY = '23P447taH34H26h5'; // production data
     public $period = 28; // 28 days of installment 
 
     function __construct() {
@@ -127,7 +129,8 @@ class ProcessPayment {
         $request->setRefId($refId);
         $request->setTransactionRequest($transactionRequestType);
         $controller = new AnetController\CreateTransactionController($request);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
         //print_r($response);
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
@@ -225,7 +228,8 @@ class ProcessPayment {
         $request->setRefId($refId);
         $request->setSubscription($subscription);
         $controller = new AnetController\ARBCreateSubscriptionController($request);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
         
           /*
            * 

@@ -1,5 +1,6 @@
 <?php
 
+header("Access-Control-Allow-Origin: *");
 require('../config.php');
 require_once($CFG->dirroot . '/user/editlib.php');
 
@@ -9,7 +10,8 @@ if (!$authplugin->can_signup()) {
     print_error('notlocalisederrormessage', 'error', '', 'Sorry, you may not use this page.');
 }
 
-if ($_POST) {
+if ($_POST) { 
+    
     $user_data = $_POST['user'];
     $posted_user = json_decode(base64_decode($user_data));
 
@@ -37,10 +39,13 @@ if ($_POST) {
     $user->secret = random_string(15);
     $user->auth = $CFG->registerauth;      
     
-    //echo "<br>----------------<br>";
-    //print_r($user);
-    //echo "<br>----------------<br>";
-    //die();
+    /*
+    echo "<br>----------------<br>";
+    print_r($user);
+    echo "<br>----------------<br>";
+    die();
+    */
+    
     // Initialize alternate name fields to empty strings.
     $namefields = array_diff(get_all_user_name_fields(), useredit_get_required_name_fields());
     foreach ($namefields as $namefield) {
@@ -50,4 +55,7 @@ if ($_POST) {
     // Perform signup process
     $authplugin->user_signup($user, false);
 } // end if $_POST
+else {
+    echo "There is no post ...";
+}
 

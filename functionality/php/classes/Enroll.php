@@ -110,7 +110,7 @@ class Enroll {
             }
         } // end if !is_nan($id)
         else {
-            $state=$id;
+            $state = $id;
         }
         return $state;
     }
@@ -130,24 +130,20 @@ class Enroll {
         if (is_numeric($user->country)) {
             $user->country = $this->get_country_name($user->country);
         } //end if is_number($user->country)
-        //echo "<br>---Enroll user----<br>";
-        //print_r($user);
-        //echo "<br>-------------------<br>";
-        //die();
+        
         $list = "";
-        $user->pwd = $this->get_password();
-        //echo "Provided country: " . $user->country . "<br/>";
+        $user->pwd = $this->get_password();        
         if ($user->country != '' && $user->country != 'US') {
             $user->country = $this->get_country_code($user->country);
         } // end if $user->country!=''
         else {
             $user->country = 'US';
         } // end else
-        //echo "<br/>User country:" . $user->country . "<br/>";
+        
         $encoded_user = base64_encode(json_encode($user));
         $data = array('user' => $encoded_user);
 
-        // 1. Signup user into moodle
+        // 1. Signup user into moodle    
         $options = array(
             'http' => array(
                 'header' => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -155,14 +151,10 @@ class Enroll {
                 'content' => http_build_query($data),
             ),
         );
+
         $context = stream_context_create($options);
         $response = @file_get_contents($this->signup_url, false, $context);
-
-        //echo "<pre>";
-        //print_r($response);
-        //echo "<pre>";
-        //die();
-
+        
         if ($response !== false) {
             // 2. Enroll user into course
             $this->enroll_user_to_course($user);
@@ -173,7 +165,7 @@ class Enroll {
             $list.="</div>";
             echo $list;
             die();
-        }
+        }      
     }
 
     function update_user_data($userid, $user) {

@@ -119,6 +119,9 @@
     //]]>
 </script>
 
+<!--[if lte IE 9]>
+<script src="http://cnausa.com/lms/theme/lambda/javascript/ie/iefix.js"></script>
+<![endif]-->
 
 
 <script>

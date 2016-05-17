@@ -64,6 +64,11 @@
  * Different environments will require different levels of error reporting.
  * By default development will show errors but testing and live will hide them.
  */
+        
+if (substr($_SERVER['HTTP_HOST'], 0, 4) === 'www.') {
+    header('Location: http'.(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ? 's':'').'://' . substr($_SERVER['HTTP_HOST'], 4).$_SERVER['REQUEST_URI']);
+    exit;
+}        
 switch (ENVIRONMENT)
 {
 	case 'development':

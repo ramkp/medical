@@ -238,7 +238,7 @@ class register_model extends CI_Model {
     public function get_register_course_states_list($courseid = null) {
         $drop_down = "";
         $drop_down.="<select id='register_state' style='width:120px;'>";
-        $drop_down.="<option value='0' selected>All States</option>";
+        $drop_down.="<option value='0' selected>State</option>";
         
         if ($courseid != null) {
             $query = "";
@@ -256,7 +256,7 @@ class register_model extends CI_Model {
         $drop_down = "";
         $drop_down.="<select id='register_cities' style='width:120px;'>";
         //$drop_down.="<select id='register_cities'>";
-        $drop_down.="<option value='0' selected>All Cities</option>";
+        $drop_down.="<option value='0' selected>City</option>";
         if ($courseid != null) {
             $query = "";
             $result = $this->db->query($query);
@@ -345,6 +345,10 @@ class register_model extends CI_Model {
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span9'>Already have an account? Please <a href='/index.php/login' target='_blank'>sign-in</a> and apply for course you need.</span>";
             $list.="</div>"; // end of container-fluid
+            
+            //$list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
+            //$list.="<span class='span9'>Registration is not available for now, please try again later 877 741 1996. </span>";
+            //$list.="</div>"; // end of container-fluid
 
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default
@@ -364,6 +368,10 @@ class register_model extends CI_Model {
             $list.="<span class='span1'><input type='hidden' value='$courseid' id='register_courses'></span>";            
             $list.="<span class='span3'>$program_schedule</span>";
             $list.="</div>"; // end of container-fluid
+            
+            //$list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
+            //$list.="<span class='span9'>Registration is not available for now, please try again later or call 877 741 1996. </span>";
+            //$list.="</div>"; // end of container-fluid
 
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default

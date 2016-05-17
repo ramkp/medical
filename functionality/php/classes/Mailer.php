@@ -143,7 +143,7 @@ class Mailer {
     function send_email($subject, $message, $recipient, $attachment = null, $certificate = null) {
 
         $mail = new PHPMailer;
-        $recipient = 'sirromas@gmail.com'; // temp workaround
+        //$recipient = 'sirromas@gmail.com'; // temp workaround
         //$mail->SMTPDebug = 3;                                
 
         $mail->isSMTP();
@@ -183,7 +183,7 @@ class Mailer {
     function send_password_recovery_email ($user, $supportuser, $subject, $message) {
         
         $mail = new PHPMailer;
-        $user->email = 'sirromas@gmail.com'; // temp workaround
+        //$user->email = 'sirromas@gmail.com'; // temp workaround
         //$mail->SMTPDebug = 3;                                
 
         $mail->isSMTP();
