@@ -75,7 +75,7 @@ class Payment {
         if ($group == null) {
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'><input type='radio' name='payment_option' id='online_personal' value='online_personal' checked >Online payment</span>";
-            //$list.="<span class='span2'><input type='radio' name='payment_option' id='offline_personal' value='offline_personal'>Offline payment</span>";
+            $list.="<span class='span2'><input type='radio' name='payment_option' id='offline_personal' value='offline_personal'>Offline payment</span>";
             if ($installment == 1) {
                 $enroll_period = $this->get_course_enrollment_period($courseid);
                 $list.="<span class='span2'><input type='radio' name='payment_option' id='online_personal_installment' value='online_personal_installment'>Installment payments</span>";
@@ -86,7 +86,7 @@ class Payment {
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'><input type='radio'  name='payment_option' id='online_whole_group_payment'   value='online_whole_group_payment' checked>Online payment</span>";
             //$list.="<span class='span2'><input type='radio'  name='payment_option' id='offline_whole_group_payment'  value='offline_whole_group_payment'>Offline payment</span>";
-            //$list.="<span class='span2'><input type='radio'  name='payment_option' id='online_group_members_payment' value='online_group_members_payment'>Participants payments</span>";
+            $list.="<span class='span2'><input type='radio'  name='payment_option' id='online_group_members_payment' value='online_group_members_payment'>Participants payments</span>";
             if ($installment == 1) {
                 $enroll_period = $this->get_course_enrollment_period($courseid);
                 $list.="<span class='span2'><input type='radio' name='payment_option' id='online_group_installment' value='online_group_installment'>Installment payments</span>";
