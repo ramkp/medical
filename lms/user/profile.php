@@ -39,6 +39,7 @@ require_once($CFG->dirroot . '/user/profile/lib.php');
 require_once($CFG->dirroot . '/user/lib.php');
 require_once($CFG->libdir.'/filelib.php');
 
+
 $userid         = optional_param('id', 0, PARAM_INT);
 $edit           = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off.
 $reset          = optional_param('reset', null, PARAM_BOOL);
@@ -200,10 +201,11 @@ echo '<div class="userprofile">';
 
 if ($user->description && !isset($hiddenfields['description'])) {
     echo '<div class="description">';
-    if (!empty($CFG->profilesforenrolledusersonly) && !$currentuser &&
-        !$DB->record_exists('role_assignments', array('userid' => $user->id))) {
+    if (!empty($CFG->profilesforenrolledusersonly) && !$currentuser && !$DB->record_exists('role_assignments', array('userid' => $user->id))) {
         echo get_string('profilenotshown', 'moodle');
-    } else {
+    } // end if !empty($CFG->profilesforenrolledusersonly)
+    
+    else {
         $user->description = file_rewrite_pluginfile_urls($user->description, 'pluginfile.php', $usercontext->id, 'user',
                                                           'profile', null);
         echo format_text($user->description, $user->descriptionformat);

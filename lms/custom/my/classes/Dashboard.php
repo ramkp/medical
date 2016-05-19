@@ -341,4 +341,72 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_user_slots($userid) {
+        $slotid = array();
+        $query = "select * from mdl_scheduler_appointment "
+                . "where studentid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid[] = $row['slotid'];
+            } // end while
+        } // end if $num>0
+        return $slotid;
+    }
+
+    function get_course_slots($courseid) {
+        $slotids = array();
+        $query = "select * from mdl_scheduler where course=$courseid";
+        //echo "Query: " . $query . "<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $schedulerid = $row['id'];
+        } // end while
+        //echo "SchedulerID: " . $schedulerid . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $query = "select * from mdl_scheduler_slots "
+                    . "where schedulerid=$schedulerid";
+            //echo "Query: " . $query . "<br>";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotids[] = $row['id'];
+            } // end while
+        } // end if $num > 0
+        return $slotids;
+    }
+
+    function get_course_schedule_data($userslots, $courseid) {
+        $list = "";
+        date_default_timezone_set('Pacific/Wallis');
+        if (count($userslots) > 0) {
+            foreach ($userslots as $slotid) {
+                $course_slots = $this->get_course_slots($courseid);
+                foreach ($course_slots as $cslot) {
+                    if ($cslot == $slotid) {
+                        $query = "select * from mdl_scheduler_slots where id=$slotid";
+                        $result = $this->db->query($query);
+                        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                            $date = date('m-d-Y h:i:s', $row['starttime']);
+                            $location_string = $row['appointmentlocation'];
+                            $notes = $row['notes'];
+                        } // end while
+                        $location_arr = explode("/", $location_string);
+                        $location = $location_arr[1] . "," . $location_arr[0];
+                        $list.="<b>Date:</b> " . $date . "<br>";
+                        $list.="<b>Location:</b> " . $location . "<br>$notes";
+                    } // end if $cslot==$slotid
+                    else {
+                        //$list.="Program detailes: N/A";
+                    }
+                } // end foreach
+            } // end foreach
+        } // end if count($slotids)> 0 
+        else {
+            $list.="Program detailes: N/A";
+        }
+        return $list;
+    }
+
 }

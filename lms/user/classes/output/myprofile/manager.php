@@ -46,7 +46,9 @@ class manager {
     public static function build_tree($user, $iscurrentuser, $course = null) {
         global $CFG;
         $tree = new tree();
-
+        
+        
+        //print_r($user);
         // Add core nodes.
 
         require_once($CFG->libdir . "/myprofilelib.php");
@@ -62,7 +64,9 @@ class manager {
             if (is_readable($file)) {
                 require_once($file);
                 $function = "core_" . $component . "_myprofile_navigation";
+                //print_r($function);
                 if (function_exists($function)) {
+                    //echo "Current function: ".$function."<br>";
                     $function($tree, $user, $iscurrentuser, $course);
                 }
             }

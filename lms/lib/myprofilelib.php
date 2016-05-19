@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -21,6 +22,7 @@
  * @copyright 2015 onwards Ankit Agarwal
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once($CFG->dirroot . '/custom/my/classes/Dashboard.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -63,8 +65,7 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     // Full profile node.
     if (!empty($course)) {
         if (empty($CFG->forceloginforprofiles) || $iscurrentuser ||
-            has_capability('moodle/user:viewdetails', $usercontext)
-            || has_coursecontact_role($user->id)) {
+                has_capability('moodle/user:viewdetails', $usercontext) || has_coursecontact_role($user->id)) {
             $url = new moodle_url('/user/profile.php', array('id' => $user->id));
             $node = new core_user\output\myprofile\node('miscellaneous', 'fullprofile', get_string('fullprofile'), null, $url);
             $tree->add_node($node);
@@ -73,15 +74,12 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
 
     // Edit profile.
     if (isloggedin() && !isguestuser($user) && !is_mnet_remote_user($user)) {
-        if (($iscurrentuser || is_siteadmin($USER) || !is_siteadmin($user)) && has_capability('moodle/user:update',
-                    $systemcontext)) {
+        if (($iscurrentuser || is_siteadmin($USER) || !is_siteadmin($user)) && has_capability('moodle/user:update', $systemcontext)) {
             $url = new moodle_url('/user/editadvanced.php', array('id' => $user->id, 'course' => $courseid,
                 'returnto' => 'profile'));
-            $node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url,
-                null, null, 'editprofile');
+            $node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url, null, null, 'editprofile');
             $tree->add_node($node);
-        } else if ((has_capability('moodle/user:editprofile', $usercontext) && !is_siteadmin($user))
-                   || ($iscurrentuser && has_capability('moodle/user:editownprofile', $systemcontext))) {
+        } else if ((has_capability('moodle/user:editprofile', $usercontext) && !is_siteadmin($user)) || ($iscurrentuser && has_capability('moodle/user:editownprofile', $systemcontext))) {
             $userauthplugin = false;
             if (!empty($user->auth)) {
                 $userauthplugin = get_auth_plugin($user->auth);
@@ -96,8 +94,7 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
                             'returnto' => 'profile'));
                     }
                 }
-                $node = new core_user\output\myprofile\node('contact', 'editprofile',
-                        get_string('editmyprofile'), null, $url, null, null, 'editprofile');
+                $node = new core_user\output\myprofile\node('contact', 'editprofile', get_string('editmyprofile'), null, $url, null, null, 'editprofile');
                 $tree->add_node($node);
             }
         }
@@ -113,11 +110,9 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
 
     // Login as ...
     if (!$user->deleted && !$iscurrentuser &&
-                !\core\session\manager::is_loggedinas() && has_capability('moodle/user:loginas',
-                $courseorsystemcontext) && !is_siteadmin($user->id)) {
-        $url = new moodle_url('/course/loginas.php',
-                array('id' => $courseid, 'user' => $user->id, 'sesskey' => sesskey()));
-        $node = new  core_user\output\myprofile\node('administration', 'loginas', get_string('loginas'), null, $url);
+            !\core\session\manager::is_loggedinas() && has_capability('moodle/user:loginas', $courseorsystemcontext) && !is_siteadmin($user->id)) {
+        $url = new moodle_url('/course/loginas.php', array('id' => $courseid, 'user' => $user->id, 'sesskey' => sesskey()));
+        $node = new core_user\output\myprofile\node('administration', 'loginas', get_string('loginas'), null, $url);
         $tree->add_node($node);
     }
 
@@ -144,28 +139,31 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $remoteuser->remotetype = $remotehost->display_name;
         $hostinfo = new stdclass();
         $hostinfo->remotename = $remotehost->name;
-        $hostinfo->remoteurl  = $remotehost->wwwroot;
+        $hostinfo->remoteurl = $remotehost->wwwroot;
 
-        $node = new core_user\output\myprofile\node('contact', 'mnet', get_string('remoteuser', 'mnet', $remoteuser), null, null,
-            get_string('remoteuserinfo', 'mnet', $hostinfo), null, 'remoteuserinfo');
+        $node = new core_user\output\myprofile\node('contact', 'mnet', get_string('remoteuser', 'mnet', $remoteuser), null, null, get_string('remoteuserinfo', 'mnet', $hostinfo), null, 'remoteuserinfo');
         $tree->add_node($node);
     }
 
-    if (isset($identityfields['email']) and ($iscurrentuser
-                                             or $user->maildisplay == 1
-                                             or has_capability('moodle/course:useremail', $courseorusercontext)
-                                             or has_capability('moodle/site:viewuseridentity', $courseorusercontext)
-                                             or ($user->maildisplay == 2 and enrol_sharing_course($user, $USER)))) {
-        $node = new core_user\output\myprofile\node('contact', 'email', get_string('email'), null, null,
-            obfuscate_mailto($user->email, ''));
+    if (isset($identityfields['email']) and ( $iscurrentuser
+            or $user->maildisplay == 1
+            or has_capability('moodle/course:useremail', $courseorusercontext)
+            or has_capability('moodle/site:viewuseridentity', $courseorusercontext)
+            or ( $user->maildisplay == 2 and enrol_sharing_course($user, $USER)))) {
+        $node = new core_user\output\myprofile\node('contact', 'email', get_string('email'), null, null, obfuscate_mailto($user->email, ''));
         $tree->add_node($node);
     }
 
     if (!isset($hiddenfields['country']) && $user->country) {
-        $node = new core_user\output\myprofile\node('contact', 'country', get_string('country'), null, null,
-                get_string($user->country, 'countries'));
+        $node = new core_user\output\myprofile\node('contact', 'country', get_string('country'), null, null, get_string($user->country, 'countries'));
         $tree->add_node($node);
     }
+
+    $node = new core_user\output\myprofile\node('contact', 'State', get_string('state'), null, null, $user->state);
+    $tree->add_node($node);
+    
+    $node = new core_user\output\myprofile\node('contact', 'Zip', 'Zip', null, null, $user->zip);
+    $tree->add_node($node);
 
     if (!isset($hiddenfields['city']) && $user->city) {
         $node = new core_user\output\myprofile\node('contact', 'city', get_string('city'), null, null, $user->city);
@@ -188,37 +186,33 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     }
 
     if (isset($identityfields['institution']) && $user->institution) {
-        $node = new core_user\output\myprofile\node('contact', 'institution', get_string('institution'), null, null,
-                $user->institution);
+        $node = new core_user\output\myprofile\node('contact', 'institution', get_string('institution'), null, null, $user->institution);
         $tree->add_node($node);
     }
 
     if (isset($identityfields['department']) && $user->department) {
-        $node = new core_user\output\myprofile\node('contact', 'department', get_string('department'), null, null,
-            $user->department);
+        $node = new core_user\output\myprofile\node('contact', 'department', get_string('department'), null, null, $user->department);
         $tree->add_node($node);
     }
 
     if (isset($identityfields['idnumber']) && $user->idnumber) {
-        $node = new core_user\output\myprofile\node('contact', 'idnumber', get_string('idnumber'), null, null,
-            $user->idnumber);
+        $node = new core_user\output\myprofile\node('contact', 'idnumber', get_string('idnumber'), null, null, $user->idnumber);
         $tree->add_node($node);
     }
 
     if ($user->url && !isset($hiddenfields['webpage'])) {
         $url = $user->url;
         if (strpos($user->url, '://') === false) {
-            $url = 'http://'. $url;
+            $url = 'http://' . $url;
         }
         $webpageurl = new moodle_url($url);
-        $node = new core_user\output\myprofile\node('contact', 'webpage', get_string('webpage'), null, null,
-            html_writer::link($url, $webpageurl));
+        $node = new core_user\output\myprofile\node('contact', 'webpage', get_string('webpage'), null, null, html_writer::link($url, $webpageurl));
         $tree->add_node($node);
     }
 
     // Printing tagged interests. We want this only for full profile.
     if (!empty($CFG->usetags) && empty($course)) {
-        if ($interests = tag_get_tags_csv('user', $user->id) ) {
+        if ($interests = tag_get_tags_csv('user', $user->id)) {
             $node = new core_user\output\myprofile\node('contact', 'interests', get_string('interests'), null, null, $interests);
             $tree->add_node($node);
         }
@@ -228,11 +222,14 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $showallcourses = optional_param('showallcourses', 0, PARAM_INT);
         if ($mycourses = enrol_get_all_users_courses($user->id, true, null, 'visible DESC, sortorder ASC')) {
             $shown = 0;
+            $ds = new Dashboard();
+            $userslots = $ds->get_user_slots($user->id);
             $courselisting = html_writer::start_tag('ul');
             foreach ($mycourses as $mycourse) {
                 if ($mycourse->category) {
                     context_helper::preload_from_record($mycourse);
                     $ccontext = context_course::instance($mycourse->id);
+                    $course_schedule = $ds->get_course_schedule_data($userslots, $mycourse->id);
                     if (!isset($course) || $mycourse->id != $course->id) {
                         $linkattributes = null;
                         if ($mycourse->visible == 0) {
@@ -246,9 +243,10 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
                             $params['showallcourses'] = 1;
                         }
                         $url = new moodle_url('/user/view.php', $params);
-                        $courselisting .= html_writer::tag('li', html_writer::link($url, $ccontext->get_context_name(false),
-                                $linkattributes));
-                    } else {
+                        $courselisting .= html_writer::tag('li', html_writer::link($url, $ccontext->get_context_name(false), $linkattributes));
+                        $courselisting .= html_writer::tag('li', $course_schedule);
+                    } // end if !isset($course) || $mycourse->id != $course->id                    
+                    else {
                         $courselisting .= html_writer::tag('li', $course->fullname);
                     }
                 }
@@ -256,21 +254,19 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
                 if (!$showallcourses && $shown == $CFG->navcourselimit) {
                     $url = null;
                     if (isset($course)) {
-                        $url = new moodle_url('/user/view.php',
-                                array('id' => $user->id, 'course' => $course->id, 'showallcourses' => 1));
+                        $url = new moodle_url('/user/view.php', array('id' => $user->id, 'course' => $course->id, 'showallcourses' => 1));
                     } else {
                         $url = new moodle_url('/user/profile.php', array('id' => $user->id, 'showallcourses' => 1));
                     }
-                    $courselisting .= html_writer::tag('li', html_writer::link($url, get_string('viewmore'),
-                            array('title' => get_string('viewmore'))), array('class' => 'viewmore'));
+                    $courselisting .= html_writer::tag('li', html_writer::link($url, get_string('viewmore'), array('title' => get_string('viewmore'))), array('class' => 'viewmore'));
                     break;
                 }
-            }
+            } // end foreach $mycourses as $mycourse
             $courselisting .= html_writer::end_tag('ul');
+            //print_r($mycourses);
             if (!empty($mycourses)) {
                 // Add this node only if there are courses to display.
-                $node = new core_user\output\myprofile\node('coursedetails', 'courseprofiles',
-                    get_string('courseprofiles'), null, null, rtrim($courselisting, ', '));
+                $node = new core_user\output\myprofile\node('coursedetails', 'courseprofiles', get_string('courseprofiles'), null, null, rtrim($courselisting, ', '));
                 $tree->add_node($node);
             }
         }
@@ -290,23 +286,22 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
             if ($usergroups = groups_get_all_groups($course->id, $user->id)) {
                 $groupstr = '';
                 foreach ($usergroups as $group) {
-                    if ($course->groupmode == SEPARATEGROUPS and !$accessallgroups and $user->id != $USER->id) {
+                    if ($course->groupmode == SEPARATEGROUPS and ! $accessallgroups and $user->id != $USER->id) {
                         if (!groups_is_member($group->id, $user->id)) {
                             continue;
                         }
                     }
 
                     if ($course->groupmode != NOGROUPS) {
-                        $groupstr .= ' <a href="'.$CFG->wwwroot.'/user/index.php?id='.$course->id.'&amp;group='.$group->id.'">'
-                                     .format_string($group->name).'</a>,';
+                        $groupstr .= ' <a href="' . $CFG->wwwroot . '/user/index.php?id=' . $course->id . '&amp;group=' . $group->id . '">'
+                                . format_string($group->name) . '</a>,';
                     } else {
                         // The user/index.php shows groups only when course in group mode.
-                        $groupstr .= ' '.format_string($group->name);
+                        $groupstr .= ' ' . format_string($group->name);
                     }
                 }
                 if ($groupstr !== '') {
-                    $node = new core_user\output\myprofile\node('coursedetails', 'groups',
-                            get_string('group'), null, null, rtrim($groupstr, ', '));
+                    $node = new core_user\output\myprofile\node('coursedetails', 'groups', get_string('group'), null, null, rtrim($groupstr, ', '));
                     $tree->add_node($node);
                 }
             }
@@ -314,57 +309,48 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
 
         if (!isset($hiddenfields['suspended'])) {
             if ($user->suspended) {
-                $node = new core_user\output\myprofile\node('coursedetails', 'suspended',
-                        null, null, null, get_string('suspended', 'auth'));
+                $node = new core_user\output\myprofile\node('coursedetails', 'suspended', null, null, null, get_string('suspended', 'auth'));
                 $tree->add_node($node);
             }
         }
     }
 
     if ($user->icq && !isset($hiddenfields['icqnumber'])) {
-        $imurl = new moodle_url('http://web.icq.com/wwp', array('uin' => $user->icq) );
+        $imurl = new moodle_url('http://web.icq.com/wwp', array('uin' => $user->icq));
         $iconurl = new moodle_url('http://web.icq.com/whitepages/online', array('icq' => $user->icq, 'img' => '5'));
-        $statusicon = html_writer::tag('img', '',
-                array('src' => $iconurl, 'class' => 'icon icon-post', 'alt' => get_string('status')));
-        $node = new core_user\output\myprofile\node('contact', 'icqnumber', get_string('icqnumber'), null, null,
-            html_writer::link($imurl, s($user->icq) . $statusicon));
+        $statusicon = html_writer::tag('img', '', array('src' => $iconurl, 'class' => 'icon icon-post', 'alt' => get_string('status')));
+        $node = new core_user\output\myprofile\node('contact', 'icqnumber', get_string('icqnumber'), null, null, html_writer::link($imurl, s($user->icq) . $statusicon));
         $tree->add_node($node);
     }
 
     if ($user->skype && !isset($hiddenfields['skypeid'])) {
-        $imurl = 'skype:'.urlencode($user->skype).'?call';
-        $iconurl = new moodle_url('http://mystatus.skype.com/smallicon/'.urlencode($user->skype));
+        $imurl = 'skype:' . urlencode($user->skype) . '?call';
+        $iconurl = new moodle_url('http://mystatus.skype.com/smallicon/' . urlencode($user->skype));
         if (is_https()) {
             // Bad luck, skype devs are lazy to set up SSL on their servers - see MDL-37233.
             $statusicon = '';
         } else {
-            $statusicon = html_writer::empty_tag('img',
-                array('src' => $iconurl, 'class' => 'icon icon-post', 'alt' => get_string('status')));
+            $statusicon = html_writer::empty_tag('img', array('src' => $iconurl, 'class' => 'icon icon-post', 'alt' => get_string('status')));
         }
 
-        $node = new core_user\output\myprofile\node('contact', 'skypeid', get_string('skypeid'), null, null,
-            html_writer::link($imurl, s($user->skype) . $statusicon));
+        $node = new core_user\output\myprofile\node('contact', 'skypeid', get_string('skypeid'), null, null, html_writer::link($imurl, s($user->skype) . $statusicon));
         $tree->add_node($node);
     }
     if ($user->yahoo && !isset($hiddenfields['yahooid'])) {
         $imurl = new moodle_url('http://edit.yahoo.com/config/send_webmesg', array('.target' => $user->yahoo, '.src' => 'pg'));
         $iconurl = new moodle_url('http://opi.yahoo.com/online', array('u' => $user->yahoo, 'm' => 'g', 't' => '0'));
-        $statusicon = html_writer::tag('img', '',
-            array('src' => $iconurl, 'class' => 'iconsmall icon-post', 'alt' => get_string('status')));
+        $statusicon = html_writer::tag('img', '', array('src' => $iconurl, 'class' => 'iconsmall icon-post', 'alt' => get_string('status')));
 
-        $node = new core_user\output\myprofile\node('contact', 'yahooid', get_string('yahooid'), null, null,
-            html_writer::link($imurl, s($user->yahoo) . $statusicon));
+        $node = new core_user\output\myprofile\node('contact', 'yahooid', get_string('yahooid'), null, null, html_writer::link($imurl, s($user->yahoo) . $statusicon));
         $tree->add_node($node);
     }
     if ($user->aim && !isset($hiddenfields['aimid'])) {
-        $imurl = 'aim:goim?screenname='.urlencode($user->aim);
-        $node = new core_user\output\myprofile\node('contact', 'aimid', get_string('aimid'), null, null,
-            html_writer::link($imurl, s($user->aim)));
+        $imurl = 'aim:goim?screenname=' . urlencode($user->aim);
+        $node = new core_user\output\myprofile\node('contact', 'aimid', get_string('aimid'), null, null, html_writer::link($imurl, s($user->aim)));
         $tree->add_node($node);
     }
     if ($user->msn && !isset($hiddenfields['msnid'])) {
-        $node = new core_user\output\myprofile\node('contact', 'msnid', get_string('msnid'), null, null,
-            s($user->msn));
+        $node = new core_user\output\myprofile\node('contact', 'msnid', get_string('msnid'), null, null, s($user->msn));
         $tree->add_node($node);
     }
 
@@ -372,12 +358,11 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         foreach ($categories as $category) {
             if ($fields = $DB->get_records('user_info_field', array('categoryid' => $category->id), 'sortorder ASC')) {
                 foreach ($fields as $field) {
-                    require_once($CFG->dirroot.'/user/profile/field/'.$field->datatype.'/field.class.php');
-                    $newfield = 'profile_field_'.$field->datatype;
+                    require_once($CFG->dirroot . '/user/profile/field/' . $field->datatype . '/field.class.php');
+                    $newfield = 'profile_field_' . $field->datatype;
                     $formfield = new $newfield($field->id, $user->id);
-                    if ($formfield->is_visible() and !$formfield->is_empty()) {
-                        $node = new core_user\output\myprofile\node('contact', 'custom_field_' . $formfield->field->shortname,
-                            format_string($formfield->field->name), null, null, $formfield->display_data());
+                    if ($formfield->is_visible() and ! $formfield->is_empty()) {
+                        $node = new core_user\output\myprofile\node('contact', 'custom_field_' . $formfield->field->shortname, format_string($formfield->field->name), null, null, $formfield->display_data());
                         $tree->add_node($node);
                     }
                 }
@@ -388,12 +373,11 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     // First access. (Why only for sites ?)
     if (!isset($hiddenfields['firstaccess']) && empty($course)) {
         if ($user->firstaccess) {
-            $datestring = userdate($user->firstaccess)."&nbsp; (".format_time(time() - $user->firstaccess).")";
+            $datestring = userdate($user->firstaccess) . "&nbsp; (" . format_time(time() - $user->firstaccess) . ")";
         } else {
             $datestring = get_string("never");
         }
-        $node = new core_user\output\myprofile\node('loginactivity', 'firstaccess', get_string('firstsiteaccess'), null, null,
-            $datestring);
+        $node = new core_user\output\myprofile\node('loginactivity', 'firstaccess', get_string('firstsiteaccess'), null, null, $datestring);
         $tree->add_node($node);
     }
 
@@ -409,14 +393,13 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         } else {
             $string = get_string('lastcourseaccess');
             if ($lastaccess = $DB->get_record('user_lastaccess', array('userid' => $user->id, 'courseid' => $course->id))) {
-                $datestring = userdate($lastaccess->timeaccess)."&nbsp; (".format_time(time() - $lastaccess->timeaccess).")";
+                $datestring = userdate($lastaccess->timeaccess) . "&nbsp; (" . format_time(time() - $lastaccess->timeaccess) . ")";
             } else {
                 $datestring = get_string("never");
             }
         }
 
-        $node = new core_user\output\myprofile\node('loginactivity', 'lastaccess', $string, null, null,
-            $datestring);
+        $node = new core_user\output\myprofile\node('loginactivity', 'lastaccess', $string, null, null, $datestring);
         $tree->add_node($node);
     }
 
@@ -428,8 +411,7 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         } else {
             $ipstring = get_string("none");
         }
-        $node = new core_user\output\myprofile\node('loginactivity', 'lastip', get_string('lastip'), null, null,
-            $ipstring);
+        $node = new core_user\output\myprofile\node('loginactivity', 'lastip', get_string('lastip'), null, null, $ipstring);
         $tree->add_node($node);
     }
 }
