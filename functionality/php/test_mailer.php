@@ -17,6 +17,7 @@ $user->city="Some City";
 $user->state="Alabama";
 $user->zip=6900;
 $user->country="US";
+$user->payment_amount=475;
 
 $mailer->send_account_confirmation_message($user);
 

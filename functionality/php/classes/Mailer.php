@@ -156,8 +156,15 @@ class Mailer {
         </tr>
         <tr style='background-color:#F5F5F5;'>
         <td>Program fee</td><td>$$course_cost</td>
-        </tr>
-        <tr style='background-color:#F5F5F5;'>
+        </tr>";
+
+        if (property_exists($user, 'payment_amount')) {
+            $list.="<tr style='background-color:#F5F5F5;'>
+            <td>Payment status: </td><td>Paid by card: $$user->payment_amount</td>
+            </tr>";
+        } // end if $payment_amount != null
+
+        $list.="<tr style='background-color:#F5F5F5;'>
         <td>Class info</td><td>$class_info</td>
         </tr>
         </tbody>
@@ -172,10 +179,11 @@ class Mailer {
         $subject = "Medical2 Career College - registration confirmation";
         $message = $this->get_account_confirmation_message($user);
         $recipient = $user->email;
-        $this->send_signup_confirmation_email($subject, $message, $recipient);
+        $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
+        $this->send_signup_confirmation_email($subject, $message, $recipient, $payment_amount);
     }
 
-    function send_signup_confirmation_email($subject, $message, $recipient) {
+    function send_signup_confirmation_email($subject, $message, $recipient, $payment_amount) {
         $mail = new PHPMailer;
         //$recipient = 'sirromas@gmail.com'; // temp workaround
         //$mail->SMTPDebug = 3;                                
@@ -190,8 +198,13 @@ class Mailer {
 
         $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
         $mail->addAddress($recipient);
-        $mail->AddCC('info@medical2.com');
-        $mail->AddBCC('help@medical2.com');
+        if ($payment_amount != null) {
+            $mail->AddCC('info@medical2.com');
+            $mail->AddBCC('help@medical2.com');
+        } // end if $payment_amount != null
+        else {
+            $mail->addAddress($recipient);
+        } // end else
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
 
         $mail->isHTML(true);

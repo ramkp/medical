@@ -26,7 +26,7 @@ class Mailer2 {
 
     function get_course_name($user) {
         $query = "select * from mdl_course where id=$user->courseid";
-        echo "Query: ".$query."<br>";
+        //echo "Query: " . $query . "<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $name = $row['fullname'];
@@ -41,9 +41,9 @@ class Mailer2 {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $notes = $row['notes'];
-                $start=date('d-m-Y',$row['starttime']);
-                $location_arr=explode("/", $row['appointmentlocation']);
-                $location=$location_arr[1].",".$location_arr[0];
+                $start = date('d-m-Y', $row['starttime']);
+                $location_arr = explode("/", $row['appointmentlocation']);
+                $location = $location_arr[1] . "," . $location_arr[0];
             } // end while
             $list.="<p align='left'>Date: $start<br>Location: $location<br>Venue: $notes</p>";
         } // end if $user->slotid>0
@@ -80,12 +80,12 @@ class Mailer2 {
         $group_status = $this->is_group_user($user);
         if ($group_status == 0) {
             $course_cost_array = $payment->get_personal_course_cost($user->courseid);
-            $course_cost=$course_cost_array['cost'];
+            $course_cost = $course_cost_array['cost'];
         } // end if $group_status==0
         else {
             $participants = $this->get_group_user_num($user);
             $course_cost_array = $payment->get_course_group_discount($user->courseid, $participants);
-            $course_cost=$course_cost_array['cost'];
+            $course_cost = $course_cost_array['cost'];
         }
         $tax_status = $payment->is_course_taxable($user->courseid);
         if ($tax_status == 1) {
@@ -112,8 +112,8 @@ class Mailer2 {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
-        $course_cost = $this->get_course_cost($user);        
-        $list.= "<!DOCTYPE HTML><html><head><title>Account Confirmation</title>";        
+        $course_cost = $this->get_course_cost($user);
+        $list.= "<!DOCTYPE HTML><html><head><title>Account Confirmation</title>";
         $list.="</head>";
         $list.="<body><br/><br/><br/><br/>";
         $list.="<div class='datagrid'>            
@@ -155,8 +155,15 @@ class Mailer2 {
         </tr>
         <tr style='background-color:#F5F5F5;'>
         <td>Program fee</td><td>$$course_cost</td>
-        </tr>
-        <tr style='background-color:#F5F5F5;'>
+        </tr>";
+
+        if (property_exists($user, 'payment_amount')) {
+            $list.="<tr style='background-color:#F5F5F5;'>
+            <td>Payment status: </td><td>Paid by card: $$user->payment_amount</td>
+            </tr>";
+        } // end if $payment_amount != null
+
+        $list.="<tr style='background-color:#F5F5F5;'>
         <td>Class info</td><td>$class_info</td>
         </tr>
         </tbody>
@@ -167,14 +174,15 @@ class Mailer2 {
         return $list;
     }
 
-    function send_account_confirmation_message($user) {        
+    function send_account_confirmation_message($user) {
         $subject = "Medical2 Career College - registration confirmation";
         $message = $this->get_account_confirmation_message($user);
         $recipient = $user->email;
-        $this->send_signup_confirmation_email($subject, $message, $recipient);
+        $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
+        $this->send_signup_confirmation_email($subject, $message, $recipient, $payment_amount);
     }
 
-    function send_signup_confirmation_email($subject, $message, $recipient) {
+    function send_signup_confirmation_email($subject, $message, $recipient, $payment_amount) {
         $mail = new PHPMailer;
         $recipient = 'sirromas@gmail.com'; // temp workaround
         //$mail->SMTPDebug = 3;                                
@@ -189,8 +197,9 @@ class Mailer2 {
 
         $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
         $mail->addAddress($recipient);
-        //$mail->AddCC('info@medical2.com');
-        //$mail->AddBCC('help@medical2.com');
+        if ($payment_amount != null) {
+            $mail->AddCC('sirromas@ukr.net');
+        }
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
 
         $mail->isHTML(true);
@@ -203,7 +212,7 @@ class Mailer2 {
             echo 'Mailer Error: ' . $mail->ErrorInfo;
         } // end if !$mail->send()        
         else {
-            //echo 'Message has been sent to ' . $recipient;
+            echo 'Message has been sent to ' . $recipient;
         }
     }
 
