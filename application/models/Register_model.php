@@ -175,7 +175,7 @@ class register_model extends CI_Model {
         $list.= "</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_group'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>";
@@ -447,7 +447,7 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_personal'><img src='http://$this->host/assets/img/ajax.gif' /></span";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_personal'><img src='https://$this->host/assets/img/ajax.gif' /></span";
         $list.="</div>";
 
         $list.="</div>";

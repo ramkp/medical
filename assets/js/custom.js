@@ -82,7 +82,7 @@ $(document).ready(function () {
             $('#login_err').html('*all fields required');
         }
         if (login != '' && password != '') {
-            var url = "http://" + domain + "/functionality/php/login.php";
+            var url = "https://" + domain + "/functionality/php/login.php";
             $.post(url, {login: login, password: password})
                     .done(function (data) {
                         if (data > 0) {
@@ -104,7 +104,7 @@ $(document).ready(function () {
      * $('#login_box').val(); var password = $('#passsword_box').val();
      * console.log('Login: '+login); console.log('Password: '+password); if
      * (login == '' || password == '') { $('#login_err').html('*all fields
-     * required'); } if (login != '' && password != '') { var url = "http://" +
+     * required'); } if (login != '' && password != '') { var url = "https://" +
      * domain + "/functionality/php/login.php"; $.post( url, { login: login,
      * password: password }) .done(function( data ) { if (data>0) {
      * $('#login_form').submit(); } // end if data>0 else {
@@ -120,7 +120,7 @@ $(document).ready(function () {
      **************************************************************************/
 
     function verify_users_upload_form() {
-        var url = "http://" + domain + "/functionality/php/upload_users_file.php";
+        var url = "https://" + domain + "/functionality/php/upload_users_file.php";
         var file_data = $('#files').prop('files');
         console.log('File: ' + file_data);
         if (file_data == '' || file_data.length == 0) {
@@ -165,7 +165,7 @@ $(document).ready(function () {
                             come_from: come_from,
                             tot_participants: data,
                             group_name: group_name};
-                        var group_url = "http://" + domain + "/functionality/php/group_signup_by_file.php";
+                        var group_url = "https://" + domain + "/functionality/php/group_signup_by_file.php";
                         var request = {group_common_section: JSON.stringify(grpoup_data)};
                         $.post(group_url, request).done(function (data) {
                             $('#ajax_loading_group_file').hide();
@@ -191,7 +191,7 @@ $(document).ready(function () {
      **************************************************************************/
 
     function get_gallery_page() {
-        $.post("http://" + domain + "/functionality/php/gallery.php", function (data) {
+        $.post("https://" + domain + "/functionality/php/gallery.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -203,7 +203,7 @@ $(document).ready(function () {
      * 
      **************************************************************************/
     function show_program_items(cat_name) {
-        $.post("http://" + domain + "/functionality/php/get_programs_list.php", {cat_name: cat_name})
+        $.post("https://" + domain + "/functionality/php/get_programs_list.php", {cat_name: cat_name})
                 .done(function (data) {
                     $('#instructions').hide();
                     $("#page").html(data);
@@ -219,7 +219,7 @@ $(document).ready(function () {
      **************************************************************************/
 
     function show_school_page(cat_name) {
-        $.post("http://" + domain + "/functionality/php/get_school_page.php", {cat_name: cat_name})
+        $.post("https://" + domain + "/functionality/php/get_school_page.php", {cat_name: cat_name})
                 .done(function (data) {
                     $('#instructions').hide();
                     $("#page").html(data);
@@ -276,7 +276,7 @@ $(document).ready(function () {
      * 
      **************************************************************************/
     function get_faq_page() {
-        $.post("http://" + domain + "/functionality/php/get_faq_page.php", function (data) {
+        $.post("https://" + domain + "/functionality/php/get_faq_page.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -289,7 +289,7 @@ $(document).ready(function () {
      **************************************************************************/
 
     function get_testimonial_page() {
-        $.post("http://" + domain + "/functionality/php/get_testimonial_page.php", function (data) {
+        $.post("https://" + domain + "/functionality/php/get_testimonial_page.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -302,7 +302,7 @@ $(document).ready(function () {
      **************************************************************************/
 
     function get_certificate_verification_form() {
-        $.post("http://" + domain + "/functionality/php/get_certificate_verification_form.php", function (data) {
+        $.post("https://" + domain + "/functionality/php/get_certificate_verification_form.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -315,7 +315,7 @@ $(document).ready(function () {
      **************************************************************************/
 
     function get_users_upload_form() {
-        $.post("http://" + domain + "/functionality/php/get_users_upload_form.php", function (data) {
+        $.post("https://" + domain + "/functionality/php/get_users_upload_form.php", function (data) {
             $('#participants_details').remove();
             $('#group_common_section').append(data);
         });
@@ -333,7 +333,7 @@ $(document).ready(function () {
         if (courseid != 0) {
             $('#program_err').html('');
             $('#group_common_errors').html('');
-            // var course_url = "http://" + domain +
+            // var course_url = "https://" + domain +
             // "/functionality/php/get_course_id.php";
             // var request = {course_name: course_name};
             // $.post(course_url, request).done(function (courseid) {
@@ -384,7 +384,7 @@ $(document).ready(function () {
 
             if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '') {
                 // Check is group name exist?
-                var course_url = "http://" + domain + "/functionality/php/is_group_exist.php";
+                var course_url = "https://" + domain + "/functionality/php/is_group_exist.php";
                 var request = {group_name: group_name};
                 $.post(course_url, request).done(function (data) {
                     if (data > 0) {
@@ -479,7 +479,7 @@ $(document).ready(function () {
             return false;
         }
 
-        var url = "http://" + domain + "/functionality/php/submit_private_group_request.php";
+        var url = "https://" + domain + "/functionality/php/submit_private_group_request.php";
         var group_request = {group_fio: group_fio,
             group_city: group_city,
             group_phone: group_phone,
@@ -516,7 +516,7 @@ $(document).ready(function () {
         }
 
         if (cert_fio != '' && cert_no != '') {
-            var url = "http://" + domain + "/lms/custom/certificates/verify_certificate.php";
+            var url = "https://" + domain + "/lms/custom/certificates/verify_certificate.php";
             var request = {cert_fio: cert_fio, cert_no: cert_no};
             $.post(url, request).done(function (data) {
                 $("#cert_err").html("<span style='color:green;'>" + data + "</span>");
@@ -534,7 +534,7 @@ $(document).ready(function () {
      * 
      **************************************************************************/
     function get_category_course(category_id) {
-        var url = "http://" + domain + "/functionality/php/get_selected_course.php";
+        var url = "https://" + domain + "/functionality/php/get_selected_course.php";
         var request = {cat_id: category_id};
         $.post(url, request).done(function (data) {
             $("#cat_course").html(data);
@@ -547,7 +547,7 @@ $(document).ready(function () {
      * 
      **************************************************************************/
     function get_register_page() {
-        $.post("http://" + domain + "/functionality/php/get_register_page.php", function (data) {
+        $.post("https://" + domain + "/functionality/php/get_register_page.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -655,7 +655,7 @@ $(document).ready(function () {
                 bill_zip: bill_zip,
                 user_group: user_group,
                 bill_email: bill_email};
-            var url = "http://" + domain + "/functionality/php/make_stub_payment.php";
+            var url = "https://" + domain + "/functionality/php/make_stub_payment.php";
             var request = {card: JSON.stringify(card)};
             $('#ajax_loading_payment').show();
             $.post(url, request).done(function (data) {
@@ -681,7 +681,7 @@ $(document).ready(function () {
             group_selected = true;
         }
         else {
-            var url = "http://" + domain + "/functionality/php/get_group_registration_form.php";
+            var url = "https://" + domain + "/functionality/php/get_group_registration_form.php";
             var request = {tot_participants: tot_participants};
             $.post(url, request).done(function (data) {
                 var el = $("#group_common_section").length;
@@ -699,7 +699,7 @@ $(document).ready(function () {
      **************************************************************************/
 
     function get_manual_group_registration_form(tot_participants) {
-        var url = "http://" + domain + "/functionality/php/get_group_manual_registration_form.php";
+        var url = "https://" + domain + "/functionality/php/get_group_manual_registration_form.php";
         var request = {tot_participants: tot_participants};
         $.post(url, request).done(function (data) {
             $('#participants_details').remove();
@@ -751,7 +751,7 @@ $(document).ready(function () {
         else {
             // Everything is fine - show payment form
             $('#group_manual_form_err').html('');
-            // var course_url = "http://" + domain +
+            // var course_url = "https://" + domain +
             // "/functionality/php/get_course_id.php";
             // var request = {course_name: course_name};
             $('#ajax_loading_group').show();
@@ -767,7 +767,7 @@ $(document).ready(function () {
                 state: state,
                 come_from: come_from,
                 group_name: group_name};
-            var signup_url = "http://" + domain + "/functionality/php/group_signup.php";
+            var signup_url = "https://" + domain + "/functionality/php/group_signup.php";
             var signup_request = {group_common_section: JSON.stringify(group_common_section),
                 users: JSON.stringify(users),
                 tot_participants: tot_participants};
@@ -840,7 +840,7 @@ $(document).ready(function () {
 
             if (addr != '' && inst != '' && zip != '' && zip != '' && city != '' && state != '' && group_name != '') {
                 // Check is group name exist?
-                var course_url = "http://" + domain + "/functionality/php/is_group_exist.php";
+                var course_url = "https://" + domain + "/functionality/php/is_group_exist.php";
                 var request = {group_name: group_name};
                 $.post(course_url, request).done(function (data) {
                     if (data > 0) {
@@ -866,7 +866,7 @@ $(document).ready(function () {
      **************************************************************************/
 
     function get_private_group_form() {
-        $.post("http://" + domain + "/functionality/php/get_private_groups_form.php", function (data) {
+        $.post("https://" + domain + "/functionality/php/get_private_groups_form.php", function (data) {
             $('#instructions').hide();
             $("#page").html(data);
         });
@@ -880,7 +880,7 @@ $(document).ready(function () {
 
     function get_selected_program_register_form(courseid) {
         console.log('Course id: ' + courseid);
-        var url = "http://" + domain + "/functionality/php/get_selected_program_register_form.php";
+        var url = "https://" + domain + "/functionality/php/get_selected_program_register_form.php";
         var request = {courseid: courseid};
         $.post(url, request).done(function (data) {
             $('#page').html(data);
@@ -895,7 +895,7 @@ $(document).ready(function () {
         console.log('Course category: ' + category_name);
         console.log('Course state: ' + state_name);
         if (category_name != 0 && state_name != 0) {
-            var url = "http://" + domain + "/functionality/php/get_state_category_items.php";
+            var url = "https://" + domain + "/functionality/php/get_state_category_items.php";
             var request = {category_name: category_name, state_name: state_name};
             $.post(url, request).done(function (data) {
                 $('#cat_course').html(data);
@@ -906,7 +906,7 @@ $(document).ready(function () {
     function show_state_programs(stateid) {
         var page = window.location.href;
         if (page.indexOf("schedule") > 0) {
-            var url = "http://" + domain + "/functionality/php/show_state_programs.php";
+            var url = "https://" + domain + "/functionality/php/show_state_programs.php";
             var request = {stateid: stateid};
             $('#ajax_loading_schedule').show();
             $.post(url, request).done(function (data) {
@@ -1014,7 +1014,7 @@ $(document).ready(function () {
             if (first_name != '' && last_name != '' && email != '' && phone != '' && addr != '' && inst != '' && zip != '' && city != '') {
 
                 // Check is email exists?
-                var url = "http://" + domain + "/functionality/php/is_email_exists.php";
+                var url = "https://" + domain + "/functionality/php/is_email_exists.php";
                 var request = {email: email};
                 $.post(url, request).done(function (data) {
                     console.log('Server response: ' + data);
@@ -1042,7 +1042,7 @@ $(document).ready(function () {
                             country: country};
                         console.log("User: " + JSON.stringify(user));
                         personal_registration_obj = JSON.stringify(user);
-                        var signup_url = "http://" + domain + "/functionality/php/single_signup.php";
+                        var signup_url = "https://" + domain + "/functionality/php/single_signup.php";
                         var signup_request = {user: JSON.stringify(user)};
                         $.post(signup_url, signup_request).done(function (data) {
                             console.log(data);
@@ -1093,7 +1093,7 @@ $(document).ready(function () {
 
         if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true) {
             $('#offline_group_owner_error').html('');
-            var url = "http://" + domain + "/functionality/php/send_group_invoice.php";
+            var url = "https://" + domain + "/functionality/php/send_group_invoice.php";
             var request = {firstname: firstname, lastname: lastname, email: email, courseid: courseid};
             $.post(url, request).done(function (data) {
                 var el = $('#payment_detailes').length;
@@ -1111,7 +1111,7 @@ $(document).ready(function () {
         var message = $('#message').val();
         var captcha = $('#captcha').val();
         if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && message != '' && captcha != '') {
-            var url = "http://" + domain + "/functionality/php/verify_captcha.php";
+            var url = "https://" + domain + "/functionality/php/verify_captcha.php";
             var request = {captcha: captcha};
             $.post(url, request).done(function (data) {
                 if (data > 0) {
@@ -1123,7 +1123,7 @@ $(document).ready(function () {
                     $('#phone').val('');
                     $('#message').val('');
                     $('#captcha').val('');
-                    var url = "http://" + domain + "/functionality/php/send_contact_request.php";
+                    var url = "https://" + domain + "/functionality/php/send_contact_request.php";
                     var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message};
                     $.post(url, request).done(function (data) {
                         $('#contact_result').html(data);
@@ -1144,7 +1144,7 @@ $(document).ready(function () {
         var cert_no = $('#cert_no').val();
         if (cert_fio != '' && cert_no != '') {
             $('#verify_cert_err').html('');
-            var url = "http://" + domain + "/lms/custom/certificates/verify_certificate.php";
+            var url = "https://" + domain + "/lms/custom/certificates/verify_certificate.php";
             var request = {cert_fio: cert_fio, cert_no: cert_no};
             $.post(url, request).done(function (data) {
                 $("#verify_cert_err").html("<span style='color:green;'>" + data + "</span>");
@@ -1160,7 +1160,7 @@ $(document).ready(function () {
         console.log('Options: ' + options);
         var payment_option = options.attr('value');
         console.log('Payment option: ' + payment_option);
-        var url = "http://" + domain + "/functionality/php/get_option_payment_section.php";
+        var url = "https://" + domain + "/functionality/php/get_option_payment_section.php";
         var request = {option: payment_option};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
@@ -1184,7 +1184,7 @@ $(document).ready(function () {
      * 
      **************************************************************************/
     function show_scheduled_course(courseid) {
-        var url = "http://" + domain + "/functionality/php/show_scheduled_course.php";
+        var url = "https://" + domain + "/functionality/php/show_scheduled_course.php";
         var request = {courseid: courseid};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
@@ -1196,7 +1196,7 @@ $(document).ready(function () {
     function submit_search_form() {
         var search_item = $('#input_search_box').val();
         if (search_item != '') {
-            var url = "http://" + domain + "/functionality/php/get_search_item.php";
+            var url = "https://" + domain + "/functionality/php/get_search_item.php";
             var request = {search_item: search_item};
             $.post(url, request).done(function (data) {
                 $('#search_result').html(data);
@@ -1213,11 +1213,11 @@ $(document).ready(function () {
         if (dialog_loaded !== true) {
             console.log('Script is not yet loaded starting loading ...');
             dialog_loaded = true;
-            var js_url = "http://" + domain + "/assets/js/bootstrap.min.js";
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
             $.getScript(js_url)
                     .done(function () {
                         console.log('Script bootstrap.min.js is loaded ...');
-                        var url = "http://" + domain + "/functionality/php/get_terms_box.php";
+                        var url = "https://" + domain + "/functionality/php/get_terms_box.php";
                         var request = {search_item: 1};
                         $.post(url, request).done(function (data) {
                             $("body").append(data);
@@ -1237,7 +1237,7 @@ $(document).ready(function () {
     function get_schedule_course_state() {
         var stateid = $('#schedule_states').val();
         var courseid = $('#schedule_courses').val();
-        var url = "http://" + domain + "/functionality/php/get_schedule_course_state.php";
+        var url = "https://" + domain + "/functionality/php/get_schedule_course_state.php";
         var request = {stateid: stateid, courseid: courseid};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
@@ -1249,7 +1249,7 @@ $(document).ready(function () {
 
     function get_schedule_course() {
         var courseid = $('#schedule_courses').val();
-        var url = "http://" + domain + "/functionality/php/get_schedule_course.php";
+        var url = "https://" + domain + "/functionality/php/get_schedule_course.php";
         var request = {courseid: courseid};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
@@ -1260,7 +1260,7 @@ $(document).ready(function () {
 
     function get_register_course_states() {
         var courseid = $('#register_courses').val();
-        var url = "http://" + domain + "/functionality/php/get_register_course_states.php";
+        var url = "https://" + domain + "/functionality/php/get_register_course_states.php";
         var request = {courseid: courseid};
         $.post(url, request).done(function (data) {
             $('#register_states_container').html(data);
@@ -1271,7 +1271,7 @@ $(document).ready(function () {
     function get_register_course_cities() {
         var courseid = $('#register_courses').val();
         var slotid = $('#register_state').val();
-        var url = "http://" + domain + "/functionality/php/get_register_course_cities.php";
+        var url = "https://" + domain + "/functionality/php/get_register_course_cities.php";
         var request = {courseid: courseid, slotid: slotid};
         $.post(url, request).done(function (data) {
             $('#register_cities_container').html(data);
@@ -1315,14 +1315,14 @@ $(document).ready(function () {
         var month = $('#month').val();
         var year = $('#year').val();
         /*
-        var url = "http://" + domain + "/functionality/php/show_gallery_pics.php";
+        var url = "https://" + domain + "/functionality/php/show_gallery_pics.php";
         var request = {state: state, month: month, year: year};
         $.post(url, request).done(function (data) {
             //console.log('Gallery response: '+data);
             $('#gallery_container').html(data);
         });
         */
-       var url="http://"+domain+"/index.php/gallery/matched/"+state+"/"+month+"/"+year;
+       var url="https://"+domain+"/index.php/gallery/matched/"+state+"/"+month+"/"+year;
        window.location=url;       
     }
 

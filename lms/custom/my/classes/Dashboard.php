@@ -16,7 +16,7 @@ class Dashboard extends Util {
 
     function __construct() {
         parent::__construct();
-        $this->resolution_path = 'http://' . $_SERVER['SERVER_NAME'] . '/lms/custom/my/get_screen_resolution.php';
+        $this->resolution_path = 'https://' . $_SERVER['SERVER_NAME'] . '/lms/custom/my/get_screen_resolution.php';
         $this->resolution_path2 = $_SERVER['SERVER_NAME'];
     }
 
@@ -95,7 +95,7 @@ class Dashboard extends Util {
         $userid = $this->user->id;
         $courseid = $this->course->id;
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0' target='_blank'>click</a> here to pay by card. </span>";
+        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0' target='_blank'>click</a> here to pay by card. </span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span12' >If you need help please contact support team.</span>";

@@ -40,46 +40,46 @@ class program_model extends CI_Model {
     public function get_course_image_path($courseid) {
         switch ($courseid) {
             case 41:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/cna best.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/cna best.jpg";
                 break;
             case 44:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
                 break;
             case 45:                
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ekg.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ekg.jpg";
                 break;
             case 46:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/picc line.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/picc line.jpg";
                 break;
             case 47:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/IV%20Picture.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/IV%20Picture.jpg";
                 break;
             case 48:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/IV%20Picture.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/IV%20Picture.jpg";
                 break;
             case 49:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ob tech.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ob tech.jpg";
                 break;
             case 50:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
                 break;
             case 51:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
                 break;
             case 52:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/IV%20Picture.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/IV%20Picture.jpg";
                 break;
             case 53:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ob tech.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ob tech.jpg";
                 break;
             case 54:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/IV%20Picture.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/IV%20Picture.jpg";
                 break;
             case 55:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/Med%20asst%201.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/Med%20asst%201.jpg";
                 break;
             case 56:
-                $path = "http://" . $_SERVER['SERVER_NAME'] . "/assets/logo/Medical%20office%20asst%20pic.jpg";
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/Medical%20office%20asst%20pic.jpg";
                 break;            
         }
         return $path;
@@ -176,7 +176,7 @@ class program_model extends CI_Model {
         $list.="</div>";
 
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
-        $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$cat_id'><button id='program_$cat_id' class='btn btn-primary'>Register</button></a></span>";
+        $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$cat_id'><button id='program_$cat_id' class='btn btn-primary'>Register</button></a></span>";
         $list.="</div>";
 
 
@@ -208,36 +208,36 @@ class program_model extends CI_Model {
                 $blocks = $this->get_item_cost_blocks($item);
                 $has_schedule = $this->is_course_has_schedule($item->id);
                 if ($has_schedule > 0) {
-                    $register_button = "<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a>";
+                    $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a>";
                 } // end if $has_schedule>0
                 else {
-                    $register_button = "<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
+                    $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
                 } // end else    
                 if ($cat_name == 'Hands-On Certification Workshops') {
                     if ($item->id == 45) {
                         $summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . ' ...' : strip_tags($item->summary);
-                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
+                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
                     <p><img src='$item->path' alt='program' style='vertical-align:text-bottom; margin: 0 .5em;' $size></p></div></div><ul class='teachers'><p align='justify'>$summary_string</p><p align='left'>" . $blocks['item_cost'] . "</p><p align='left'>" . $blocks['item_group_cost'] . "</p><p align='left'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></p></ul></div></div>";
                     } // end if $item->id==45
                     if ($item->id == 44) {
                         $summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . ' ...' : strip_tags($item->summary);
-                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
+                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
                     <p><img src='$item->path' alt='program' style='vertical-align:text-bottom; margin: 0 .5em;'  $size></p></div></div><ul class='teachers'><p align='justify'>$summary_string</p><p align='left'>" . $blocks['item_cost'] . "</p><p align='left'>" . $blocks['item_group_cost'] . "</p><p align='left'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></p></ul></div></div>";
                     } // end if $item->id==45
                     if ($item->id == 54) {
                         $summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . ' ...' : strip_tags($item->summary);
-                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
+                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
                     <p><img src='$item->path' alt='program' style='vertical-align:text-bottom; margin: 0 .5em;'   $size></p></div></div><ul class='teachers'><p align='justify'>$summary_string</p><p align='left'>" . $blocks['item_cost'] . "</p><p align='left'>" . $blocks['item_group_cost'] . "</p><p align='left'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></p></ul></div></div>";
                     } // end if $item->id==45
                     if ($item->id == 46) {
                         $summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . ' ...' : strip_tags($item->summary);
-                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
+                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
                     <p><img src='$item->path' alt='program' style='vertical-align:text-bottom; margin: 0 .5em;'   $size></p></div></div><ul class='teachers'><p align='justify'>$summary_string</p><p align='left'>" . $blocks['item_cost'] . "</p><p align='left'>" . $blocks['item_group_cost'] . "</p><p align='left'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></p></ul></div></div>";
                     } // end if $item->id==45
                 } // end if $cat_name == 'Hands-On Certification Workshops'                
                 else {
                     $summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . ' ...' : strip_tags($item->summary);
-                    $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
+                    $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
                     <p><img src='$item->path' alt='program' style='vertical-align:text-bottom; margin: 0 .5em;'    $size></p></div></div><ul class='teachers'><p align='justify'>$summary_string</p><p align='left'>" . $blocks['item_cost'] . "</p><p align='left'>" . $blocks['item_group_cost'] . "</p><p align='left'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></p></ul></div></div>";
                 }
             } // end foreach            
@@ -312,7 +312,7 @@ class program_model extends CI_Model {
                 $list.="</div>";
 
                 $list.="<br/><div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
+                $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
                 $list.="</div>";
 
                 $list.="</div>"; // end of panel-body
@@ -366,10 +366,10 @@ class program_model extends CI_Model {
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
         $has_schedule = $this->is_course_has_schedule($item->id);
         if ($has_schedule > 0) {
-            $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
+            $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
         } // end if $has_schedule>0
         else {
-            $list.="<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
+            $list.="<a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
         } // end else         
         $list.="</div>";
 
@@ -466,11 +466,11 @@ class program_model extends CI_Model {
                 $list.= "<span class='span6'>" . $blocks['item_group_cost'] . "</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span6'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></span>";
+                $list.= "<span class='span6'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/detailes/$item->id'>More</a></span>";
                 $list.="</div>";
 
                 $list.="<br/><div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
+                $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
                 $list.="</div>";
 
                 $list.="</div>"; // end of panel-body
@@ -551,7 +551,7 @@ class program_model extends CI_Model {
                     $list.= "<span class='span2'>$location</span>";
                     $list.= "<span class='span3'>$row->notes</span>";
                     $list.= "<span class='span1'>9am -  5pm</span>";
-                    $list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
+                    $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
                     $list.="</div>";
 
                     $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -597,7 +597,7 @@ class program_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_schedule'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_schedule'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>"; // end of panel-body

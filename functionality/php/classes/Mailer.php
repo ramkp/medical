@@ -249,6 +249,7 @@ class Mailer {
     }
 
     function send_payment_confirmation_message($payment, $group = null, $free = null) {
+        $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
         $subject = "Medical2 Career College - payment confirmation";
         $message = $this->get_payment_confirmation_message($payment, $group, $free);
         $recipient = $payment->bill_email;

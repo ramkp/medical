@@ -5,11 +5,11 @@
             <p class="helplink"></p><br/>
             <div class="footnote"  style="display:inline-block;vertical-align: middle;">
                 <p>(c) 2016 | <a href="#" target="_blank">
-                        <img src="http://<?php echo $_SERVER['SERVER_NAME']; ?>/assets/icons/heart.gif" alt="heart" width="15" height="15">
+                        <img src="https://<?php echo $_SERVER['SERVER_NAME']; ?>/assets/icons/heart.gif" alt="heart" width="15" height="15">
                     </a> Powered  By Z&S &nbsp;&nbsp;                                                                
-                    <a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/about">About Us</a>&nbsp;
+                    <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/about">About Us</a>&nbsp;
                     <!--<a href="#">Chat with US</a>&nbsp;-->
-                    <a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/contact">Contact US</a>&nbsp;
+                    <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/contact">Contact US</a>&nbsp;
                     <!--<i class="fa fa-mobile fa-lg"></i>&nbsp; Phone: (007) 123-456    
                     <i class="fa fa-envelope-o"></i>&nbsp; E-mail:
                     <a href="mailto:info@medical-training.com">info@medical-training.com</a>
@@ -52,14 +52,14 @@
 <script type="text/javascript">
     //<![CDATA[
     var require = {
-        baseUrl: 'http://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/requirejs.php/1451892663/',
+        baseUrl: 'https://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/requirejs.php/1451892663/',
         // We only support AMD modules with an explicit define() statement.
         enforceDefine: true,
         skipDataMain: true,
         paths: {
-            jquery: 'http://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/javascript.php/1451892663/lib/jquery/jquery-1.11.3.min',
-            jqueryui: 'http://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/javascript.php/1451892663/lib/jquery/ui-1.11.4/jquery-ui.min',
-            jqueryprivate: 'http://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/javascript.php/1451892663/lib/requirejs/jquery-private'
+            jquery: 'https://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/javascript.php/1451892663/lib/jquery/jquery-1.11.3.min',
+            jqueryui: 'https://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/javascript.php/1451892663/lib/jquery/ui-1.11.4/jquery-ui.min',
+            jqueryprivate: 'https://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/javascript.php/1451892663/lib/requirejs/jquery-private'
         },
         // Custom jquery config map.
         map: {
@@ -75,7 +75,7 @@
 
     //]]>
 </script>
-<script type="text/javascript" src="http://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/javascript.php/1451892663/lib/requirejs/require.min.js"></script>
+<script type="text/javascript" src="https://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/lib/javascript.php/1451892663/lib/requirejs/require.min.js"></script>
 <script type="text/javascript">
     //<![CDATA[
     require(['core/first'], function () {
@@ -86,7 +86,7 @@
     });
     //]]>
 </script>
-<script type="text/javascript" src="http://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/theme/javascript.php/lambda/1451892772/footer"></script>
+<script type="text/javascript" src="https://<?php echo $_SERVER['SERVER_NAME']; ?>/lms/theme/javascript.php/lambda/1451892772/footer"></script>
 <script type="text/javascript">
     //<![CDATA[
     M.str = {"moodle": {"lastmodified": "Last modified", "name": "Name", "error": "Error", "info": "Information", "viewallcourses": "View all courses", "morehelp": "More help", "loadinghelp": "Loading...", "cancel": "Cancel", "yes": "Yes", "confirm": "Confirm", "no": "No", "areyousure": "Are you sure?", "closebuttontitle": "Close", "unknownerror": "Unknown error"}, "repository": {"type": "Type", "size": "Size", "invalidjson": "Invalid JSON string", "nofilesattached": "No files attached", "filepicker": "File picker", "logout": "Logout", "nofilesavailable": "No files available", "norepositoriesavailable": "Sorry, none of your current repositories can return files in the required format.", "fileexistsdialogheader": "File exists", "fileexistsdialog_editor": "A file with that name has already been attached to the text you are editing.", "fileexistsdialog_filemanager": "A file with that name has already been attached", "renameto": "Rename to \"{$a}\"", "referencesexist": "There are {$a} alias\/shortcut files that use this file as their source", "select": "Select"}, "block": {"addtodock": "Move this to the dock", "undockitem": "Undock this item", "dockblock": "Dock {$a} block", "undockblock": "Undock {$a} block", "undockall": "Undock all", "hidedockpanel": "Hide the dock panel", "hidepanel": "Hide panel"}, "langconfig": {"thisdirectionvertical": "btt"}, "admin": {"confirmation": "Confirmation"}};
@@ -120,7 +120,7 @@
 </script>
 
 <!--[if lte IE 9]>
-<script src="http://cnausa.com/lms/theme/lambda/javascript/ie/iefix.js"></script>
+<script src="https://cnausa.com/lms/theme/lambda/javascript/ie/iefix.js"></script>
 <![endif]-->
 
 

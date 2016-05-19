@@ -17,7 +17,7 @@ $CFG->dboptions = array (
   'dbsocket' => '',
 );
 
-$CFG->wwwroot   = 'http://medical2.com/lms';
+$CFG->wwwroot   = 'https://medical2.com/lms';
 $CFG->dataroot  = '/home/cnausa/public_html/moodledata';
 $CFG->admin     = 'admin';
 

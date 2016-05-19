@@ -22,7 +22,7 @@ class Payment {
         $this->db = new pdo_db();
         $this->enroll = new Enroll();
         $this->invoice = new Invoice();
-        $this->host=$_SERVER['SERVER_NAME'];
+        $this->host = $_SERVER['SERVER_NAME'];
     }
 
     function get_payment_options($courseid, $group = null) {
@@ -303,7 +303,7 @@ class Payment {
         $list.= "</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>";
@@ -801,7 +801,7 @@ class Payment {
             } // end else when tax is not null
         } // end if $installment==null
         else {
-            $users->slotid=0; // There is no delay fee for installment users            
+            $users->slotid = 0; // There is no delay fee for installment users            
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
                 $course_cost = $this->get_personal_course_cost($users->courseid);
@@ -814,7 +814,7 @@ class Payment {
                 }
             } // end if $group==NULL 
             else {
-                $group_data->slotid=0; // There is no delay fee for installment users            
+                $group_data->slotid = 0; // There is no delay fee for installment users            
                 $course_name = $this->get_course_name($group_data->courseid);
                 $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
@@ -897,7 +897,7 @@ class Payment {
         $list.= "</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="</div>";
@@ -1011,7 +1011,7 @@ class Payment {
     }
 
     function get_user_payment_credentials($userid) {
-        $query = "select firstname,lastname,state "
+        $query = "select * "
                 . "from mdl_user where id=$userid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -1058,6 +1058,20 @@ class Payment {
         $this->db->query($query);
     }
 
+    function get_user_slotid($userid) {
+        $slotid = 0;
+        $query = "select * from mdl_scheduler_appointment "
+                . "where studentid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['slotid'];
+            }
+        } // end if $num>0
+        return $slotid;
+    }
+
     function make_stub_payment($card) {
         $list = "";
         $mailer = new Mailer();
@@ -1066,6 +1080,21 @@ class Payment {
         $userid = $card->userid;
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
+        $user_payment_data = $this->get_user_payment_credentials($card->userid);
+
+        // Make card object compatible with confirmation email
+        $card->slotid = $this->get_user_slotid($card->userid);
+        $card->first_name = $user_payment_data->firstname;
+        $card->last_name = $user_payment_data->lastname;
+        $card->phone = $user_payment_data->phone1;
+        $card->pwd = $user_payment_data->purepwd;
+        $card->addr = $user_payment_data->address;
+        $card->city = $user_payment_data->city;
+        $card->state = $user_payment_data->state;
+        $card->zip = $user_payment_data->zip;
+        $card->country = "US";
+        $card->payment_amount = $card->sum;
+
         $installment_status = $invoice->is_installment_user($card->userid, $card->courseid);
         //echo "Installment status: ".$installment_status."<br>";
         if ($installment_status == 0) {

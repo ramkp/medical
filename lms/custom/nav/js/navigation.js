@@ -5,7 +5,7 @@ $(document).ready(function () {
     console.log("ready!");
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
-        $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='http://"+domain+"/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
+        $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='https://"+domain+"/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
     }
 
     function get_price_items_from_category(id) {
@@ -1381,7 +1381,7 @@ $(document).ready(function () {
      ***********************************************************************/
 
     function get_category_course(category_id) {
-        var url = "http://" + domain + "/functionality/php/get_selected_course.php";
+        var url = "https://" + domain + "/functionality/php/get_selected_course.php";
         var request = {cat_id: category_id};
         $.post(url, request).done(function (data) {
             $("#cat_course").html(data);
@@ -1390,7 +1390,7 @@ $(document).ready(function () {
 
     function get_register_course_states() {
         var courseid = $('#register_courses').val();
-        var url = "http://" + domain + "/functionality/php/get_register_course_states.php";
+        var url = "https://" + domain + "/functionality/php/get_register_course_states.php";
         var request = {courseid: courseid};
         $.post(url, request).done(function (data) {
             $('#register_states_container').html(data);
@@ -1401,7 +1401,7 @@ $(document).ready(function () {
     function get_register_course_cities() {
         var courseid = $('#register_courses').val();
         var slotid = $('#register_state').val();
-        var url = "http://" + domain + "/functionality/php/get_register_course_cities.php";
+        var url = "https://" + domain + "/functionality/php/get_register_course_cities.php";
         var request = {courseid: courseid, slotid: slotid};
         $.post(url, request).done(function (data) {
             $('#register_cities_container').html(data);

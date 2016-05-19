@@ -401,7 +401,7 @@ function theme_lambda_process_css($css, $theme) {
 
     $setting = 'list_bg';
 	if (is_null($theme->setting_file_url('pagebackground', 'pagebackground'))) {
-    	global $OUTPUT;
+    	global $OUTPUT;        
 		if ($theme->settings->list_bg==1)  {
         	$pagebackground = $OUTPUT->pix_url('page_bg/page_bg_02', 'theme');
 			$repeat = 'no-repeat fixed 0 0';
@@ -653,6 +653,7 @@ function theme_lambda_set_pagebackground($css, $pagebackground, $setting) {
         $replacement = $OUTPUT->pix_url('page_bg/page_bg_01', 'theme');
     }
     $css = str_replace($tag, $replacement, $css);
+    //echo "Background css: ".$css."<br>";
     return $css;
 }
 

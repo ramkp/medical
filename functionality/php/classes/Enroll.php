@@ -16,7 +16,7 @@ class Enroll {
 
     function __construct() {
         $this->db = new pdo_db();
-        $this->signup_url = 'http://' . $_SERVER['SERVER_NAME'] . '/lms/login/my_signup.php';
+        $this->signup_url = 'https://' . $_SERVER['SERVER_NAME'] . '/lms/login/my_signup.php';
     }
 
     function get_password($length = 8) {

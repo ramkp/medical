@@ -64,9 +64,22 @@
  * Different environments will require different levels of error reporting.
  * By default development will show errors but testing and live will hide them.
  */
-        
+$headers = apache_request_headers();
+$cookie=$headers['Cookie'];
+$cookie_arr=  explode(';', $cookie);
+$status=$cookie_arr[3];
+if (trim($status)=='roundcube_cookies=enabled') {
+    $request_scheme='https';
+}
+else {
+    $request_scheme='http';    
+}
+//echo "Request scheme:  ".$request_scheme ."<br>";
+//print_r($headers);        
 if (substr($_SERVER['HTTP_HOST'], 0, 4) === 'www.') {
-    header('Location: http'.(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ? 's':'').'://' . substr($_SERVER['HTTP_HOST'], 4).$_SERVER['REQUEST_URI']);
+    //header('Location: http'.(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on' ? 's':'').'://' . substr($_SERVER['HTTP_HOST'], 4).$_SERVER['REQUEST_URI']);
+    //header('Location: https://'.substr($_SERVER['HTTP_HOST'], 4).$_SERVER['REQUEST_URI']);
+    header('Location: https://medical2.com'.$_SERVER['REQUEST_URI']);
     exit;
 }        
 switch (ENVIRONMENT)
