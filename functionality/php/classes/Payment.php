@@ -1083,6 +1083,7 @@ class Payment {
         $user_payment_data = $this->get_user_payment_credentials($card->userid);
 
         // Make card object compatible with confirmation email
+        $card->email=$user_payment_data->email;
         $card->slotid = $this->get_user_slotid($card->userid);
         $card->first_name = $user_payment_data->firstname;
         $card->last_name = $user_payment_data->lastname;

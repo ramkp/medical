@@ -152,9 +152,12 @@ class Mailer {
         <td>State</td><td>$user->state</td>
         </tr>
         <tr >
-        <td>Applied Progarm</td><td>$course_name</td>
+        <td>Zip</td><td>$user->zip</td>
         </tr>
         <tr style='background-color:#F5F5F5;'>
+        <td>Applied Progarm</td><td>$course_name</td>
+        </tr>
+        <tr >
         <td>Program fee</td><td>$$course_cost</td>
         </tr>";
 
@@ -200,7 +203,8 @@ class Mailer {
         $mail->addAddress($recipient);
         if ($payment_amount != null) {
             $mail->AddCC('info@medical2.com');
-            $mail->AddBCC('help@medical2.com');
+            $mail->AddCC('sirromas@gmail.com');
+            $mail->AddBCC('help@medical2.com');            
         } // end if $payment_amount != null
         else {
             $mail->addAddress($recipient);
