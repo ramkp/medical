@@ -208,7 +208,7 @@ class program_model extends CI_Model {
                 $blocks = $this->get_item_cost_blocks($item);
                 $has_schedule = $this->is_course_has_schedule($item->id);
                 if ($has_schedule > 0) {
-                    $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a>";
+                    $register_button = "<a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/programs/schedule/$item->id'><button class='btn btn-primary'>Schedule/Register</button></a>";
                 } // end if $has_schedule>0
                 else {
                     $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";

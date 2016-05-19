@@ -19,13 +19,14 @@ class Menu {
         } // end while
         return $list;
     }
+
 }
+
 $menu = new Menu();
 $categories = $menu->get_categories_menu();
 
-$host=$_SERVER['HTTP_HOST'];
+$host = $_SERVER['HTTP_HOST'];
 //echo "Host: ".$host."<br>";
-
 ?>
 <!DOCTYPE html>
 <html  dir="ltr" lang="en" xml:lang="en">
@@ -41,7 +42,7 @@ $host=$_SERVER['HTTP_HOST'];
             var M = {};
             M.yui = {};
             M.pageloadstarttime = new Date();
-           
+
             var yui1ConfigFn = function (me) {
                 if (/-skin|reset|fonts|grids|base/.test(me.name)) {
                     me.type = 'css';
@@ -99,13 +100,13 @@ $host=$_SERVER['HTTP_HOST'];
 
         <div id="wrapper">
             <header id="page-header" class="clearfix">                
-                <div class="container-fluid"><div class="text-center"><a href="https://<?php echo $host ?>/"><img src="https://<?php echo $host ?>/assets/logo/5.png" width="350" height="90"/></a></div></div>
+                <div class="container-fluid"><div class="text-center"><a href="http://<?php echo $host ?>/"><img src="https://<?php echo $host ?>/assets/logo/5.png" width="350" height="90"/></a></div></div>
             </header>
 
             <header  class="navbar">
                 <nav class="navbar-inner">
                     <div class="container-fluid">
-                        <a class="brand" href="https://<?php echo $host ?>" style="height: 30;"><img src="https://<?php echo $host  ?>/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2 Career College</a>
+                        <a class="brand" href="http://<?php echo $host ?>" style="height: 30;"><img src="https://<?php echo $host ?>/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2 Career College</a>
                         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
@@ -121,24 +122,24 @@ $host=$_SERVER['HTTP_HOST'];
                                 <ul class="nav"><li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Courses<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">                                            
 
-                                            <li><a class="dropdown-toggle" href="https://<?php echo $host ?>/index.php/programs/program/5" id="ws"  title="">Healthcare Career Courses </a></li>
-                                            <li><a href="https://<?php echo $host ?>/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>
+                                            <li><a class="dropdown-toggle" href="http://<?php echo $host ?>/index.php/programs/program/5" id="ws"  title="">Healthcare Career Courses </a></li>
+                                            <li><a href="http://<?php echo $host ?>/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>
                                             <!--<li><a href="https://medical2.com/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>-->                                           
-                                            <li><a href="https://<?php echo $host ?>/index.php/programs/program/3/" id="exam" title="">CEUs & Online Courses</a></li>
-                                            <li><a href="https://<?php echo $host ?>/index.php/programs/program/4/" id="college" title="">Online Certification Exams</a></li>                                                                                       
+                                            <li><a href="http://<?php echo $host ?>/index.php/programs/program/3/" id="exam" title="">CEUs & Online Courses</a></li>
+                                            <li><a href="http://<?php echo $host ?>/index.php/programs/program/4/" id="college" title="">Online Certification Exams</a></li>                                                                                       
 
                                         </ul>
                                     </li>                                    
                                     <li><a href="https://<?php echo $host ?>/index.php/register"  id="register_item" title="Register">Register</a></li>
-                                    <li><a href="https://<?php echo $host ?>/index.php/faq"  id="faq_item" title="FAQ’s">FAQ’s</a></li>
+                                    <li><a href="http://<?php echo $host ?>/index.php/faq"  id="faq_item" title="FAQ’s">FAQ’s</a></li>
 
                                     <li id='login_link'><a href="https://<?php echo $host ?>/index.php/login" title="Login">Login</a></li>                                    
                                     <li class="dropdown"><a title="More" class="dropdown-toggle" href="#cm_submenu_2">More<b class="caret"></b></a>
                                         <ul class="dropdown-menu">                                            
-                                            <li><a href="https://<?php echo $host ?>/index.php/certs"  id="cert" title="Verify Certification">Verify Certification</a></li>
-                                            <li><a href="https://<?php echo $host ?>/index.php/groups"  id="group" title="Private Groups">Private Groups</a></li>
-                                            <li><a href="https://<?php echo $host ?>/index.php/testimonial"  id="testimonial" title="Testimonial">Testimonial</a></li>
-                                            <li><a href="https://<?php echo $host ?>/index.php/gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>                                            
+                                            <li><a href="http://<?php echo $host ?>/index.php/certs"  id="cert" title="Verify Certification">Verify Certification</a></li>
+                                            <li><a href="http://<?php echo $host ?>/index.php/groups"  id="group" title="Private Groups">Private Groups</a></li>
+                                            <li><a href="http://<?php echo $host ?>/index.php/testimonial"  id="testimonial" title="Testimonial">Testimonial</a></li>
+                                            <li><a href="http://<?php echo $host ?>/index.php/gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>                                            
                                         </ul>
                                     </li>
 
@@ -170,21 +171,21 @@ $host=$_SERVER['HTTP_HOST'];
                                     }
 
                                     /*
-                                    $(window).on("orientationchange", function () {
-                                        $('#translator_container').remove();
-                                        var width = $(window).width();
-                                        if (width >= 1024) {
-                                            document.write('<li class="dropdown" id="translator_container"><span id="google_translate_element" style="vertical-align:middle;"></span></li>');
-                                        }
-                                        else {
-                                            document.write('<li class="dropdown" id="translator_container"><a><span id="google_translate_element" style="vertical-align:middle;"></span></a><br></li>');
-                                        }
-                                        function googleTranslateElementInit() {
-                                            new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
-                                        }
-
-                                    });
-                                    */
+                                     $(window).on("orientationchange", function () {
+                                     $('#translator_container').remove();
+                                     var width = $(window).width();
+                                     if (width >= 1024) {
+                                     document.write('<li class="dropdown" id="translator_container"><span id="google_translate_element" style="vertical-align:middle;"></span></li>');
+                                     }
+                                     else {
+                                     document.write('<li class="dropdown" id="translator_container"><a><span id="google_translate_element" style="vertical-align:middle;"></span></a><br></li>');
+                                     }
+                                     function googleTranslateElementInit() {
+                                     new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+                                     }
+                                     
+                                     });
+                                     */
 
                                 </script>                                        
 
@@ -203,10 +204,24 @@ $host=$_SERVER['HTTP_HOST'];
 
                                 </style>
 
+                                <?php
+                                $url = $_SERVER['REQUEST_URI'];
+                                echo "Url: " . $url . "<br>";                                
+                                if (strpos($url, 'register') === FALSE && strpos($url, 'login') ===FALSE) {
+                                    echo "<script type='text/javascript' src='http://w.sharethis.com/button/buttons.js'></script>";
+                                    echo "<script type='text/javascript'>stLight.options({publisher: 'eda8d1a9-031a-4879-9550-5afd52ee1ddf', doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>";
+                                }
+                                
+                                
+                                ?>
 
-                                <!-- Sharethis buttons -->
-                                <script type="text/javascript" src="https://w.sharethis.com/button/buttons.js"></script>
+
+
+                                <!-- Sharethis buttons -->                                
+                                <!--
+                                <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
                                 <script type="text/javascript">stLight.options({publisher: "eda8d1a9-031a-4879-9550-5afd52ee1ddf", doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>
+                                -->
 
                             </ul>
                         </div>
