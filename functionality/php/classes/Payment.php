@@ -865,8 +865,8 @@ class Payment {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
         $list.="<span class='span2'><input type='text' id='bill_addr' name='bill_addr'  ></span>";
-        $list.="<span class='span2'>Expiration Date*</span>";
-        $list.="<span class='span2'>" . $card_year . "&nbsp;&nbsp;&nbsp;" . $card_month . "</span>";
+        $list.="<span class='span2'>Expiration Date*</span>";        
+        $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
