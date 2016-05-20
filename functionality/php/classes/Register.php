@@ -14,7 +14,7 @@ class Register {
 
     function __construct() {
         $this->db = new pdo_db();
-        $this->host=$_SERVER['SERVER_NAME'];
+        $this->host = $_SERVER['SERVER_NAME'];
     }
 
     function get_participants_dropbox() {
@@ -479,10 +479,10 @@ class Register {
             $num = $this->db->numrows($query);
             if ($num > 0) {
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $slots[] = $row['id'];
+                    $slots[] = trim($row['id']);
                 } // end while
             } // end if $num > 0
-        } // $schedulerid>0
+        } // $schedulerid>0        
         return $slots;
     }
 
@@ -500,17 +500,22 @@ class Register {
     }
 
     function get_register_course_states($courseid) {
+        $register_states = array();
         $drop_down = "";
         $drop_down.="<select id='register_state' style='width:120px;'>";
-        $drop_down.="<option value='0' selected>All States</option>";
+        $drop_down.="<option value='0' selected>State</option>";
         $slots = $this->get_course_slots($courseid);
         if (count($slots) > 0) {
             foreach ($slots as $slot) {
                 $slot_data = $this->get_slot_data($slot);
                 $locations = explode("/", $slot_data->appointmentlocation);
                 $state = $locations[0];
-                $drop_down.="<option value='$slot'>$state</option>";
+                $register_states[$slot] = $state;
             } // end foreach
+            asort($register_states);
+            foreach ($register_states as $key => $value) {
+                $drop_down.="<option value='$key'>$value</option>";
+            } // end foeach 
         } // end if count($slots)>0
         $drop_down.="</select>";
         return $drop_down;
@@ -529,28 +534,28 @@ class Register {
         date_default_timezone_set('Pacific/Wallis');
         $drop_down = "";
         $drop_down.="<select id='register_cities' style='width:120px;'>";
-        $drop_down.="<option value='0' selected>All Cities</option>";
+        $drop_down.="<option value='0' selected>City</option>";
         $schedulerid = $this->get_schedulerid($courseid);
         if ($schedulerid > 0) {
             $slot_data = $this->get_slot_data($slotid);
             $locations = explode("/", $slot_data->appointmentlocation);
             $statename = $locations[0];
-            $now=time()+86400;
+            $now = time() + 86400;
             $query = "select * from mdl_scheduler_slots "
                     . "where schedulerid=$schedulerid "
                     . "and appointmentlocation like '%$statename%' "
-                    . "and starttime>$now order by starttime";
+                    . "and starttime>$now order by appointmentlocation";
             $result = $this->db->query($query);
             $num = $this->db->numrows($query);
             if ($num > 0) {
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $hdate=date('m-d-Y', $row['starttime']);
+                    $hdate = date('m-d-Y', $row['starttime']);
                     $locations2 = explode("/", $row['appointmentlocation']);
                     if (count($locations2) == 0) {
                         $locations2 = explode(",", $row['appointmentlocation']);
-                    }               
+                    }
                     $cityname = $locations2[1];
-                    $drop_down.="<option value='".$row['id']."'>$cityname - $hdate</option>";
+                    $drop_down.="<option value='" . $row['id'] . "'>$cityname - $hdate</option>";
                 } // end while
             } // end if $num > 0
         } // end if $schedulerid>0
