@@ -91,7 +91,7 @@ class Payments extends Util {
                 $course = $this->get_course_name($payment->courseid);
                 $date = date('Y-m-d', $payment->i_pdate);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span1'>User</span><span class='span3'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
+                $list.="<span class='span1'>User</span><span class='span3'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span1'>Program</span><span class='span3'>$course</span>";
@@ -309,7 +309,7 @@ class Payments extends Util {
                 $course = $this->get_course_name($payment->courseid);
                 $date = date('Y-m-d', $payment->pdate);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User</span><span class='span3'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname ($user->email)</a></span>";
+                $list.="<span class='span2'>User</span><span class='span3'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program</span><span class='span6'>$course </span>";

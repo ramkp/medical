@@ -266,7 +266,7 @@ class Invoices extends Util {
                 $prefix = ($paid == false) ? "from " : "paid date ";
                 $link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $invoice->i_file));
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User</span><span class='span6'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$invoice->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
+                $list.="<span class='span2'>User</span><span class='span6'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$invoice->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
 
                 $list.="<div class='container-fluid'>";
