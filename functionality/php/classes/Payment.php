@@ -1139,7 +1139,7 @@ class Payment {
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Payment is successfull. Thank you!</span>";
+                    $list.= "<span class='span8'>Payment is successfull. Thank you! You can print your registration data <a href='https://".$_SERVER['SERVER_NAME']."/lms/custom/invoices/registrations/$user_payment_data->email' target='_blank'>here.</a></span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";

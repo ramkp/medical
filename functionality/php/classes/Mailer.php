@@ -10,6 +10,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/mailer/vendor/PHPMailerAutoload.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
 
+use Dompdf\Dompdf;
+
 class Mailer {
 
     public $mail_smtp_host = 'mail.medical2.com';
@@ -17,11 +19,13 @@ class Mailer {
     public $mail_smtp_user = 'info@medical2.com';
     public $mail_smtp_pwd = 'aK6SKymc';
     public $invoice_path;
+    public $registration_path;
     public $db;
 
     function __construct() {
         $this->db = new pdo_db();
         $this->invoice_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices';
+        $this->registration_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/registrations';
     }
 
     function get_course_name($user) {
@@ -109,7 +113,7 @@ class Mailer {
         return $grand_total;
     }
 
-    function get_account_confirmation_message($user) {
+    function get_account_confirmation_message($user,$printed_data = null) {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
@@ -119,10 +123,13 @@ class Mailer {
         $list.="<body><br/><br/><br/><br/>";
         $list.="<div class='datagrid'>            
         <table style='table-layout: fixed;' width='360'>
-        <thead><tr>
-        <th colspan='2' align='left'><img src='http://medical2.com/assets/logo/5.png' width='360' height='90'></th>
-        </tr>
-        </thead>
+        <thead>";
+        if ($printed_data == NULL) {
+            $list.="<tr>";
+            $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/5.png' width='360' height='90'></th>";
+            $list.="</tr>";
+        } // end if $printed_data == NULL        
+        $list.="</thead>
         <tbody>
         <tr style='background-color:#F5F5F5;'>
         <td>First name</td><td>$user->first_name</td>
@@ -178,12 +185,27 @@ class Mailer {
         return $list;
     }
 
+    function create_registration_data_details($user) {
+        $dompdf = new Dompdf();
+        $message = $this->get_account_confirmation_message($user, true);
+        $dompdf->loadHtml($message);
+
+        $dompdf->setPaper('A4', 'portrait');
+
+        $dompdf->render();
+        $output = $dompdf->output();
+
+        $file_path = $this->registration_path . "/$user->email.pdf";
+        file_put_contents($file_path, $output);
+    }
+
     function send_account_confirmation_message($user) {
         $subject = "Medical2 Career College - registration confirmation";
         $message = $this->get_account_confirmation_message($user);
         $recipient = $user->email;
         $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
         $this->send_signup_confirmation_email($subject, $message, $recipient, $payment_amount);
+        $this->create_registration_data_details($user);
     }
 
     function send_signup_confirmation_email($subject, $message, $recipient, $payment_amount) {
@@ -204,7 +226,7 @@ class Mailer {
         if ($payment_amount != null) {
             $mail->AddCC('info@medical2.com');
             $mail->AddCC('sirromas@gmail.com');
-            $mail->AddBCC('help@medical2.com');            
+            $mail->AddBCC('help@medical2.com');
         } // end if $payment_amount != null
         else {
             $mail->addAddress($recipient);
