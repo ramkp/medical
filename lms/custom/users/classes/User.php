@@ -71,8 +71,8 @@ class User extends Util {
         $list.="</div>";
         foreach ($users as $user) {
             $list.="<div class='container-fluid'>";
-            $list.="<a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'><span class='span2'>$user->firstname</a></span>";
-            $list.="<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'>$user->lastname</a></span>";
+            $list.="<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'><span class='span2'>$user->firstname</a></span>";
+            $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'>$user->lastname</a></span>";
             $list.="<span class='span4'>$user->email</span>";
             $list.="<span class='span2'>$user->purepwd</span>";
             $list.="</div>";
