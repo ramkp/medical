@@ -23,7 +23,7 @@ class Util {
         $this->db = $db;
         $this->user = $USER;
         $this->course = $COURSE;
-        $this->host=$_SERVER['SERVER_NAME'];
+        $this->host = $_SERVER['SERVER_NAME'];
     }
 
     function get_screen_resolution() {
@@ -31,9 +31,9 @@ class Util {
             
         }  // end if isset($_SESSION['screen_width']) AND isset($_SESSION['screen_height'])
         else if (isset($_REQUEST['width']) AND isset($_REQUEST['height'])) {
-          //  $_SESSION['screen_width'] = $_REQUEST['width'];
-          //  $_SESSION['screen_height'] = $_REQUEST['height'];
-          //  header('Location: ' . $_SERVER['PHP_SELF']);
+            //  $_SESSION['screen_width'] = $_REQUEST['width'];
+            //  $_SESSION['screen_height'] = $_REQUEST['height'];
+            //  header('Location: ' . $_SERVER['PHP_SELF']);
         } // end else if        
         else {
             echo '<script type="text/javascript">window.location = "' . $_SERVER['PHP_SELF'] . '?width="+$(window).width()+"&height="+$(window).height();</script>';
@@ -124,14 +124,14 @@ class Util {
     }
 
     function get_user_details($id) {
-        $query = "select firstname, lastname, email from mdl_user where id=$id";
+        $query = "select * from mdl_user where id=$id";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $user = new stdClass();
             if ($row['firstname'] != '' && $row['lastname'] != '') {
-                $user->firstname = $row['firstname'];
-                $user->lastname = $row['lastname'];
-                $user->email = $row['email'];
+                foreach ($row as $key => $value) {
+                    $user->$key = $value;
+                } // end foreach
             } // end if $row['firstname'] != '' && $row['lastname'] != ''
         } // end while
         return $user;

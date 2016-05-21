@@ -376,10 +376,28 @@ class Dashboard extends Util {
         } // end if $num > 0
         return $slotids;
     }
+    
+    function get_user_payments ($userid,$courseid) {
+        $list="";
+        $query="select * from mdl_card_payments "
+                . "where courseid=$courseid and userid=$userid";       
+        $num = $this->db->numrows($query);
+        if ($num>0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $list.="Paid by card $".$row['psum']."";
+            } // end while
+        } // end if $num>0
+        else {
+            $list.="N/A";
+        }
+        return $list;
+    }
 
-    function get_course_schedule_data($userslots, $courseid) {
+    function get_course_schedule_data($userid, $userslots, $courseid) {
         $list = "";
         date_default_timezone_set('Pacific/Wallis');
+        $user_payments=$this->get_user_payments($userid, $courseid);
         if (count($userslots) > 0) {
             foreach ($userslots as $slotid) {
                 $course_slots = $this->get_course_slots($courseid);
@@ -396,6 +414,7 @@ class Dashboard extends Util {
                         $location = $location_arr[1] . "," . $location_arr[0];
                         $list.="<b>Date:</b> " . $date . "<br>";
                         $list.="<b>Location:</b> " . $location . "<br>$notes";
+                        $list.="<b>Payment status:</b> $user_payments";
                     } // end if $cslot==$slotid
                     else {
                         //$list.="Program detailes: N/A";
@@ -406,6 +425,17 @@ class Dashboard extends Util {
         else {
             $list.="Program detailes: N/A";
         }
+        return $list;
+    }
+
+    function get_address_block($userid) {
+        $list = "";
+        $user_detailes = $this->get_user_details($userid);
+        $list.="$user_detailes->firstname $user_detailes->lastname<br>";
+        $list.="Phone: $user_detailes->phone1<br>";
+        $list.="Email: $user_detailes->email<br>";
+        $list.="$user_detailes->address<br>";
+        $list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
         return $list;
     }
 

@@ -515,8 +515,7 @@ class Register {
         if (count($slots) > 0) {
             foreach ($slots as $slot) {
                 $slot_data = $this->get_slot_data($slot);
-                $locations = explode("/", $slot_data->appointmentlocation);
-                $date = date('d-m-Y', $slot_data->starttime);
+                $locations = explode("/", $slot_data->appointmentlocation);                
                 //$state = $locations[0] . "  " . $locations[1]. "- ".$date;
                 $state = $locations[0] ;
                 $register_states[$slot] = $state;

@@ -70,6 +70,10 @@ class user_editadvanced_form extends moodleform {
         $mform->addElement('text', 'username', get_string('username'), 'size="20"');
         $mform->addRule('username', $strrequired, 'required', null, 'client');
         $mform->setType('username', PARAM_RAW);
+        
+        $mform->addElement('text', 'address', get_string('address'), 'size="20"');
+        //$mform->addRule('address', $strrequired, 'required', null, 'client');
+        $mform->setType('address', PARAM_RAW);
 
         $auths = core_component::get_plugin_list('auth');
         $enabled = get_string('pluginenabled', 'core_plugin');

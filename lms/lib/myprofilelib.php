@@ -44,7 +44,7 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     $courseorusercontext = !empty($course) ? context_course::instance($course->id) : $usercontext;
     $courseorsystemcontext = !empty($course) ? context_course::instance($course->id) : $systemcontext;
     $courseid = !empty($course) ? $course->id : SITEID;
-
+    $ds = new Dashboard();
     $contactcategory = new core_user\output\myprofile\category('contact', get_string('userdetails'));
     // No after property specified intentionally. It is a hack to make administration block appear towards the end. Refer MDL-49928.
     $coursedetailscategory = new core_user\output\myprofile\category('coursedetails', get_string('coursedetails'));
@@ -158,10 +158,16 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $node = new core_user\output\myprofile\node('contact', 'country', get_string('country'), null, null, get_string($user->country, 'countries'));
         $tree->add_node($node);
     }
+    
+    $addr_block=$ds->get_address_block($user->id);
+    $node = new core_user\output\myprofile\node('contact', 'address', 'Address', null, null, $addr_block);
+    $tree->add_node($node);
 
+    /*
+     * 
     $node = new core_user\output\myprofile\node('contact', 'State', get_string('state'), null, null, $user->state);
     $tree->add_node($node);
-    
+
     $node = new core_user\output\myprofile\node('contact', 'Zip', 'Zip', null, null, $user->zip);
     $tree->add_node($node);
 
@@ -169,11 +175,21 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
         $node = new core_user\output\myprofile\node('contact', 'city', get_string('city'), null, null, $user->city);
         $tree->add_node($node);
     }
+     * 
+     */
 
-    if (isset($identityfields['address']) && $user->address) {
-        $node = new core_user\output\myprofile\node('contact', 'address', get_string('address'), null, null, $user->address);
-        $tree->add_node($node);
-    }
+    /*
+     * 
+      if (isset($identityfields['address']) && $user->address) {
+      $node = new core_user\output\myprofile\node('contact', 'address', get_string('address'), null, null, $user->address);
+      $tree->add_node($node);
+      }
+     * 
+     */
+
+
+    
+
 
     if (isset($identityfields['phone1']) && $user->phone1) {
         $node = new core_user\output\myprofile\node('contact', 'phone1', get_string('phone1'), null, null, $user->phone1);
@@ -221,15 +237,14 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     if (!isset($hiddenfields['mycourses'])) {
         $showallcourses = optional_param('showallcourses', 0, PARAM_INT);
         if ($mycourses = enrol_get_all_users_courses($user->id, true, null, 'visible DESC, sortorder ASC')) {
-            $shown = 0;
-            $ds = new Dashboard();
+            $shown = 0;            
             $userslots = $ds->get_user_slots($user->id);
             $courselisting = html_writer::start_tag('ul');
             foreach ($mycourses as $mycourse) {
                 if ($mycourse->category) {
                     context_helper::preload_from_record($mycourse);
                     $ccontext = context_course::instance($mycourse->id);
-                    $course_schedule = $ds->get_course_schedule_data($userslots, $mycourse->id);
+                    $course_schedule = $ds->get_course_schedule_data($user->id,$userslots, $mycourse->id);
                     if (!isset($course) || $mycourse->id != $course->id) {
                         $linkattributes = null;
                         if ($mycourse->visible == 0) {
