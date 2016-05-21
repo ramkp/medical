@@ -472,9 +472,12 @@ class Register {
     function get_course_slots($courseid) {
         $slots = array();
         $schedulerid = $this->get_schedulerid($courseid);
+        $now=time()+86400;
         if ($schedulerid > 0) {
-            $query = "select * from mdl_scheduler_slots "
-                    . "where schedulerid=$schedulerid order by starttime";
+            $query = "select DISTINCT id from mdl_scheduler_slots "
+                    . "where schedulerid=$schedulerid "
+                    . "and starttime>".$now." order by starttime";
+            //echo "Query: ".$query."<br>";
             $result = $this->db->query($query);
             $num = $this->db->numrows($query);
             if ($num > 0) {
@@ -483,6 +486,8 @@ class Register {
                 } // end while
             } // end if $num > 0
         } // $schedulerid>0        
+        array_unique($slots);
+        
         return $slots;
     }
 
@@ -496,10 +501,12 @@ class Register {
                 $slot->$key = $value;
             } // end foreach
         } // end while
+        //array_unique($slot);
         return $slot;
     }
 
     function get_register_course_states($courseid) {
+        date_default_timezone_set('Pacific/Wallis');
         $register_states = array();
         $drop_down = "";
         $drop_down.="<select id='register_state' style='width:120px;'>";
@@ -509,11 +516,14 @@ class Register {
             foreach ($slots as $slot) {
                 $slot_data = $this->get_slot_data($slot);
                 $locations = explode("/", $slot_data->appointmentlocation);
-                $state = $locations[0];
+                $date = date('d-m-Y', $slot_data->starttime);
+                //$state = $locations[0] . "  " . $locations[1]. "- ".$date;
+                $state = $locations[0] ;
                 $register_states[$slot] = $state;
             } // end foreach
-            asort($register_states);
-            foreach ($register_states as $key => $value) {
+            $sorted=  array_unique($register_states);
+            asort($sorted);
+            foreach ($sorted as $key => $value) {
                 $drop_down.="<option value='$key'>$value</option>";
             } // end foeach 
         } // end if count($slots)>0
