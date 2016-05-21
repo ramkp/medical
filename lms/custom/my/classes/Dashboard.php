@@ -376,28 +376,54 @@ class Dashboard extends Util {
         } // end if $num > 0
         return $slotids;
     }
-    
-    function get_user_payments ($userid,$courseid) {
-        $list="";
-        $query="select * from mdl_card_payments "
-                . "where courseid=$courseid and userid=$userid";       
+
+    function get_user_card_payments($userid, $courseid) {
+        $list = "";
+        $query = "select * from mdl_card_payments "
+                . "where courseid=$courseid and userid=$userid";
         $num = $this->db->numrows($query);
-        if ($num>0) {
+        if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by card $".$row['psum']."";
+                $list.="Paid by card $" . $row['psum'] . "&nbsp;";
             } // end while
         } // end if $num>0
         else {
-            $list.="N/A";
+            $list.="Paid by card: N/A &nbsp;";
         }
+        return $list;
+    }
+
+    function get_user_invoice_payments($userid, $courseid) {
+        $list = "";
+        $query = "select * from mdl_invoice "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $list.="Paid by cash $" . $row['i_sum'] . "&nbsp;";
+            } // end while
+        } // end if $num>0
+        else {
+            $list.="Paid by cash: N/A &nbsp;";
+        }
+        return $list;
+    }
+
+    function get_user_payments($userid, $courseid) {
+        $list = "";
+        $card_payments = $this->get_user_card_payments($userid, $courseid);
+        $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
+        $list.=$card_payments;
+        $list.=$invoice_payments;
         return $list;
     }
 
     function get_course_schedule_data($userid, $userslots, $courseid) {
         $list = "";
         date_default_timezone_set('Pacific/Wallis');
-        $user_payments=$this->get_user_payments($userid, $courseid);
+        $user_payments = $this->get_user_payments($userid, $courseid);
         if (count($userslots) > 0) {
             foreach ($userslots as $slotid) {
                 $course_slots = $this->get_course_slots($courseid);
@@ -423,7 +449,8 @@ class Dashboard extends Util {
             } // end foreach
         } // end if count($slotids)> 0 
         else {
-            $list.="Program detailes: N/A";
+            $list.="<b>Program detailes</b>: N/A<br>";
+            $list.="<b>Payment status:</b> $user_payments";
         }
         return $list;
     }

@@ -54,6 +54,8 @@ class Invoices extends Util {
         $list = "Item successfully updated";
         return $list;
     }
+    
+    
 
     /*     * ******************************************************
      * 
@@ -265,8 +267,13 @@ class Invoices extends Util {
                 $coursename = $this->get_course_name($invoice->courseid);
                 $prefix = ($paid == false) ? "from " : "paid date ";
                 $link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $invoice->i_file));
+                $address_block=$this->get_user_address_block($invoice->userid);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>User</span><span class='span6'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$invoice->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
+                $list.="</div>";
+                
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Address</span><span class='span6'>$address_block</span>";
                 $list.="</div>";
 
                 $list.="<div class='container-fluid'>";

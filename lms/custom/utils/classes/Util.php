@@ -202,4 +202,15 @@ class Util {
         return $name;
     }
 
+    function get_user_address_block($userid) {
+        $list = "";
+        $user_detailes = $this->get_user_details($userid);
+        $list.="$user_detailes->firstname $user_detailes->lastname<br>";
+        $list.="Phone: $user_detailes->phone1<br>";
+        $list.="Email: $user_detailes->email<br>";
+        $list.="$user_detailes->address<br>";
+        $list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
+        return $list;
+    }
+
 }

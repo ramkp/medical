@@ -87,8 +87,18 @@ class Certificates extends Util {
                 $list.="<div class='container-fluid' style='text-align:center;'>";
                 $list.="<span class='span8' style='color:red;' id='cert_err'></span>";
                 $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span2'><a href='#' onclick='return false;' id='select_all'>Select all</a></span>";
+                $list.="<span class='span2'><a href='#' onclick='return false;' id='deselect_all'>Deselect all</a></span>";
+                $list.="<span class='span3'><a href='#' onclick='return false;' id='print_certs'>Print Selected Certificates</a></span>";
+                $list.="<span class='span3'><a href='#' onclick='return false;' id='print_labels'>Print Selected Labels</a></span>";             
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span10' id='print_err'></span>";
+                $list.="</div>";
+                
                 $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
-                $list.="<span class='span10'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+                $list.="<span class='span10'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
                 $list.="</div>";
             } // end if $toolbar==true            
             $list.="<div id='certificates_container'>";
@@ -107,6 +117,9 @@ class Certificates extends Util {
                 $_exp_date = ($exp_date == '') ? "n/a" : $exp_date;
                 $cert_link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $certificate->path));
                 $addr_link = "/lms/custom/certificates/$certificate->userid/label.pdf";
+                //$address_block=$this->get_user_address_block($user->id);                
+                //echo "Address block: ".$address_block."<br>";
+                
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Firstname</span><span class='span2'>$user->firstname</span>";
                 $list.="</div>";
@@ -115,7 +128,15 @@ class Certificates extends Util {
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Email</span><span class='span2'>$user->email</span>";
+                $list.="</div>";                
+                /*
+                 * 
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Address</span><span class='span2'>$address_block</span>";
                 $list.="</div>";
+                 * 
+                 */
+                
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program name</span><span class='span6'>$coursename</span>";
                 $list.="</div>";
@@ -134,6 +155,11 @@ class Certificates extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Expiration date</span><span class='span2'>$_exp_date</span>";
                 $list.="</div>";
+                
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'><input class='cert' type='checkbox' id='$certificate->userid' value='$certificate->userid'></span><span class='span2'>Select</span>";
+                $list.="</div>";          
+                
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span6'><hr/></span>";
                 $list.="</div>";
@@ -206,7 +232,7 @@ class Certificates extends Util {
     }
 
     function get_user_details($id) {
-        $query = "select firstname, lastname, email from mdl_user where id=$id";
+        $query = "select * from mdl_user where id=$id";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $user = new stdClass();
@@ -214,6 +240,7 @@ class Certificates extends Util {
                 $user->firstname = $row['firstname'];
                 $user->lastname = $row['lastname'];
                 $user->email = $row['email'];
+                $user->id=$row['id'];
             } // end if $row['firstname'] != '' && $row['lastname'] != ''
         } // end while
         return $user;

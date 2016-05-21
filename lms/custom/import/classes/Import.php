@@ -12,6 +12,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 require_once($CFG->dirroot . '/user/editlib.php');
 
 use Dompdf\Dompdf;
@@ -37,7 +38,7 @@ class Import extends Util {
     }
 
     function get_user_address_data($userid) {
-        $query = "SELECT firstname, lastname, email, phone1, address, city, state, zip
+        $query = "SELECT *
                 FROM  `mdl_user` where id=$userid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -807,7 +808,7 @@ class Import extends Util {
                 $email = strtolower(trim($data[1]));
                 $stateid = trim($data[2]);
                 $note = trim($data[3]);
-                if ($uid!='' && $email!='' && $this->valid_email($email) && $stateid != '') {
+                if ($uid != '' && $email != '' && $this->valid_email($email) && $stateid != '') {
                     $statename = $this->get_state_name($stateid);
                     $user_exists = $this->is_user_uid_exists($email);
                     echo "User exists: " . $user_exists . "<br>";
@@ -836,6 +837,73 @@ class Import extends Util {
         else {
             die("Error: can't open file <br>");
         } // end else
+    }
+
+    function update_users_addresses() {
+        $certificates = array();
+        $query = "select * from mdl_certificates order by userid desc";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $certificate = new stdClass();
+            foreach ($row as $key => $value) {
+                $certificate->$key = $value;
+            }
+            $certificates[] = $certificate;
+        }
+        $pdf2 = new PDF_Label('L7163');
+
+        /*
+          echo "<pre>";
+          print_r($certificates);
+          echo "</pre><br>";
+         */
+
+        $i = 0;
+        echo "Total Certificates found: " . count($certificates);
+        $pdf = new mPDF('utf-8', 'A4-P');
+        foreach ($certificates as $certificate) {
+            $user_address_block = $this->get_user_address_block($certificate->userid);
+
+            echo "<br>-----------------------------------<br>";
+            echo "User ID: " . $certificate->userid . "<br>";
+            echo $user_address_block;
+
+            $pdf2 = new PDF_Label('L7163');
+            $pdf2->AddPage();
+            $user_address=$this->get_user_address_data($certificate->userid);
+            $text = sprintf("%s\n%s\n%s\n%s\n%s", "$user_address->firstname $user_address->lastname", "Phone: $user_address->phone1", "Email: $user_address->email", "$user_address->address", "$user_address->city, $user_address->state, $user_address->zip");
+            //$text = sprintf("%s\n%s\n%s\n%s", $user_address_block);
+            $pdf2->Add_Label($text);
+            $dir_path = $this->cert_path . "/$certificate->userid";
+            if (!is_dir($dir_path)) {
+                if (!mkdir($dir_path)) {
+                    die('Could not write to disk');
+                } // end if !mkdir($dir_path)
+            } // end if !is_dir($dir_path)
+            $path = $dir_path . "/label.pdf";
+            $pdf2->Output($path, 'F');
+            $i++;
+            /*
+             * 
+              $pdf->WriteHTML($user_address_block);
+              $dir_path = $this->cert_path . "/$certificate->userid";
+              if (!is_dir($dir_path)) {
+              if (!mkdir($dir_path)) {
+              die('Could not write to disk');
+              } // end if !mkdir($dir_path)
+              } // end if !is_dir($dir_path)
+              $path = $dir_path . "/label.pdf";
+              echo "Label location: ".$path."<br>";
+              $pdf->Output($path, 'F');
+              $pdf->Close();
+              echo "<br>Address label for User ($certificate->userid) was created";
+              echo "<br>-----------------------------------<br>";
+              $i++;
+              } // end foreach
+             * 
+             */
+        } // end foreach
+        echo "<br>Total Labels created: " . $i . "<br>";
     }
 
 }

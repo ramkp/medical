@@ -1,11 +1,11 @@
 
 $(document).ready(function () {
 
-    var domain = 'medical2.com';    
+    var domain = 'medical2.com';
     console.log("ready!");
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
-        $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='https://"+domain+"/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
+        $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='https://" + domain + "/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
     }
 
     function get_price_items_from_category(id) {
@@ -328,7 +328,7 @@ $(document).ready(function () {
         else {
             taxes = 0;
         }
-        console.log('Taxes status: '+taxes);
+        console.log('Taxes status: ' + taxes);
 
         if ($(expire_num).is(':checked')) {
             expire = 1;
@@ -336,7 +336,7 @@ $(document).ready(function () {
         else {
             expire = 0;
         }
-        console.log ('Expiration status: '+expire);
+        console.log('Expiration status: ' + expire);
 
         if ($(installment_id).is(':checked')) {
             installment = 1;
@@ -873,6 +873,57 @@ $(document).ready(function () {
         } // end else 
     }
 
+    function select_all() {
+        // console.log('Select all function ....');
+        $('.cert').each(function () { //loop through each checkbox
+            this.checked = true;  //select all checkboxes with class "cert"              
+        });
+    }
+
+    function deselect_all() {
+        //console.log('Deselect all function ....');
+        $('.cert').each(function () { //loop through each checkbox
+            this.checked = false;  //select all checkboxes with class "cert"              
+        });
+    }
+
+    function print_certs() {
+        var selected = new Array();
+        $(".cert").each(function () {
+            if ($(this).is(':checked')) {
+                selected.push($(this).val());
+            }
+        });
+        console.log('Array length: ' + selected.length);
+        if (selected.length > 0) {
+            if (confirm('Print selected certificates?')) {
+                $('#print_err').html("Selected certificates were sent to printer");
+            } // end if confirm
+        } // end if selected.length>0
+        else {
+            $('#print_err').html('Please select at least one certificate to be printed');
+        } // end else
+    }
+
+    function print_labels() {
+        var selected = new Array();
+        $(".cert").each(function () {
+            if ($(this).is(':checked')) {
+                selected.push($(this).val());
+            }
+        });
+        console.log('Array length: ' + selected.length);
+        if (selected.length > 0) {
+            if (confirm('Print selected labels?')) {
+                $('#print_err').html("Selected labels were sent to printer");
+            } // end if confirm
+        } // end if selected.length>0
+        else {
+            $('#print_err').html('Please select at least one certificate to be printed');
+        } // end else
+
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -1080,6 +1131,23 @@ $(document).ready(function () {
         if (event.target.id == 'send_invoice_renew') {
             send_invoice_renew();
         }
+
+        if (event.target.id == 'select_all') {
+            select_all();
+        }
+
+        if (event.target.id == 'deselect_all') {
+            deselect_all();
+        }
+
+        if (event.target.id == 'print_certs') {
+            print_certs();
+        }
+
+        if (event.target.id == 'print_labels') {
+            print_labels();
+        }
+
 
     }); // end of $('#region-main').on('click', 'a'
 
