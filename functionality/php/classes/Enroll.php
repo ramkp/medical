@@ -171,6 +171,7 @@ class Enroll {
     function update_user_data($userid, $user) {
         $query = "update mdl_user "
                 . "set purepwd='$user->pwd' ,"
+                . "slotid='$user->slotid' ,"
                 . "address='$user->addr', "
                 . "business='$user->inst', "
                 . "zip='$user->zip', "
