@@ -36,7 +36,13 @@ class Dashboard extends Util {
             $query = "select * from mdl_invoice "
                     . "where userid=$userid and courseid=$courseid and i_status=1";
             $invoice_payments_num = $this->db->numrows($query);
-            if ($card_payments_num > 0 || $invoice_payments_num > 0) {
+
+            // 3. Check among partial payments
+            $query = "select * from mdl_partial_payments "
+                    . "where userid=$userid and courseid=$courseid";
+            $partial_num = $this->db->numrows($query);
+
+            if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0) {
                 $status = 1;
             } // end if $card_payments_num>0 || $invoice_payments_num>0
         } // end if $installment_status==0
@@ -414,9 +420,9 @@ class Dashboard extends Util {
     function get_user_payments($userid, $courseid) {
         $list = "";
         $card_payments = $this->get_user_card_payments($userid, $courseid);
-        $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
+        //$invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $list.=$card_payments;
-        $list.=$invoice_payments;
+        //$list.=$invoice_payments;
         return $list;
     }
 
