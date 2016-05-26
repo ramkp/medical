@@ -130,6 +130,7 @@ class navClass extends Util {
                                     <li><a href='#' title='About' id='about'>About page</a></li>
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>
+                                    <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
                                     <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>                                    
@@ -217,6 +218,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>
                                     <li><a href='#' title='Renew fee' id='renew_fee'>Renew Fee</a></li>
+                                    <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='FAQ' id='FAQ'>FAQ’s</a></li>
                                     <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>

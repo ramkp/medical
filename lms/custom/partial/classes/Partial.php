@@ -38,11 +38,34 @@ class Partial extends Util {
         return $counter;
     }
 
-    function get_partial_payments_list() {
-        $list = "";
+    function get_partial_cc_payments() {
         $partials = array();
         $query = "select * from mdl_card_payments "
-                . "where pdate>1464074847 order by pdate desc limit 0, $this->limit";
+                . "where pdate>1464074847 order by pdate desc";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $course_cost_array = $this->payment->get_personal_course_cost($row['courseid']);
+                $user_payment = $row['psum'];
+                $course_cost = $course_cost_array['cost'];
+                if ($user_payment < $course_cost) {
+                    $partial = new stdClass();
+                    $partial->userid = $row['userid'];
+                    $partial->courseid = $row['courseid'];
+                    $partial->payment = $row['psum'];
+                    $partial->cost = $course_cost;
+                    $partial->pdate = $row['pdate'];
+                    $partials[] = $partial;
+                } // end if $user_payment!=$course_cost
+            } // end while
+        } // end if $num > 0
+        return $partials;
+    }
+
+    function get_partial_offline_payments() {
+        $partials = array();
+        $query = "select * from mdl_partial_payments";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -61,6 +84,14 @@ class Partial extends Util {
                 } // end if $user_payment!=$course_cost
             } // end while
         } // end if $num > 0        
+        return $partials;
+    }
+
+    function get_partial_payments_list() {
+        $list = "";
+        $cc_partials = $this->get_partial_cc_payments();
+        $of_partials = $this->get_partial_offline_payments();
+        $partials = array_merge($cc_partials, $of_partials);
         $list.=$this->create_partial_payments_list($partials);
         return $list;
     }
@@ -75,7 +106,7 @@ class Partial extends Util {
             $list.="</div>";
             $add_payment_block = $this->get_add_partial_payment_page();
             $list.="<br><div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span10' id='add_payment_container' style='display:none;'>$add_payment_block</span>";
+            $list.="<span class='span12' id='add_payment_container' style='display:none;'>$add_payment_block</span>";
             $list.="</div>";
         } // end if $toolbar==true
 
@@ -148,7 +179,7 @@ class Partial extends Util {
         $list.="<span class='span3'><a href='#' id='get_partial_payment_section' onClick='return false;'>Proceed</a></span>";
         $list.="</div>";
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' id='payment_section'></span>";
+        $list.="<span class='span12' id='payment_section'></span>";
         $list.="</div>";
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span8' id='partial_err' style='color:red;'></span>";
@@ -189,8 +220,7 @@ class Partial extends Util {
         return $list;
     }
 
-    function add_payments_log($courseid, $userid, $sum) {
-        $payment_type = 1;
+    function add_payments_log($courseid, $userid, $sum, $payment_type) {
         $modifierid = $this->user->id;
         $date = time();
         $query = "insert into mdl_payments_log "
@@ -211,31 +241,84 @@ class Partial extends Util {
         $this->db->query($query);
     }
 
-    function add_partial_payment($courseid, $userid, $sum) {
+    function add_partial_payment($courseid, $userid, $sum, $source) {
         $date = time();
-        $query3 = "insert into mdl_card_payments "
-                . "(userid,"
-                . "courseid,"
-                . "psum,"
-                . "trans_id,"
-                . "auth_code,"
-                . "pdate) "
-                . "values($userid,"
-                . "$courseid, "
-                . "'$sum',"
-                . "'partial',"
-                . "'1'"
-                . ",$date)";
-        //echo "Query: " . $query3 . "<br>";
-        $this->db->query($query3);
-        $this->add_payments_log($courseid, $userid, $sum);
+        $payment_type = 0; // cc        
+
+        if ($source == 'cc') {
+            /*
+             * 
+              $query = "insert into mdl_card_payments "
+              . "(userid,"
+              . "courseid,"
+              . "psum,"
+              . "trans_id,"
+              . "auth_code,"
+              . "pdate) "
+              . "values($userid,"
+              . "$courseid, "
+              . "'$sum',"
+              . "'partial',"
+              . "'1'"
+              . ",$date)";
+              $this->db->query($query);
+             * 
+             */
+            //$this->add_payments_log($courseid, $userid, $sum, $payment_type);
+        } // end if $source == 'cc'
+
+        if ($source == 'add_cash' || $source == 'add_cheque') {
+            //1 - cash
+            //2 - cheque 
+            $payment_type = ($source == 'add_cash') ? 1 : 2;
+            $query = "insert into mdl_partial_payments "
+                    . "(userid,"
+                    . "courseid,"
+                    . "ptype,"
+                    . "psum,"
+                    . "pdate) "
+                    . "values($userid,"
+                    . "$courseid,"
+                    . "$payment_type,"
+                    . "'$sum',"
+                    . "'$date')";
+            $this->db->query($query);
+        } // end if $source == 'add_cash' || $source == 'add_cheque'
         $list = "Partial payment successfully added. Please reload the page";
         return $list;
     }
 
-    function get_payment_section($ptype) {
+    function get_payment_section($courseid, $userid, $sum, $ptype) {
         $list = "";
-        $list.="Payment type: " . $ptype . "<br>";
+
+        if ($ptype == 'cash') {
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Paid sum</span>";
+            $list.="<span class='span2'><input type='text' id='sum' style='width:45px;' /></span>";
+            $list.="<span class='span2'><button class='btn btn-primary' id='add_cash'>Add</span>";
+            $list.="</div>";
+        } // end if $ptype=='cash'
+
+        if ($ptype == 'cheque') {
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Paid sum</span>";
+            $list.="<span class='span2'><input type='text' id='sum' style='width:45px;' /></span>";
+            $list.="<span class='span2'><button class='btn btn-primary' id='add_cheque'>Add</span>";
+            $list.="</div>";
+        } // end if $ptype=='cheque'
+
+        if ($ptype == 'cc') {
+            $group_data = '';
+            $participants = 1;
+            $user_data = $this->get_user_details($userid);
+            $user = new stdClass();
+            $user->id = $userid;
+            $user->courseid = $courseid;
+            $user->sloid = $user_data->slotid;
+            $user->state = $user_data->state;
+            $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, true);
+        } // end if $ptype=='cc'
+
         return $list;
     }
 

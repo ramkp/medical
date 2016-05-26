@@ -7,6 +7,7 @@ $list = $partial->get_partial_payments_list();
 echo $list;
 ?>
 
+<!--
 <script type="text/javascript">
 
     $(document).ready(function () {
@@ -31,3 +32,4 @@ echo $list;
     });
 
 </script>
+-->

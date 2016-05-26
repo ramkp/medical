@@ -887,6 +887,23 @@ $(document).ready(function () {
         });
     }
 
+    function add_partial_payment(source) {
+
+        var courseid = $('#courses').val();
+        var userid = $('#users').val();
+        var sum = $('#sum').val();
+        if (courseid > 0 && userid > 0 && sum != '') {
+            $('#partial_err').html('');
+            var url = "/lms/custom/partial/add_partial_payment.php";
+            $.post(url, {courseid: courseid, userid: userid, sum: sum, source: source}).done(function (data) {
+                $('#partial_err').html("<span style='color:black;'>" + data + "</span>");
+            });
+        } // end if courseid>0 && userid>0 && sum!=''
+        else {
+            $('#partial_err').html('Please select program and user and provide paid amount');
+        } // end else
+    }
+
     function print_certs() {
         var selected = new Array();
         $(".cert").each(function () {
@@ -897,7 +914,15 @@ $(document).ready(function () {
         console.log('Array length: ' + selected.length);
         if (selected.length > 0) {
             if (confirm('Print selected certificates?')) {
-                $('#print_err').html("Selected certificates were sent to printer");
+                var url = "http://medical2.com/lms/custom/webprint/DemoPrintFile.php";
+                window.open(url, '_blank');
+                /*
+                 var selected_certs = selected.join();
+                 var url = "/lms/custom/certificates/print_certificate.php";
+                 $.post(url, {certs: selected_certs}).done(function (data) {
+                 $('#print_err').html(data);
+                 });
+                 */
             } // end if confirm
         } // end if selected.length>0
         else {
@@ -922,6 +947,31 @@ $(document).ready(function () {
             $('#print_err').html('Please select at least one certificate to be printed');
         } // end else
 
+    }
+
+    function get_partial_payments_section() {
+        var courseid = $('#courses').val();
+        var userid = $('#users').val();
+        var sum = $('#sum').val();
+        var ptype = $('input[name=payment_type]:checked').val();
+        if (ptype == 'cc') {
+            if (courseid > 0 && userid > 0) {
+                var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/0";
+                window.open(url, '_blank');
+            } // end if courseid > 0 && userid > 0     
+        } // end if ptype=='cc'
+        else {
+            if (courseid > 0 && userid > 0 && sum != '') {
+                $('#partial_err').html('');
+                var url = "/lms/custom/partial/get_payment_section.php";
+                $.post(url, {courseid: courseid, userid: userid, sum: sum, ptype: ptype}).done(function (data) {
+                    $('#payment_section').html(data);
+                });
+            } // end if courseid > 0 && userid > 0 && sum != ''
+            else {
+                $('#partial_err').html('Please select program and user and provide paid amount');
+            } // end else
+        } // end else
     }
 
     /**********************************************************************
@@ -1069,7 +1119,7 @@ $(document).ready(function () {
                 case "3":
                     get_free_payments();
                     break;
-            } // end swutch
+            } // end switch
         }  // end of event.target.id == 'clear_payment_button'
 
         if (event.target.id == 'search_card_payment_button') {
@@ -1087,6 +1137,15 @@ $(document).ready(function () {
         if (event.target.id == 'clear_certificate_button') {
             get_certificates_page();
         }
+
+        if (event.target.id == 'add_payment') {
+            add_partial_payment();
+        }
+
+        if (event.target.id == 'add_cash' || event.target.id == 'add_cheque') {
+            add_partial_payment(event.target.id);
+        }
+
 
     }); // end of #region-main click', 'button',
 
@@ -1148,6 +1207,20 @@ $(document).ready(function () {
             print_labels();
         }
 
+        if (event.target.id == 'add_partial') {
+            if ($('#add_payment_container').is(':visible')) {
+                $('#add_payment_container').hide();
+            } // end if 
+            else {
+                $('#add_payment_container').show();
+            } // end else
+        }
+
+        if (event.target.id == 'get_partial_payment_section') {
+            get_partial_payments_section();
+        }
+
+
 
     }); // end of $('#region-main').on('click', 'a'
 
@@ -1183,6 +1256,7 @@ $(document).ready(function () {
 
         if (event.target.id == 'users') {
             $('#installment_params').show();
+            $('#payment_options').show();
         }
 
         if (event.target.id == 'states') {
@@ -1268,6 +1342,14 @@ $(document).ready(function () {
         var url = "/lms/custom/users/get_users_page.php";
         $.post(url, {id: 1}).done(function (data) {
             console.log('Server response: ' + data);
+            $('#region-main').html(data);
+        });
+    }
+
+    function get_partial_payments_page() {
+        var url = "/lms/custom/partial/get_partial_payments_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            //console.log(data);
             $('#region-main').html(data);
         });
     }
@@ -1440,6 +1522,11 @@ $(document).ready(function () {
     $("#user_cred").click(function (event) {
         update_navigation_status__menu('User credentials');
         get_user_credentials_page();
+    });
+
+    $("#partial").click(function (event) {
+        update_navigation_status__menu('Partial payments');
+        get_partial_payments_page();
     });
 
     /************************************************************************
