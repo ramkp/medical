@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -21,19 +22,19 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @package core_user
  */
-
 require_once('../config.php');
-require_once($CFG->libdir.'/gdlib.php');
-require_once($CFG->libdir.'/adminlib.php');
-require_once($CFG->dirroot.'/user/editadvanced_form.php');
-require_once($CFG->dirroot.'/user/editlib.php');
-require_once($CFG->dirroot.'/user/profile/lib.php');
-require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->libdir . '/gdlib.php');
+require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->dirroot . '/user/editadvanced_form.php');
+require_once($CFG->dirroot . '/user/editlib.php');
+require_once($CFG->dirroot . '/user/profile/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/class.pdo.database.php');
 
 // HTTPS is required in this page when $CFG->loginhttps enabled.
 $PAGE->https_required();
 
-$id     = optional_param('id', $USER->id, PARAM_INT);    // User id; -1 if creating new user.
+$id = optional_param('id', $USER->id, PARAM_INT);    // User id; -1 if creating new user.
 $course = optional_param('course', SITEID, PARAM_INT);   // Course id (defaults to Site).
 $returnto = optional_param('returnto', null, PARAM_ALPHA);  // Code determining where to return to after save.
 
@@ -74,7 +75,8 @@ if ($id == -1) {
     $user->timezone = '99';
     require_capability('moodle/user:create', $systemcontext);
     admin_externalpage_setup('addnewuser', '', array('id' => -1));
-} else {
+} // end if $id == -1
+else {
     // Editing existing user.
     require_capability('moodle/user:update', $systemcontext);
     $user = $DB->get_record('user', array('id' => $id), '*', MUST_EXIST);
@@ -82,11 +84,12 @@ if ($id == -1) {
     $PAGE->navbar->includesettingsbase = true;
     if ($user->id != $USER->id) {
         $PAGE->navigation->extend_for_user($user);
-    } else {
+    } // end if $user->id != $USER->id
+    else {
         if ($node = $PAGE->navigation->find('myprofile', navigation_node::TYPE_ROOTNODE)) {
             $node->force_open();
         }
-    }
+    } // end else
 }
 
 // Remote users cannot be edited.
@@ -94,7 +97,7 @@ if ($user->id != -1 and is_mnet_remote_user($user)) {
     redirect($CFG->wwwroot . "/user/view.php?id=$id&course={$course->id}");
 }
 
-if ($user->id != $USER->id and is_siteadmin($user) and !is_siteadmin($USER)) {  // Only admins may edit other admins.
+if ($user->id != $USER->id and is_siteadmin($user) and ! is_siteadmin($USER)) {  // Only admins may edit other admins.
     print_error('useradmineditadmin');
 }
 
@@ -117,22 +120,23 @@ profile_load_data($user);
 
 // User interests.
 if (!empty($CFG->usetags)) {
-    require_once($CFG->dirroot.'/tag/lib.php');
+    require_once($CFG->dirroot . '/tag/lib.php');
     $user->interests = tag_get_tags_array('user', $id);
 }
 
 if ($user->id !== -1) {
     $usercontext = context_user::instance($user->id);
     $editoroptions = array(
-        'maxfiles'   => EDITOR_UNLIMITED_FILES,
-        'maxbytes'   => $CFG->maxbytes,
-        'trusttext'  => false,
+        'maxfiles' => EDITOR_UNLIMITED_FILES,
+        'maxbytes' => $CFG->maxbytes,
+        'trusttext' => false,
         'forcehttps' => false,
-        'context'    => $usercontext
+        'context' => $usercontext
     );
 
     $user = file_prepare_standard_editor($user, 'description', $editoroptions, $usercontext, 'user', 'profile', 0);
-} else {
+} // end if $user->id !== -1 
+else {
     $usercontext = null;
     // This is a new user, we don't want to add files here.
     $editoroptions = array(
@@ -147,10 +151,10 @@ if ($user->id !== -1) {
 // Prepare filemanager draft area.
 $draftitemid = 0;
 $filemanagercontext = $editoroptions['context'];
-$filemanageroptions = array('maxbytes'       => $CFG->maxbytes,
-                             'subdirs'        => 0,
-                             'maxfiles'       => 1,
-                             'accepted_types' => 'web_image');
+$filemanageroptions = array('maxbytes' => $CFG->maxbytes,
+    'subdirs' => 0,
+    'maxfiles' => 1,
+    'accepted_types' => 'web_image');
 file_prepare_draft_area($draftitemid, $filemanagercontext->id, 'user', 'newicon', 0, $filemanageroptions);
 $user->imagefile = $draftitemid;
 // Create form.
@@ -160,7 +164,20 @@ $userform = new user_editadvanced_form(new moodle_url($PAGE->url, array('returnt
     'user' => $user));
 
 if ($usernew = $userform->get_data()) {
+    //print_r($usernew);
+    //die();
     $usercreated = false;
+    
+
+    // Update pure pwd field if any
+    if ($usernew->newpassword != '') {
+        $db = new pdo_db();
+        $query = "update mdl_user set purepwd='$usernew->newpassword' "
+                . "where id=$usernew->id";
+        $db->query($query);
+    } // end if $usernew->newpassword!=''
+    
+    // Update address field
 
     if (empty($usernew->auth)) {
         // User editing self.
@@ -179,7 +196,7 @@ if ($usernew = $userform->get_data()) {
         unset($usernew->createpassword);
         $usernew = file_postupdate_standard_editor($usernew, 'description', $editoroptions, null, 'user', 'profile', null);
         $usernew->mnethostid = $CFG->mnet_localhost_id; // Always local user.
-        $usernew->confirmed  = 1;
+        $usernew->confirmed = 1;
         $usernew->timecreated = time();
         if ($authplugin->is_internal()) {
             if ($createpassword or empty($usernew->newpassword)) {
@@ -192,14 +209,15 @@ if ($usernew = $userform->get_data()) {
         }
         $usernew->id = user_create_user($usernew, false, false);
 
-        if (!$authplugin->is_internal() and $authplugin->can_change_password() and !empty($usernew->newpassword)) {
+        if (!$authplugin->is_internal() and $authplugin->can_change_password() and ! empty($usernew->newpassword)) {
             if (!$authplugin->user_update_password($usernew, $usernew->newpassword)) {
                 // Do not stop here, we need to finish user creation.
                 debugging(get_string('cannotupdatepasswordonextauth', '', '', $usernew->auth), DEBUG_NONE);
             }
         }
         $usercreated = true;
-    } else {
+    } // end if $usernew->id == -1    
+    else {
         $usernew = file_postupdate_standard_editor($usernew, 'description', $editoroptions, $usercontext, 'user', 'profile', 0);
         // Pass a true old $user here.
         if (!$authplugin->user_update($user, $usernew)) {
@@ -225,7 +243,7 @@ if ($usernew = $userform->get_data()) {
         }
 
         // Force logout if user just suspended.
-        if (isset($usernew->suspended) and $usernew->suspended and !$user->suspended) {
+        if (isset($usernew->suspended) and $usernew->suspended and ! $user->suspended) {
             \core\session\manager::kill_user_sessions($user->id);
         }
     }
@@ -272,7 +290,7 @@ if ($usernew = $userform->get_data()) {
 
     if ($user->id == $USER->id) {
         // Override old $USER session variable.
-        foreach ((array)$usernew as $variable => $value) {
+        foreach ((array) $usernew as $variable => $value) {
             if ($variable === 'description' or $variable === 'password') {
                 // These are not set for security nad perf reasons.
                 continue;
@@ -310,17 +328,17 @@ if ($usernew = $userform->get_data()) {
         redirect("$CFG->wwwroot/$CFG->admin/user.php");
     }
     // Never reached..
-}
-
+} // end if $usernew = $userform->get_data()
 // Make sure we really are on the https page when https login required.
 $PAGE->verify_https_required();
 
 
 // Display page header.
-if ($user->id == -1 or ($user->id != $USER->id)) {
+if ($user->id == -1 or ( $user->id != $USER->id)) {
     if ($user->id == -1) {
         echo $OUTPUT->header();
-    } else {
+    } // end if $user->id == -1 or ($user->id != $USER->id) 
+    else {
         $streditmyprofile = get_string('editmyprofile');
         $userfullname = fullname($user, true);
         $PAGE->set_heading($userfullname);
@@ -342,9 +360,9 @@ if ($user->id == -1 or ($user->id != $USER->id)) {
     echo '<br />';
 } else {
     $streditmyprofile = get_string('editmyprofile');
-    $strparticipants  = get_string('participants');
-    $strnewuser       = get_string('newuser');
-    $userfullname     = fullname($user, true);
+    $strparticipants = get_string('participants');
+    $strnewuser = get_string('newuser');
+    $userfullname = fullname($user, true);
 
     $PAGE->set_title("$course->shortname: $streditmyprofile");
     $PAGE->set_heading($userfullname);

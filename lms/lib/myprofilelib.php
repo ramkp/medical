@@ -162,6 +162,10 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     $addr_block=$ds->get_address_block($user->id);
     $node = new core_user\output\myprofile\node('contact', 'address', 'Address', null, null, $addr_block);
     $tree->add_node($node);
+    
+    $h_date=date('d-m-Y', $user->timecreated);
+    $node = new core_user\output\myprofile\node('contact', 'timecreated', 'Signup date', null, null, $h_date);
+    $tree->add_node($node);
 
     /*
      * 

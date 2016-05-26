@@ -299,10 +299,12 @@ if (defined('WEB_CRON_EMULATED_CLI')) {
         exit(1);
     }
 } else {
+    
     if (!CLI_SCRIPT) {
         echo('Command line scripts must define CLI_SCRIPT before requiring config.php'."\n");
         exit(1);
     }
+    
 }
 
 // All web service requests have WS_SERVER == true.

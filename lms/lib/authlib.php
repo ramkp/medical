@@ -252,7 +252,8 @@ class auth_plugin_base {
      * @return bool                  True on success
      */
     function user_update_password($user, $newpassword) {
-        //override if needed        
+        // Update pure pwd too
+        
         return true;
     }
 

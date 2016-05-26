@@ -318,12 +318,31 @@ function useredit_shared_definition(&$mform, $editoroptions, $filemanageroptions
     $choices['2'] = get_string('emaildisplaycourse');
     $mform->addElement('select', 'maildisplay', get_string('emaildisplay'), $choices);
     $mform->setDefault('maildisplay', $CFG->defaultpreference_maildisplay);
-
+        
+    $mform->addElement('text', 'address', 'Address', 'maxlength="120" size="30"');
+    $mform->setType('address', PARAM_TEXT);
+    
+    $mform->addElement('text', 'city', get_string('city'), 'maxlength="120" size="30"');
+    $mform->setType('city', PARAM_TEXT);
+    
+    $mform->addElement('text', 'state', 'State', 'maxlength="120" size="30"');
+    $mform->setType('state', PARAM_TEXT);
+    
+    $mform->addElement('text', 'zip', 'Zip', 'maxlength="120" size="30"');
+    $mform->setType('zip', PARAM_TEXT);
+    
+    /*
+     * 
     $mform->addElement('text', 'city', get_string('city'), 'maxlength="120" size="21"');
     $mform->setType('city', PARAM_TEXT);
     if (!empty($CFG->defaultcity)) {
         $mform->setDefault('city', $CFG->defaultcity);
     }
+     * 
+     */
+
+    
+    
 
     $choices = get_string_manager()->get_list_of_countries();
     $choices = array('' => get_string('selectacountry') . '...') + $choices;
