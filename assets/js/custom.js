@@ -76,8 +76,8 @@ $(document).ready(function () {
     function check_login_form() {
         var login = $('#login_box').val();
         var password = $('#password_box').val();
-        console.log('Login: ' + login);
-        console.log('Password: ' + password);
+        //console.log('Login: ' + login);
+        //console.log('Password: ' + password);
         if (login == '' || password == '') {
             $('#login_err').html('*all fields required');
         }
