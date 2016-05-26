@@ -119,18 +119,17 @@ class Students {
         return $users;
     }
 
-    function check_owe_students() {
-        $list = "";
+    function get_partial_cc_payments() {
         $partials = array();
         $query = "select * from mdl_card_payments "
-                . "where pdate>1464074847 order by pdate desc ";
+                . "where pdate>1464074847 order by pdate desc";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_payment = $row['psum'];
-                $course_cost = $this->get_course_cost($row['courseid']);
                 $user_data = $this->get_user_data($row['userid']);
+                $course_cost = $this->get_course_cost($row['courseid']);
                 if ($user_payment < $course_cost) {
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
@@ -142,8 +141,43 @@ class Students {
                     $partials[] = $partial;
                 } // end if $user_payment!=$course_cost
             } // end while
-            $list.=$this->process_receivers($partials);
+        } // end if $num > 0
+        return $partials;
+    }
+
+    function get_partial_offline_payments() {
+        $partials = array();
+        $query = "select * from mdl_partial_payments";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_payment = $row['psum'];
+                $user_data = $this->get_user_data($row['userid']);
+                $course_cost = $this->get_course_cost($row['courseid']);
+                if ($user_payment < $course_cost) {
+                    $partial = new stdClass();
+                    $partial->userid = $row['userid'];
+                    $partial->courseid = $row['courseid'];
+                    $partial->payment = $row['psum'];
+                    $partial->cost = $course_cost;
+                    $partial->pdate = $row['pdate'];
+                    $partial->slotid = $user_data->slotid;
+                    $partials[] = $partial;
+                } // end if $user_payment!=$course_cost
+            } // end while
         } // end if $num > 0        
+        return $partials;
+    }
+
+    function check_owe_students() {
+        $list = "";
+        $cc_partials = $this->get_partial_cc_payments();
+        $of_partials = $this->get_partial_offline_payments();
+        $partials = array_merge($cc_partials, $of_partials);
+        if (count($partials) > 0) {
+            $list.=$this->process_receivers($partials);
+        } // end if count($partials)>0
         else {
             $list.="There are no users with partial payments \n";
         }
