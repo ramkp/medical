@@ -264,7 +264,7 @@ class Students {
         $user_date = $this->get_user_data($teacherid);
         $email = $user_date->email;
 
-        $email = 'sirromas@gmail.com'; // for testing;
+        //$email = 'sirromas@gmail.com'; // for testing;
 
         $mail = new PHPMailer;
         //$user->email = 'sirromas@gmail.com'; // temp workaround
