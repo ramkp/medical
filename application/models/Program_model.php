@@ -505,7 +505,7 @@ class program_model extends CI_Model {
         $query = "select id from mdl_scheduler where course=$courseid";
         $result = $this->db->query($query);
         $num = $result->num_rows();
-        $now = time() + 86400;
+        $now = time();
         if ($num > 0) {
             foreach ($result->result() as $row) {
                 $schedulerid = $row->id;
