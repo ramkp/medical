@@ -204,7 +204,7 @@ class Enroll {
         $userid = $this->getUserId($user->email);
         $this->assign_roles($userid, $user->courseid);
         $this->update_user_data($userid, $user);
-        $this->add_user_to_course_schedule($userid, $user);
+        //$this->add_user_to_course_schedule($userid, $user);
         $user->userid=$userid;
         $this->send_confirmation_email($user);
     }

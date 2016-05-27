@@ -842,7 +842,6 @@ class Payment {
             } // end else 
             $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
             $list.="</div>";
-
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span6'>Note: this is first payment of $num_payments payment(s) to be put within $period day(s).</span>";
             $list.="</div>";
@@ -1132,7 +1131,7 @@ class Payment {
                 else {
                     $card->transid = $status['trans_id'];
                     $card->auth_code = $status['auth_code'];
-                    $this->confirm_user($card->email);
+                    $this->confirm_user($card->email);                    
                     $this->add_payment_to_db($card); // adds payment result to DB
                     $mailer->send_payment_confirmation_message($card);
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
@@ -1143,6 +1142,7 @@ class Payment {
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
+                    $this->enroll->add_user_to_course_schedule($card->userid, $card);
                 }
             } // end if $user_group==''        
             // Installment online payment?
@@ -1189,6 +1189,7 @@ class Payment {
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
+                    $this->enroll->add_user_to_course_schedule($card->userid, $card);
                 } // end else             
             } // end if $user_group!='' && $userid!=''
             // Group online payment
@@ -1244,11 +1245,12 @@ class Payment {
                     $list.= "<span class='span8'>Payment is successfull. Thank you!</span>";
                     $list.="</div>";
                     $list.="</div>";
-                    $list.="</div>";
+                    $list.="</div>";                    
 
                     foreach ($group_users as $userid) {
                         $user = $this->get_user_detailes($userid);
                         $card->userid = $userid;
+                        $this->enroll->add_user_to_course_schedule($card->userid, $card);
                         $card->sum = round(($group_sum / count($group_users)), 2); // Sum for every group participant 
                         $this->add_payment_to_db($card); // adds payment result to DB
                         $this->confirm_user($user->username);
@@ -1298,6 +1300,7 @@ class Payment {
                 $list.="</div>";
                 $list.="</div>";
                 $list.="</div>";
+                $this->enroll->add_user_to_course_schedule($card->userid, $card);
             } // end if is_numeric($subscriptionID)
             else {
                 $list.="<div class='panel panel-default' id='personal_payment_details'>";
