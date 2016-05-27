@@ -1237,7 +1237,7 @@ $(document).ready(function () {
     function get_schedule_course_state() {
         var stateid = $('#schedule_states').val();
         var courseid = $('#schedule_courses').val();
-        var url = "https://" + domain + "/functionality/php/get_schedule_course_state.php";
+        var url = "http://" + domain + "/functionality/php/get_schedule_course_state.php";
         var request = {stateid: stateid, courseid: courseid};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
