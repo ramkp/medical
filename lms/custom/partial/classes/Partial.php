@@ -96,6 +96,25 @@ class Partial extends Util {
         return $list;
     }
 
+    function is_past_schedule($slotid) {
+        $now = time();
+        $diff = 86400; // one day in sec
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $starttime = $row['starttime'];
+            } // end while 
+        } // end if $num > 0
+        if (($starttime - $now) >= $diff) {
+            return true;
+        }  // end if ($starttime - $now) >= $diff        
+        else {
+            return false;
+        }
+    }
+
     function create_partial_payments_list($partials, $toolbar = true, $search = false) {
 
         date_default_timezone_set('Pacific/Wallis');
@@ -241,10 +260,26 @@ class Partial extends Util {
         $this->db->query($query);
     }
 
+    function confirm_user($userid) {
+        $query = "update mdl_user set confirmed=1 where id=$userid";
+        $this->db->query($query);
+    }
+
+    function add_user_to_course_schedule($slotid, $userid) {
+        if ($slotid > 0) {
+            $query = "insert into mdl_scheduler_appointment "
+                    . "(slotid,"
+                    . "studentid,"
+                    . "attended) values ($slotid,$userid,0)";
+            //echo "Query: ".$query."<br>";
+            $this->db->query($query);
+        } // end if $user->slotid>0
+    }
+
     function add_partial_payment($courseid, $userid, $sum, $source) {
         $date = time();
         $payment_type = 0; // cc        
-
+        $user_data = $this->get_user_details($userid);
         if ($source == 'cc') {
             /*
              * 
@@ -283,6 +318,8 @@ class Partial extends Util {
                     . "'$sum',"
                     . "'$date')";
             $this->db->query($query);
+            $this->confirm_user($userid);
+            $this->add_user_to_course_schedule($user_data->slotid, $userid);
         } // end if $source == 'add_cash' || $source == 'add_cheque'
         $list = "Partial payment successfully added. Please reload the page";
         return $list;

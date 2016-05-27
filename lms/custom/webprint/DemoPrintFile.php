@@ -2,7 +2,7 @@
   ob_start();
   session_start();
   
-  include 'WebClientPrint.php';
+  include 'WebClientPrint.php';  
   use Neodynamic\SDK\Web\WebClientPrint;
   use Neodynamic\SDK\Web\Utils;
 
@@ -188,6 +188,7 @@
   $currentFolder = substr($_SERVER['REQUEST_URI'], 0, strlen($_SERVER['REQUEST_URI']) - strlen($currentFileName));
   //Specify the ABSOLUTE URL to the php file that will create the ClientPrintJob object
   echo WebClientPrint::createScript(Utils::getRoot().$currentFolder.'DemoPrintFileProcess.php')
+  
 ?>
 
 <script type="text/javascript">
@@ -205,9 +206,7 @@
 
 <?php
   $script = ob_get_contents();
-  ob_clean();
-  
-  
+  ob_clean(); 
   include("template.php");
 ?>
 

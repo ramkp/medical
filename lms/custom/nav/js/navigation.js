@@ -1626,5 +1626,8 @@ $(document).ready(function () {
             assign_user_to_course();
         }
     });
+
+    
+
 }); // end of $(document).ready(function()
 

@@ -11,8 +11,8 @@ WebClientPrint::$licenseKey = '';
 //IMPORTANT SETTINGS:
 //===================
 //Set ABSOLUTE URL to WebClientPrint.php file
-//WebClientPrint::$webClientPrintAbsoluteUrl = Utils::getRoot().'/WebClientPrint.php';
-WebClientPrint::$webClientPrintAbsoluteUrl = 'http://:'.$_SERVER['SCRIPT_NAME'] .'/lms/custom/webprint/WebClientPrint.php';
+WebClientPrint::$webClientPrintAbsoluteUrl = Utils::getRoot().'/lms/custom/webprint/WebClientPrint.php';
+//WebClientPrint::$webClientPrintAbsoluteUrl = 'http://:'.$_SERVER['SCRIPT_NAME'] .'/lms/custom/webprint/WebClientPrint.php';
 //Set wcpcache folder RELATIVE to WebClientPrint.php file
 //FILE WRITE permission on this folder is required!!!
 WebClientPrint::$wcpCacheFolder = 'wcpcache/';
@@ -149,6 +149,8 @@ class WebClientPrint {
     public static function cacheClean($minutes){
         if (!Utils::isNullOrEmptyString(self::$wcpCacheFolder)){
             $cacheDir = (Utils::strEndsWith(self::$wcpCacheFolder, '/')?self::$wcpCacheFolder:self::$wcpCacheFolder.'/');
+            $cacheDir=$_SERVER['DOCUMENT_ROOT'].'/lms/custom/webprint/wcpcache/';
+            //echo "Cache dir: ".$cacheDir."<br>";            
             if ($handle = opendir($cacheDir)) {
                  while (false !== ($file = readdir($handle))) {
                     if ($file!='.' && $file!='..' && (time()-filectime($cacheDir.$file)) > (60*$minutes)) {

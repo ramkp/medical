@@ -1,5 +1,6 @@
 <?php
 
+error_reporting(0);
 include 'WebClientPrint.php';
 use Neodynamic\SDK\Web\WebClientPrint;
 use Neodynamic\SDK\Web\Utils;
@@ -11,6 +12,9 @@ use Neodynamic\SDK\Web\ClientPrintJob;
 // Process request
 // Generate ClientPrintJob? only if clientPrint param is in the query string
 $urlParts = parse_url($_SERVER['REQUEST_URI']);
+//echo "<br>----------------------------------<br>";
+//print_r($urlParts);
+//echo "<br>----------------------------------<br>";
 $rawQuery = $urlParts['query'];
 
 if (isset($rawQuery)){
