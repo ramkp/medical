@@ -974,6 +974,32 @@ $(document).ready(function () {
         } // end else
     }
 
+    function search_slots_by_date() {
+        var start = $('#start').val();
+        var end = $('#end').val();
+        var scheduler = $('#scheduler').val();
+        var url = "/lms/custom/schedule/get_slots_by_date.php";
+        $('#ajax_loading').show();
+        $.post(url, {start: start, end: end, scheduler: scheduler}).done(function (data) {
+            $('#ajax_loading').hide();
+            $('#schedule_container').html(data);
+        });
+    }
+
+    function search_slots() {
+        var search = $('#search').val();
+        var scheduler = $('#scheduler').val();
+        console.log('Scheduler: ' + scheduler);
+        //if (search != '') {
+        var url = "/lms/custom/schedule/search_slot.php";
+        $('#ajax_loading').show();
+        $.post(url, {search: search, scheduler: scheduler}).done(function (data) {
+            $('#ajax_loading').hide();
+            $('#schedule_container').html(data);
+        });
+        //} // end if search!=''        
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -1146,6 +1172,18 @@ $(document).ready(function () {
             add_partial_payment(event.target.id);
         }
 
+        if (event.target.id == 'date_btn') {
+            search_slots_by_date();
+        }
+
+        if (event.target.id == 'search_btn') {
+            search_slots();
+        }
+
+
+
+
+
 
     }); // end of #region-main click', 'button',
 
@@ -1218,6 +1256,18 @@ $(document).ready(function () {
 
         if (event.target.id == 'get_partial_payment_section') {
             get_partial_payments_section();
+        }
+
+        if (event.target.id == 'students_all') {
+            $('.students').each(function () { //loop through each checkbox
+                this.checked = true;  //select all checkboxes with class "cert"              
+            });
+        }
+
+        if (event.target.id == 'students_none') {
+            $('.students').each(function () { //loop through each checkbox
+                this.checked = false;  //select all checkboxes with class "cert"              
+            });
         }
 
 
@@ -1627,7 +1677,7 @@ $(document).ready(function () {
         }
     });
 
-    
+
 
 }); // end of $(document).ready(function()
 

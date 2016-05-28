@@ -508,7 +508,7 @@ if ($slots) {
 echo $output->render($commandbar);
 $schedule=new Schedule();
 $schedulerid=$schedule->get_course_scheduler($COURSE->id);
-$list=$schedule->get_course_slots($schedulerid);
+$list=$schedule->get_course_slots(true, $schedulerid);
 echo $list;
 
 
