@@ -1058,18 +1058,15 @@ class Payment {
     }
 
     function get_user_slotid($userid) {
-        $slotid = 0;
-        $query = "select * from mdl_scheduler_appointment "
-                . "where studentid=$userid";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $slotid = $row['slotid'];
-            }
-        } // end if $num>0
+        $query="select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slotid=$row['slotid'];
+        }
         return $slotid;
     }
+    
+    
 
     function make_stub_payment($card) {
         $list = "";
@@ -1138,7 +1135,7 @@ class Payment {
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Payment is successfull. Thank you! You can print your registration data <a href='https://".$_SERVER['SERVER_NAME']."/lms/custom/invoices/registrations/$user_payment_data->email' target='_blank'>here.</a></span>";
+                    $list.= "<span class='span8'>Payment is successfull. Thank you! You can print your registration data <a href='https://".$_SERVER['SERVER_NAME']."/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
