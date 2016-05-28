@@ -989,15 +989,78 @@ $(document).ready(function () {
     function search_slots() {
         var search = $('#search').val();
         var scheduler = $('#scheduler').val();
-        console.log('Scheduler: ' + scheduler);
-        //if (search != '') {
         var url = "/lms/custom/schedule/search_slot.php";
         $('#ajax_loading').show();
         $.post(url, {search: search, scheduler: scheduler}).done(function (data) {
             $('#ajax_loading').hide();
             $('#schedule_container').html(data);
         });
-        //} // end if search!=''        
+
+    }
+
+    function change_students_course_status() {
+        var selected = new Array();
+        $("input:checked").each(function () {
+            selected.push($(this).val());
+        });
+        if (selected.length > 0) {
+            $('#sch_err').html('');
+            var students = selected.join();
+            var courseid = $('#courseid').val();
+            console.log('Course ID: ' + courseid);
+            console.log('Students: ' + students);
+            if (confirm('Change selected students course status to passed?')) {
+                $('#ajax_loading').show();
+                var url = "/lms/custom/schedule/compete_students.php";
+                $.post(url, {courseid: courseid, students: students}).done(function () {
+                    $('#ajax_loading').hide();
+                });
+            } // end if confirm
+        } // selected.length>0
+        else {
+            $('#sch_err').html('Please select at least one student');
+        }
+    }
+
+    function print_certificates() {
+        var selected = new Array();
+        $("input:checked").each(function () {
+            selected.push($(this).val());
+        });
+        if (selected.length > 0) {
+            $('#sch_err').html('');
+            var students = selected.join();
+            var courseid = $('#courseid').val();
+            console.log('Course ID: ' + courseid);
+            console.log('Students: ' + students);
+            if (confirm('Print certificates for selected users?')) {
+
+            } // end if confirm
+        } // end if selected.length > 0
+        else {
+            $('#sch_err').html('Please select at least one student');
+        }
+
+    }
+
+    function send_certificates() {
+        var selected = new Array();
+        $("input:checked").each(function () {
+            selected.push($(this).val());
+        });
+        if (selected.length > 0) {
+            $('#sch_err').html('');
+            var students = selected.join();
+            var courseid = $('#courseid').val();
+            console.log('Course ID: ' + courseid);
+            console.log('Students: ' + students);
+            if (confirm('Send certificates for selected users?')) {
+
+            } // end if confirm
+        } // end if selected.length > 0
+        else {
+            $('#sch_err').html('Please select at least one student');
+        }
     }
 
     /**********************************************************************
@@ -1262,6 +1325,18 @@ $(document).ready(function () {
             $('.students').each(function () { //loop through each checkbox
                 this.checked = true;  //select all checkboxes with class "cert"              
             });
+        }
+
+        if (event.target.id == 'complete') {
+            change_students_course_status();
+        }
+
+        if (event.target.id == 'print') {
+            print_certificates();
+        }
+
+        if (event.target.id == 'send') {
+            send_certificates();
         }
 
         if (event.target.id == 'students_none') {

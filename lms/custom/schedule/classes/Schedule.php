@@ -133,7 +133,9 @@ class Schedule extends Util {
             $list.="<span class='span2'><input type='text' id='search' style='width:125px;'></span>";
             $list.="<span class='span2'><button type='button' class='btn btn-primary'  id='search_btn'>Search</button></span>";
             $schedulerid = $this->get_course_scheduler($this->course->id);
+            $courseid = $this->course->id;
             $list.="<span><input type='hidden' id='scheduler' value='$schedulerid'></span>";
+            $list.="<span><input type='hidden' id='courseid' value='$courseid'></span>";
             $list.="<span class='span1'>Start</span>";
             $list.="<span class='span2'><input type='text' id='start' style='width:75px;'></span>";
             $list.="<span class='span1'>End</span>";
@@ -143,28 +145,29 @@ class Schedule extends Util {
             $list.= "<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'><a href='#' id='students_all' onClick='return false;'>Select all</a></span>";
             $list.="<span class='span2'><a href='#' id='students_none' onClick='return false;'>Deselct all</a></span>";
-            $list.="<span class='span3'><a href=''>Change completion status</a></span>";
-            $list.="<span class='span2'><a href=''>Print certificates</a></span>";
-            $list.="<span class='span2'><a href=''>Send certificates</a></span>";
+            $list.="<span class='span3'><a href='#' id='complete' onClick='return false;'>Change completion status</a></span>";
+            $list.="<span class='span2'><a href='#' id='print' onClick='return false;'>Print certificates</a></span>";
+            $list.="<span class='span2'><a href='#' id='send' onClick='return false;'>Send certificates</a></span>";
             $list.="</div>";
             $list.= "<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span12' id='ajax_loading' style='display:none;'><img src='https://medical2.com/assets/img/ajax.gif' /></div>";
+            $list.="<span class='span12' id='sch_err' style='color:red;'></span>";
             $list.="</div>";
+            $list.= "<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span12' id='ajax_loading' style='display:none;'><img src='https://medical2.com/assets/img/ajax.gif' /></span>";
             $list.="</div>";
         } // end if $tools == true
 
         if (count($slots) > 0) {
             $list.="<div id='schedule_container'>";
             foreach ($slots as $slot) {
-                //echo "<br>--------------------------<br>";
-                //print_r($slot);
-                //echo "<br>--------------------------<br>";
                 $addr_array = explode("/", $slot->appointmentlocation);
                 $addr_block = $addr_array[1] . " , " . $addr_array[0];
                 $list.="<div class='panel panel-default'>";
                 $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "<br> $slot->notes</h5></div>";
                 $list.="<div class='panel-body'>";
                 $slot_students = $this->get_slot_students($slot->id);
+
+
                 if (count($slot_students) > 0) {
                     $list.= "<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                     $list.="<span class='span1'></span>";
@@ -185,7 +188,7 @@ class Schedule extends Util {
                         $list.="<span class='span3'><a href='https://medical2.com/lms/user/profile.php?id=$student->studentid'  target='_blank'>$user_data->firstname $user_data->lastname</a></span>";
                         $list.="<span class='span4'>$status</span>";
                         $list.="</div>";
-                    } // end foreach
+                    } // end foreach                                    
                 } // end if count($slot_students)>0
                 else {
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
@@ -194,15 +197,14 @@ class Schedule extends Util {
                 }
                 $list.="</div>";
                 $list.="</div>";
-            } // end foreeach
+            } // end foreeach                
             $list.="</div>";
-        } // end if count($slots)>0
+        } // end if count($slots)>0        
         else {
             $list.= "<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span8'>There are no scheduled workshops</span>";
             $list.="</div>";
         }
-        //echo "List: ".$list."<br>";
         return $list;
     }
 
@@ -214,10 +216,12 @@ class Schedule extends Util {
 
     function search_slot($schedulerid, $search) {
         $list = "";
-        //echo "Scheduler: ".$schedulerid."<br>";
-        //echo "Search: ".$search."<br>";
         $list.= $this->get_course_slots(false, $schedulerid, $search, null, null);
         return $list;
+    }
+
+    function change_students_course_status($courseid, $students) {
+        
     }
 
 }
