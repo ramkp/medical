@@ -418,7 +418,7 @@ class navClass extends Util {
                 . "where course=$courseid and userid=$userid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $completed = $row['timestarted'];
+            $completed = $row['timecompleted'];
         }
         return $completed;
     }

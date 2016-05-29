@@ -1014,9 +1014,35 @@ $(document).ready(function () {
                 var url = "/lms/custom/schedule/compete_students.php";
                 $.post(url, {courseid: courseid, students: students}).done(function () {
                     $('#ajax_loading').hide();
+                    document.location.reload();
                 });
             } // end if confirm
         } // selected.length>0
+        else {
+            $('#sch_err').html('Please select at least one student');
+        }
+    }
+
+    function send_certificates() {
+        var selected = new Array();
+        $("input:checked").each(function () {
+            selected.push($(this).val());
+        });
+        if (selected.length > 0) {
+            $('#sch_err').html('');
+            var students = selected.join();
+            var courseid = $('#courseid').val();
+            console.log('Course ID: ' + courseid);
+            console.log('Students: ' + students);
+            if (confirm('Send certificates for selected users?')) {
+                $('#ajax_loading').show();
+                var url = "/lms/custom/schedule/send_certificates.php";
+                $.post(url, {courseid: courseid, students: students}).done(function (data) {
+                    $('#ajax_loading').hide();
+                    $('#sch_err').html("<span style='color:black'>" + data + "</span>");
+                });
+            } // end if confirm
+        } // end if selected.length > 0
         else {
             $('#sch_err').html('Please select at least one student');
         }
@@ -1041,26 +1067,6 @@ $(document).ready(function () {
             $('#sch_err').html('Please select at least one student');
         }
 
-    }
-
-    function send_certificates() {
-        var selected = new Array();
-        $("input:checked").each(function () {
-            selected.push($(this).val());
-        });
-        if (selected.length > 0) {
-            $('#sch_err').html('');
-            var students = selected.join();
-            var courseid = $('#courseid').val();
-            console.log('Course ID: ' + courseid);
-            console.log('Students: ' + students);
-            if (confirm('Send certificates for selected users?')) {
-
-            } // end if confirm
-        } // end if selected.length > 0
-        else {
-            $('#sch_err').html('Please select at least one student');
-        }
     }
 
     /**********************************************************************

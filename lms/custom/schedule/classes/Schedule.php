@@ -6,6 +6,7 @@
  * @author sirromas
  */
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
 
 class Schedule extends Util {
 
@@ -87,6 +88,15 @@ class Schedule extends Util {
         return $list;
     }
 
+    function is_user_deleted($userid) {
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $deleted = $row['deleted'];
+        }
+        return $deleted;
+    }
+
     function get_slot_students($slotid) {
         $apps = array();
         $query = "select * from mdl_scheduler_appointment "
@@ -95,14 +105,21 @@ class Schedule extends Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $app = new stdClass();
-                foreach ($row as $key => $value) {
-                    $app->$key = $value;
-                } // end foreach
-                $apps[] = $app;
+                $deleted = $this->is_user_deleted($row['studentid']);
+                if ($deleted == 0) {
+                    $app = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $app->$key = $value;
+                    } // end foreach
+                    $apps[] = $app;
+                } // end if $deleted == 0
             } // end while
         } // end if $num > 0
         return $apps;
+    }
+
+    function is_user_paid() {
+        
     }
 
     function get_student_course_completion_status($courseid, $userid) {
@@ -124,6 +141,8 @@ class Schedule extends Util {
     }
 
     function create_slots_page($slots, $tools = true) {
+        $qs = $_SERVER['QUERY_STRING'];
+        $modid = trim(str_replace("id=", "", $qs));
         $list = "";
         if ($tools == true) {
             $list.="<div class='panel panel-default'>";
@@ -160,14 +179,14 @@ class Schedule extends Util {
         if (count($slots) > 0) {
             $list.="<div id='schedule_container'>";
             foreach ($slots as $slot) {
+                $slotid = $slot->id;
+                $editactionurl = "https://medical2.com/lms/mod/scheduler/view.php?id=" . $modid . "&what=updateslot&subpage=myappointments&offset=-1&sesskey=" . sesskey() . "&slotid=" . $slotid . "";
                 $addr_array = explode("/", $slot->appointmentlocation);
                 $addr_block = $addr_array[1] . " , " . $addr_array[0];
                 $list.="<div class='panel panel-default'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "<br> $slot->notes</h5></div>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a><br> $slot->notes</h5></div>";
                 $list.="<div class='panel-body'>";
                 $slot_students = $this->get_slot_students($slot->id);
-
-
                 if (count($slot_students) > 0) {
                     $list.= "<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                     $list.="<span class='span1'></span>";
@@ -221,7 +240,51 @@ class Schedule extends Util {
     }
 
     function change_students_course_status($courseid, $students) {
-        
+        $students_arr = explode(",", $students);
+        $now = time();
+        if (count($students_arr) > 0) {
+            foreach ($students_arr as $studentid) {
+                $query = "insert into mdl_course_completions "
+                        . "(userid,"
+                        . "course,"
+                        . "timeenrolled,"
+                        . "timestarted,"
+                        . "timecompleted,"
+                        . "reaggregate) "
+                        . "values($studentid,"
+                        . "$courseid,"
+                        . "$now,"
+                        . "0,"
+                        . "$now,"
+                        . "0)";
+                $this->db->query($query);
+            } // end foreach
+        } // end if count($students_arr)>0
+    }
+
+    function get_course_completion_date($courseid, $userid) {
+        $query = "select * from mdl_course_completions "
+                . "where course=$courseid and userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $completed = $row['timecompleted'];
+        }
+        return $completed;
+    }
+
+    function send_certificate($courseid, $students) {
+        $list = "";
+        $students_arr = explode(",", $students);
+        if (count($students_arr) > 0) {
+            $cert = new Certificates();
+            foreach ($students_arr as $studentid) {
+                $date = $this->get_course_completion_date($courseid, $studentid);
+                $cert = new Certificates();
+                $cert->send_certificate($courseid, $studentid, $date);
+            } // end foreach
+        } // end if count($students_arr) > 0
+        $list.="Certificates were sent to selected users";
+        return $list;
     }
 
 }

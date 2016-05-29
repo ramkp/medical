@@ -233,15 +233,19 @@ if ($action == 'updateslot') {
 
     if ($mform->is_cancelled()) {
         redirect($returnurl);
-    } else if ($formdata = $mform->get_data()) {
+    } // end if $mform->is_cancelled()
+    
+    else if ($formdata = $mform->get_data()) {
         scheduler_save_slotform ($scheduler, $course, $slotid, $formdata);
         echo $output->action_message(get_string('slotupdated', 'scheduler'));
-    } else {
+    } // end else if $formdata = $mform->get_data()
+    
+    else {
         echo $output->heading(get_string('updatesingleslot', 'scheduler'));
         $mform->display();
         echo $output->footer($course);
         die;
-    }
+    } // end else
 
 }
 /************************************ Add session multiple slots form ****************************************/
@@ -512,8 +516,8 @@ $list=$schedule->get_course_slots(true, $schedulerid);
 echo $list;
 
 
-/*
 
+/*
 // Some slots already exist - prepare the table of slots.
 if ($slots) {
 
@@ -704,5 +708,8 @@ else if (count($students) > 0) {
 else {
     echo $output->notification(get_string('noexistingstudents', 'scheduler'));
 }
+ 
+ * 
  */
+ 
 echo $output->footer();
