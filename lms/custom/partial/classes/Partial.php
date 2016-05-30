@@ -315,43 +315,20 @@ class Partial extends Util {
         } // end if $user->slotid>0
     }
 
+    function update_slots_table($courseid, $userid, $slotid) {
+        $query = "insert into mdl_slots "
+                . "(slotid,"
+                . "courseid,"
+                . "userid) "
+                . "values($slotid,"
+                . "$courseid,"
+                . "$userid)";
+        $this->db->query($query);
+    }
+
     function add_partial_payment($courseid, $userid, $sum, $source, $slotid) {
         $date = time();
-        $payment_type = 0; // cc        
-        $user_data = $this->get_user_details($userid);
-        if ($source == 'cc') {
-            /*
-             * 
-              $query = "insert into mdl_card_payments "
-              . "(userid,"
-              . "courseid,"
-              . "psum,"
-              . "trans_id,"
-              . "auth_code,"
-              . "pdate) "
-              . "values($userid,"
-              . "$courseid, "
-              . "'$sum',"
-              . "'partial',"
-              . "'1'"
-              . ",$date)";
-              $this->db->query($query);
-             * 
-             */
-            //$this->add_payments_log($courseid, $userid, $sum, $payment_type);
-        } // end if $source == 'cc'
-
-        function update_slots_table ($courseid, $userid, $slotid) {
-            $query = "insert into mdl_slots "
-                    . "(slotid,"
-                    . "courseid,"
-                    . "userid) "
-                    . "values($slotid,"
-                    . "$courseid,"
-                    . "$userid)";
-            $this->db->query($query);
-        }
-
+        $payment_type = 0; // cc                
         if ($source == 'add_cash' || $source == 'add_cheque') {
             //1 - cash
             //2 - cheque 
