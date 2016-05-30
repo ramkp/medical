@@ -888,14 +888,14 @@ $(document).ready(function () {
     }
 
     function add_partial_payment(source) {
-
-        var courseid = $('#courses').val();
+        var courseid = $('#register_courses').val();
         var userid = $('#users').val();
         var sum = $('#sum').val();
+        var slotid = $('#register_cities').val();
         if (courseid > 0 && userid > 0 && sum != '') {
             $('#partial_err').html('');
             var url = "/lms/custom/partial/add_partial_payment.php";
-            $.post(url, {courseid: courseid, userid: userid, sum: sum, source: source}).done(function (data) {
+            $.post(url, {courseid: courseid, userid: userid, sum: sum, source: source, slotid: slotid}).done(function (data) {
                 $('#partial_err').html("<span style='color:black;'>" + data + "</span>");
             });
         } // end if courseid>0 && userid>0 && sum!=''
@@ -956,21 +956,27 @@ $(document).ready(function () {
     }
 
     function get_partial_payments_section() {
-        var courseid = $('#courses').val();
+        var courseid = $('#register_courses').val();
         var userid = $('#users').val();
         var sum = $('#sum').val();
+        var slotid = $('#register_cities').val();
         var ptype = $('input[name=payment_type]:checked').val();
+        console.log('Course ID: ' + courseid);
+        console.log('User ID: ' + userid);
+        console.log('slot ID: ' + slotid);
+        console.log('Sum : ' + sum);
+        console.log('Ptype: ' + ptype);
         if (ptype == 'cc') {
             if (courseid > 0 && userid > 0) {
-                var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/0";
+                var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "";
                 window.open(url, '_blank');
             } // end if courseid > 0 && userid > 0     
         } // end if ptype=='cc'
         else {
-            if (courseid > 0 && userid > 0 && sum != '') {
+            if (courseid > 0 && userid > 0) {
                 $('#partial_err').html('');
                 var url = "/lms/custom/partial/get_payment_section.php";
-                $.post(url, {courseid: courseid, userid: userid, sum: sum, ptype: ptype}).done(function (data) {
+                $.post(url, {courseid: courseid, userid: userid, sum: sum, ptype: ptype, slotid: slotid}).done(function (data) {
                     $('#payment_section').html(data);
                 });
             } // end if courseid > 0 && userid > 0 && sum != ''
@@ -1404,6 +1410,23 @@ $(document).ready(function () {
             get_state_workshops();
         }
 
+        if (event.target.id == 'categories') {
+            var category_id = $('#categories').val();
+            get_category_course(category_id);
+        }
+
+        if (event.target.id == 'register_courses') {
+            get_register_course_states();
+            var id = $('#register_courses').val();
+            get_course_users(id);
+        }
+
+        if (event.target.id == 'register_state') {
+            get_register_course_cities();
+        }
+
+
+
     }); // end of $('#region-main').on('change', 'select',
 
     function get_contact_page() {
@@ -1708,7 +1731,6 @@ $(document).ready(function () {
 
         if (event.target.id == 'categories') {
             var category_id = $('#categories').val();
-            console.log('Category ID: ' + category_id);
             get_category_course(category_id);
         }
 

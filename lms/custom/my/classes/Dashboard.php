@@ -96,12 +96,23 @@ class Dashboard extends Util {
         return $status;
     }
 
+    function get_user_course_slot($courseid, $userid) {
+        $query = "select * from mdl_slots "
+                . "where courseid=$courseid and userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slotid = $row['slotid'];
+        }
+        return $slotid;
+    }
+
     function get_user_warning_message() {
         $list = "";
         $userid = $this->user->id;
         $courseid = $this->course->id;
+        $slotid=$this->get_user_course_slot($courseid, $userid);
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0' target='_blank'>click</a> here to pay by card. </span>";
+        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/$slotid' target='_blank'>click</a> here to pay by card. </span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span12' >If you need help please contact support team.</span>";
@@ -334,6 +345,17 @@ class Dashboard extends Util {
         $this->db->query($query);
     }
 
+    function add_user_slots($courseid, $slotid, $userid) {
+        $query = "insert into mdl_slots "
+                . "(slotid,"
+                . "courseid,"
+                . "userid) "
+                . "values($slotid,"
+                . "$courseid,"
+                . "$userid)";
+        $this->db->query($query);
+    }
+
     function enrol_user_to_course($courseid, $slotid, $userid) {
         $enrolled = $this->is_user_already_enrolled($courseid, $userid);
         //echo "Enrolled status: ".$enrolled."<br>";
@@ -341,7 +363,7 @@ class Dashboard extends Util {
             $this->enroll_user($courseid, $userid);
         } // end if $enrolled==0
         if ($slotid > 0) {
-            $this->add_user_to_slot($userid, $slotid);
+            $this->add_user_slots($courseid, $slotid, $userid);            
         } // end if $slotid>0
         $list = "You was successfully enrolled into selected course/schedule.The page will be reloaded ....";
         return $list;

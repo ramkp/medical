@@ -130,16 +130,16 @@ class Enroll {
         if (is_numeric($user->country)) {
             $user->country = $this->get_country_name($user->country);
         } //end if is_number($user->country)
-        
+
         $list = "";
-        $user->pwd = $this->get_password();        
+        $user->pwd = $this->get_password();
         if ($user->country != '' && $user->country != 'US') {
             $user->country = $this->get_country_code($user->country);
         } // end if $user->country!=''
         else {
             $user->country = 'US';
         } // end else
-        
+
         $encoded_user = base64_encode(json_encode($user));
         $data = array('user' => $encoded_user);
 
@@ -154,7 +154,7 @@ class Enroll {
 
         $context = stream_context_create($options);
         $response = @file_get_contents($this->signup_url, false, $context);
-        
+
         if ($response !== false) {
             // 2. Enroll user into course
             $this->enroll_user_to_course($user);
@@ -165,7 +165,7 @@ class Enroll {
             $list.="</div>";
             echo $list;
             die();
-        }      
+        }
     }
 
     function update_user_data($userid, $user) {
@@ -200,12 +200,24 @@ class Enroll {
         } // end if $user->slotid>0
     }
 
+    function update_slots_table($courseid, $userid, $slotid) {
+        $query = "insert into mdl_slots "
+                . "(slotid,"
+                . "courseid,"
+                . "userid) "
+                . "values($slotid,"
+                . "$courseid,"
+                . "$userid)";
+        $this->db->query($query);
+    }
+
     function enroll_user_to_course($user) {
         $userid = $this->getUserId($user->email);
         $this->assign_roles($userid, $user->courseid);
         $this->update_user_data($userid, $user);
         //$this->add_user_to_course_schedule($userid, $user);
-        $user->userid=$userid;
+        $this->update_slots_table($user->courseid, $userid, $user->slotid);
+        $user->userid = $userid;
         $this->send_confirmation_email($user);
     }
 

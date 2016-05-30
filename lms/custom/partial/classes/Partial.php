@@ -2,6 +2,7 @@
 
 require_once ('/home/cnausa/public_html/lms/class.pdo.database.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/my/classes/Dashboard.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
 
 class Partial extends Util {
@@ -14,6 +15,36 @@ class Partial extends Util {
         parent::__construct();
         $this->payment = new Payment();
         $this->db = new pdo_db();
+        $this->update_users_list();
+    }
+
+    function update_users_list() {
+        $users = array();
+        $dir_path = $_SERVER['DOCUMENT_ROOT'] . "/lms";
+        $file_name = 'users.json';
+        $full_file_path = $dir_path . "/" . $file_name;
+        $query = "select * from mdl_user where deleted=0";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            //$item = $row['firstname'] . "&nbsp;" . $row['lastname'] . "&nbsp;" . $row['email'];
+            $item = $row['email'];
+            $users[] = $item;
+        }
+        $myfile = fopen($full_file_path, "w");
+        fwrite($myfile, "[");
+        for ($i = 0; $i <= count($users); $i++) {
+            if ($i < count($users)) {
+                $write_item = json_encode($users[$i]) . ",";
+            }
+            if ($i == count($users) - 1) {
+                $write_item = json_encode($users[$i]);
+            }
+            if ($users[$i] != null) {
+                fwrite($myfile, $write_item);
+            }
+        } // end for
+        fwrite($myfile, "]");
+        fclose($myfile);
     }
 
     function get_partial_payments_total() {
@@ -181,15 +212,23 @@ class Partial extends Util {
 
     function get_add_partial_payment_page() {
         $list = "";
-        $program_types = $this->get_course_categories();
+        $ds = new Dashboard();
+        $cats = $ds->get_course_categories();
+        $courses = $ds->get_courses_by_category();
+        $register_state = $ds->get_register_course_states_list();
+        $cities = $ds->get_register_course_cities_list();
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8'>$program_types</span>";
+        $list.="<span class='span3'>$cats</span>";
+        $list.="<span class='span3' id='cat_course'>$courses</span>";
+        $list.="<span class='span3' id='register_states_container'>$register_state</span>";
+        $list.="<span class='span3' id='register_cities_container'>$cities</span>";
         $list.="</div>";
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' id='category_courses'></span>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='span8' id='enrolled_users'></span>";
         $list.="</div>";
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' id='enrolled_users'></span>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+
         $list.="</div>";
         $list.="<div class='container-fluid' style='text-align:left;display:none;' id='payment_options'>";
         $list.="<span class='span3'><input type='radio' name='payment_type' value='cc' checked>Card payment</span>";
@@ -276,7 +315,7 @@ class Partial extends Util {
         } // end if $user->slotid>0
     }
 
-    function add_partial_payment($courseid, $userid, $sum, $source) {
+    function add_partial_payment($courseid, $userid, $sum, $source, $slotid) {
         $date = time();
         $payment_type = 0; // cc        
         $user_data = $this->get_user_details($userid);
@@ -302,30 +341,43 @@ class Partial extends Util {
             //$this->add_payments_log($courseid, $userid, $sum, $payment_type);
         } // end if $source == 'cc'
 
+        function update_slots_table ($courseid, $userid, $slotid) {
+            $query = "insert into mdl_slots "
+                    . "(slotid,"
+                    . "courseid,"
+                    . "userid) "
+                    . "values($slotid,"
+                    . "$courseid,"
+                    . "$userid)";
+            $this->db->query($query);
+        }
+
         if ($source == 'add_cash' || $source == 'add_cheque') {
             //1 - cash
             //2 - cheque 
             $payment_type = ($source == 'add_cash') ? 1 : 2;
             $query = "insert into mdl_partial_payments "
                     . "(userid,"
-                    . "courseid,"
+                    . "courseid, slotid,"
                     . "ptype,"
                     . "psum,"
                     . "pdate) "
-                    . "values($userid,"
-                    . "$courseid,"
+                    . "values($userid, "
+                    . "$courseid, $slotid,"
                     . "$payment_type,"
                     . "'$sum',"
                     . "'$date')";
+            //echo "Query: ".$query."<br>";
             $this->db->query($query);
             $this->confirm_user($userid);
-            $this->add_user_to_course_schedule($user_data->slotid, $userid);
+            $this->update_slots_table($courseid, $userid, $slotid);
+            $this->add_user_to_course_schedule($slotid, $userid);
         } // end if $source == 'add_cash' || $source == 'add_cheque'
         $list = "Partial payment successfully added. Please reload the page";
         return $list;
     }
 
-    function get_payment_section($courseid, $userid, $sum, $ptype) {
+    function get_payment_section($courseid, $userid, $sum, $ptype, $slotid) {
         $list = "";
 
         if ($ptype == 'cash') {
@@ -351,7 +403,7 @@ class Partial extends Util {
             $user = new stdClass();
             $user->id = $userid;
             $user->courseid = $courseid;
-            $user->sloid = $user_data->slotid;
+            $user->sloid = $slotid;
             $user->state = $user_data->state;
             $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, true);
         } // end if $ptype=='cc'

@@ -114,8 +114,7 @@ class Payment_model extends CI_Model {
         $list = "";                
         if ($userid != NULL) {
             $invoice = new Invoice();
-            $user = $this->get_user_data($userid);
-            $slotid = $this->get_user_slot($userid);
+            $user = $this->get_user_data($userid);            
             $user->courseid = $courseid;
             $user->slotid = $slotid;
             $group_status = $this->is_group_member($userid);

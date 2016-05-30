@@ -864,7 +864,7 @@ class Payment {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Address*</span>";
         $list.="<span class='span2'><input type='text' id='bill_addr' name='bill_addr'  ></span>";
-        $list.="<span class='span2'>Expiration Date*</span>";        
+        $list.="<span class='span2'>Expiration Date*</span>";
         $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
         $list.="</div>";
 
@@ -1057,16 +1057,15 @@ class Payment {
         $this->db->query($query);
     }
 
-    function get_user_slotid($userid) {
-        $query="select * from mdl_user where id=$userid";
+    function get_user_slotid($courseid, $userid) {
+        $query = "select * from mdl_slots "
+                . "where courseid=$courseid and userid=$userid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $slotid=$row['slotid'];
+            $slotid = $row['slotid'];
         }
         return $slotid;
     }
-    
-    
 
     function make_stub_payment($card) {
         $list = "";
@@ -1079,8 +1078,8 @@ class Payment {
         $user_payment_data = $this->get_user_payment_credentials($card->userid);
 
         // Make card object compatible with confirmation email
-        $card->email=$user_payment_data->email;
-        $card->slotid = $this->get_user_slotid($card->userid);
+        $card->email = $user_payment_data->email;
+        $card->slotid = $this->get_user_slotid($card->courseid, $card->userid);
         $card->first_name = $user_payment_data->firstname;
         $card->last_name = $user_payment_data->lastname;
         $card->phone = $user_payment_data->phone1;
@@ -1128,14 +1127,14 @@ class Payment {
                 else {
                     $card->transid = $status['trans_id'];
                     $card->auth_code = $status['auth_code'];
-                    $this->confirm_user($card->email);                    
+                    $this->confirm_user($card->email);
                     $this->add_payment_to_db($card); // adds payment result to DB
                     $mailer->send_payment_confirmation_message($card);
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Payment is successfull. Thank you! You can print your registration data <a href='https://".$_SERVER['SERVER_NAME']."/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
+                    $list.= "<span class='span8'>Payment is successfull. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
@@ -1242,7 +1241,7 @@ class Payment {
                     $list.= "<span class='span8'>Payment is successfull. Thank you!</span>";
                     $list.="</div>";
                     $list.="</div>";
-                    $list.="</div>";                    
+                    $list.="</div>";
 
                     foreach ($group_users as $userid) {
                         $user = $this->get_user_detailes($userid);
