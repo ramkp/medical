@@ -40,24 +40,31 @@ echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
 echo"<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
 echo "<script src='//code.jquery.com/jquery-1.10.2.js'></script>";
 echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
+echo "<script src='https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js'></script>";
 ?>
 
 <script>
     /*
-    $(function () {
-        $('#fileupload').fileupload({
-            dataType: 'json',
-            done: function (e, data) {
-                $.each(data.result.files, function (index, file) {
-                    $('<p/>').text(file.name).appendTo(document.body);
-                });
-            }
-        });
-    });
-    */
+     $(function () {
+     $('#fileupload').fileupload({
+     dataType: 'json',
+     done: function (e, data) {
+     $.each(data.result.files, function (index, file) {
+     $('<p/>').text(file.name).appendTo(document.body);
+     });
+     }
+     });
+     });
+     */
     $(function () {
         $("#start").datepicker();
         $("#end").datepicker();
+    });
+<?php $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/users.json"; ?>
+    $('input.typeahead').typeahead({
+        name: 'countries',
+        prefetch: '<?php echo $path; ?>',
+        limit: 100000
     });
 </script>
 
@@ -78,10 +85,10 @@ if (strpos($checkuseragent, 'MSIE 8')) {
 
 <?php if ($PAGE->theme->settings->socials_position == 1) { ?>
     <div class="container-fluid socials-header"> 
-    <?php require_once(dirname(__FILE__) . '/socials.php'); ?>
+        <?php require_once(dirname(__FILE__) . '/socials.php'); ?>
     </div>
-    <?php }
-    ?>
+<?php }
+?>
 
 <header id="page-header" class="clearfix">
 
