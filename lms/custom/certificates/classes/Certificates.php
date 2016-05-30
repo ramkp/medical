@@ -20,7 +20,7 @@ class Certificates extends Util {
     function __construct() {
         parent::__construct();
         $this->cert_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates';
-        $this->host=$_SERVER['SERVER_NAME'];
+        $this->host = $_SERVER['SERVER_NAME'];
     }
 
     function get_course_name($id) {
@@ -91,12 +91,12 @@ class Certificates extends Util {
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='select_all'>Select all</a></span>";
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='deselect_all'>Deselect all</a></span>";
                 $list.="<span class='span3'><a href='#' onclick='return false;' id='print_certs'>Print Selected Certificates</a></span>";
-                $list.="<span class='span3'><a href='#' onclick='return false;' id='print_labels'>Print Selected Labels</a></span>";             
+                $list.="<span class='span3'><a href='#' onclick='return false;' id='print_labels'>Print Selected Labels</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid' style='text-align:center;'>";
                 $list.="<span class='span10' id='print_err'></span>";
                 $list.="</div>";
-                
+
                 $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
                 $list.="<span class='span10'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
                 $list.="</div>";
@@ -119,7 +119,7 @@ class Certificates extends Util {
                 $addr_link = "/lms/custom/certificates/$certificate->userid/label.pdf";
                 //$address_block=$this->get_user_address_block($user->id);                
                 //echo "Address block: ".$address_block."<br>";
-                
+
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Firstname</span><span class='span2'>$user->firstname</span>";
                 $list.="</div>";
@@ -128,15 +128,15 @@ class Certificates extends Util {
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Email</span><span class='span2'>$user->email</span>";
-                $list.="</div>";                
+                $list.="</div>";
                 /*
                  * 
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Address</span><span class='span2'>$address_block</span>";
-                $list.="</div>";
+                  $list.="<div class='container-fluid'>";
+                  $list.="<span class='span2'>Address</span><span class='span2'>$address_block</span>";
+                  $list.="</div>";
                  * 
                  */
-                
+
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program name</span><span class='span6'>$coursename</span>";
                 $list.="</div>";
@@ -155,11 +155,11 @@ class Certificates extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Expiration date</span><span class='span2'>$_exp_date</span>";
                 $list.="</div>";
-                
+
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'><input class='cert' type='checkbox' id='$certificate->userid' value='$certificate->userid'></span><span class='span2'>Select</span>";
-                $list.="</div>";          
-                
+                $list.="</div>";
+
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span6'><hr/></span>";
                 $list.="</div>";
@@ -240,7 +240,7 @@ class Certificates extends Util {
                 $user->firstname = $row['firstname'];
                 $user->lastname = $row['lastname'];
                 $user->email = $row['email'];
-                $user->id=$row['id'];
+                $user->id = $row['id'];
             } // end if $row['firstname'] != '' && $row['lastname'] != ''
         } // end while
         return $user;
@@ -383,7 +383,7 @@ class Certificates extends Util {
         return $num;
     }
 
-    function send_certificate($courseid, $userid, $date = 0) {
+    function send_certificate($courseid, $userid, $date = 0, $send = true) {
         //echo "Date: ".$date."<br>";
         if ($date == 0) { // course is not yet completed
             $date = $this->get_user_course_entollment_date($courseid, $userid);
@@ -415,8 +415,10 @@ class Certificates extends Util {
             //echo "Query: ".$query."<br>";
             $this->db->query($query);
         } // end if $certificate_exists==0
-        $mailer = new Mailer();
-        $mailer->send_certificate($user);
+        if ($send == true) {
+            $mailer = new Mailer();
+            $mailer->send_certificate($user);
+        }
         $list = "Certificate has been sent";
         return $list;
     }
@@ -582,6 +584,42 @@ class Certificates extends Util {
             $list.="</div>";
         }
         return $list;
+    }
+
+    function print_certificates($students) {
+        $certs = array();
+        $students_arr = explode(",", $students);
+        if (count($students_arr) > 0) {
+            foreach ($students_arr as $studentid) {
+                $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.pdf";
+                $certs[] = $pdf_file;
+            } // end foreach
+            $datadir = $_SERVER['DOCUMENT_ROOT'] . "/print/";
+            $outputName = $datadir . "merged.pdf";
+            $cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$outputName ";
+            foreach ($certs as $certificate) {
+                $cmd .= $certificate . " ";
+            } // end foreach
+            shell_exec($cmd);
+        } // end f count($students_arr) > 0
+    }
+
+    function print_labels($labels) {
+        $lb = array();
+        $labels_arr = explode(",", $labels);
+        if (count($labels_arr) > 0) {
+            foreach ($labels_arr as $label) {
+                $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$label/label.pdf";
+                $lb[] = $pdf_file;
+            } // end foreach
+            $datadir = $_SERVER['DOCUMENT_ROOT'] . "/print/";
+            $outputName = $datadir . "merged.pdf";
+            $cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$outputName ";
+            foreach ($lb as $label) {
+                $cmd .= $label . " ";
+            } // end foreach
+            shell_exec($cmd);
+        } // end f count($students_arr) > 0
     }
 
 }

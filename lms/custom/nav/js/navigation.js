@@ -911,18 +911,17 @@ $(document).ready(function () {
                 selected.push($(this).val());
             }
         });
-        console.log('Array length: ' + selected.length);
         if (selected.length > 0) {
+            $('#print_err').html('');
             if (confirm('Print selected certificates?')) {
-                var url = "http://medical2.com/lms/custom/webprint/DemoPrintFile.php";
-                window.open(url, '_blank');
-                /*
-                 var selected_certs = selected.join();
-                 var url = "/lms/custom/certificates/print_certificate.php";
-                 $.post(url, {certs: selected_certs}).done(function (data) {
-                 $('#print_err').html(data);
-                 });
-                 */
+                $('#ajax_loader').show();
+                var selected_certs = selected.join();
+                var url = "/lms/custom/certificates/print_certificates.php";
+                $.post(url, {certs: selected_certs}).done(function () {
+                    $('#ajax_loader').hide();
+                    var url = "http://medical2.com/print/merged.pdf";
+                    window.open(url, "print");
+                });
             } // end if confirm
         } // end if selected.length>0
         else {
@@ -937,14 +936,21 @@ $(document).ready(function () {
                 selected.push($(this).val());
             }
         });
-        console.log('Array length: ' + selected.length);
         if (selected.length > 0) {
+            $('#print_err').html('');
             if (confirm('Print selected labels?')) {
-                $('#print_err').html("Selected labels were sent to printer");
+                $('#ajax_loader').show();
+                var selected_labels = selected.join();
+                var url = "/lms/custom/certificates/print_labels.php";
+                $.post(url, {labels: selected_labels}).done(function () {
+                    $('#ajax_loader').hide();
+                    var url = "http://medical2.com/print/merged.pdf";
+                    window.open(url, "print");
+                });
             } // end if confirm
         } // end if selected.length>0
         else {
-            $('#print_err').html('Please select at least one certificate to be printed');
+            $('#print_err').html('Please select at least one addresss label to be printed');
         } // end else
 
     }
@@ -1057,10 +1063,14 @@ $(document).ready(function () {
             $('#sch_err').html('');
             var students = selected.join();
             var courseid = $('#courseid').val();
-            console.log('Course ID: ' + courseid);
-            console.log('Students: ' + students);
             if (confirm('Print certificates for selected users?')) {
-
+                $('#ajax_loading').show();
+                var url = "/lms/custom/schedule/print_certificates.php";
+                $.post(url, {courseid: courseid, students: students}).done(function () {
+                    $('#ajax_loading').hide();
+                    var url = "http://medical2.com/print/merged.pdf";
+                    var oWindow = window.open(url, "print");
+                });
             } // end if confirm
         } // end if selected.length > 0
         else {

@@ -5,6 +5,7 @@
  *
  * @author sirromas
  */
+session_start();
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
 
@@ -243,6 +244,7 @@ class Schedule extends Util {
         $students_arr = explode(",", $students);
         $now = time();
         if (count($students_arr) > 0) {
+            $cert = new Certificates();
             foreach ($students_arr as $studentid) {
                 $query = "insert into mdl_course_completions "
                         . "(userid,"
@@ -258,6 +260,8 @@ class Schedule extends Util {
                         . "$now,"
                         . "0)";
                 $this->db->query($query);
+                $date = $this->get_course_completion_date($courseid, $studentid);
+                $cert->send_certificate($courseid, $studentid, $date, false);
             } // end foreach
         } // end if count($students_arr)>0
     }
@@ -279,12 +283,56 @@ class Schedule extends Util {
             $cert = new Certificates();
             foreach ($students_arr as $studentid) {
                 $date = $this->get_course_completion_date($courseid, $studentid);
-                $cert = new Certificates();
                 $cert->send_certificate($courseid, $studentid, $date);
             } // end foreach
         } // end if count($students_arr) > 0
         $list.="Certificates were sent to selected users";
         return $list;
+    }
+
+    function print_certificate($courseid, $students) {
+        $certs=array();
+        $students_arr = explode(",", $students);
+        if (count($students_arr) > 0) {
+            $now = time();
+            $cert = new Certificates();
+            foreach ($students_arr as $studentid) {
+                $cert->send_certificate($courseid, $studentid, $now, false);
+                $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.pdf";
+                //$jpg_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.jpg";
+                //exec("convert -density 300 $pdf_file $jpg_file");
+                $certs[]=$pdf_file;
+            }            
+            $datadir=$_SERVER['DOCUMENT_ROOT']."/print/"; 
+            $outputName = $datadir."merged.pdf";            
+            $cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$outputName ";
+            foreach ($certs as $certificate) {
+                 $cmd .= $certificate." ";
+            } // end foreach
+            shell_exec($cmd);
+            
+            /*
+            $query = "select * from mdl_print_job";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $query2 = "update mdl_print_job set students='$students'";
+            } // end if $num > 0
+            else {
+                $query2 = "insert into mdl_print_job (students) values('$students')";
+            } // end else
+            $this->db->query($query2);
+            */
+            
+        } // end if count($students_arr) > 0
+    }
+
+    function get_print_job() {
+        $query = "select * from mdl_print_job";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $students = $row['students'];
+        }
+        return $students;
     }
 
 }
