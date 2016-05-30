@@ -306,12 +306,18 @@ class Partial extends Util {
 
     function add_user_to_course_schedule($slotid, $userid) {
         if ($slotid > 0) {
-            $query = "insert into mdl_scheduler_appointment "
-                    . "(slotid,"
-                    . "studentid,"
-                    . "attended) values ($slotid,$userid,0)";
-            //echo "Query: ".$query."<br>";
-            $this->db->query($query);
+            $query = "select * from mdl_scheduler_appointment "
+                    . "where slotid=$slotid "
+                    . "and studentid=$userid";
+            $num = $this->db->numrows($query);
+            if ($num == 0) {
+                $query = "insert into mdl_scheduler_appointment "
+                        . "(slotid,"
+                        . "studentid,"
+                        . "attended) values ($slotid,$userid,0)";
+                //echo "Query: ".$query."<br>";
+                $this->db->query($query);
+            } // end if $num == 0
         } // end if $user->slotid>0
     }
 

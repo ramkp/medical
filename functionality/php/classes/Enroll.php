@@ -189,14 +189,19 @@ class Enroll {
     }
 
     function add_user_to_course_schedule($userid, $user) {
-        //print_r($user);
         if ($user->slotid > 0) {
-            $query = "insert into mdl_scheduler_appointment "
-                    . "(slotid,"
-                    . "studentid,"
-                    . "attended) values ($user->slotid,$userid,0)";
-            //echo "Query: ".$query."<br>";
-            $this->db->query($query);
+            $query = "select * from mdl_scheduler_appointment "
+                    . "where slotid=$user->slotid "
+                    . "and studentid=$userid";
+            $num = $this->db->numrows($query);
+            if ($num == 0) {
+                $query = "insert into mdl_scheduler_appointment "
+                        . "(slotid,"
+                        . "studentid,"
+                        . "attended) values ($user->slotid,$userid,0)";
+                //echo "Query: ".$query."<br>";
+                $this->db->query($query);
+            } // end if $num==0
         } // end if $user->slotid>0
     }
 
