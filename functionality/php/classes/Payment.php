@@ -629,7 +629,7 @@ class Payment {
         return $drop_down;
     }
 
-    function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null) {
+    function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null, $renew = false) {
 
         /*
           echo "<br/>Users-------------<br/>";
@@ -669,7 +669,12 @@ class Payment {
         if ($installment == null) {
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
-                $course_cost = $this->get_personal_course_cost($users->courseid);
+                if ($renew == false) {
+                    $course_cost = $this->get_personal_course_cost($users->courseid);
+                } // end if $renew == false
+                else {
+                    $course_cost = array('cost' => 50, 'discount' => 0);
+                }
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$users->courseid' id='courseid' name='courseid' />";
@@ -681,14 +686,20 @@ class Payment {
                 else {
                     $tax = 0;
                 } // end else
-                if ($users->slotid != '') {
+                if ($users->slotid != '' && $renew==false) {
                     $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
                     $late_fee = $late->get_delay_fee($users->courseid);
                 }
             } // end if $group==''
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
-                $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
+                if ($renew == false) {
+                    $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
+                } // end if $renew == false 
+                else {
+                    $course_cost = array('cost' => 50, 'discount' => 0);
+                } // end else
+
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
@@ -700,7 +711,7 @@ class Payment {
                 else {
                     $tax = 0;
                 } // end else
-                if ($group_data->slotid != '') {
+                if ($group_data->slotid != '' && $renew==false) {
                     $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
                     $late_fee = $late->get_delay_fee($group_data->courseid);
                 }
@@ -804,11 +815,16 @@ class Payment {
             $users->slotid = 0; // There is no delay fee for installment users            
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
-                $course_cost = $this->get_personal_course_cost($users->courseid);
+                if ($renew == false) {
+                    $course_cost = $this->get_personal_course_cost($users->courseid);
+                } // end if $renew == false
+                else {
+                    $course_cost = array('cost' => 50, 'discount' => 0);
+                }
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$users->courseid' id='courseid' name='courseid' />";
-                if ($users->slotid != '') {
+                if ($users->slotid != '' && $renew==false) {
                     $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
                     $late_fee = $late->get_delay_fee($group_data->courseid);
                 }
@@ -816,11 +832,16 @@ class Payment {
             else {
                 $group_data->slotid = 0; // There is no delay fee for installment users            
                 $course_name = $this->get_course_name($group_data->courseid);
-                $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
+                if ($renew == false) {
+                    $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
+                } // end if
+                else {
+                    $course_cost = array('cost' => 50, 'discount' => 0);
+                }
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
-                if ($group_data->slotid != '') {
+                if ($group_data->slotid != '' && $renew==false) {
                     $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $group_data->slotid);
                     $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
                 }

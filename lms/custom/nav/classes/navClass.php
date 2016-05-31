@@ -21,7 +21,7 @@ class navClass extends Util {
             $top_menu = $this->get_admin_menu_items($userid);
         }// end if $userid==2
         else {
-            if ($roleid != '') {                
+            if ($roleid != '') {
                 //echo "Role ID: ".$roleid."<br>";                
                 //echo "Username: ".$username."<br>";            
                 if ($roleid == 3 || $roleid == 4) {
@@ -283,6 +283,7 @@ class navClass extends Util {
         $userid = $this->user->id;
         $courseid = $this->get_user_course($userid);
         $expired = $this->is_course_expired($courseid);
+        $completion_status = $this->is_course_completed($courseid, $this->user->id);
         $list = "";
         $list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
@@ -300,6 +301,10 @@ class navClass extends Util {
                         <li class='dropdown'><a href='#cm_submenu_2' class='dropdown-toggle' title='Cerrtificate'>Certtificate<b class='caret'></b></a>                        
                         <ul class='dropdown-menu' style='display: none;'>                                            
                         <li><a title='Get Certificate' id='get_cert' href='#'>Get Certificate</a></li>";
+        if ($completion_status > 0) {
+            $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>Print Certificate</a></li>";
+        } // end if $compleation_status!=0
+
         if ($expired != 0) {
             $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>Renew Certificate</a></li>";
         }
@@ -454,20 +459,22 @@ class navClass extends Util {
         return $list;
     }
 
+    function get_renew_fee() {
+        $query = "select * from mdl_renew_fee";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $fee = $row['fee_sum'];
+        } // end while
+        return $fee;
+    }
+
     function check_user_balance($courseid, $userid) {
-        $query = "select * from mdl_user_balance "
-                . "where courseid=$courseid and userid=$userid";
+        $fee = $this->get_renew_fee();
+        $query = "select * from mdl_card_payments "
+                . "where courseid=$courseid and userid=$userid and psum='$fee'";
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $sum = $row['balance_sum'];
-            } // end while
-        } // end if $num>0
-        else {
-            $sum = 'n/a';
-        }
-        return $sum;
+        return $num;
     }
 
     function update_user_balance($courseid, $userid) {
@@ -478,10 +485,29 @@ class navClass extends Util {
         $this->db->query($query);
     }
 
+    function make_student_course_completed($courseid, $userid) {
+        $now = time();
+        $query = "insert into mdl_course_completions "
+                . "(userid,"
+                . "course,"
+                . "timeenrolled,"
+                . "timestarted,"
+                . "timecompleted,"
+                . "reaggregate) "
+                . "values($userid,"
+                . "$courseid,"
+                . "$now,"
+                . "0,"
+                . "$now,"
+                . "0)";
+        $this->db->query($query);
+    }
+
     function renew_certificate() {
         $courseid = $this->get_user_course($this->user->id);
         $sum = $this->check_user_balance($courseid, $this->user->id);
         if ($sum > 0) {
+            $this->make_student_course_completed($courseid, $this->user->id);
             $user = $this->get_user_details($this->user->id);
             $cert = new Certificates();
             $date = $cert->get_course_completion($courseid, $this->user->id, TRUE);
@@ -494,10 +520,8 @@ class navClass extends Util {
         } // end if $sum>0
         else {
             $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Your balance does not contain enough funds to renew certificate.</span>";
-            $list.="</div>";
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Certificate renew is a paid service. Please click <a href='#' onClick='return false;' id='send_invoice_renew'>here</a> to get Certificate Renew invoice. Once invoice will be paid you will be able to Renew Certificate</span>";
+            $userid = $this->user->id;
+            $list.="<span class='span9'>Certificate renew is a paid service. Please click <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/1' target='_blank'>here</a> to pay by card.</span>";
             $list.="</div>";
             return $list;
         }
