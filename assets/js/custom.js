@@ -554,6 +554,7 @@ $(document).ready(function () {
     }
 
     function verify_personal_payment_section() {
+        var dashboard=$('#dashboard').val();
         var card = $('#card_type').text();
         var card_type = card.trim();
         var sum = $('#payment_sum').val();
@@ -640,6 +641,7 @@ $(document).ready(function () {
         if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_email != '' && validateEmail(bill_email) == true) {
             $('#personal_payment_err').html('');
             var card = {sum: sum,
+                dashboard:dashboard,
                 email: email,
                 userid: userid,
                 courseid: courseid,

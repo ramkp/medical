@@ -9,6 +9,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Late.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Upload.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Classes/ProcessPayment.php';
+//require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
 
 class Payment {
 
@@ -662,6 +663,8 @@ class Payment {
         $states = $this->get_states_list();
         $late = new Late();
 
+        $dashboard = ($from_email == null) ? 0 : 1;
+        $list.="<input type='hidden' id='dashboard' value='$dashboard'>";
         if ($from_email != null) {
             $list.="<br/><div  class='form_div'>";
         }
@@ -1101,6 +1104,17 @@ class Payment {
         return $slotid;
     }
 
+    function get_course_completion($courseid, $userid) {
+        $query = "select * from mdl_course_completions "
+                . "where course=$courseid "
+                . "and userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $timecompleted = $row['timecompleted'];
+        }
+        return $timecompleted;
+    }
+
     function make_stub_payment($card) {
         $list = "";
         $mailer = new Mailer();
@@ -1110,7 +1124,7 @@ class Payment {
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
         $user_payment_data = $this->get_user_payment_credentials($card->userid);
-
+        $renew_fee = $this->get_renew_fee();
         // Make card object compatible with confirmation email
         $card->email = $user_payment_data->email;
         $card->slotid = $this->get_user_slotid($card->courseid, $card->userid);
@@ -1168,7 +1182,12 @@ class Payment {
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Payment is successfull. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
+                    if ($card->sum != $renew_fee) {
+                        $list.= "<span class='span8'>Payment is successfull. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
+                    } // end if $card->sum != $renew_fee                    
+                    else {                        
+                        $list.= "<span class='span8'>Payment is successfull. Thank you! Please use Renew Certificate option from <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/my' target='_blank'>your Dashboard</a></span>";
+                    } // end else
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
