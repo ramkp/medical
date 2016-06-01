@@ -299,15 +299,12 @@ class navClass extends Util {
                     <ul class='nav pull-left'>
                         <li></li>                        
                         <li class='dropdown'><a href='#cm_submenu_2' class='dropdown-toggle' title='Cerrtificate'>Certtificate<b class='caret'></b></a>                        
-                        <ul class='dropdown-menu' style='display: none;'>                                            
-                        <li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
+                        <ul class='dropdown-menu' style='display: none;'>";
         if ($completion_status > 0) {
             $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>Print Certificate</a></li>";
-        } // end if $compleation_status!=0
-
-        if ($expired != 0) {
             $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>Renew Certificate</a></li>";
-        }
+            $list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";            
+        } // end if $compleation_status!=0        
         $list.="</ul>
                         </li>                        
                     </ul>                            
