@@ -303,7 +303,7 @@ class navClass extends Util {
         if ($completion_status > 0) {
             $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>Print Certificate</a></li>";
             $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>Renew Certificate</a></li>";
-            $list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";            
+            $list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
         } // end if $compleation_status!=0        
         $list.="</ul>
                         </li>                        
@@ -466,9 +466,16 @@ class navClass extends Util {
     }
 
     function check_user_balance($courseid, $userid) {
+        // Payment should be done not later then 360 days ago        
+        $year = 31104000; // 360 days in secs
+        $now = time();
+        $exp = $now + $year;
         $fee = $this->get_renew_fee();
         $query = "select * from mdl_card_payments "
-                . "where courseid=$courseid and userid=$userid and psum='$fee'";
+                . "where courseid=$courseid"
+                . " and userid=$userid "
+                . "and psum='$fee' "
+                . "and pdate<$exp";
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         return $num;
@@ -500,6 +507,17 @@ class navClass extends Util {
         $this->db->query($query);
     }
 
+    function get_course_completion($courseid, $userid) {
+        $query = "select * from mdl_course_completions "
+                . "where course=$courseid "
+                . "and userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $timecompleted = $row['timecompleted'];
+        }
+        return $timecompleted;
+    }
+
     function renew_certificate() {
         $courseid = $this->get_user_course($this->user->id);
         $sum = $this->check_user_balance($courseid, $this->user->id);
@@ -507,9 +525,8 @@ class navClass extends Util {
             $this->make_student_course_completed($courseid, $this->user->id);
             $user = $this->get_user_details($this->user->id);
             $cert = new Certificates();
-            $date = $cert->get_course_completion($courseid, $this->user->id, TRUE);
-            $new_date = $date + 31536000;
-            $cert->send_certificate($courseid, $this->user->id, $new_date);
+            $date = $this->get_course_completion($courseid, $this->user->id);
+            $cert->send_certificate($courseid, $this->user->id, $date);
             $this->update_user_balance($courseid, $this->user->id);
             $list.="<div class='container-fluid'>";
             $list.="<span class='span9'>New Certificate has been sent to $user->email.</span>";
