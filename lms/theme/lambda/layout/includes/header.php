@@ -38,9 +38,7 @@ echo "</script>";
 echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
 echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
 echo"<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
-echo "<script src='//code.jquery.com/jquery-1.10.2.js'></script>";
-echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
-echo "<script src='https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js'></script>";
+//echo "<script src='https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js'></script>";
 ?>
 
 <script>
@@ -60,12 +58,7 @@ echo "<script src='https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/ty
         $("#start").datepicker();
         $("#end").datepicker();
     });
-<?php $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/users.json"; ?>
-    $('input.typeahead').typeahead({
-        name: 'countries',
-        prefetch: '<?php echo $path; ?>',
-        limit: 100000
-    });
+
 </script>
 
 <?php
