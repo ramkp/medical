@@ -519,14 +519,22 @@ class navClass extends Util {
     }
 
     function renew_certificate() {
-        $courseid = $this->get_user_course($this->user->id);
+        
+        /***************************************************************
+         *  Certificate validation is one year. So whenever user clicks
+         *  Renew Certificate it sould be prolonged for one year from
+         *  course completion moment, no other cases 
+         ***************************************************************/
+        
+        $courseid = $this->get_user_course($this->user->id);        
         $sum = $this->check_user_balance($courseid, $this->user->id);
         if ($sum > 0) {
             $this->make_student_course_completed($courseid, $this->user->id);
             $user = $this->get_user_details($this->user->id);
             $cert = new Certificates();
             $date = $this->get_course_completion($courseid, $this->user->id);
-            $cert->send_certificate($courseid, $this->user->id, $date);
+            $new_date = $date + 31536000; // one year later after course completion
+            $cert->send_certificate($courseid, $this->user->id, $new_date);
             $this->update_user_balance($courseid, $this->user->id);
             $list.="<div class='container-fluid'>";
             $list.="<span class='span9'>New Certificate has been sent to $user->email.</span>";
