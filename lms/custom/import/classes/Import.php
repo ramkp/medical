@@ -14,6 +14,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.p
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 require_once($CFG->dirroot . '/user/editlib.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/connect.php';
 
 use Dompdf\Dompdf;
 
@@ -26,6 +27,7 @@ class Import extends Util {
 
     public $cert_path;
     public $invoice_path;
+    public $manager_id = 234;
 
     function __construct() {
         parent::__construct();
@@ -292,9 +294,8 @@ class Import extends Util {
         return $num;
     }
 
-    function is_user_uid_exists($email) {
-        $query = "select * from mdl_user where email='$email'";
-        //echo "Query: " . $query . "<br>";
+    function is_user_uid_exists($uid) {
+        $query = "select * from mdl_user where uid='$uid'";
         $num = $this->db->numrows($query);
         return $num;
     }
@@ -338,6 +339,13 @@ class Import extends Util {
         return $enrolid;
     }
 
+    function class_exists($uid) {
+        $query = "select * from mdl_scheduler_slots where uid=$uid";
+        echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
     function get_users_activity_data($filepath) {
         $activities = array();
         $handle = @fopen($filepath, "r");
@@ -354,14 +362,14 @@ class Import extends Util {
                 $ptype = $data[4];
                 $regdate = $data[5];
                 $courseid = $data[6];
-                $certno = $data[7];
-                $cstart = $data[8];
-                $cend = $data[9];
+                $classid = $data[7];
+                $certno = $data[8];
+                $cstart = $data[9];
+                $cend = $data[10];
                 if ($courseid != 'Course_Def_Number') {
                     $course_exists = $this->is_course_exists($courseid);
                     $user_exists = $this->is_user_uid_exists($uid);
-                    //echo "<br>Course exists: $course_exists<br>";
-                    //echo "User exists: $user_exists<br>";
+                    $class_exists = $this->class_exissts($classid);
                     if ($course_exists > 0 && $user_exists > 0) {
                         //echo "User with $uid exists - creating activity object <br>";
                         $user_activity = new stdClass();
@@ -372,6 +380,7 @@ class Import extends Util {
                         $user_activity->ptype = $ptype;
                         $user_activity->regdate = $regdate;
                         $user_activity->courseid = $courseid;
+                        $user_activity->classid = $classid;
                         $user_activity->certno = $certno;
                         $user_activity->cstart = $cstart;
                         $user_activity->cend = $cend;
@@ -461,7 +470,11 @@ class Import extends Util {
 
     function create_user_certification_data($activity) {
         $list = "";
-        if ($activity->certno != '1/1/1900') {
+
+        echo "Certificate issue date: " . $activity->cstart . "<br>";
+        echo "Certificate issue timestamp date:" . strtotime($activity->cstart) . "<br>";
+
+        if (trim($activity->certno) != '1/1/1900' && trim($activity->cstart) != '1/1/1900') {
 
             $courseid = $this->get_course_id($activity->courseid);
             $userid = $this->get_user_id_by_uid($activity->uid);
@@ -564,6 +577,9 @@ class Import extends Util {
                 echo "<br>User $activity->uid already has certificate from course #$activity->courseid<br>";
             }
         } // end if $activity->certno!='1/1/1900'
+        else {
+            echo "Certificate number or issue date are not correct ... <br>";
+        }
     }
 
     function add_user_payment($activity) {
@@ -716,9 +732,25 @@ class Import extends Util {
                 } // end if $card_payment_exists==0
                 else {
                     echo "<br>Credit card payment data for user ($activity->uid) already exists  <br>";
+                    echo "Echo Credit Card payment date: " . $activity->pdate . "<br>";
                 }
             } // end else payment made by CC card
         } // end if $activity->pstatus==0
+    }
+
+    function add_user_to_class($activity) {
+        //$class_exists = $this->class_exists($activity->classid);
+        $userid = $this->get_user_id_by_uid($activity->uid);
+        if ($userid > 0) {
+            $query = "insert into mdl_scheduler_appointment "
+                    . "(slotid,"
+                    . "studentid,"
+                    . "attended) "
+                    . "values ($activity->classid,"
+                    . "$userid,"
+                    . "0)";
+            $this->db->query($query);
+        } // end if $class_exists>0
     }
 
     function process_user_activities($filepath) {
@@ -729,6 +761,7 @@ class Import extends Util {
                 $this->enroll_user_to_course($activity);
                 $this->create_user_certification_data($activity);
                 $this->add_user_payment($activity);
+                $this->add_user_to_class($activity);
                 echo "<br>------------------------------------------------<br>";
             } // end foreach
         } // end if count($activities)>0
@@ -870,7 +903,7 @@ class Import extends Util {
 
             $pdf2 = new PDF_Label('L7163');
             $pdf2->AddPage();
-            $user_address=$this->get_user_address_data($certificate->userid);
+            $user_address = $this->get_user_address_data($certificate->userid);
             $text = sprintf("%s\n%s\n%s\n%s\n%s", "$user_address->firstname $user_address->lastname", "Phone: $user_address->phone1", "Email: $user_address->email", "$user_address->address", "$user_address->city, $user_address->state, $user_address->zip");
             //$text = sprintf("%s\n%s\n%s\n%s", $user_address_block);
             $pdf2->Add_Label($text);
@@ -904,6 +937,361 @@ class Import extends Util {
              */
         } // end foreach
         echo "<br>Total Labels created: " . $i . "<br>";
+    }
+
+    function get_scheduler_id($uid) {
+        switch ($uid) {
+            case 556:
+                $schedulerid = 8;
+                break;
+            case 671:
+                $schedulerid = 5;
+                break;
+            case 672:
+                $schedulerid = 4;
+                break;
+            case 673:
+                $schedulerid = 16;
+                break;
+            case 676:
+                $schedulerid = 12;
+                break;
+            case 677:
+                $schedulerid = 14;
+                break;
+            case 678:
+                $schedulerid = 11;
+                break;
+            case 696:
+                $schedulerid = 10;
+                break;
+            case 697:
+                $schedulerid = 13;
+                break;
+            case 698:
+                $schedulerid = 9;
+                break;
+            case 699:
+                $schedulerid = 6;
+                break;
+            case 756:
+                $schedulerid = 7;
+                break;
+        }
+        return $schedulerid;
+    }
+
+    function is_slot_exist($schedulerid, $location, $date) {
+        $num = 0;
+        $query = "SELECT `id` , `schedulerid` , 
+            FROM_UNIXTIME( `starttime` , '%m/%d/%Y' ) as date , 
+            `appointmentlocation` , 
+            `notes` FROM `mdl_scheduler_slots` 
+            where schedulerid='$schedulerid' "
+                . "and appointmentlocation='$location' "
+                . "and FROM_UNIXTIME( `starttime` , '%m/%d/%Y' )='$date'";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_state_name_by_id($stateid) {
+        $state = null;
+        if ($stateid != '') {
+            $query = "select * from mdl_states where id=$stateid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $state = $row['state'];
+            }
+        } // end if $stateid != ''
+        return $state;
+    }
+
+    function add_one_day($date) {
+        $date_arr = explode('/', $date);
+        $day = $date_arr[1] + 1;
+        $newdate = $date_arr[0] . "/" . $day . "/" . $date_arr[2];
+        return $newdate;
+    }
+
+    function add_slot_item($slot) {
+        $starttime = strtotime($slot->starttime);
+        $teacherid = 234;
+        $duration = 480;
+        $query = "insert into mdl_scheduler_slots "
+                . "(schedulerid,"
+                . "uid,"
+                . "starttime,"
+                . "duration,"
+                . "teacherid,"
+                . "appointmentlocation,"
+                . "notes) "
+                . "values('$slot->schedulerid', "
+                . "$slot->uid,"
+                . "'$starttime',"
+                . "'$duration',"
+                . "'$teacherid',"
+                . "'$slot->location',"
+                . "'$slot->notes')";
+        echo "Query: " . $query . "<br>";
+        $this->db->query($query);
+    }
+
+    function add_scheduler_slots($filepath) {
+        $handle = @fopen($filepath, "r");
+        $i = 0;
+        if ($handle) {
+            while (($buffer = fgets($handle, 4096)) !== false) {
+                $class_arr = explode(',', $buffer);
+                $classid = $class_arr[0];
+                $courseid = $class_arr[1];
+                $schedulerid = $this->get_scheduler_id($courseid);
+                //$classdate = $this->add_one_day($class_arr[3]);
+                $classdate = $class_arr[3];
+                $stateid = $class_arr[4];
+                $statename = $this->get_state_name_by_id($stateid);
+                $city = $class_arr[5];
+                $location = $statename . "/" . $city;
+                $venue = str_replace('"', '', $class_arr[6]);
+                //$exists = $this->class_exists($classid);
+                $exists = 0;
+                if ($statename != null && $city != '' && $venue != '' && $exists == 0) {
+                    echo "Class ID: " . $classid . "&nbsp;Course ID: " . $courseid . "&nbsp;Scheduler ID: " . $schedulerid . "&nbsp;Class location: $location &nbsp; Class notes: $venue &nbsp; Class Date: " . $classdate . "&nbsp; Class exists: $exists<br>";
+                    $slot = new stdClass();
+                    $slot->uid = $classid;
+                    $slot->schedulerid = $schedulerid;
+                    $slot->starttime = $classdate;
+                    $slot->location = $location;
+                    $slot->notes = $venue;
+                    $this->add_slot_item($slot);
+                    $i++;
+                    echo "------------------------------------------------------------------------------------------------------------------------<br>";
+                } // end if $statename!=null && $city!='' && $venue!=''
+                else {
+                    echo "Slot with ID: " . $classid . " already exists, skip this record ....<br>";
+                }
+            } // end while            
+            echo "Total new slots: " . $i . "<br>";
+            fclose($handle);
+        } // end if $handle
+        else {
+            die("Error: can't open file <br>");
+        } // end else
+    }
+
+    /*     * *********************************************************************
+     * 
+     *              Code related to exams import
+     * 
+     * ********************************************************************* */
+
+    function get_question_category($courseid) {
+        $catid = 0;
+        switch ($courseid) {
+            case 676:
+                $catid = 10;
+                break;
+            case 677:
+                $catid = 14;
+                break;
+            case 678:
+                $catid = 15;
+                break;
+        }
+        return $catid;
+    }
+
+    function get_stamp() {
+        $now = time();
+        $string = $this->get_password(6);
+        $stamp = "medical2.com+" . $now . "+" . $string;
+        return $stamp;
+    }
+
+    function process_exam_questions($filepath) {
+        $handle = @fopen($filepath, "r");
+        $i = 0;
+        if ($handle) {
+            while (($buffer = fgets($handle, 4096)) !== false) {
+                $clean_buffer = str_replace(',,', ',', $buffer);
+                $clean_buffer2 = str_replace('"', '', $clean_buffer);
+                $q_arr = explode(',', $clean_buffer2);
+                $cid = $q_arr[0];
+                $q = $q_arr[1];
+                $a = $q_arr[2];
+                $b = $q_arr[3];
+                $c = $q_arr[4];
+                $d = $q_arr[5];
+                $ca = trim($q_arr[6]);
+                $catid = $this->get_question_category($cid);
+                if ($catid > 0 && $q != '' && $a != '' && $b != '' && $c != '' && $d != '' && $ca != '') {
+                    $question = new stdClass();
+                    $question->category = $catid;
+                    $question->name = $q;
+
+                    echo "<br>--------------------------------------------------------------------------<br>";
+
+                    $questionid = $this->add_question($question);
+                    echo "Question ID: " . $questionid . "<br>";
+
+                    if ($questionid > 0) {
+                        $this->add_multichoice_options($questionid);
+                        $answers = array();
+
+                        $a1 = new stdClass();
+                        $a1->id = $questionid;
+                        $a1->answer = $a;
+                        $a1->feedback = '';
+                        if ($ca == 'A') {
+                            $a1->fraction = '1.0000000';
+                        } // end if
+                        else {
+                            $a1->fraction = '0.0000000';
+                        } // end else
+
+                        $a2 = new stdClass();
+                        $a2->id = $questionid;
+                        $a2->answer = $b;
+                        $a2->feedback = '';
+                        if ($ca == 'B') {
+                            $a2->fraction = '1.0000000';
+                        } // end if
+                        else {
+                            $a2->fraction = '0.0000000';
+                        } // end else
+
+                        $a3 = new stdClass();
+                        $a3->id = $questionid;
+                        $a3->answer = $c;
+                        $a3->feedback = '';
+                        if ($ca == 'C') {
+                            $a3->fraction = '1.0000000';
+                        } // end if
+                        else {
+                            $a3->fraction = '0.0000000';
+                        } // end else
+
+                        $a4 = new stdClass();
+                        $a4->id = $questionid;
+                        $a4->answer = $d;
+                        $a4->feedback = '';
+                        if ($ca == 'D') {
+                            $a4->fraction = '1.0000000';
+                        } // end if
+                        else {
+                            $a4->fraction = '0.0000000';
+                        } // end else
+
+                        array_push($answers, $a1, $a2, $a3, $a4);
+                        $this->add_question_answers($answers);
+                        $i++;
+                        echo "<br>--------------------------------------------------------------------------<br>";
+                    } // end if $questionid>0
+                } // end if $catid > 0 && $q != '' ...
+            } // end while
+            echo "Total questions imported: " . $i . "<br>";
+        } // end if $handle
+        else {
+            die("Error: can't open file <br>");
+        } // end else
+    }
+
+    function add_question($q) {
+
+        echo "<br>------<br>";
+        print_r($q);
+        echo "<br>------<br>";
+
+        $catid = $q->category;
+        $userid = $this->manager_id;
+        $parent = 0;
+        $qtype = "multichoice";
+        $stamp = $this->get_stamp();
+        $now = time();
+        $query = "insert into mdl_question "
+                . "(category,"
+                . "parent,"
+                . "name,"
+                . "questiontext,"
+                . "questiontextformat,"
+                . "generalfeedback,"
+                . "generalfeedbackformat,"
+                . "qtype,"
+                . "stamp,"
+                . "version,"
+                . "timecreated,"
+                . "timemodified,"
+                . "createdby,"
+                . "modifiedby) "
+                . "values('" . $catid . "',"
+                . "'" . $parent . "',"
+                . "'" . $q->name . "',"
+                . "'" . $q->name . "',"
+                . "'" . 1 . "',"
+                . "'" . '' . "',"
+                . "'" . 1 . "',"
+                . "'" . $qtype . "',"
+                . "'" . $stamp . "',"
+                . "'" . $stamp . "',"
+                . "'" . $now . "',"
+                . "'" . $now . "',"
+                . "'" . $userid . "',"
+                . "'" . $userid . "')";
+        echo "Query: " . $query . "<br>";
+        mysql_query($query);
+        $id = mysql_insert_id();
+        return $id;
+    }
+
+    function add_multichoice_options($questionid) {
+        $query = "insert into mdl_qtype_multichoice_options "
+                . "(questionid,"
+                . "layout,"
+                . "single,"
+                . "shuffleanswers,"
+                . "correctfeedback,"
+                . "correctfeedbackformat,"
+                . "partiallycorrectfeedback,"
+                . "partiallycorrectfeedbackformat,"
+                . "incorrectfeedback,"
+                . "incorrectfeedbackformat,"
+                . "answernumbering,"
+                . "shownumcorrect) "
+                . "values ("
+                . "$questionid,"
+                . "0,"
+                . "1,"
+                . "1,"
+                . "'',"
+                . "1,"
+                . "'',"
+                . "1,"
+                . "'',"
+                . "1,"
+                . "'abc',"
+                . "0)";
+        echo "Query: " . $query . "<br>";
+        mysql_query($query);
+    }
+
+    function add_question_answers($answers) {
+        foreach ($answers as $a) {
+            $query = "insert into mdl_question_answers "
+                    . "(question,"
+                    . "answer,"
+                    . "answerformat,"
+                    . "fraction,"
+                    . "feedback,"
+                    . "feedbackformat) "
+                    . "values ($a->id,"
+                    . "'" . mysql_real_escape_string($a->answer) . "',"
+                    . "1,"
+                    . "$a->fraction,"
+                    . "'" . $a->feedback . "',"
+                    . "1)";
+            echo "Query: " . $query . "<br>";
+            $this->db->query($query);
+        } // end foreach
     }
 
 }
