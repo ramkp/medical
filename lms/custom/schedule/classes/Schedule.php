@@ -36,18 +36,18 @@ class Schedule extends Util {
             if ($start == null && $end == null) {
                 $query = "select * from mdl_scheduler_slots "
                         . "where schedulerid=$schedulerid "
-                        . "and starttime>$now";
+                        . "and starttime>$now order by starttime";
             } // end if $start == null && $end == null
             if ($start != null && $end == null) {
                 $query = "select * from mdl_scheduler_slots "
                         . "where schedulerid=$schedulerid "
-                        . "and starttime>" . strtotime($start) . "";
+                        . "and starttime>" . strtotime($start) . " order by starttime";
             } // end if $start!=null && $end==null
             if ($start != null && $end != null) {
                 $query = "select * from mdl_scheduler_slots "
                         . "where schedulerid=$schedulerid "
                         . "and starttime>" . strtotime($start) . " "
-                        . "and starttime<" . strtotime($end) . "";
+                        . "and starttime<" . strtotime($end) . " order by starttime";
             } // end if $start != null && $end != null
         } // end if ($search == null) {
         else {
@@ -62,7 +62,7 @@ class Schedule extends Util {
                         . "where schedulerid=$schedulerid "
                         . "and 	(appointmentlocation like '%$search%' "
                         . "or notes like '%$search%') "
-                        . "and starttime>" . strtotime($start) . "";
+                        . "and starttime>" . strtotime($start) . " order by starttime";
             } // end if $start!=null && $end==null
             if ($start != null && $end != null) {
                 $query = "select * from mdl_scheduler_slots "
@@ -70,7 +70,7 @@ class Schedule extends Util {
                         . "and starttime>" . strtotime($start) . " "
                         . "and 	(appointmentlocation like '%$search%' "
                         . "or notes like '%$search%') "
-                        . "and starttime<" . strtotime($end) . "";
+                        . "and starttime<" . strtotime($end) . " order by starttime";
             } // end if $start != null && $end != null
         } // end else
         //echo "Query: " . $query . "<br>";
