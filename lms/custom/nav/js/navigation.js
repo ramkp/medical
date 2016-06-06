@@ -1100,17 +1100,20 @@ $(document).ready(function () {
         }
 
         if (event.target.id.indexOf("_faq") >= 0) {
-            var data = CKEDITOR.instances.editor1.getData();
+            var oEditor = FCKeditorAPI.GetInstance('editor');
+            var data = oEditor.GetHTML();
             update_faq_page(data);
         }
 
         if (event.target.id.indexOf("_about") >= 0) {
-            var data = CKEDITOR.instances.editor1.getData();
+            var oEditor = FCKeditorAPI.GetInstance('editor');
+            var data = oEditor.GetHTML();
             update_about_page(data);
         }
 
         if (event.target.id.indexOf("_test") >= 0) {
-            var data = CKEDITOR.instances.editor1.getData();
+            var oEditor = FCKeditorAPI.GetInstance('editor');
+            var data = oEditor.GetHTML();
             update_testimonial_page(data);
         }
 
@@ -1176,7 +1179,8 @@ $(document).ready(function () {
         }
 
         if (event.target.id.indexOf("_contact") >= 0) {
-            var data = CKEDITOR.instances.editor1.getData();
+            var oEditor = FCKeditorAPI.GetInstance('editor');
+            var data = oEditor.GetHTML();
             update_contact_page(data);
         }
 

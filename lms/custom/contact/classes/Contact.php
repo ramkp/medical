@@ -5,11 +5,11 @@
  *
  * @author sirromas
  */
-
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+include $_SERVER['DOCUMENT_ROOT'] . "/lms/editor/fckeditor.php";
 
 class Contact extends Util {
-    
+
     function get_edit_page() {
         $list = "";
         $query = "select id, content from mdl_contact_page where id=1";
@@ -17,8 +17,10 @@ class Contact extends Util {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $content = $row['content'];
         }
-        $editor = $this->get_editor_instance($content);
-        $list = $list . "<p align='center' style='font-weight:bolder;'>Edit Page - Contact</p>";
+        $oFCKeditor = new FCKeditor('editor');
+        $oFCKeditor->BasePath = $this->editor_path;
+        $oFCKeditor->Value = $content;
+        $editor = $oFCKeditor->Create(false);
         $list = $list . "<table class='table table-hover' border='0'>";
         $list = $list . "<tr>";
         $list = $list . "</td >&nbsp;&nbsp;$editor</td>";
@@ -49,5 +51,5 @@ class Contact extends Util {
         $list = "<p align='center'>Data successfully saved. </p>";
         return $list;
     }
-    
+
 }

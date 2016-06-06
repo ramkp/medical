@@ -16,6 +16,7 @@ class Util {
     public $user;
     public $course;
     public $student_role = 5;
+    public $editor_path;
 
     function __construct() {
         global $USER, $COURSE;
@@ -24,6 +25,7 @@ class Util {
         $this->user = $USER;
         $this->course = $COURSE;
         $this->host = $_SERVER['SERVER_NAME'];
+        $this->editor_path='https://'.$_SERVER['SERVER_NAME']."/lms/editor/";
     }
 
     function get_screen_resolution() {
