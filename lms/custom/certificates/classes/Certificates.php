@@ -290,7 +290,7 @@ class Certificates extends Util {
         return $title;
     }
 
-    function prepare_ceriticate($courseid, $userid, $date = 0) {
+    function get_certificate_template($courseid, $userid, $date = 0) {
         $list = "";
         $coursename = $this->get_course_name($courseid); // string
         $userdetails = $this->get_user_details($userid); // object
@@ -305,34 +305,143 @@ class Certificates extends Util {
         $renew_status = $this->get_course_renew_status($courseid);
         $title = $this->get_certificate_title($courseid);
         $code = $this->get_course_code($courseid, $userid);
-        //echo "Certificate code: ".$code."<br>";
         if ($renew_status == 1) {
             $expiration_date_sec = $date + 31536000;
         }
         $expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
-        $list.="<!DOCTYPE HTML SYSTEM>";
-        $list.="<head>";
-        $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
-        $list.="<link rel='stylesheet' type='text/css' href='cert.css'>";
-        $list.="</head>";
-        $list.="<body>";
-        $list.="<div class='cert'>";
-        $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
-        $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-        $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
-        $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
-        $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
-        $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
-        if ($renew_status == true) {
-            $list.="EXPIRATION DATE $expiration_date</p>";
-        }
-        //$list.="<div align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Shahid Malik, President</span> &nbsp; <span align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Donna Steele, Director</span></span></div>";
-        //$list.="</div>";        
-        $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
-        $list.="</div>";
+        switch ($courseid) {
+            case 45:
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="<link rel='stylesheet' type='text/css' href='cert.css'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div class='cert'>";
+                $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy with EKG certification the $day th of $month $year To:</span>";
+                $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of hands-on clinical exam and written certification exam.<br>"
+                        . "Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture,<br> "
+                        . "Patient bill of rights, order of draws, needle/syringe, winged infusion (butterfly), lancet, evacuated tube system, and corrective techniques.<br><br>"
+                        . "The workshop also discusses procedures to preform an Electrocardiogram.</span>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                } // end if $renew_status == true                                 
+                // President signature
+                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="</div>";
 
-        $list.="</body>";
-        $list.="</html>";
+                $list.="</body>";
+                $list.="</html>";
+
+                $pdf = new mPDF('utf-8', 'A4-L');
+                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+                $pdf->WriteHTML($stylesheet, 1);
+                $pdf->WriteHTML($list, 2);
+                $dir_path = $this->cert_path . "/$userid";
+                if (!is_dir($dir_path)) {
+                    if (!mkdir($dir_path)) {
+                        die('Could not write to disk');
+                    } // end if !mkdir($dir_path)
+                } // end if !is_dir($dir_path)
+                $path = $dir_path . "/certificate.pdf";
+                $pdf->Output($path, 'F');
+
+                break;
+            case 1:
+
+                break;
+            default:
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="<link rel='stylesheet' type='text/css' href='cert.css'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div class='cert'>";
+                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                }
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+                $list.="</div>";
+                $list.="</body>";
+                $list.="</html>";
+
+                $pdf = new mPDF('utf-8', 'A4-L');
+                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+                $pdf->WriteHTML($stylesheet, 1);
+                $pdf->WriteHTML($list, 2);
+                $dir_path = $this->cert_path . "/$userid";
+                if (!is_dir($dir_path)) {
+                    if (!mkdir($dir_path)) {
+                        die('Could not write to disk');
+                    } // end if !mkdir($dir_path)
+                } // end if !is_dir($dir_path)
+                $path = $dir_path . "/certificate.pdf";
+                $pdf->Output($path, 'F');
+                break;
+        } // end switch
+        return $list;
+    }
+
+    function prepare_ceriticate($courseid, $userid, $date = 0) {
+        $list = "";
+
+
+        /*
+          $coursename = $this->get_course_name($courseid); // string
+          $userdetails = $this->get_user_details($userid); // object
+          $firstname = strtoupper($userdetails->firstname);
+          $lastname = strtoupper($userdetails->lastname);
+          if ($date == 0) {
+          $date = time();
+          }
+          $day = date('d', $date);
+          $month = date('M', $date);
+          $year = date('Y', $date);
+          $renew_status = $this->get_course_renew_status($courseid);
+          $title = $this->get_certificate_title($courseid);
+          $code = $this->get_course_code($courseid, $userid);
+          if ($renew_status == 1) {
+          $expiration_date_sec = $date + 31536000;
+          }
+          $expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
+         */
+
+
+        $list.=$this->get_certificate_template($courseid, $userid, $date);
+
+
+        /*
+          $list.="<!DOCTYPE HTML SYSTEM>";
+          $list.="<head>";
+          $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+          $list.="<link rel='stylesheet' type='text/css' href='cert.css'>";
+          $list.="</head>";
+          $list.="<body>";
+          $list.="<div class='cert'>";
+          $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+          $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
+          $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+          $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
+          $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
+          $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+          if ($renew_status == true) {
+          $list.="EXPIRATION DATE $expiration_date</p>";
+          }
+          $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+          $list.="</div>";
+          $list.="</body>";
+          $list.="</html>";
+         */
 
         $pdf = new mPDF('utf-8', 'A4-L');
         $stylesheet = file_get_contents($this->cert_path . '/cert.css');
