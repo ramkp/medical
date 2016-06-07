@@ -136,8 +136,8 @@ $host = $_SERVER['HTTP_HOST'];
                                     <li id='login_link'><a href="https://<?php echo $host ?>/index.php/login" title="Login">Login</a></li>                                    
                                     <li class="dropdown"><a title="More" class="dropdown-toggle" href="#cm_submenu_2">More<b class="caret"></b></a>
                                         <ul class="dropdown-menu">                                            
-                                            <li><a href="http://<?php echo $host ?>/index.php/certs"  id="cert" title="Verify Certification">Verify Certification</a></li>
-                                            <li><a href="http://<?php echo $host ?>/index.php/groups"  id="group" title="Private Groups">Private Groups</a></li>
+                                            <li><a href="https://<?php echo $host ?>/index.php/certs"  id="cert" title="Verify Certification">Verify Certification</a></li>
+                                            <li><a href="https://<?php echo $host ?>/index.php/groups"  id="group" title="Private Groups">Private Groups</a></li>
                                             <li><a href="http://<?php echo $host ?>/index.php/testimonial"  id="testimonial" title="Testimonial">Testimonial</a></li>
                                             <li><a href="http://<?php echo $host ?>/index.php/gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>                                            
                                         </ul>
@@ -206,8 +206,8 @@ $host = $_SERVER['HTTP_HOST'];
 
                                 <?php
                                 $url = $_SERVER['REQUEST_URI'];
-                                echo "Url: " . $url . "<br>";                                
-                                if (strpos($url, 'register') === FALSE && strpos($url, 'login') ===FALSE) {
+                                //echo "Url: " . $url . "<br>";                                
+                                if (strpos($url, 'register') === FALSE && strpos($url, 'login') ===FALSE && strpos($url, 'certs') ===FALSE && strpos($url, 'groups') ===FALSE && strpos($url, 'payment') ===FALSE) {
                                     echo "<script type='text/javascript' src='http://w.sharethis.com/button/buttons.js'></script>";
                                     echo "<script type='text/javascript'>stLight.options({publisher: 'eda8d1a9-031a-4879-9550-5afd52ee1ddf', doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>";
                                 }
