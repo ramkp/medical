@@ -165,9 +165,10 @@ class Schedule extends Util {
             $list.= "<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'><a href='#' id='students_all' onClick='return false;'>Select all</a></span>";
             $list.="<span class='span2'><a href='#' id='students_none' onClick='return false;'>Deselct all</a></span>";
-            $list.="<span class='span3'><a href='#' id='complete' onClick='return false;'>Change completion status</a></span>";
+            $list.="<span class='span2'><a href='#' id='complete' onClick='return false;'>Change status</a></span>";
             $list.="<span class='span2'><a href='#' id='print' onClick='return false;'>Print certificates</a></span>";
             $list.="<span class='span2'><a href='#' id='send' onClick='return false;'>Send certificates</a></span>";
+            $list.="<span class='span2'><a href='#' id='add_students' onClick='return false;'>Add students</a></span>";
             $list.="</div>";
             $list.= "<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span12' id='sch_err' style='color:red;'></span>";
@@ -291,7 +292,7 @@ class Schedule extends Util {
     }
 
     function print_certificate($courseid, $students) {
-        $certs=array();
+        $certs = array();
         $students_arr = explode(",", $students);
         if (count($students_arr) > 0) {
             $now = time();
@@ -301,28 +302,27 @@ class Schedule extends Util {
                 $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.pdf";
                 //$jpg_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.jpg";
                 //exec("convert -density 300 $pdf_file $jpg_file");
-                $certs[]=$pdf_file;
-            }            
-            $datadir=$_SERVER['DOCUMENT_ROOT']."/print/"; 
-            $outputName = $datadir."merged.pdf";            
+                $certs[] = $pdf_file;
+            }
+            $datadir = $_SERVER['DOCUMENT_ROOT'] . "/print/";
+            $outputName = $datadir . "merged.pdf";
             $cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$outputName ";
             foreach ($certs as $certificate) {
-                 $cmd .= $certificate." ";
+                $cmd .= $certificate . " ";
             } // end foreach
             shell_exec($cmd);
-            
+
             /*
-            $query = "select * from mdl_print_job";
-            $num = $this->db->numrows($query);
-            if ($num > 0) {
-                $query2 = "update mdl_print_job set students='$students'";
-            } // end if $num > 0
-            else {
-                $query2 = "insert into mdl_print_job (students) values('$students')";
-            } // end else
-            $this->db->query($query2);
-            */
-            
+              $query = "select * from mdl_print_job";
+              $num = $this->db->numrows($query);
+              if ($num > 0) {
+              $query2 = "update mdl_print_job set students='$students'";
+              } // end if $num > 0
+              else {
+              $query2 = "insert into mdl_print_job (students) values('$students')";
+              } // end else
+              $this->db->query($query2);
+             */
         } // end if count($students_arr) > 0
     }
 
@@ -333,6 +333,37 @@ class Schedule extends Util {
             $students = $row['students'];
         }
         return $students;
+    }
+    
+    
+    
+    function get_students_box () {
+        global $COURSE;
+        $list = "";
+        $courseid=$COURSE->id;
+        echo "Course ID: ".$courseid."<br>";                
+        $students=$this->get_course_users($courseid);
+        $list.="<div id='myModal' class='modal fade'>
+    <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+                <h4 class='modal-title'>Add student</h4>
+            </div>
+            <div class='modal-body'>
+            <div class='container-fluid' style='text-align:left;'>
+            <span class='span2'>$students</span>    
+            </div>
+                
+            </div>
+            <div class='modal-footer'>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='ok'>I Agree with Terms and Conditions</button></span>
+            </div>
+        </div>
+    </div>
+</div>";
+        return $list;
     }
 
 }

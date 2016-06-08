@@ -2,6 +2,7 @@
 $(document).ready(function () {
 
     var domain = 'medical2.com';
+    var dialog_loaded;
     console.log("ready!");
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
@@ -530,6 +531,32 @@ $(document).ready(function () {
         else {
             $(status_id).html("<span style='color:red;'>Please select payment type</span>");
         } // end else
+    }
+    
+    function get_students_modal_box () {
+        console.log('Dialog loaded: ' + dialog_loaded);
+        if (dialog_loaded !== true) {
+            console.log('Script is not yet loaded starting loading ...');
+            dialog_loaded = true;
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "https://" + domain + "/lms/custom/schedule/get_students_box.php";
+                        var request = {search_item: 1};
+                        $.post(url, request).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
+        } // dialog_loaded!=true
+        else {
+            console.log('Script already loaded');
+            $("#myModal").modal('show');
+        }
     }
 
     function search_payment(typeid) {
@@ -1414,6 +1441,10 @@ $(document).ready(function () {
             $('.students').each(function () { //loop through each checkbox
                 this.checked = false;  //select all checkboxes with class "cert"              
             });
+        }
+
+        if (event.target.id == 'add_students') {
+            get_students_modal_box(); 
         }
 
 

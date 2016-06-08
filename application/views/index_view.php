@@ -35,14 +35,18 @@
 
                     <!-- Wrapper for Slides -->
                     <div class="carousel-inner">
-                        <div class="item active">
-                            <!-- Set the first background image using inline CSS below. -->
-                            <div class="fill" style="background-image:url('assets/img/image.png');height:375px;"></div>                        
-                        </div>
                         <div class="item">
+                            <!-- Set the first background image using inline CSS below. -->
+                            <div class="fill" style="background-image:url('assets/img/site_pic3.jpg');height:375px;"></div>                        
+                        </div>
+                        <div class="item active">
                             <!-- Set the second background image using inline CSS below. -->
-                            <div class="fill" style="background-image:url('assets/img/16.jpg');height:375px;"></div>                        
-                        </div>                    
+                            <div class="fill" style="background-image:url('assets/img/kid_1st.jpg');height:375px;"></div>                        
+                        </div>                        
+                        <div class="item">
+                            <!-- Set the fourth background image using inline CSS below. -->
+                            <div class="fill" style="background-image:url('assets/img/site_pic_4.jpg');height:375px;"></div>                        
+                        </div>                                            
                     </div>
                     <!-- Controls -->
                     <a class="left carousel-control" href="#myCarousel" data-slide="prev">

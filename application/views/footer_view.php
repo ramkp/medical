@@ -26,8 +26,9 @@
                     <span class='st_googleplus_large' displayText='Google +'></span>
                     <span class='st_instagram_large' displayText='Instagram Badge'></span>
                     <span class='st__large' displayText=''></span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.bbb.org/mississippi/business-reviews/schools-business-and-vocational/medical-2-training-institute-in-tupelo-ms-235827408/#bbbonlineclick" target="_blank" rel="nofollow"><img src="http://seal-ms.bbb.org/seals/blue-seal-200-65-bbb-235827408.png" style="border: 0;" alt="Medical 2 Training Institute BBB Business Review" /></a>
                 </p>
-
+                
             </div>
 
             <script type="text/javascript">
@@ -38,7 +39,7 @@
                     po.type = 'text/javascript';
                     po.async = true;
                     var referrer = (document.referrer) ? encodeURIComponent(document.referrer.substr(document.referrer.indexOf('://') + 1)) : '';
-                    var location = (document.location) ? encodeURIComponent(window.location.href.substring(window.location.protocol.length)) : '';                    
+                    var location = (document.location) ? encodeURIComponent(window.location.href.substring(window.location.protocol.length)) : '';
                     po.src = '//medical2.com/chat/index.php/chat/getstatus/(click)/internal/(position)/bottom_right/(ma)/br/(top)/350/(units)/pixels/(leaveamessage)/true?r=' + referrer + '&l=' + location;
                     var s = document.getElementsByTagName('script')[0];
                     s.parentNode.insertBefore(po, s);
