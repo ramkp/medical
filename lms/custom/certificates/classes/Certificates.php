@@ -290,7 +290,7 @@ class Certificates extends Util {
         return $title;
     }
 
-    function get_certificate_template($courseid, $userid, $date = 0) {
+    function get_certificate_template($courseid, $userid, $date = 0, $code = '') {
         $list = "";
         $coursename = $this->get_course_name($courseid); // string
         $userdetails = $this->get_user_details($userid); // object
@@ -304,7 +304,9 @@ class Certificates extends Util {
         $year = date('Y', $date);
         $renew_status = $this->get_course_renew_status($courseid);
         $title = $this->get_certificate_title($courseid);
-        $code = $this->get_course_code($courseid, $userid);
+        if ($code == '') {
+            $code = $this->get_course_code($courseid, $userid);
+        } // end if $code==''
         if ($renew_status == 1) {
             $expiration_date_sec = $date + 31536000;
         }
