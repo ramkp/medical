@@ -699,7 +699,7 @@ class Payment {
                 else {
                     $tax = 0;
                 } // end else
-                if ($users->slotid != '' && $renew == false) {
+                if ($users->slotid != '' && $sum == false) {
                     $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
                     $late_fee = $late->get_delay_fee($users->courseid);
                 }
@@ -724,7 +724,7 @@ class Payment {
                 else {
                     $tax = 0;
                 } // end else
-                if ($group_data->slotid != '' && $renew == false) {
+                if ($group_data->slotid != '' && $sum == false) {
                     $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
                     $late_fee = $late->get_delay_fee($group_data->courseid);
                 }
@@ -845,17 +845,16 @@ class Payment {
             else {
                 $group_data->slotid = 0; // There is no delay fee for installment users            
                 $course_name = $this->get_course_name($group_data->courseid);
-                if ($renew == false) {
+                if ($sum == false) {
                     $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 } // end if
-                else {
-                    $fee = $this->get_renew_fee();
-                    $course_cost = array('cost' => $fee, 'discount' => 0);
+                else {                    
+                    $course_cost = array('cost' => $sum, 'discount' => 0);
                 }
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
                 $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
-                if ($group_data->slotid != '' && $renew == false) {
+                if ($group_data->slotid != '' && $sum == false) {
                     $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $group_data->slotid);
                     $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
                 }
