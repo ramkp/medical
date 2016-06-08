@@ -967,6 +967,30 @@ $(document).ready(function () {
 
     }
 
+    function renew_certificates() {
+        var selected = new Array();
+        $(".cert").each(function () {
+            if ($(this).is(':checked')) {
+                selected.push($(this).val());
+            }
+        });
+        if (selected.length > 0) {
+            $('#print_err').html('');
+            if (confirm('Renew selected certificate(s)?')) {
+                $('#ajax_loader').show();
+                var selected_certs = selected.join();
+                var url = "/lms/custom/certificates/renew_certs.php";
+                $.post(url, {certs: selected_certs}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#print_err').html(data);
+                });
+            } // end if confirm
+        } // end if selected.length > 0
+        else {
+            $('#print_err').html('Please select at least one certificate');
+        } // end else
+    }
+
     function get_partial_payments_section() {
         var courseid = $('#register_courses').val();
         var userid = $('#users').val();
@@ -1353,6 +1377,10 @@ $(document).ready(function () {
 
         if (event.target.id == 'print_labels') {
             print_labels();
+        }
+
+        if (event.target.id == 'renew_cert') {
+            renew_certificates();
         }
 
         if (event.target.id == 'add_partial') {

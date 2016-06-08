@@ -40,7 +40,22 @@ class Certificates extends Util {
 
     function get_certificates_list() {
         $certificates = array();
-        $query = "select * from mdl_certificates order by issue_date desc limit 0, $this->limit";
+        $query = "select * from mdl_certificates where userid<>3002 and userid<>3784 order by issue_date desc limit 0, $this->limit";
+
+        /*
+         * 
+          $query="SELECT id,
+          courseid,
+          userid,
+          cert_no,
+          issue_date,
+          FROM_UNIXTIME( `issue_date` , '%Y-%m-%d' ) AS date,
+          expiration_date
+          FROM mdl_certificates
+          WHERE FROM_UNIXTIME( `issue_date` , '%Y-%m-%d' ) != '1999-12-31'
+          order by issue_date desc limit 0, $this->limit";
+         * 
+         */
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -90,8 +105,9 @@ class Certificates extends Util {
                 $list.="<div class='container-fluid' style='text-align:center;'>";
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='select_all'>Select all</a></span>";
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='deselect_all'>Deselect all</a></span>";
-                $list.="<span class='span3'><a href='#' onclick='return false;' id='print_certs'>Print Selected Certificates</a></span>";
-                $list.="<span class='span3'><a href='#' onclick='return false;' id='print_labels'>Print Selected Labels</a></span>";
+                $list.="<span class='span2'><a href='#' onclick='return false;' id='print_certs'>Print Certificate</a></span>";
+                $list.="<span class='span2'><a href='#' onclick='return false;' id='print_labels'>Print Label</a></span>";
+                $list.="<span class='span2'><a href='#' onclick='return false;' id='renew_cert'>Renew Certificate</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid' style='text-align:center;'>";
                 $list.="<span class='span10' id='print_err'></span>";
@@ -112,14 +128,14 @@ class Certificates extends Util {
             foreach ($certificates as $certificate) {
                 $user = $this->get_user_details($certificate->userid);
                 $coursename = $this->get_course_name($certificate->courseid);
-                $date = date('Y-m-d', $certificate->issue_date);
-                $exp_date = date('Y-m-d', $certificate->expiration_date);
+                $date = date('m-d-Y', $certificate->issue_date);
+                $exp_date = date('m-d-Y', $certificate->expiration_date);
                 $_exp_date = ($exp_date == '') ? "n/a" : $exp_date;
                 $cert_link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $certificate->path));
                 $addr_link = "/lms/custom/certificates/$certificate->userid/label.pdf";
                 //$address_block=$this->get_user_address_block($user->id);                
                 //echo "Address block: ".$address_block."<br>";
-
+                //if ($date != '1999-12-31') {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Firstname</span><span class='span2'>$user->firstname</span>";
                 $list.="</div>";
@@ -163,6 +179,7 @@ class Certificates extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span6'><hr/></span>";
                 $list.="</div>";
+                //} // end if $date != '1999-12-31'
             } // end foreach
             $list.="</div>";
             if ($toolbar == true) {
@@ -296,6 +313,7 @@ class Certificates extends Util {
         $userdetails = $this->get_user_details($userid); // object
         $firstname = strtoupper($userdetails->firstname);
         $lastname = strtoupper($userdetails->lastname);
+        //echo "Issue date: ".date('m-d-Y',$date)."<br>";
         if ($date == 0) {
             $date = time();
         }
@@ -311,6 +329,7 @@ class Certificates extends Util {
             $expiration_date_sec = $date + 31536000;
         }
         $expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
+        //echo "Expiration date: ".$expiration_date."<br>";
         switch ($courseid) {
             case 45:
                 $list.="<!DOCTYPE HTML SYSTEM>";
@@ -544,7 +563,10 @@ class Certificates extends Util {
             $page = $page - 1;
             $offset = $rec_limit * $page;
         }
-        $query = "select * from mdl_certificates order by issue_date desc LIMIT $offset, $rec_limit";
+        $query = "select * from mdl_certificates "
+                . "where userid<>3002 "
+                . "and userid<>3784 "
+                . "order by issue_date desc LIMIT $offset, $rec_limit";
         //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -731,6 +753,38 @@ class Certificates extends Util {
             } // end foreach
             shell_exec($cmd);
         } // end f count($students_arr) > 0
+    }
+
+    function get_certificate_detailes($userid) {
+        $query = "select * from mdl_certificates where userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cert = new stdClass();
+            $cert->id = $row['id'];
+            $cert->courseid = $row['courseid'];
+            $cert->userid = $row['userid'];
+            $cert->code = $row['cert_no'];
+            $cert->date = $row['issue_date'];
+        }
+        return $cert;
+    }
+
+    function update_certificate_data() {
+        
+    }
+
+    function renew_certificates($certs) {
+        $list = "";        
+        $certs_array = explode(",", $certs);
+        if (count($certs_array) > 0) {
+            foreach ($certs_array as $userid) {
+                $certificate = $this->get_certificate_detailes($userid);
+                $new_date = $certificate->date + 31536000; // one year later after certificate issue date
+                $this->get_certificate_template($certificate->courseid, $certificate->userid, $new_date, $certificate->code);
+            } // end foreach
+        } // end if count($certs_array)>0
+        $list.="Selected Certificate(s) were renewed";
+        return $list;
     }
 
 }
