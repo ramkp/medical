@@ -541,7 +541,7 @@ class Invoices extends Util {
                 . "where firstname "
                 . "like '%$item%' "
                 . "or lastname like '%$item%' "
-                . "or email like '%$item%'";
+                . "or email like '%$item%' and deleted=0";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);

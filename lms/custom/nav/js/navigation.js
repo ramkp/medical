@@ -636,6 +636,18 @@ $(document).ready(function () {
         }
     }
 
+    function search_partial_payments() {
+        var item = $('#search_partial').val();
+        if (item != '') {
+            var url = "/lms/custom/partial/search_partial.php";
+            $('#ajax_loader').show();
+            $.post(url, {item: item}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#partial_container').html(data);
+            });
+        } // end if item!=''
+    }
+
     function show_private_group_request_detailes(id) {
         var container_id = '#det_' + id;
         var status = $(container_id).is(":visible");
@@ -1273,6 +1285,14 @@ $(document).ready(function () {
             get_partial_payments_section();
         }
 
+        if (event.target.id == 'search_partial_button') {
+            search_partial_payments();
+        }
+
+        if (event.target.id == 'clear_partial_button') {
+            get_partial_payments_page();
+        }
+
 
 
     }); // end of #region-main click', 'button',
@@ -1342,7 +1362,7 @@ $(document).ready(function () {
             else {
                 $('#add_payment_container').show();
             } // end else
-        }        
+        }
 
         if (event.target.id == 'students_all') {
             $('.students').each(function () { //loop through each checkbox

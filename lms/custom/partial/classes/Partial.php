@@ -4,9 +4,11 @@ require_once ('/home/cnausa/public_html/lms/class.pdo.database.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/my/classes/Dashboard.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/classes/Invoice.php');
 
 class Partial extends Util {
 
+    public $invoice;
     public $payment;
     public $db;
     public $limit = 3;
@@ -14,37 +16,8 @@ class Partial extends Util {
     function __construct() {
         parent::__construct();
         $this->payment = new Payment();
+        $this->invoice = new Invoices();
         $this->db = new pdo_db();
-        $this->update_users_list();
-    }
-
-    function update_users_list() {
-        $users = array();
-        $dir_path = $_SERVER['DOCUMENT_ROOT'] . "/lms";
-        $file_name = 'users.json';
-        $full_file_path = $dir_path . "/" . $file_name;
-        $query = "select * from mdl_user where deleted=0";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            //$item = $row['firstname'] . "&nbsp;" . $row['lastname'] . "&nbsp;" . $row['email'];
-            $item = $row['email'];
-            $users[] = $item;
-        }
-        $myfile = fopen($full_file_path, "w");
-        fwrite($myfile, "[");
-        for ($i = 0; $i <= count($users); $i++) {
-            if ($i < count($users)) {
-                $write_item = json_encode($users[$i]) . ",";
-            }
-            if ($i == count($users) - 1) {
-                $write_item = json_encode($users[$i]);
-            }
-            if ($users[$i] != null) {
-                fwrite($myfile, $write_item);
-            }
-        } // end for
-        fwrite($myfile, "]");
-        fclose($myfile);
     }
 
     function get_partial_payments_total() {
@@ -69,18 +42,28 @@ class Partial extends Util {
         return $counter;
     }
 
+    function get_renew_fee() {
+        $query = "select * from mdl_renew_fee";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $fee = $row['fee_sum'];
+        } // end while
+        return $fee;
+    }
+
     function get_partial_cc_payments() {
         $partials = array();
         $query = "select * from mdl_card_payments "
                 . "where pdate>1464074847 order by pdate desc";
         $num = $this->db->numrows($query);
         if ($num > 0) {
+            $renew_fee = $this->get_renew_fee();
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $course_cost_array = $this->payment->get_personal_course_cost($row['courseid']);
                 $user_payment = $row['psum'];
                 $course_cost = $course_cost_array['cost'];
-                if ($user_payment < $course_cost) {
+                if ($user_payment < $course_cost && $user_payment != $renew_fee) {
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
                     $partial->courseid = $row['courseid'];
@@ -96,7 +79,7 @@ class Partial extends Util {
 
     function get_partial_offline_payments() {
         $partials = array();
-        $query = "select * from mdl_partial_payments";
+        $query = "select * from mdl_partial_payments order by pdate desc";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -146,17 +129,29 @@ class Partial extends Util {
         }
     }
 
-    function create_partial_payments_list($partials, $toolbar = true, $search = false) {
-
+    function create_partial_payments_list($partials, $toolbar = true) {
         date_default_timezone_set('Pacific/Wallis');
         $list = "";
         if ($toolbar == true) {
-            $list.="<br><div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span10'><a href='#' onClick='return false;' id='add_partial'>Add partial payment</a></span>";
-            $list.="</div>";
             $add_payment_block = $this->get_add_partial_payment_page();
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span2'>Search</span>";
+            $list.="<span class='span2'><input type='text' id='search_partial' style='width:125px;' /></span>";
+            $list.="<span class='span3'><button class='btn btn-primary' id='search_partial_button'>Search</button></span>";
+            $list.="<span class='span2'><button class='btn btn-primary' id='clear_partial_button'>Clear filter</button></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+            $list.="<span class='span10'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+            $list.="</div>";
+
             $list.="<br><div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span12' id='add_payment_container' style='display:none;'>$add_payment_block</span>";
+            $list.="<span class='span12' id='add_payment_container'>$add_payment_block</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span12'><hr></span>";
             $list.="</div>";
         } // end if $toolbar==true
 
@@ -230,14 +225,14 @@ class Partial extends Util {
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='span8' id='enrolled_users'></span>";
         $list.="</div>";
-        
+
         /*
-        $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span2'>Paid sum</span>";
-        $list.="<span class='span2'><input type='text' id='sum' style='width:45px;' /></span>";
-        $list.="</div>";
-        */
-        
+          $list.="<div class='container-fluid' style='text-align:center;'>";
+          $list.="<span class='span2'>Paid sum</span>";
+          $list.="<span class='span2'><input type='text' id='sum' style='width:45px;' /></span>";
+          $list.="</div>";
+         */
+
         $list.="<div class='container-fluid' style='text-align:left;display:none;' id='payment_options'>";
         $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cc' checked>Card payment</span>";
         $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cash' >Cash payment</span>";
@@ -344,10 +339,10 @@ class Partial extends Util {
     function add_partial_payment($courseid, $userid, $sum, $source, $slotid) {
         $date = time();
         $payment_type = 0; // cc                
-        if ($source == 'add_cash' || $source == 'add_cheque') {
+        if ($source == 'cheque' || $source == 'cash') {
             //1 - cash
             //2 - cheque 
-            $payment_type = ($source == 'add_cash') ? 1 : 2;
+            $payment_type = ($source == 'cash') ? 1 : 2;
             $query = "insert into mdl_partial_payments "
                     . "(userid,"
                     . "courseid, slotid,"
@@ -400,6 +395,118 @@ class Partial extends Util {
             $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, true);
         } // end if $ptype=='cc'
 
+        return $list;
+    }
+
+    function get_user_classes($item) {
+        $schedulers = array();
+        $courses = array();
+        $query = "select * from mdl_scheduler_slots where notes like '%$item%'";
+        //echo "Query: ".$query."<br>";
+        $num = $this->db->numrows($query);
+        //echo "Slots num: ".$num."<br>";
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $schedulers[] = $row['schedulerid'];
+            } // end while
+            //echo "<br>----------Schedulers--------------------<br>";
+            //print_r($schedulers);
+            //echo "<br>";
+            foreach ($schedulers as $scheduler) {
+                $query = "select * from mdl_scheduler where id=$scheduler";
+                //echo "Scheduler Query: ".$query."<br>";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $courses[] = $row['course'];
+                } // end while
+            } // end foreach
+        } // end if $num > 0
+        return $courses;
+    }
+
+    function search_item($item) {
+        $list = "";
+        $partials = array();
+        $users_array = array_unique($this->invoice->search_invoice_users($item));
+        $courses_array = array_unique($this->invoice->search_invoice_courses($item));
+        $users_list = implode(",", $users_array);
+        $courses_list = implode(",", $courses_array);
+
+        // 1. Card payments
+        if ($users_list != '') {
+            $query = "select * from mdl_card_payments "
+                    . "where  userid in ($users_list) and pdate>1464074847 order by pdate desc ";
+        } // end if $users_list != ''
+        if ($courses_list != '') {
+            $query = "select * from mdl_card_payments "
+                    . "where courseid in ($courses_list) and pdate>1464074847 order by pdate desc ";
+        } // end if $courses_list != ''
+        if ($users_list != '' && $courses_list != '') {
+            $query = "select * from mdl_card_payments "
+                    . "where (courseid in ($courses_list) "
+                    . "or userid in ($users_list)) and pdate>1464074847 order by pdate desc ";
+        } // end if $users_list != '' && $courses_list != '' 
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $renew_fee = $this->get_renew_fee();
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $course_cost_array = $this->payment->get_personal_course_cost($row['courseid']);
+                $course_cost = $course_cost_array['cost'];
+                if ($row['psum'] < $course_cost and $row['psum'] != $renew_fee) {
+                    $partial = new stdClass();
+                    $partial->userid = $row['userid'];
+                    $partial->courseid = $row['courseid'];
+                    $partial->payment = $row['psum'];
+                    $partial->cost = $course_cost;
+                    $partial->pdate = $row['pdate'];
+                    $partials[] = $partial;
+                } // end if $row['psum']<$course_cost and $row['psum']!=$renew_fee
+            } // end while            
+        } // end if $num > 0
+        // 2. Cash and cheque payments
+        if ($users_list != '') {
+            $query = "select * from mdl_partial_payments "
+                    . "where  userid in ($users_list) and pdate>1464074847 order by pdate desc ";
+        } // end if $users_list != ''
+        if ($courses_list != '') {
+            $query = "select * from mdl_partial_payments "
+                    . "where courseid in ($courses_list) and pdate>1464074847 order by pdate desc ";
+        } // end if $courses_list != ''
+        if ($users_list != '' && $courses_list != '') {
+            $query = "select * from mdl_partial_payments "
+                    . "where (courseid in ($courses_list) "
+                    . "or userid in ($users_list)) and pdate>1464074847 order by pdate desc ";
+        } // end if $users_list != '' && $courses_list != ''        
+
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $renew_fee = $this->get_renew_fee();
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $course_cost_array = $this->payment->get_personal_course_cost($row['courseid']);
+                $course_cost = $course_cost_array['cost'];
+                if ($row['psum'] < $course_cost and $row['psum'] != $renew_fee) {
+                    $partial = new stdClass();
+                    $partial->userid = $row['userid'];
+                    $partial->courseid = $row['courseid'];
+                    $partial->payment = $row['psum'];
+                    $partial->cost = $course_cost;
+                    $partial->pdate = $row['pdate'];
+                    $partials[] = $partial;
+                } // end if $row['psum']<$course_cost and $row['psum']!=$renew_fee
+            } // end while            
+        } // end if $num > 0
+
+        if (count($partials) > 0) {
+            $list.=$this->create_partial_payments_list($partials, FALSE);
+        } // end if count($partials)>0        
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span6'>No Partial payments found</span>";
+            $list.="</div>";
+        } // end else 
         return $list;
     }
 
