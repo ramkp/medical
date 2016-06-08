@@ -224,17 +224,26 @@ class Partial extends Util {
         $list.="<span class='span3' id='register_states_container'>$register_state</span>";
         $list.="<span class='span3' id='register_cities_container'>$cities</span>";
         $list.="</div>";
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span3'></span>";
+        $list.="</div>";
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='span8' id='enrolled_users'></span>";
         $list.="</div>";
+        
+        /*
         $list.="<div class='container-fluid' style='text-align:center;'>";
-
+        $list.="<span class='span2'>Paid sum</span>";
+        $list.="<span class='span2'><input type='text' id='sum' style='width:45px;' /></span>";
         $list.="</div>";
+        */
+        
         $list.="<div class='container-fluid' style='text-align:left;display:none;' id='payment_options'>";
-        $list.="<span class='span3'><input type='radio' name='payment_type' value='cc' checked>Card payment</span>";
-        $list.="<span class='span3'><input type='radio' name='payment_type' value='cash' >Cash payment</span>";
-        $list.="<span class='span3'><input type='radio' name='payment_type' value='cheque' >Cheque payment</span>";
-        $list.="<span class='span3'><a href='#' id='get_partial_payment_section' onClick='return false;'>Proceed</a></span>";
+        $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cc' checked>Card payment</span>";
+        $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cash' >Cash payment</span>";
+        $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cheque' >Cheque payment</span>";
+        $list.="<span class='span3'><input type='text' id='sum' style='width:120px;' /></span>";
+        $list.="<span class='span3'><button class='btn btn-primary' id='get_partial_payment_section'>Add</button></span>";
         $list.="</div>";
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span12' id='payment_section'></span>";
@@ -375,7 +384,7 @@ class Partial extends Util {
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Paid sum</span>";
             $list.="<span class='span2'><input type='text' id='sum' style='width:45px;' /></span>";
-            $list.="<span class='span2'><button class='btn btn-primary' id='add_cheque'>Add</span>";
+            $list.="<span class='span2'><button class='btn btn-primary' id='add_cheque'>Add</button></span>";
             $list.="</div>";
         } // end if $ptype=='cheque'
 

@@ -9,6 +9,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Late.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Upload.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Classes/ProcessPayment.php';
+
 //require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
 
 class Payment {
@@ -639,7 +640,7 @@ class Payment {
         return $fee;
     }
 
-    function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null, $renew = false) {
+    function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null, $sum = false) {
 
         /*
           echo "<br/>Users-------------<br/>";
@@ -653,7 +654,7 @@ class Payment {
           echo "<br/>-------------<br/>";
          */
 
-
+        //echo "Sum inside payment section: ".$sum."<br>";
 
         $list = "";
         $cost_block = "";
@@ -681,12 +682,11 @@ class Payment {
         if ($installment == null) {
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
-                if ($renew == false) {
+                if ($sum == false) {
                     $course_cost = $this->get_personal_course_cost($users->courseid);
                 } // end if $renew == false
                 else {
-                    $fee = $this->get_renew_fee();
-                    $course_cost = array('cost' => $fee, 'discount' => 0);
+                    $course_cost = array('cost' => $sum, 'discount' => 0);
                 }
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
@@ -706,12 +706,11 @@ class Payment {
             } // end if $group==''
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
-                if ($renew == false) {
+                if ($sum == false) {
                     $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 } // end if $renew == false 
                 else {
-                    $fee = $this->get_renew_fee();
-                    $course_cost = array('cost' => $fee, 'discount' => 0);
+                    $course_cost = array('cost' => $sum, 'discount' => 0);
                 } // end else
 
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
@@ -829,12 +828,11 @@ class Payment {
             $users->slotid = 0; // There is no delay fee for installment users            
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
-                if ($renew == false) {
+                if ($sum == false) {
                     $course_cost = $this->get_personal_course_cost($users->courseid);
                 } // end if $renew == false
                 else {
-                    $fee = $this->get_renew_fee();
-                    $course_cost = array('cost' => $fee, 'discount' => 0);
+                    $course_cost = array('cost' => $sum, 'discount' => 0);
                 }
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
                 $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
@@ -1185,7 +1183,7 @@ class Payment {
                     if ($card->sum != $renew_fee) {
                         $list.= "<span class='span8'>Payment is successfull. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
                     } // end if $card->sum != $renew_fee                    
-                    else {                        
+                    else {
                         $list.= "<span class='span8'>Payment is successfull. Thank you! Please use Renew Certificate option from <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/my' target='_blank'>your Dashboard</a></span>";
                     } // end else
                     $list.="</div>";

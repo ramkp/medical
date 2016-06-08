@@ -966,24 +966,24 @@ $(document).ready(function () {
         console.log('slot ID: ' + slotid);
         console.log('Sum : ' + sum);
         console.log('Ptype: ' + ptype);
-        if (ptype == 'cc') {
-            if (courseid > 0 && userid > 0) {
-                var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "";
+        if (courseid > 0 && userid > 0 && $.isNumeric(sum) && sum > 0) {
+            $('#partial_err').html('');
+            if (ptype == 'cc') {
+                var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum;
                 window.open(url, '_blank');
-            } // end if courseid > 0 && userid > 0     
-        } // end if ptype=='cc'
-        else {
-            if (courseid > 0 && userid > 0) {
-                $('#partial_err').html('');
-                var url = "/lms/custom/partial/get_payment_section.php";
-                $.post(url, {courseid: courseid, userid: userid, sum: sum, ptype: ptype, slotid: slotid}).done(function (data) {
-                    $('#payment_section').html(data);
-                });
-            } // end if courseid > 0 && userid > 0 && sum != ''
+            } // end if ptype=='cc'
             else {
-                $('#partial_err').html('Please select program and user and provide paid amount');
-            } // end else
-        } // end else
+                if (confirm('Add partial payment for current user?')) {
+                    var url = "/lms/custom/partial/add_partial_payment.php";
+                    $.post(url, {courseid: courseid, userid: userid, sum: sum, source: ptype, slotid: slotid}).done(function (data) {
+                        $('#partial_err').html("<span style='color:black;'>" + data + "</span>");
+                    });
+                } // end if confirm
+            } // end else when it is not cc payment
+        } // end if courseid > 0 && userid > 0 && sum > 0
+        else {
+            $('#partial_err').html('Please select program and user and provide paid amount');
+        } // end else    
     }
 
     function search_slots_by_date() {
@@ -1269,8 +1269,9 @@ $(document).ready(function () {
             search_slots();
         }
 
-
-
+        if (event.target.id == 'get_partial_payment_section') {
+            get_partial_payments_section();
+        }
 
 
 
@@ -1341,11 +1342,7 @@ $(document).ready(function () {
             else {
                 $('#add_payment_container').show();
             } // end else
-        }
-
-        if (event.target.id == 'get_partial_payment_section') {
-            get_partial_payments_section();
-        }
+        }        
 
         if (event.target.id == 'students_all') {
             $('.students').each(function () { //loop through each checkbox

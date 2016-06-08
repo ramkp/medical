@@ -516,7 +516,9 @@ class navClass extends Util {
             $timecompleted = $row['timecompleted'];
         }
         return $timecompleted;
-    }
+    }    
+    
+
 
     function renew_certificate() {
         
@@ -543,7 +545,8 @@ class navClass extends Util {
         else {
             $list.="<div class='container-fluid'>";
             $userid = $this->user->id;
-            $list.="<span class='span9'>Certificate renew is a paid service. Please click <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/1' target='_blank'>here</a> to pay by card.</span>";
+            $renew_fee=$this->get_renew_fee();
+            $list.="<span class='span9'>Certificate renew is a paid service. Please click <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$renew_fee' target='_blank'>here</a> to pay by card.</span>";
             $list.="</div>";
             return $list;
         }

@@ -106,11 +106,20 @@ class Dashboard extends Util {
         return $slotid;
     }
 
+    function get_renew_fee() {
+        $query = "select * from mdl_renew_fee";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $fee = $row['fee_sum'];
+        } // end while
+        return $fee;
+    }
+
     function get_user_warning_message() {
         $list = "";
         $userid = $this->user->id;
         $courseid = $this->course->id;
-        $slotid=$this->get_user_course_slot($courseid, $userid);
+        $slotid = $this->get_user_course_slot($courseid, $userid);        
         $list.="<div class='container-fluid'>";
         $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/$slotid/0' target='_blank'>click</a> here to pay by card. </span>";
         $list.="</div>";
@@ -363,7 +372,7 @@ class Dashboard extends Util {
             $this->enroll_user($courseid, $userid);
         } // end if $enrolled==0
         if ($slotid > 0) {
-            $this->add_user_slots($courseid, $slotid, $userid);            
+            $this->add_user_slots($courseid, $slotid, $userid);
         } // end if $slotid>0
         $list = "You was successfully enrolled into selected course/schedule.The page will be reloaded ....";
         return $list;
