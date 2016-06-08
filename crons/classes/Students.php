@@ -119,24 +119,48 @@ class Students {
         return $users;
     }
 
+    function get_renew_fee() {
+        $query = "select * from mdl_renew_fee";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $fee = $row['fee_sum'];
+        } // end while
+        return $fee;
+    }
+
+    function get_user_slot($courseid, $userid) {
+        $slotid = 0;
+        $query = "select * from mdl_slots "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['slotid'];
+            } // end while
+        } // end if $num > 0
+        return $slotid;
+    }
+
     function get_partial_cc_payments() {
         $partials = array();
         $query = "select * from mdl_card_payments "
                 . "where pdate>1464074847 order by pdate desc";
         $num = $this->db->numrows($query);
         if ($num > 0) {
+            $renew_fee = $this->get_renew_fee();
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $user_payment = $row['psum'];
-                $user_data = $this->get_user_data($row['userid']);
+                $user_payment = $row['psum'];                
                 $course_cost = $this->get_course_cost($row['courseid']);
-                if ($user_payment < $course_cost) {
+                $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
+                if ($user_payment < $course_cost && $user_payment != $renew_fee) {
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
                     $partial->courseid = $row['courseid'];
                     $partial->payment = $row['psum'];
                     $partial->cost = $course_cost;
-                    $partial->slotid = $user_data->slotid;
+                    $partial->slotid = $slotid;
                     $partial->pdate = $row['pdate'];
                     $partials[] = $partial;
                 } // end if $user_payment!=$course_cost
@@ -155,6 +179,7 @@ class Students {
                 $user_payment = $row['psum'];
                 $user_data = $this->get_user_data($row['userid']);
                 $course_cost = $this->get_course_cost($row['courseid']);
+                $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
                 if ($user_payment < $course_cost) {
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
@@ -162,7 +187,7 @@ class Students {
                     $partial->payment = $row['psum'];
                     $partial->cost = $course_cost;
                     $partial->pdate = $row['pdate'];
-                    $partial->slotid = $user_data->slotid;
+                    $partial->slotid = $slotid;
                     $partials[] = $partial;
                 } // end if $user_payment!=$course_cost
             } // end while
