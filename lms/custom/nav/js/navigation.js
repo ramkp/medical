@@ -533,7 +533,7 @@ $(document).ready(function () {
         } // end else
     }
     
-    function get_students_modal_box () {
+    function get_students_modal_box () {        
         console.log('Dialog loaded: ' + dialog_loaded);
         if (dialog_loaded !== true) {
             console.log('Script is not yet loaded starting loading ...');
@@ -556,7 +556,7 @@ $(document).ready(function () {
         else {
             console.log('Script already loaded');
             $("#myModal").modal('show');
-        }
+        }        
     }
 
     function search_payment(typeid) {
@@ -1089,7 +1089,7 @@ $(document).ready(function () {
                 var url = "/lms/custom/schedule/compete_students.php";
                 $.post(url, {courseid: courseid, students: students}).done(function () {
                     $('#ajax_loading').hide();
-                    document.location.reload();
+                    //document.location.reload();
                 });
             } // end if confirm
         } // selected.length>0

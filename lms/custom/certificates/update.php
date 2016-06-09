@@ -5,7 +5,6 @@
  *
  * @author sirromas
  */
-
 set_time_limit(0);
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
@@ -33,8 +32,27 @@ class update extends Util {
         return $certs;
     }
 
-    function process_ekg_certificates($certs) {
-        $i=0;
+    function get_all_certs($list) {
+        $certs = array();
+        if ($list != '') {
+            $query = "select * from mdl_certificates where courseid in ($list)";
+        } // end if $list!=''
+        else {
+            $query = "select * from mdl_certificates ";
+        } // end else
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cert = new stdClass();
+            foreach ($row as $key => $value) {
+                $cert->$key = $value;
+            } // end foreach
+            $certs[] = $cert;
+        } // end while 
+        return $certs;
+    }
+
+    function process_certificates($certs) {
+        $i = 0;
         foreach ($certs as $cert) {
             echo "<pre>";
             print_r($cert);
@@ -52,5 +70,7 @@ class update extends Util {
 }
 
 $up = new update();
-$certs = $up->get_ekg_certs();
-$up->process_ekg_certificates($certs);
+//$certs = $up->get_ekg_certs();
+$list="47, 48, 49, 50, 51";
+$certs=$up->get_all_certs($list);
+$up->process_certificates($certs);

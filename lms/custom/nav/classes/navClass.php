@@ -536,7 +536,9 @@ class navClass extends Util {
             $cert = new Certificates();
             $date = $this->get_course_completion($courseid, $this->user->id);
             $new_date = $date + 31536000; // one year later after course completion
-            $cert->send_certificate($courseid, $this->user->id, $new_date);
+            $code = ''; 
+            $renew = true;
+            $cert->send_certificate($courseid, $this->user->id, $new_date, true, $code, $renew);
             $this->update_user_balance($courseid, $this->user->id);
             $list.="<div class='container-fluid'>";
             $list.="<span class='span9'>New Certificate has been sent to $user->email.</span>";

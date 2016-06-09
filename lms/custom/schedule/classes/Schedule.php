@@ -127,7 +127,9 @@ class Schedule extends Util {
         $query = "select * from mdl_course_completions "
                 . "where course=$courseid "
                 . "and userid=$userid";
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
+        //echo "Num: ".$num."<br>";
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -141,7 +143,24 @@ class Schedule extends Util {
         return $status;
     }
 
+    function get_course_id($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $schedulerid = $row['schedulerid'];
+        }
+        $query = "select * from mdl_scheduler where id=$schedulerid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['course'];
+        }
+        return $courseid;
+    }
+
     function create_slots_page($slots, $tools = true) {
+        global $COURSE;
+        $courseid = $COURSE->id;
+        //echo "Course id: " . $courseid . "<br>";
         $qs = $_SERVER['QUERY_STRING'];
         $modid = trim(str_replace("id=", "", $qs));
         $list = "";
@@ -189,6 +208,7 @@ class Schedule extends Util {
                 $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a><br> $slot->notes</h5></div>";
                 $list.="<div class='panel-body'>";
                 $slot_students = $this->get_slot_students($slot->id);
+                $courseid = $this->get_course_id($slot->id);
                 if (count($slot_students) > 0) {
                     $list.= "<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                     $list.="<span class='span1'></span>";
@@ -197,7 +217,8 @@ class Schedule extends Util {
                     $list.="</div>";
                     foreach ($slot_students as $student) {
                         $user_data = $this->get_user_details($student->studentid);
-                        $completion_arr = $this->get_student_course_completion_status($this->course->id, $student->studentid);
+                        $completion_arr = $this->get_student_course_completion_status($courseid, $student->studentid);
+                        //print_r($completion_arr);
                         if ($completion_arr['passed'] == 1) {
                             $status = "Passed " . date('m-d-Y', completed) . "";
                         } // end if $completion_arr['passed']==1
@@ -334,15 +355,13 @@ class Schedule extends Util {
         }
         return $students;
     }
-    
-    
-    
-    function get_students_box () {
+
+    function get_students_box() {
         global $COURSE;
         $list = "";
-        $courseid=$COURSE->id;
-        echo "Course ID: ".$courseid."<br>";                
-        $students=$this->get_course_users($courseid);
+        $courseid = $COURSE->id;
+        echo "Course ID: " . $courseid . "<br>";
+        $students = $this->get_course_users($courseid);
         $list.="<div id='myModal' class='modal fade'>
     <div class='modal-dialog'>
         <div class='modal-content'>

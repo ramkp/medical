@@ -173,7 +173,7 @@ class Certificates extends Util {
                 $list.="</div>";
 
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'><input class='cert' type='checkbox' id='$certificate->userid' value='$certificate->userid'></span><span class='span2'>Select</span>";
+                $list.="<span class='span2'><input class='cert' type='checkbox' id='$certificate->id' value='$certificate->id'></span><span class='span2'>Select</span>";
                 $list.="</div>";
 
                 $list.="<div class='container-fluid'>";
@@ -307,26 +307,52 @@ class Certificates extends Util {
         return $title;
     }
 
-    function get_certificate_template($courseid, $userid, $date = 0, $code = '') {
+    function get_certificate_issue_date($courseid, $userid) {
+        $exp_date = 0;
+        $query = "select * from mdl_certificates "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $exp_date = $row['issue_date'];
+            } // end while
+        } // end if $num > 0
+        return $exp_date;
+    }
+
+    function get_certificate_template($courseid, $userid, $date = 0, $code = '', $renew = false) {
         $list = "";
         $coursename = $this->get_course_name($courseid); // string
         $userdetails = $this->get_user_details($userid); // object
         $firstname = strtoupper($userdetails->firstname);
         $lastname = strtoupper($userdetails->lastname);
-        //echo "Issue date: ".date('m-d-Y',$date)."<br>";
+        // This is expiration date
         if ($date == 0) {
             $date = time();
         }
-        $day = date('d', $date);
-        $month = date('M', $date);
-        $year = date('Y', $date);
+        $cert_issue_date = $this->get_certificate_issue_date($courseid, $userid);
+        $issue_date = ($cert_issue_date == 0) ? time() : $cert_issue_date;
+        $day = date('d', $issue_date);
+        $month = date('M', $issue_date);
+        $year = date('Y', $issue_date);
         $renew_status = $this->get_course_renew_status($courseid);
         $title = $this->get_certificate_title($courseid);
         if ($code == '') {
             $code = $this->get_course_code($courseid, $userid);
         } // end if $code==''
         if ($renew_status == 1) {
-            $expiration_date_sec = $date + 31536000;
+            // new expiration date
+            //echo "Expiration date: " . date('m-d-Y', $date) . "<br>";
+
+            if ($renew == true) {
+              //  echo "Inside renew ....<br>";
+                $expiration_date_sec = $date + 31536000;
+            } // end if $renew==true
+            else {
+                //echo "Inside issue ....<br>";
+                $expiration_date_sec = $issue_date + 31536000;
+            }
         }
         $expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
         //echo "Expiration date: ".$expiration_date."<br>";
@@ -371,8 +397,77 @@ class Certificates extends Util {
                 $pdf->Output($path, 'F');
 
                 break;
-            case 1:
+            case 48:
+                $coursename = "IV Therapy Exam";
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="<link rel='stylesheet' type='text/css' href='cert.css'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div class='cert'>";
+                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                }
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+                $list.="</div>";
+                $list.="</body>";
+                $list.="</html>";
 
+                $pdf = new mPDF('utf-8', 'A4-L');
+                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+                $pdf->WriteHTML($stylesheet, 1);
+                $pdf->WriteHTML($list, 2);
+                $dir_path = $this->cert_path . "/$userid";
+                if (!is_dir($dir_path)) {
+                    if (!mkdir($dir_path)) {
+                        die('Could not write to disk');
+                    } // end if !mkdir($dir_path)
+                } // end if !is_dir($dir_path)
+                $path = $dir_path . "/certificate.pdf";
+                $pdf->Output($path, 'F');
+                break;
+            case 51:
+                $coursename = "Phlebotomy Technician Exam";
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="<link rel='stylesheet' type='text/css' href='cert.css'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div class='cert'>";
+                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                }
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+                $list.="</div>";
+                $list.="</body>";
+                $list.="</html>";
+
+                $pdf = new mPDF('utf-8', 'A4-L');
+                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+                $pdf->WriteHTML($stylesheet, 1);
+                $pdf->WriteHTML($list, 2);
+                $dir_path = $this->cert_path . "/$userid";
+                if (!is_dir($dir_path)) {
+                    if (!mkdir($dir_path)) {
+                        die('Could not write to disk');
+                    } // end if !mkdir($dir_path)
+                } // end if !is_dir($dir_path)
+                $path = $dir_path . "/certificate.pdf";
+                $pdf->Output($path, 'F');
                 break;
             default:
                 $list.="<!DOCTYPE HTML SYSTEM>";
@@ -413,7 +508,7 @@ class Certificates extends Util {
         return $list;
     }
 
-    function prepare_ceriticate($courseid, $userid, $date = 0) {
+    function prepare_ceriticate($courseid, $userid, $date = 0, $code = '', $renew = false) {
         $list = "";
 
 
@@ -438,7 +533,7 @@ class Certificates extends Util {
          */
 
 
-        $list.=$this->get_certificate_template($courseid, $userid, $date);
+        $list.=$this->get_certificate_template($courseid, $userid, $date, $code, $renew);
 
 
         /*
@@ -513,7 +608,7 @@ class Certificates extends Util {
         return $num;
     }
 
-    function send_certificate($courseid, $userid, $date = 0, $send = true) {
+    function send_certificate($courseid, $userid, $date = 0, $send = true, $code = '', $renew = false) {
         //echo "Date: ".$date."<br>";
         if ($date == 0) { // course is not yet completed
             $date = $this->get_user_course_entollment_date($courseid, $userid);
@@ -525,11 +620,13 @@ class Certificates extends Util {
         else {
             $expiration_date_sec = 'n/a';
         } // end else
-        $path = $this->prepare_ceriticate($courseid, $userid, $date);
+        $path = $this->prepare_ceriticate($courseid, $userid, $date, $code, $renew);
         $this->create_label($courseid, $userid);
         $user = $this->get_user_details($userid);
         $user->path = $path;
-        $code = $this->get_course_code($courseid, $userid);
+        if ($code == '') {
+            $code = $this->get_course_code($courseid, $userid);
+        } // end if $code == ''
         $certificate_exists = $this->is_certificate_exists($courseid, $userid);
         if ($certificate_exists == 0) {
             $query = "insert into mdl_certificates (courseid,"
@@ -719,11 +816,21 @@ class Certificates extends Util {
         return $list;
     }
 
-    function print_certificates($students) {
+    function get_user_id($id) {
+        $query = "select * from mdl_certificates where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $userid = $row['userid'];
+        }
+        return $userid;
+    }
+
+    function print_certificates($certificates) {
         $certs = array();
-        $students_arr = explode(",", $students);
-        if (count($students_arr) > 0) {
-            foreach ($students_arr as $studentid) {
+        $certificates_arr = explode(",", $certificates);
+        if (count($certificates_arr) > 0) {
+            foreach ($certificates_arr as $id) {
+                $studentid = $this->get_user_id($id);
                 $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.pdf";
                 $certs[] = $pdf_file;
             } // end foreach
@@ -737,12 +844,13 @@ class Certificates extends Util {
         } // end f count($students_arr) > 0
     }
 
-    function print_labels($labels) {
+    function print_labels($certificates) {
         $lb = array();
-        $labels_arr = explode(",", $labels);
-        if (count($labels_arr) > 0) {
-            foreach ($labels_arr as $label) {
-                $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$label/label.pdf";
+        $certificates_arr = explode(",", $certificates);
+        if (count($certificates_arr) > 0) {
+            foreach ($certificates_arr as $id) {
+                $studentid = $this->get_user_id($id);
+                $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/label.pdf";
                 $lb[] = $pdf_file;
             } // end foreach
             $datadir = $_SERVER['DOCUMENT_ROOT'] . "/print/";
@@ -755,8 +863,8 @@ class Certificates extends Util {
         } // end f count($students_arr) > 0
     }
 
-    function get_certificate_detailes($userid) {
-        $query = "select * from mdl_certificates where userid=$userid";
+    function get_certificate_detailes($id) {
+        $query = "select * from mdl_certificates where id=$id";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $cert = new stdClass();
@@ -764,23 +872,25 @@ class Certificates extends Util {
             $cert->courseid = $row['courseid'];
             $cert->userid = $row['userid'];
             $cert->code = $row['cert_no'];
-            $cert->date = $row['issue_date'];
+            $cert->date = $row['expiration_date'];
         }
         return $cert;
     }
 
-    function update_certificate_data() {
-        
+    function update_certificate_data($id, $exp_date) {
+        $query = "update mdl_certificates "
+                . "set expiration_date='$exp_date' where id=$id";
+        $this->db->query($query);
     }
 
     function renew_certificates($certs) {
-        $list = "";        
+        $list = "";
         $certs_array = explode(",", $certs);
         if (count($certs_array) > 0) {
-            foreach ($certs_array as $userid) {
-                $certificate = $this->get_certificate_detailes($userid);
-                $new_date = $certificate->date + 31536000; // one year later after certificate issue date
-                $this->get_certificate_template($certificate->courseid, $certificate->userid, $new_date, $certificate->code);
+            foreach ($certs_array as $id) {
+                $certificate = $this->get_certificate_detailes($id);
+                $this->get_certificate_template($certificate->courseid, $certificate->userid, $certificate->date, $certificate->code, true);
+                $this->update_certificate_data($id, $certificate->date);
             } // end foreach
         } // end if count($certs_array)>0
         $list.="Selected Certificate(s) were renewed";
