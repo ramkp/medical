@@ -5,14 +5,18 @@
  *
  * @author sirromas
  */
-session_start();
+//session_start();
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
 
 class Schedule extends Util {
 
+    public $courseid;
+
     function __construct() {
+        global $COURSE;
         parent::__construct();
+        $this->courseid = $COURSE->id;
     }
 
     function get_course_scheduler($courseid) {
@@ -180,6 +184,7 @@ class Schedule extends Util {
             $list.="<span class='span1'>End</span>";
             $list.="<span class='span2'><input type='text' id='end'  style='width:75px;'></span>";
             $list.="<span class='span2'><button type='button' class='btn btn-primary'  id='date_btn'>Go</button></span>";
+            $list.="<input type='hidden' id='sesskey' value='" . sesskey() . "'>";
             $list.="</div>";
             $list.= "<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'><a href='#' id='students_all' onClick='return false;'>Select all</a></span>";
@@ -356,11 +361,36 @@ class Schedule extends Util {
         return $students;
     }
 
-    function get_students_box() {
-        global $COURSE;
+    function get_students_course_slots($schedulerid) {
         $list = "";
-        $courseid = $COURSE->id;
-        echo "Course ID: " . $courseid . "<br>";
+        date_default_timezone_set('Pacific/Wallis');
+        $query = "select * from mdl_scheduler_slots "
+                . "where schedulerid=$schedulerid order by starttime";
+        $num = $this->db->numrows($query);
+
+        if ($num > 0) {
+
+            $list.="<span class='span3'>Workshops: </span><span class='span4'><select id='slots' style='width:295px;'>";
+            $list.="<option value='0' slected>Workshops</option>";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $date = date('m-d-Y', $row['starttime']);
+                $app = explode('/' . $row['appointmentlocation']);
+                $location = $app[1] . "," . $app[0];
+                $ws = $date . "&nbsp;" . $location .
+                        $list.="<option value='" . $row['id'] . "'>" . $date . " " . $row['appointmentlocation'] . "</option>";
+            } // end while
+            $list.="</select>";
+        } // end if $num > 0
+        else {
+            $list.="n/a";
+        }
+        return $list;
+    }
+
+    function get_students_box($courseid, $schedulerid) {
+        $list = "";
+        $slots = $this->get_students_course_slots($schedulerid);
         $students = $this->get_course_users($courseid);
         $list.="<div id='myModal' class='modal fade'>
     <div class='modal-dialog'>
@@ -373,16 +403,32 @@ class Schedule extends Util {
             <div class='container-fluid' style='text-align:left;'>
             <span class='span2'>$students</span>    
             </div>
+            
+            <div class='container-fluid' style='text-align:left;'>
+            <span class='span2'>$slots</span>    
+            </div>
                 
             </div>
             <div class='modal-footer'>
                 <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
-                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='ok'>I Agree with Terms and Conditions</button></span>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='add_user_to_slot'>Add</button></span>
             </div>
         </div>
     </div>
 </div>";
         return $list;
+    }
+
+    function add_user_to_slot($lsotid, $userid) {
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid=$lsotid and studentid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num == 0) {
+            $query = "insert into mdl_scheduler_appointment "
+                    . "(slotid,studentid,attended) "
+                    . "values ($lsotid,$userid,0)";
+            $this->db->query($query);
+        } // end if $num==0
     }
 
 }

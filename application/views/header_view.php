@@ -100,13 +100,14 @@ $host = $_SERVER['HTTP_HOST'];
 
         <div id="wrapper">
             <header id="page-header" class="clearfix">                
-                <div class="container-fluid"><div class="text-center"><a href="http://<?php echo $host ?>/"><img src="https://<?php echo $host ?>/assets/logo/5.png" width="350" height="90"/></a></div></div>
+                <!--<div class="container-fluid"><div class="text-center"><a href="http://<?php echo $host ?>/"><img src="https://<?php echo $host ?>/assets/logo/5.png" width="350" height="90"/></a></div></div>-->
+                <div class="container-fluid"><div class="text-center"><a href="http://<?php echo $host ?>/"><img src="https://<?php echo $host ?>/assets/logo/5_edited.png" width="350" height="90"/></a></div></div>
             </header>
 
             <header  class="navbar">
                 <nav class="navbar-inner">
                     <div class="container-fluid">
-                        <a class="brand" href="http://<?php echo $host ?>" style="height: 30;"><img src="https://<?php echo $host ?>/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2 Career College</a>
+                        <a class="brand" href="http://<?php echo $host ?>" style="height: 30;"><img src="https://<?php echo $host ?>/assets/icons/home2.png" width="20" alt='home' height="20">&nbsp; Medical2</a>
                         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>

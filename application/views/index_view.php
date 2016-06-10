@@ -12,7 +12,7 @@
                                         line-height: 1.5em;margin-right: 5%;
                                         padding-left: 10px;
                                         text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);">
-                                        Easy Steps</h3>
+                                        Certification</h3>
                                 </div>
                                 <div>
                                     <span style="background: rgba(0, 0, 0, 0.5) none repeat scroll 0 0;

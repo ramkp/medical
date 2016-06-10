@@ -113,6 +113,23 @@ $(document).ready(function () {
         } // end if file_data != '' && file_data.length != 0 && state > 0 && month > 0 && year > 0
     }
 
+    function add_user_to_slot() {
+        var userid = $('#users').val();
+        var slotid = $('#slots').val();
+        console.log('User ID: ' + userid);
+        console.log('Slot ID:' + slotid);
+        if (userid > 0 && slotid > 0) {
+            var url = "/lms/custom/schedule/add_user_to_slot.php";
+            $.post(url, {slotid: slotid, userid: userid}).done(function (data) {
+                console.log('Server response: ' + data);
+                document.location.reload();
+            });
+        } // end if userid>0 && slotid>0
+        else {
+            alert('Please sleect student and workshop!');
+        }
+    }
+
     function refresh_gallery_thumbs() {
         var url = "/lms/custom/gallery/refresh.php";
         $.post(url, {id: 1}).done(function (data) {
@@ -532,9 +549,11 @@ $(document).ready(function () {
             $(status_id).html("<span style='color:red;'>Please select payment type</span>");
         } // end else
     }
-    
-    function get_students_modal_box () {        
+
+    function get_students_modal_box() {
         console.log('Dialog loaded: ' + dialog_loaded);
+        var courseid = $('#courseid').val();
+        var scheduler = $('#scheduler').val();
         if (dialog_loaded !== true) {
             console.log('Script is not yet loaded starting loading ...');
             dialog_loaded = true;
@@ -543,7 +562,7 @@ $(document).ready(function () {
                     .done(function () {
                         console.log('Script bootstrap.min.js is loaded ...');
                         var url = "https://" + domain + "/lms/custom/schedule/get_students_box.php";
-                        var request = {search_item: 1};
+                        var request = {courseid: courseid, scheduler: scheduler};
                         $.post(url, request).done(function (data) {
                             $("body").append(data);
                             $("#myModal").modal('show');
@@ -556,7 +575,7 @@ $(document).ready(function () {
         else {
             console.log('Script already loaded');
             $("#myModal").modal('show');
-        }        
+        }
     }
 
     function search_payment(typeid) {
@@ -1052,10 +1071,11 @@ $(document).ready(function () {
     function search_slots_by_date() {
         var start = $('#start').val();
         var end = $('#end').val();
+        var sesskey = $('#sesskey').val();
         var scheduler = $('#scheduler').val();
         var url = "/lms/custom/schedule/get_slots_by_date.php";
         $('#ajax_loading').show();
-        $.post(url, {start: start, end: end, scheduler: scheduler}).done(function (data) {
+        $.post(url, {start: start, end: end, scheduler: scheduler, sesskey: sesskey}).done(function (data) {
             $('#ajax_loading').hide();
             $('#schedule_container').html(data);
         });
@@ -1089,7 +1109,7 @@ $(document).ready(function () {
                 var url = "/lms/custom/schedule/compete_students.php";
                 $.post(url, {courseid: courseid, students: students}).done(function () {
                     $('#ajax_loading').hide();
-                    //document.location.reload();
+                    document.location.reload();
                 });
             } // end if confirm
         } // selected.length>0
@@ -1344,7 +1364,9 @@ $(document).ready(function () {
             get_partial_payments_page();
         }
 
-
+        if (event.target.id == 'add_user_to_slot') {
+            add_user_to_slot();
+        }
 
     }); // end of #region-main click', 'button',
 
@@ -1444,7 +1466,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'add_students') {
-            get_students_modal_box(); 
+            get_students_modal_box();
         }
 
 
@@ -1867,6 +1889,13 @@ $(document).ready(function () {
         //console.log('Item clicked: ' + event.target.id);
         if (event.target.id == 'internal_apply') {
             assign_user_to_course();
+        }
+    });
+
+    $("body").click(function (event) {
+        console.log('Element clicked: ' + event.target.id);
+        if (event.target.id == 'add_user_to_slot') {
+            add_user_to_slot();
         }
     });
 
