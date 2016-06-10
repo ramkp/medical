@@ -1037,6 +1037,79 @@ $(document).ready(function () {
         } // end else
     }
 
+    function recertificate() {
+        var selected = new Array();
+        $(".cert").each(function () {
+            if ($(this).is(':checked')) {
+                selected.push($(this).val());
+            }
+        });
+        if (selected.length > 0) {
+            $('#print_err').html('');
+            var certs = selected.join();
+            console.log('Selected certificates: ' + certs);
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/certificates/get_dates_box.php";
+                            $.post(url, {certs: certs}).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("#myModal").modal('show');
+            }
+        } // end if selected.length>0
+        else {
+            $('#print_err').html('Please select at least one certificate');
+        } // end else
+
+
+
+    }
+
+
+    function recertificate_done() {
+        var certs = $('#certs').val();
+        var s_m = $('#s_m').val();
+        var s_d = $('#s_d').val();
+        var s_y = $('#s_y').val();
+
+        var e_m = $('#e_m').val();
+        var e_d = $('#e_d').val();
+        var e_y = $('#e_y').val();
+
+        if (s_m > 0 && s_d > 0 && s_y > 0 && e_m > 0 && e_d > 0 && e_y > 0) {
+            //var start = s_m + '-' + s_d + '-' + s_y;
+            //var end = e_m + '-' + e_d + '-' + e_y;
+            var start = s_y + '-' + s_m + '-' + s_d;
+            var end = e_y + '-' + e_m + '-' + e_d;
+            $('#print_err').html('');
+            $('#ajax_loader').show();
+            console.log('Issue date: ' + start);
+            console.log('Expire date: ' + end);
+            console.log('Certificates list:' + certs);
+            var url = "/lms/custom/certificates/recertificate.php";
+            $.post(url, {certs: certs, start: start, end: end}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#print_err').html(data);
+            });
+        } // end if selected.length > 0
+        else {
+            $('#print_err').html('Please select at least one certificate and dates');
+        } // end else
+    }
+
     function get_partial_payments_section() {
         var courseid = $('#register_courses').val();
         var userid = $('#users').val();
@@ -1430,6 +1503,10 @@ $(document).ready(function () {
 
         if (event.target.id == 'renew_cert') {
             renew_certificates();
+        }
+
+        if (event.target.id == 'recertificate') {
+            recertificate();
         }
 
         if (event.target.id == 'add_partial') {
@@ -1897,6 +1974,11 @@ $(document).ready(function () {
         if (event.target.id == 'add_user_to_slot') {
             add_user_to_slot();
         }
+
+        if (event.target.id == 'recreate') {
+            recertificate_done();
+        }
+
     });
 
 
