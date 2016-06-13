@@ -1115,7 +1115,8 @@ class Import extends Util {
             while (($buffer = fgets($handle, 4096)) !== false) {
                 $clean_buffer = str_replace(',,', ',', $buffer);
                 $clean_buffer2 = str_replace('"', '', $clean_buffer);
-                $q_arr = explode(',', $clean_buffer2);
+                $q_arr = explode("\t", $clean_buffer2);
+                //$q_arr = preg_split('"/[\t]/"', $clean_buffer2);
                 $cid = $q_arr[0];
                 $q = $q_arr[1];
                 $a = $q_arr[2];
@@ -1124,12 +1125,20 @@ class Import extends Util {
                 $d = $q_arr[5];
                 $ca = trim($q_arr[6]);
                 $catid = $this->get_question_category($cid);
+
+                echo "Old system course ID: " . $cid . "<br>";
+                echo "New system questions category: " . $catid . "<br>";
+                echo "Question: " . $q . "<br>";
+                echo "Reply A: " . $a . "<br>";
+                echo "Reply B:" . $b . "<br>";
+                echo "Reply C:" . $c . "<br>";
+                echo "Reply D: " . $d . "<br>";
+                echo "Correct reply: " . $ca . "<br>";
+
                 if ($catid > 0 && $q != '' && $a != '' && $b != '' && $c != '' && $d != '' && $ca != '') {
                     $question = new stdClass();
                     $question->category = $catid;
-                    $question->name = $q;
-
-                    echo "<br>--------------------------------------------------------------------------<br>";
+                    $question->name = $q;                    
 
                     $questionid = $this->add_question($question);
                     echo "Question ID: " . $questionid . "<br>";
@@ -1188,7 +1197,8 @@ class Import extends Util {
                         echo "<br>--------------------------------------------------------------------------<br>";
                     } // end if $questionid>0
                 } // end if $catid > 0 && $q != '' ...
-            } // end while
+            } // end while                 
+
             echo "Total questions imported: " . $i . "<br>";
         } // end if $handle
         else {
@@ -1198,9 +1208,13 @@ class Import extends Util {
 
     function add_question($q) {
 
-        echo "<br>------<br>";
-        print_r($q);
-        echo "<br>------<br>";
+        /*
+         * 
+          echo "<br>------<br>";
+          print_r($q);
+          echo "<br>------<br>";
+         * 
+         */
 
         $catid = $q->category;
         $userid = $this->manager_id;
@@ -1225,8 +1239,8 @@ class Import extends Util {
                 . "modifiedby) "
                 . "values('" . $catid . "',"
                 . "'" . $parent . "',"
-                . "'" . $q->name . "',"
-                . "'" . $q->name . "',"
+                . "'" . mysql_real_escape_string($q->name) . "',"
+                . "'" . mysql_real_escape_string($q->name) . "',"
                 . "'" . 1 . "',"
                 . "'" . '' . "',"
                 . "'" . 1 . "',"
@@ -1287,7 +1301,7 @@ class Import extends Util {
                     . "'" . mysql_real_escape_string($a->answer) . "',"
                     . "1,"
                     . "$a->fraction,"
-                    . "'" . $a->feedback . "',"
+                    . "'" . mysql_real_escape_string($a->feedback) . "',"
                     . "1)";
             echo "Query: " . $query . "<br>";
             $this->db->query($query);

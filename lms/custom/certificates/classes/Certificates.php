@@ -1044,14 +1044,14 @@ class Certificates extends Util {
         $renew_status = $this->get_course_renew_status($cert->courseid);
         $title = $this->get_certificate_title($cert->courseid);
         $expiration_date = strtoupper(date('m-d-Y', $expire));
-        /*
-          echo "Certificate ID: " . $cert->id;
+          /*  
+          echo "Certificate ID: " . $cert->id;  
           echo "User ID: " . $userid . "<br>";
           echo "User credentials: " . $firstname . "&nbsp;" . $lastname . "<br>";
           echo "Course name: " . $coursename . "<br>";
           echo "Issue date: " . $issue_date . "<br>";
           echo "Expiration date: " . $expiration_date . "<br>";
-         */
+          */  
         switch ($cert->courseid) {
             case 45:
                 $list.="<!DOCTYPE HTML SYSTEM>";
