@@ -91,6 +91,8 @@ $host = $_SERVER['HTTP_HOST'];
         <!--<script type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>-->        
         <script type="text/javascript" src="https://<?php echo $host ?>/assets/js/custom.js"></script>        
         <script type="text/javascript" src="https://<?php echo $host ?>/assets/js/selectbox/jquery.selectBox.js"></script>        
+        <script type="text/javascript" src='http://medical2.com/assets/js/attrchange.js'></script>
+        <script type="text/javascript" src='http://medical2.com/assets/js/attrchange_ext.js'></script>
         <script type="text/javascript">
             //<![CDATA[
             document.body.className += ' jsenabled';

@@ -16,8 +16,16 @@ class Index extends Util {
     function get_toolbar() {
         $list = "";
 
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>Please note at least one slide must be ticked as first, otherwise you will have empty slider section</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'></span>";
+        $list.="</div>";
+
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span2'>Slide title</span><span class='span4'><input type='text' id='title' style='width:145px;'></span><span class='span2'><input type='file' id='files' name='files'></span>";
+        $list.="<span class='span2'>Slide title*</span><span class='span4'><input type='text' id='title' style='width:145px;'></span><span class='span2'><input type='file' id='files' name='files'></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;display:none;' id='ajax_loader'>";
@@ -34,6 +42,10 @@ class Index extends Util {
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Slogan #3*</span><span class='span2'><input type='text' id='slogan3' style='width:145px;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'>Make it first</span><span class='span2'><input type='checkbox' id='active'></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
@@ -94,6 +106,12 @@ class Index extends Util {
         $list.="<span class='span8'>$slide->slogan3</span>";
         $list.="</div>";
 
+        if ($slide->active == 1) {
+            $list.="<div class='container-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span2'>Status</span><span class='span3'>First slide</span>";
+            $list.="</div>";
+        }
+
         return $list;
     }
 
@@ -131,6 +149,12 @@ class Index extends Util {
         $slogan1 = $post['slogan1'];
         $slogan2 = $post['slogan2'];
         $slogan3 = $post['slogan3'];
+        $active = $post['active'];
+
+        if ($active == 1) {
+            $query = "update mdl_slides set active=0";
+            $this->db->query($query);
+        }
 
         foreach ($files as $file) {
             $tmp_name = $file['tmp_name'];
@@ -148,13 +172,12 @@ class Index extends Util {
                             . "slogan1,"
                             . "slogan2,"
                             . "slogan3,"
-                            . "path) "
+                            . "path, active) "
                             . "values('$title',"
                             . "'$slogan1',"
                             . "'$slogan2',"
                             . "'$slogan3',"
-                            . "'$destination')";
-                    //echo "Query: ".$query."<br>";
+                            . "'$destination', $active)";
                     $this->db->query($query);
                     $this->create_image_thumb($new_file_name);
                 } //end if move_uploaded_file($tmp_name, $destination)
@@ -198,6 +221,22 @@ class Index extends Util {
     function delete_slide($id) {
         $query = "delete from mdl_slides where id=$id";
         $this->db->query($query);
+    }
+
+    function get_random_banner() {
+        $banners = array();
+        $query = "select * from mdl_slides";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $banner = new stdClass();
+            foreach ($row as $key => $value) {
+                $banner->$key = $value;
+            }
+            $banners[] = $banner;
+        }
+        $rand_keys = array_rand($banners, 1);
+        $banner = $banners[$rand_keys];
+        return json_encode($banner);
     }
 
 }

@@ -1253,7 +1253,14 @@ $(document).ready(function () {
         var slogan1 = $('#slogan1').val();
         var slogan2 = $('#slogan2').val();
         var slogan3 = $('#slogan3').val();
-
+        var active;
+        if ($('#active').is(":checked")) {
+            active = 1;
+        }
+        else {
+            active = 0;
+        }       
+        
         if (file_data == '' || file_data.length == 0) {
             $('#slide_err').html('Please select files to be upload ...');
             return false;
@@ -1274,6 +1281,7 @@ $(document).ready(function () {
             form_data.append('slogan1', slogan1);
             form_data.append('slogan2', slogan2);
             form_data.append('slogan3', slogan3);
+            form_data.append('active', active);
             $('#ajax_loader').show();
             $.ajax({
                 url: url,

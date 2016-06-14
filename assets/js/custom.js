@@ -65,7 +65,7 @@ $(document).ready(function () {
      * 
      **************************************************************************/
 
-    var domain = 'medical2.com';    
+    var domain = 'medical2.com';
     /***************************************************************************
      * 
      * Login form verification
@@ -554,7 +554,7 @@ $(document).ready(function () {
     }
 
     function verify_personal_payment_section() {
-        var dashboard=$('#dashboard').val();
+        var dashboard = $('#dashboard').val();
         var card = $('#card_type').text();
         var card_type = card.trim();
         var sum = $('#payment_sum').val();
@@ -641,7 +641,7 @@ $(document).ready(function () {
         if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_email != '' && validateEmail(bill_email) == true) {
             $('#personal_payment_err').html('');
             var card = {sum: sum,
-                dashboard:dashboard,
+                dashboard: dashboard,
                 email: email,
                 userid: userid,
                 courseid: courseid,
@@ -1317,15 +1317,15 @@ $(document).ready(function () {
         var month = $('#month').val();
         var year = $('#year').val();
         /*
-        var url = "https://" + domain + "/functionality/php/show_gallery_pics.php";
-        var request = {state: state, month: month, year: year};
-        $.post(url, request).done(function (data) {
-            //console.log('Gallery response: '+data);
-            $('#gallery_container').html(data);
-        });
-        */
-       var url="https://"+domain+"/index.php/gallery/matched/"+state+"/"+month+"/"+year;
-       window.location=url;       
+         var url = "https://" + domain + "/functionality/php/show_gallery_pics.php";
+         var request = {state: state, month: month, year: year};
+         $.post(url, request).done(function (data) {
+         //console.log('Gallery response: '+data);
+         $('#gallery_container').html(data);
+         });
+         */
+        var url = "https://" + domain + "/index.php/gallery/matched/" + state + "/" + month + "/" + year;
+        window.location = url;
     }
 
     /***************************************************************************
@@ -1751,10 +1751,58 @@ $(document).ready(function () {
     } // end if url.indexOf("school") >= 0
 
     $("body").click(function (event) {
-        // console.log('Element clicked: ' + event.target.id);
+        //console.log('Element clicked: ' + event.target.id);
         if (event.target.id == 'ok') {
             $('#policy_checkbox').prop("checked", true);
         }
+
+        if (event.target.id == 'prev_slide') {
+            console.log('Prev is clicked ...');
+        }
+
+        if (event.target.id == 'next_slide') {
+            console.log('Next is clicked ...');
+        }
+    }); // end of $("body").click(function (event) {    
+
+    $("body").bind('cssClassChanged', function (event) {
+        console.log('Item1 has changed class ... ' + event);
+
     });
+
+    $("body").attrchange({
+        trackValues: true,
+        callback: function (event) {
+            //console.log("Element ID: " + event.target.id);
+            //console.log("Attribute name: " + event.attributeName);
+            //console.log("Attribute old value: " + event.oldValue);
+            //console.log("Attribute new value: " + event.newValue);            
+        }
+    });
+
+
+    (function worker() {
+        $.ajax({
+            url: 'http://medical2.com/banner.php',
+            success: function (data) {
+                var obj = JSON.parse(data);
+                var title = obj.title;
+                var slogans = obj.slogans;
+                console.log('Banner title: ' + title);
+                console.log('Banner slogans: ' + slogans);
+
+                $('#banner_title').html(title);
+                $('#banner_slogans').html(slogans);
+                //$('#banner').html(data);
+            },
+            complete: function () {
+                // Schedule the next request when the current one's complete
+                setTimeout(worker, 10000);
+            }
+        });
+    })();
+
+
+
 
 }); // end of (document).ready(function ()
