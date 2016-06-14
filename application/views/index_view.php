@@ -12,7 +12,7 @@
                                         line-height: 1.5em;margin-right: 5%;
                                         padding-left: 10px;
                                         text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);">
-                                        Certification</h3>
+                                        Certifications</h3>
                                 </div>
                                 <div>
                                     <span style="background: rgba(0, 0, 0, 0.5) none repeat scroll 0 0;
@@ -24,9 +24,9 @@
                                           margin-left: 5%;
                                           padding: 15px 20px;
                                           text-shadow: 0 0 1px rgba(0, 0, 0, 0.5)">
-                                        1. Pick Program  <br/>
-                                        2. Pick Schedule <br/>
-                                        3. Signup and Register</span>
+                                       Phlebotomy & EKG Certification   <br/>
+                                       1 Day Phlebotomy  Certification  <br/>
+                                       Program/Schedule/Register </span>
                                 </div>
                             </div>
                         </div>

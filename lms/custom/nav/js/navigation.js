@@ -1241,6 +1241,54 @@ $(document).ready(function () {
 
     }
 
+    function refresh_slide_tumbs() {
+        get_index_page();
+    }
+
+    function upload_slide() {
+        $list = "";
+        var url = "/lms/custom/index/upload.php";
+        var file_data = $('#files').prop('files');
+        var title = $('#title').val();
+        var slogan1 = $('#slogan1').val();
+        var slogan2 = $('#slogan2').val();
+        var slogan3 = $('#slogan3').val();
+
+        if (file_data == '' || file_data.length == 0) {
+            $('#slide_err').html('Please select files to be upload ...');
+            return false;
+        }
+
+        if (title == '' || slogan1 == '' || slogan2 == '' || slogan3 == '') {
+            $('#slide_err').html('Please provide banner title and slogan items');
+            return false;
+        } // end if state==0 || month==0 || year==0
+
+        if (file_data != '' && file_data.length != 0 && title != '' && slogan1 != '' && slogan2 != '' && slogan3 != '') {
+            $('#slide_err').html('');
+            var form_data = new FormData();
+            $.each(file_data, function (key, value) {
+                form_data.append(key, value);
+            });
+            form_data.append('title', title);
+            form_data.append('slogan1', slogan1);
+            form_data.append('slogan2', slogan2);
+            form_data.append('slogan3', slogan3);
+            $('#ajax_loader').show();
+            $.ajax({
+                url: url,
+                data: form_data,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                success: function () {
+                    $('#ajax_loader').hide();
+                    refresh_slide_tumbs();
+                }
+            });
+        } // end if file_data != '' && file_data.length != 0 && state > 0 && month > 0 && year > 0        
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -1440,6 +1488,23 @@ $(document).ready(function () {
         if (event.target.id == 'add_user_to_slot') {
             add_user_to_slot();
         }
+
+        if (event.target.id == 'upload_slide') {
+            upload_slide();
+        }
+
+        if (event.target.id.indexOf('del_slide_') >= 0) {
+            var id = event.target.id.replace("del_slide_", "");
+            if (id > 0) {
+                if (confirm('Delete current slide?')) {
+                    var url = "/lms/custom/index/del_slide.php";
+                    $.post(url, {id: id}).done(function () {
+                        get_index_page();
+                    });
+                }  // end if confirm
+            } // end if id>0
+        } // end if event.target.id.indexOf('del_slide_') >= 0
+
 
     }); // end of #region-main click', 'button',
 
@@ -1697,6 +1762,13 @@ $(document).ready(function () {
         });
     }
 
+    function get_index_page() {
+        var url = "/lms/custom/index/get_index_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     /************************************************************************
      * 
      *                   Menu processing items
@@ -1711,6 +1783,11 @@ $(document).ready(function () {
     $("#FAQ").click(function (event) {
         update_navigation_status__menu('FAQ');
         get_faq_edit_page();
+    });
+
+    $("#index").click(function (event) {
+        update_navigation_status__menu('Index page');
+        get_index_page();
     });
 
     $("#about").click(function (event) {
