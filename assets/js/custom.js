@@ -1771,39 +1771,18 @@ $(document).ready(function () {
     });
 
     /*
-    $("body").attrchange({
-        trackValues: true,
-        callback: function (event) {
-            //console.log("Element ID: " + event.target.id);
-            //console.log("Attribute name: " + event.attributeName);
-            //console.log("Attribute old value: " + event.oldValue);
-            //console.log("Attribute new value: " + event.newValue);            
-        }
-    });
-    */
+     $("body").attrchange({
+     trackValues: true,
+     callback: function (event) {
+     //console.log("Element ID: " + event.target.id);
+     //console.log("Attribute name: " + event.attributeName);
+     //console.log("Attribute old value: " + event.oldValue);
+     //console.log("Attribute new value: " + event.newValue);            
+     }
+     });
+     */
+    
 
-/*
-    (function worker() {
-        $.ajax({
-            url: 'http://medical2.com/banner.php',
-            success: function (data) {
-                var obj = JSON.parse(data);
-                var title = obj.title;
-                var slogans = obj.slogans;
-                console.log('Banner title: ' + title);
-                console.log('Banner slogans: ' + slogans);
-
-                $('#banner_title').html(title);
-                $('#banner_slogans').html(slogans);
-                //$('#banner').html(data);
-            },
-            complete: function () {
-                // Schedule the next request when the current one's complete
-                setTimeout(worker, 10000);
-            }
-        });
-    })();
-*/
 
 
 
