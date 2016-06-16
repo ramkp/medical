@@ -1259,8 +1259,8 @@ $(document).ready(function () {
         }
         else {
             active = 0;
-        }       
-        
+        }
+
         if (file_data == '' || file_data.length == 0) {
             $('#slide_err').html('Please select files to be upload ...');
             return false;
@@ -1620,6 +1620,32 @@ $(document).ready(function () {
         }
 
 
+        if (event.target.id.indexOf("upd_slogan_") >= 0) {
+            var list = event.target.id.replace('upd_slogan_', "");
+            var ids = list.split('_');
+            var sloganid = ids[0];
+            var bannerid = ids[1];
+            var slogan_elid = '#input_slogan_' + sloganid + '_' + bannerid;
+            var text = $(slogan_elid).val();
+            if (text != '') {
+                var url = "/lms/custom/index/update_slogan.php";
+                $.post(url, {sloganid: sloganid, bannerid: bannerid, text: text}).done(function (data) {
+                    console.log('Server response: ' + data);
+                    get_index_page();
+                });
+            } // end if text != ''
+        } // end if event.target.id.indexOf("upd_slogan_") >= 0
+
+        if (event.target.id.indexOf("first_") >= 0) {
+            var id = event.target.id.replace('first_', "");
+            if (confirm('Set current banner as first one?')) {
+                var url = "/lms/custom/index/set_first_banner.php";
+                $.post(url, {id: id}).done(function (data) {
+                    console.log('Server response: ' + data);
+                    get_index_page();
+                }); // end if $.post
+            } // end if confirm
+        } // end if event.target.id.indexOf("first_") >= 0
 
     }); // end of $('#region-main').on('click', 'a'
 

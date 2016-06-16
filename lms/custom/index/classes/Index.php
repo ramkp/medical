@@ -91,24 +91,32 @@ class Index extends Util {
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Slogan1</span>";
-        $list.="<span class='span8'>$slide->slogan1</span>";
+        $list.="<span class='span8'><input id='input_slogan_1_$slide->id' value='$slide->slogan1'></span>";
+        $list.="<span class='span1'><a href='#' onClick='return false;' id='upd_slogan_1_$slide->id'>Update</a></span>";
         $list.="</div>";
 
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Slogan2</span>";
-        $list.="<span class='span8'>$slide->slogan2</span>";
+        $list.="<span class='span8'><input id='input_slogan_2_$slide->id' value='$slide->slogan2'></span>";
+        $list.="<span class='span1'><a href='#' onClick='return false;' id='upd_slogan_2_$slide->id'>Update</a></span>";
         $list.="</div>";
 
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Slogan3</span>";
-        $list.="<span class='span8'>$slide->slogan3</span>";
+        $list.="<span class='span8'><input id='input_slogan_3_$slide->id' value='$slide->slogan3'></span>";
+        $list.="<span class='span1'><a href='#' onClick='return false;' id='upd_slogan_3_$slide->id'>Update</a></span>";
         $list.="</div>";
 
         if ($slide->active == 1) {
             $list.="<div class='container-fluid' style='font-weight:bold;'>";
             $list.="<span class='span2'>Status</span><span class='span3'>First slide</span>";
+            $list.="</div>";
+        } //end if $slide->active == 1
+        else {
+            $list.="<div class='container-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span2'>Status</span><span class='span3'><a href='#' onClick='return false;' id='first_$slide->id'>Make it first</a></span>";
             $list.="</div>";
         }
 
@@ -237,6 +245,29 @@ class Index extends Util {
         $rand_keys = array_rand($banners, 1);
         $banner = $banners[$rand_keys];
         return json_encode($banner);
+    }
+
+    function update_slogan($sloganid, $bannerid, $text) {
+        switch ($sloganid) {
+            case 1:
+                $query = "update mdl_slides set slogan1='$text' where id=$bannerid";
+                break;
+            case 2:
+                $query = "update mdl_slides set slogan2='$text' where id=$bannerid";
+                break;
+            case 3:
+                $query = "update mdl_slides set slogan3='$text' where id=$bannerid";
+                break;
+        }
+        $this->db->query($query);
+    }
+
+    function set_first_banner($id) {
+        $query = "update mdl_slides set active=0";
+        $this->db->query($query);
+
+        $query = "update mdl_slides set active=1 where id=$id";
+        $this->db->query($query);
     }
 
 }
