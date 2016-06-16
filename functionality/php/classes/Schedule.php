@@ -197,7 +197,7 @@ class Schedule extends Programs {
             } // end else 
             $coursename = $this->get_course_name($courseid);
             $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
-            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$coursename</h5></div>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Phlebotomy & EKG Certification Workshops</h5></div>";
             $list.="<div class='panel-body'>";
 
             $result = $this->db->query($query);
@@ -217,10 +217,19 @@ class Schedule extends Programs {
                     $state = $locations[0];
                     $city = $locations[1];
                     $location = $city . " , " . $state;
+                    
+                    if ($row['schedulerid']==6) {
+                              $notes="<b>Phlebotomy Certification Workshop</b><br>".$row['notes']."";
+                        }                        
+                        if ($row['schedulerid']==5) {
+                            $notes="<b>Phlebotomy With EKG Certification Workshop</b><br>".$row['notes']."";
+                        }
+                    
                     $list.="<div class='container-fluid' style='text-align:left;'>";
                     $list.= "<span class='span1'>$human_date</span>";
                     $list.= "<span class='span2'>$location</span>";
-                    $list.= "<span class='span3'>" . $row['notes'] . "</span>";
+                    //$list.= "<span class='span3'>" . $row['notes'] . "</span>";
+                    $list.= "<span class='span3'>" . $notes . "</span>";
                     $list.= "<span class='span1'>9am -  5pm</span>";
                     if ($row['schedulerid'] == 6) {
                         $list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/44/" . $row['id'] . "'><button class='btn btn-primary'>Register</button></a></span>";
@@ -251,6 +260,7 @@ class Schedule extends Programs {
     }
 
     function get_course_schedule($courseid, $state = null) {
+        //echo "Course id: ".$courseid."<br>";
         date_default_timezone_set('Pacific/Wallis');
         $list = "";
         if ($courseid == 44 || $courseid == 45) {

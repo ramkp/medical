@@ -525,7 +525,7 @@ class program_model extends CI_Model {
                 } // end else 
                 $coursename = $this->get_course_name($courseid);
                 $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
-                $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$coursename</h5></div>";
+                $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Phlebotomy & EKG Certification Workshops</h5></div>";
                 $list.="<div class='panel-body'>";
 
                 $result = $this->db->query($query);
@@ -546,10 +546,19 @@ class program_model extends CI_Model {
                         $state = $locations[0];
                         $city = $locations[1];
                         $location = $city . " , " . $state;
+                        
+                        if ($row->schedulerid==6) {
+                              $notes="<b>Phlebotomy Certification Workshop</b><br>$row->notes";
+                        }                        
+                        if ($row->schedulerid==5) {
+                            $notes="<b>Phlebotomy With EKG Certification Workshop</b><br>$row->notes";
+                        }
+                        
                         $list.="<div class='container-fluid' style='text-align:left;'>";
                         $list.= "<span class='span1'>$human_date</span>";
                         $list.= "<span class='span2'>$location</span>";
-                        $list.= "<span class='span3'>$row->notes</span>";
+                        //$list.= "<span class='span3'>$row->notes</span>";
+                        $list.= "<span class='span3'>$notes</span>";
                         $list.= "<span class='span1'>9am -  5pm</span>";
                         //echo "Scheduler id: ".$row->schedulerid."<br>";
                         if ($row->schedulerid==6) {
