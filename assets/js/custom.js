@@ -1770,6 +1770,7 @@ $(document).ready(function () {
 
     });
 
+    /*
     $("body").attrchange({
         trackValues: true,
         callback: function (event) {
@@ -1779,8 +1780,9 @@ $(document).ready(function () {
             //console.log("Attribute new value: " + event.newValue);            
         }
     });
+    */
 
-
+/*
     (function worker() {
         $.ajax({
             url: 'http://medical2.com/banner.php',
@@ -1801,7 +1803,7 @@ $(document).ready(function () {
             }
         });
     })();
-
+*/
 
 
 

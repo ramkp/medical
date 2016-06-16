@@ -9,11 +9,10 @@ class program_model extends CI_Model {
 
     public $host;
 
-
     public function __construct() {
         parent::__construct();
         $this->load->database();
-        $this->host=$_SERVER['SERVER_NAME'];
+        $this->host = $_SERVER['SERVER_NAME'];
     }
 
     public function get_category_id($cat_name) {
@@ -45,7 +44,7 @@ class program_model extends CI_Model {
             case 44:
                 $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
                 break;
-            case 45:                
+            case 45:
                 $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/ekg.jpg";
                 break;
             case 46:
@@ -80,7 +79,7 @@ class program_model extends CI_Model {
                 break;
             case 56:
                 $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/Medical%20office%20asst%20pic.jpg";
-                break;            
+                break;
         }
         return $path;
     }
@@ -190,9 +189,9 @@ class program_model extends CI_Model {
 
         return $list;
     }
-    
-    function get_size () {
-        $list="height='110' width='154'";
+
+    function get_size() {
+        $list = "height='110' width='154'";
         return $list;
     }
 
@@ -200,7 +199,7 @@ class program_model extends CI_Model {
         $list = "";
         $list.="<br/><div  class='form_div'>";
         //print_r($items);
-        $size=$this->get_size();
+        $size = $this->get_size();
         if (count($items) > 0) {
             $list.="<div class='courses category-browse category-browse-3'>";
             foreach ($items as $item) {
@@ -498,79 +497,166 @@ class program_model extends CI_Model {
         return $state;
     }
 
-    public function get_course_schedule($courseid, $state = null) {
-
+    public function get_shared_schedule($courseid, $state = null) {
         $list = "";
+        $sch_arr=array();
         // 1.Get scheduler id
-        $query = "select id from mdl_scheduler where course=$courseid";
-        $result = $this->db->query($query);
-        $num = $result->num_rows();
-        $now = time();
-        if ($num > 0) {
-            foreach ($result->result() as $row) {
-                $schedulerid = $row->id;
-            } // end foreach
-            // 2. Get slots list
-            if ($state == null) {
-                $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid "
-                        . "and starttime>$now order by starttime";
-            } // end if $state==null
-            else {
-                $statename = $this->get_state_name($state);
-                $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid "
-                        . "and appointmentlocation like '%$statename%' "
-                        . "order by starttime";
-            } // end else 
-            $coursename = $this->get_course_name($courseid);
-            $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
-            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$coursename</h5></div>";
-            $list.="<div class='panel-body'>";
-
+            $query = "select id from mdl_scheduler where course in (44,45)";
             $result = $this->db->query($query);
             $num = $result->num_rows();
-            date_default_timezone_set('Pacific/Wallis');
+            $now = time();
             if ($num > 0) {
                 foreach ($result->result() as $row) {
-                    $human_date = date('m-d-Y', $row->starttime);
-                    $hours_num = round($row->duration / 60);
-                    $human_start_time = date('m-d-Y H:i', $row->timemodified);
-                    $end_time = $row->timemodified + $hours_num * 3600;
-                    $human_end_date = date('m-d-Y H:i', $end_time);
-                    //$locations = preg_split("/\W|_/", $row->appointmentlocation);
-                    $locations = explode("/", $row->appointmentlocation);
-                    if (count($locations) == 0) {
-                        $locations = explode(",", $row->appointmentlocation);
-                    }
-                    $state = $locations[0];
-                    $city = $locations[1];
-                    $location = $city . " , " . $state;
-                    $list.="<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span1'>$human_date</span>";
-                    $list.= "<span class='span2'>$location</span>";
-                    $list.= "<span class='span3'>$row->notes</span>";
-                    $list.= "<span class='span1'>9am -  5pm</span>";
-                    $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
-                    $list.="</div>";
-
-                    $list.="<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span9'><hr/></span>";
-                    $list.="</div>";
+                    $sch_arr[]= $row->id;
                 } // end foreach
+                $sch_list= implode(',', $sch_arr);
+                // 2. Get slots list
+                if ($state == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid in ($sch_list) "
+                            . "and starttime>$now order by starttime";
+                } // end if $state==null
+                else {
+                    $statename = $this->get_state_name($state);
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid in ($sch_list) "
+                            . "and appointmentlocation like '%$statename%' "
+                            . "order by starttime";
+                } // end else 
+                $coursename = $this->get_course_name($courseid);
+                $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
+                $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$coursename</h5></div>";
+                $list.="<div class='panel-body'>";
 
-                $list.="</div>"; // end of panel-body
-                $list.="</div>"; // end of panel panel-default           
-            } // end if $num > 0 when slots are available at the course
-            else {
-                $list.="<div class='container-fluid' style='text-align:center;'>";
-                $list.= "<span class='span6'>This program does not have schedule in selected state</span>";
-                $list.="</div>";
+                $result = $this->db->query($query);
+                $num = $result->num_rows();
+                date_default_timezone_set('Pacific/Wallis');
+                if ($num > 0) {
+                    foreach ($result->result() as $row) {
+                        $human_date = date('m-d-Y', $row->starttime);
+                        $hours_num = round($row->duration / 60);
+                        $human_start_time = date('m-d-Y H:i', $row->timemodified);
+                        $end_time = $row->timemodified + $hours_num * 3600;
+                        $human_end_date = date('m-d-Y H:i', $end_time);
+                        //$locations = preg_split("/\W|_/", $row->appointmentlocation);
+                        $locations = explode("/", $row->appointmentlocation);
+                        if (count($locations) == 0) {
+                            $locations = explode(",", $row->appointmentlocation);
+                        }
+                        $state = $locations[0];
+                        $city = $locations[1];
+                        $location = $city . " , " . $state;
+                        $list.="<div class='container-fluid' style='text-align:left;'>";
+                        $list.= "<span class='span1'>$human_date</span>";
+                        $list.= "<span class='span2'>$location</span>";
+                        $list.= "<span class='span3'>$row->notes</span>";
+                        $list.= "<span class='span1'>9am -  5pm</span>";
+                        //echo "Scheduler id: ".$row->schedulerid."<br>";
+                        if ($row->schedulerid==6) {
+                            $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/44/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
+                        }                        
+                        if ($row->schedulerid==5) {
+                            $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/45/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
+                        }                        
+                        $list.="</div>";
 
-                $list.="</div>"; // end of panel-body
-                $list.="</div>"; // end of panel panel-default           
-            }
-        } // end if $num > 0 when scheduler is available at the course
+                        $list.="<div class='container-fluid' style='text-align:left;'>";
+                        $list.= "<span class='span9'><hr/></span>";
+                        $list.="</div>";
+                    } // end foreach
+
+                    $list.="</div>"; // end of panel-body
+                    $list.="</div>"; // end of panel panel-default           
+                } // end if $num > 0 when slots are available at the course
+                else {
+                    $list.="<div class='container-fluid' style='text-align:center;'>";
+                    $list.= "<span class='span6'>This program does not have schedule in selected state</span>";
+                    $list.="</div>";
+
+                    $list.="</div>"; // end of panel-body
+                    $list.="</div>"; // end of panel panel-default           
+                }
+            } // end if $num > 0 when scheduler is available at the course
+            return $list;
+    }
+
+    public function get_course_schedule($courseid, $state = null) {
+        $list = "";
+        if ($courseid == 44 || $courseid == 45) {
+            $list.=$this->get_shared_schedule($courseid, $state);
+        } // end if $courseid==44 || $courseid==45
+        else {
+            // 1.Get scheduler id
+            $query = "select id from mdl_scheduler where course=$courseid";
+            $result = $this->db->query($query);
+            $num = $result->num_rows();
+            $now = time();
+            if ($num > 0) {
+                foreach ($result->result() as $row) {
+                    $schedulerid = $row->id;
+                } // end foreach
+                // 2. Get slots list
+                if ($state == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and starttime>$now order by starttime";
+                } // end if $state==null
+                else {
+                    $statename = $this->get_state_name($state);
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and appointmentlocation like '%$statename%' "
+                            . "order by starttime";
+                } // end else 
+                $coursename = $this->get_course_name($courseid);
+                $list.="<div class='panel panel-default' id='schedule_section' style='margin-bottom:0px;'>";
+                $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>$coursename</h5></div>";
+                $list.="<div class='panel-body'>";
+
+                $result = $this->db->query($query);
+                $num = $result->num_rows();
+                date_default_timezone_set('Pacific/Wallis');
+                if ($num > 0) {
+                    foreach ($result->result() as $row) {
+                        $human_date = date('m-d-Y', $row->starttime);
+                        $hours_num = round($row->duration / 60);
+                        $human_start_time = date('m-d-Y H:i', $row->timemodified);
+                        $end_time = $row->timemodified + $hours_num * 3600;
+                        $human_end_date = date('m-d-Y H:i', $end_time);
+                        //$locations = preg_split("/\W|_/", $row->appointmentlocation);
+                        $locations = explode("/", $row->appointmentlocation);
+                        if (count($locations) == 0) {
+                            $locations = explode(",", $row->appointmentlocation);
+                        }
+                        $state = $locations[0];
+                        $city = $locations[1];
+                        $location = $city . " , " . $state;
+                        $list.="<div class='container-fluid' style='text-align:left;'>";
+                        $list.= "<span class='span1'>$human_date</span>";
+                        $list.= "<span class='span2'>$location</span>";
+                        $list.= "<span class='span3'>$row->notes</span>";
+                        $list.= "<span class='span1'>9am -  5pm</span>";
+                        $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
+                        $list.="</div>";
+
+                        $list.="<div class='container-fluid' style='text-align:left;'>";
+                        $list.= "<span class='span9'><hr/></span>";
+                        $list.="</div>";
+                    } // end foreach
+
+                    $list.="</div>"; // end of panel-body
+                    $list.="</div>"; // end of panel panel-default           
+                } // end if $num > 0 when slots are available at the course
+                else {
+                    $list.="<div class='container-fluid' style='text-align:center;'>";
+                    $list.= "<span class='span6'>This program does not have schedule in selected state</span>";
+                    $list.="</div>";
+
+                    $list.="</div>"; // end of panel-body
+                    $list.="</div>"; // end of panel panel-default           
+                }
+            } // end if $num > 0 when scheduler is available at the course
+        }// end else
         return $list;
     }
 
