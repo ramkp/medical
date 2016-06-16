@@ -1251,7 +1251,7 @@ $(document).ready(function () {
 
     function get_schedule_course() {
         var courseid = $('#schedule_courses').val();
-        var url = "https://" + domain + "/functionality/php/get_schedule_course.php";
+        var url = "http://" + domain + "/functionality/php/get_schedule_course.php";
         var request = {courseid: courseid};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
