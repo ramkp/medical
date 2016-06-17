@@ -8,17 +8,9 @@
                         <img src="https://<?php echo $_SERVER['SERVER_NAME']; ?>/assets/icons/heart.gif" alt="heart" width="15" height="15">
                     </a> Powered  By Z&S &nbsp;&nbsp;                                                                
                     <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/about">About Us</a>&nbsp;
-                    <!--<a href="#">Chat with US</a>&nbsp;-->
+                    <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/map">Site Map</a>&nbsp;
                     <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/contact">Contact US</a>&nbsp;
-                    <!--<i class="fa fa-mobile fa-lg"></i>&nbsp; Phone: (007) 123-456    
-                    <i class="fa fa-envelope-o"></i>&nbsp; E-mail:
-                    <a href="mailto:info@medical-training.com">info@medical-training.com</a>
-                    -->  
-                    <!--   
-                    <div class="social_icons pull-left">
-                        <div class='shareaholic-canvas' data-app='share_buttons' data-app-id='24115344'></div>
-                    </div>
-                    -->
+                    
                     <!-- Social sharing buttons -->
                     <span class='st_facebook_large' displayText='Facebook'></span>
                     <span class='st_twitter_large' displayText='Tweet'></span>
