@@ -29,6 +29,7 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 require_once($CFG->dirroot . '/mod/quiz/addrandomform.php');
 require_once($CFG->dirroot . '/question/editlib.php');
 require_once($CFG->dirroot . '/question/category_class.php');
+require_once($CFG->dirroot . '/custom/my/classes/Dashboard.php');
 
 list($thispageurl, $contexts, $cmid, $cm, $quiz, $pagevars) =
         question_edit_setup('editq', '/mod/quiz/addrandom.php', true);
@@ -87,13 +88,15 @@ if ($data = $mform->get_data()) {
         $includesubcategories = !empty($data->includesubcategories);
         $returnurl->param('cat', $data->category);
 
-    } else if (!empty($data->newcategory)) {
+    } // end if !empty($data->existingcategory)     
+    else if (!empty($data->newcategory)) {
         list($parentid, $contextid) = explode(',', $data->parent);
         $categoryid = $qcobject->add_category($data->parent, $data->name, '', true);
         $includesubcategories = 0;
 
         $returnurl->param('cat', $categoryid . ',' . $contextid);
-    } else {
+    } // end if !empty($data->newcategory)    
+    else {
         throw new coding_exception(
                 'It seems a form was submitted without any button being pressed???');
     }

@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/question/engine/lib.php');
 require_once($CFG->dirroot . '/question/type/questiontypebase.php');
-
+require_once($CFG->dirroot . '/custom/my/classes/Dashboard.php');
 
 
 /// CONSTANTS ///////////////////////////////////
@@ -1011,7 +1011,8 @@ function question_make_default_categories($contexts) {
             $category->sortorder = 999;
             $category->stamp = make_unique_id_code();
             $category->id = $DB->insert_record('question_categories', $category);
-        } else {
+        } // end if !$exists = $DB->record_exists("question_categories",         
+        else {
             $category = question_get_default_category($context->id);
         }
         $thispreferredness = $preferredlevels[$context->contextlevel];
@@ -1505,13 +1506,21 @@ class question_edit_contexts {
      * @return array parent contexts having capability, zero based index
      */
     public function having_cap($cap) {
+        $ds=new Dashboard();
+        
+        //print_r($this->allcontexts);
+        
         $contextswithcap = array();
         foreach ($this->allcontexts as $context) {
+            //echo "Current context: ".$context."<br>";
             if (has_capability($cap, $context)) {
                 $contextswithcap[] = $context;
             }
-        }
+        } 
+        $contexts=$ds->get_courses_questions_context();        
         return $contextswithcap;
+        
+        //return $contexts;
     }
 
     /**

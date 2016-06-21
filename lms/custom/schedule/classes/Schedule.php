@@ -35,7 +35,7 @@ class Schedule extends Util {
     function get_course_slots($toolbar, $schedulerid, $search = null, $start = null, $end = null) {
         date_default_timezone_set('Pacific/Wallis');
         $slots = array();
-        $now = time();
+        $now = time()-86400;
         if ($search == null) {
             if ($start == null && $end == null) {
                 $query = "select * from mdl_scheduler_slots "

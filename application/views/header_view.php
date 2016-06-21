@@ -128,14 +128,14 @@ $host = $_SERVER['HTTP_HOST'];
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">                                            
 
                                             <li><a class="dropdown-toggle" href="http://<?php echo $host ?>/index.php/programs/program/5" id="ws"  title="">Healthcare Career Courses </a></li>
-                                            <li><a href="http://<?php echo $host ?>/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>
-                                            <!--<li><a href="https://medical2.com/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>-->                                           
+                                            <li><a href="http://<?php echo $host ?>/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>                                            
                                             <li><a href="http://<?php echo $host ?>/index.php/programs/program/3/" id="exam" title="">CEUs & Online Courses</a></li>
                                             <li><a href="http://<?php echo $host ?>/index.php/programs/program/4/" id="college" title="">Online Certification Exams</a></li>                                                                                       
 
                                         </ul>
                                     </li>                                    
                                     <li><a href="https://<?php echo $host ?>/index.php/register"  id="register_item" title="Register">Register</a></li>
+                                    <li><a href="http://<?php echo $host ?>/index.php/testimonial"  id="testimonial" title="Testimonial">Clients</a></li>
                                     <li><a href="http://<?php echo $host ?>/index.php/faq"  id="faq_item" title="FAQ’s">FAQ’s</a></li>
 
                                     <li id='login_link'><a href="https://<?php echo $host ?>/index.php/login" title="Login">Login</a></li>                                    
@@ -143,7 +143,6 @@ $host = $_SERVER['HTTP_HOST'];
                                         <ul class="dropdown-menu">                                            
                                             <li><a href="https://<?php echo $host ?>/index.php/certs"  id="cert" title="Verify Certification">Verify Certification</a></li>
                                             <li><a href="https://<?php echo $host ?>/index.php/groups"  id="group" title="Private Groups">Private Groups</a></li>
-                                            <li><a href="http://<?php echo $host ?>/index.php/testimonial"  id="testimonial" title="Testimonial">Testimonial</a></li>
                                             <li><a href="http://<?php echo $host ?>/index.php/gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>                                            
                                         </ul>
                                     </li>

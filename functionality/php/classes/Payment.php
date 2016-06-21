@@ -848,7 +848,7 @@ class Payment {
                 if ($sum == false) {
                     $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 } // end if
-                else {                    
+                else {
                     $course_cost = array('cost' => $sum, 'discount' => 0);
                 }
                 $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
@@ -983,6 +983,7 @@ class Payment {
         $_SESSION['users'] = $users;
         $_SESSION['tot_participants'] = $tot_participants;
         $list = $this->get_payment_options($group_common_section->courseid, 1);
+        //$list = "<p align='center'>Please contact site administrator for payment options help@medical2.com</p>";
         return $list;
     }
 
@@ -1044,22 +1045,27 @@ class Payment {
     }
 
     function get_user_payment_credentials($userid) {
-        $query = "select * "
-                . "from mdl_user where id=$userid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $user = new stdClass();
-            foreach ($row as $key => $value) {
-                $user->$key = $value;
-            } // end foreach
-        } // end while
+        if ($userid > 0) {
+            $query = "select * "
+                    . "from mdl_user where id=$userid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user = new stdClass();
+                foreach ($row as $key => $value) {
+                    $user->$key = $value;
+                } // end foreach
+            } // end while
 
-        $query = "select code from mdl_states where state='$user->state'";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $code = $row['code'];
-        } // end while
-        $user->state_code = $code;
+            $query = "select code from mdl_states where state='$user->state'";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $code = $row['code'];
+            } // end while
+            $user->state_code = $code;
+        } //  ebd if $userid > 0
+        else {
+            $user = null;
+        }
         return $user;
     }
 
@@ -1092,11 +1098,16 @@ class Payment {
     }
 
     function get_user_slotid($courseid, $userid) {
-        $query = "select * from mdl_slots "
-                . "where courseid=$courseid and userid=$userid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $slotid = $row['slotid'];
+        if ($userid > 0) {
+            $query = "select * from mdl_slots "
+                    . "where courseid=$courseid and userid=$userid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['slotid'];
+            }
+        } // end if $userid>0
+        else {
+            $slotid = 0;
         }
         return $slotid;
     }
@@ -1112,7 +1123,18 @@ class Payment {
         return $timecompleted;
     }
 
+    function get_group_users_slot($userid) {
+        $query = "select * from mdl_slots where userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slotid = $row['slotid'];
+        }
+        return $slotid;
+    }
+
     function make_stub_payment($card) {
+        //print_r($card);
+        //die ();
         $list = "";
         $mailer = new Mailer();
         $invoice = new Invoice();
@@ -1120,11 +1142,11 @@ class Payment {
         $userid = $card->userid;
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
-        $user_payment_data = $this->get_user_payment_credentials($card->userid);
+        $user_payment_data = $this->get_user_payment_credentials($card->userid); // compatible if user does not exist
         $renew_fee = $this->get_renew_fee();
         // Make card object compatible with confirmation email
         $card->email = $user_payment_data->email;
-        $card->slotid = $this->get_user_slotid($card->courseid, $card->userid);
+        $card->slotid = $this->get_user_slotid($card->courseid, $card->userid); // compatible if user does not exist
         $card->first_name = $user_payment_data->firstname;
         $card->last_name = $user_payment_data->lastname;
         $card->phone = $user_payment_data->phone1;
@@ -1140,7 +1162,7 @@ class Payment {
         //echo "Installment status: ".$installment_status."<br>";
         if ($installment_status == 0) {
             // Personal online payment
-            if ($user_group == '' && $userid != '') {
+            if ($user_group == '' && $userid > 0) {
                 $user_payment_data = $this->get_user_payment_credentials($userid);
                 $order = new stdClass();
                 $order->cds_name = "$user_payment_data->firstname $user_payment_data->lastname";
@@ -1192,13 +1214,17 @@ class Payment {
                 }
             } // end if $user_group==''        
             // Installment online payment?
-            if ($user_group != '' && $userid != '') {
-                $user_payment_data = $this->get_user_payment_credentials($userid);
+            if ($user_group != '' && $userid > 0) {
+                //$user_payment_data = $this->get_user_payment_credentials($userid);
                 $order = new stdClass();
-                $order->cds_name = "$user_payment_data->firstname $user_payment_data->lastname";
+                $names = explode(" ", $card->card_holder);
+                //print_r($names);
+                //echo "<br>";                
+                //die ();
+                $order->cds_name = "$names[0] $names[1]";
                 $order->cds_address_1 = $card->bill_addr;
                 $order->cds_city = $card->bill_city;
-                $order->cds_state = "$user_payment_data->state_code";
+                $order->cds_state = $card->bill_state;
                 $order->cds_zip = $card->bill_zip;
                 $order->cds_email = $card->email;
                 $order->cds_pay_type = $cart_type_num;
@@ -1243,14 +1269,6 @@ class Payment {
 
                 $group_users = $this->get_group_users($user_group);
 
-                /*
-                 * 
-                  echo "<br>-----Group users:----------------<br>";
-                  print_r($group_users);
-                  echo "<br>---------------------------------<br>";
-                 * 
-                 */
-
                 $group_sum = $card->sum;
 
                 $order = new stdClass();
@@ -1283,7 +1301,7 @@ class Payment {
                 else {
                     $card->transid = $status['trans_id'];
                     $card->auth_code = $status['auth_code'];
-                    $mailer->send_payment_confirmation_message($card, 1); // payment confrnation email to group owner
+                    //$mailer->send_payment_confirmation_message($card, 1); // user is not exists in the system
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
                     $list.="<div class='panel-body'>";
@@ -1293,15 +1311,25 @@ class Payment {
                     $list.="</div>";
                     $list.="</div>";
 
-                    foreach ($group_users as $userid) {
-                        $user = $this->get_user_detailes($userid);
-                        $card->userid = $userid;
-                        $this->enroll->add_user_to_course_schedule($card->userid, $card);
-                        $card->sum = round(($group_sum / count($group_users)), 2); // Sum for every group participant 
-                        $this->add_payment_to_db($card); // adds payment result to DB
-                        $this->confirm_user($user->username);
-                        $mailer->send_group_payment_confirmation_message($user);
-                    } // end foreach
+                    /*
+                      echo "<br>-----Group users:----------------<br>";
+                      print_r($group_users);
+                      echo "<br>---------------------------------<br>";
+                     */
+
+                    if (count($group_users > 0)) {
+                        foreach ($group_users as $userid) {
+                            $slotid = $this->get_group_users_slot($userid);
+                            $card->slotid = $slotid;
+                            $user = $this->get_user_detailes($userid);
+                            $card->userid = $userid;
+                            $this->enroll->add_user_to_course_schedule($userid, $card);
+                            $card->sum = round(($group_sum / count($group_users)), 2); // Sum for every group participant 
+                            $this->add_payment_to_db($card); // adds payment result to DB
+                            $this->confirm_user($user->username);
+                            $mailer->send_group_payment_confirmation_message($user);
+                        } // end foreach
+                    } // end if count($group_users > 0)
                 } // end else             
             } // end if $user_group!='' && $userid==''
         } // end if $installment_status==0

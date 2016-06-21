@@ -119,7 +119,7 @@ class Dashboard extends Util {
         $list = "";
         $userid = $this->user->id;
         $courseid = $this->course->id;
-        $slotid = $this->get_user_course_slot($courseid, $userid);        
+        $slotid = $this->get_user_course_slot($courseid, $userid);
         $list.="<div class='container-fluid'>";
         $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/$slotid/0' target='_blank'>click</a> here to pay by card. </span>";
         $list.="</div>";
@@ -501,6 +501,90 @@ class Dashboard extends Util {
         $list.="$user_detailes->address<br>";
         $list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
         return $list;
+    }
+
+    function get_exam_courses() {
+        $courses = array();
+        $query = "SELECT * FROM mdl_course WHERE category =4"; // exams category
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courses[] = $row['id'];
+            } // end while
+        } // end if $num > 0
+        return $courses;
+    }
+
+    function get_course_questions_category($contextid) {
+        //mdl_question_categories
+        $query = "select * from mdl_question_categories where contextid=$contextid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
+    }
+
+    function get_category_name($category) {
+        $query = "select * from mdl_question_categories where id=$category";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $name = $row['name'];
+        }
+        return $name;
+    }
+
+    function is_category_has_items($category) {
+        $query = "select * from mdl_question where category=$category";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_course_option_value($contextid) {
+        $list = "";
+        $query = "select * from mdl_question_categories where contextid=$contextid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+            $num = $this->is_category_has_items($id);
+            if ($num > 0) {
+                $name = $this->get_category_name($id);
+                $list.="<option value='" . $id . ",$contextid'>$name</option>";
+            } // end of $num>0
+        } // end while        
+        return $list;
+    }
+
+    function get_courses_questions_banks() {
+        $list = "";
+        $list.="<select id='id_category' name='category'>";
+        $courses = $this->get_exam_courses();
+        $contexts = array();
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $contexts[] = $this->get_course_context($courseid);
+            } // end foreach
+        } // end if count($courses)>0
+
+        if (count($contexts) > 0) {
+            foreach ($contexts as $contextid) {
+                $list.=$this->get_course_option_value($contextid);
+            } // end foreach
+        } // end if count($contexts)>0
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_courses_questions_context() {        
+        $courses = $this->get_exam_courses();
+        $contexts = array();
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $contexts[] = $this->get_course_context($courseid);
+            } // end foreach
+        } // end if count($courses)>0
+        return $contexts;
     }
 
 }

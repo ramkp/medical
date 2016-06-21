@@ -138,7 +138,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Google Map' id='contact_page'>Contact Page</a></li>
                                     <li><a href='#' title='Google Map' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
-                                    <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li> 
+                                    <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                     <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>                                     
                                 </ul>
@@ -227,7 +227,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
-                                    <li><a href='#' title='Testimonial' id='Testimonial'>Testimonial</a></li> 
+                                    <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                     <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>                                     
                                 </ul>
