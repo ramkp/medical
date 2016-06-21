@@ -80,6 +80,9 @@ class program_model extends CI_Model {
             case 56:
                 $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/Medical%20office%20asst%20pic.jpg";
                 break;
+            case 57:
+                $path = "https://" . $_SERVER['SERVER_NAME'] . "/assets/logo/phlebotomy.jpg";
+                break;
         }
         return $path;
     }
@@ -89,7 +92,7 @@ class program_model extends CI_Model {
         //$cat_id = $this->get_category_id($cat_name);
         $cat_name = $this->get_category_name($cat_id);
         $query = "select * "
-                . "from mdl_course where category=$cat_id and cost>0 order by fullname desc";
+                . "from mdl_course where category=$cat_id and visible=1 and cost>0 order by fullname desc";
         $result = $this->db->query($query);
         $num = $result->num_rows();
         if ($num > 0) {
