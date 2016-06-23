@@ -472,11 +472,11 @@ class Register {
     function get_course_slots($courseid) {
         $slots = array();
         $schedulerid = $this->get_schedulerid($courseid);
-        $now=time()+86400;
+        $now = time() + 86400;
         if ($schedulerid > 0) {
             $query = "select DISTINCT id from mdl_scheduler_slots "
                     . "where schedulerid=$schedulerid "
-                    . "and starttime>".$now." order by starttime";
+                    . "and starttime>" . $now . " order by starttime";
             //echo "Query: ".$query."<br>";
             $result = $this->db->query($query);
             $num = $this->db->numrows($query);
@@ -487,7 +487,7 @@ class Register {
             } // end if $num > 0
         } // $schedulerid>0        
         array_unique($slots);
-        
+
         return $slots;
     }
 
@@ -515,12 +515,12 @@ class Register {
         if (count($slots) > 0) {
             foreach ($slots as $slot) {
                 $slot_data = $this->get_slot_data($slot);
-                $locations = explode("/", $slot_data->appointmentlocation);                
+                $locations = explode("/", $slot_data->appointmentlocation);
                 //$state = $locations[0] . "  " . $locations[1]. "- ".$date;
-                $state = $locations[0] ;
+                $state = $locations[0];
                 $register_states[$slot] = $state;
             } // end foreach
-            $sorted=  array_unique($register_states);
+            $sorted = array_unique($register_states);
             asort($sorted);
             foreach ($sorted as $key => $value) {
                 $drop_down.="<option value='$key'>$value</option>";
@@ -539,7 +539,7 @@ class Register {
         return $state;
     }
 
-    function get_register_course_cities($courseid, $slotid) {
+    function get_register_course_cities($courseid, $slotid, $future = true) {
         date_default_timezone_set('Pacific/Wallis');
         $drop_down = "";
         $drop_down.="<select id='register_cities' style='width:120px;'>";
@@ -550,10 +550,18 @@ class Register {
             $locations = explode("/", $slot_data->appointmentlocation);
             $statename = $locations[0];
             $now = time() + 86400;
-            $query = "select * from mdl_scheduler_slots "
-                    . "where schedulerid=$schedulerid "
-                    . "and appointmentlocation like '%$statename%' "
-                    . "and starttime>$now order by appointmentlocation";
+            if ($future == true) {
+                $query = "select * from mdl_scheduler_slots "
+                        . "where schedulerid=$schedulerid "
+                        . "and appointmentlocation like '%$statename%' "
+                        . "and starttime>$now order by appointmentlocation";
+            } // end if $future==true
+            else {
+                $query = "select * from mdl_scheduler_slots "
+                        . "where schedulerid=$schedulerid "
+                        . "and appointmentlocation like '%$statename%' "
+                        . "order by appointmentlocation";
+            } // end else
             $result = $this->db->query($query);
             $num = $this->db->numrows($query);
             if ($num > 0) {

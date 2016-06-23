@@ -75,7 +75,6 @@ $(document).ready(function () {
         var month = $('#month').val();
         var year = $('#year').val();
         var comment = $('#comment').val();
-
         if (file_data == '' || file_data.length == 0) {
             $('#gallery_err').html('Please select files to be upload ...');
             return false;
@@ -87,7 +86,7 @@ $(document).ready(function () {
         } // end if state==0 || month==0 || year==0
 
         if (file_data != '' && file_data.length != 0 && state > 0 && month > 0 && year > 0) {
-            //console.log('File data: ' + file_data);
+//console.log('File data: ' + file_data);
             $('#gallery_err').html('');
             $('#comment').val('');
             var form_data = new FormData();
@@ -141,12 +140,10 @@ $(document).ready(function () {
         var state = $('#state').val();
         var month = $('#month').val();
         var year = $('#year').val();
-
         var url = "/lms/custom/gallery/filter.php";
         $.post(url, {state: state, month: month, year: year}).done(function (data) {
             $('#thumb_list').html(data);
         });
-
     }
 
     function delete_gallery_img() {
@@ -222,26 +219,21 @@ $(document).ready(function () {
         var item_lat_id = '#lat_' + courseid;
         var item_lng_id = '#lng_' + courseid;
         var item_marker_id = '#marker_' + courseid;
-
         var item_lat = $(item_lat_id).val();
         var item_lng = $(item_lng_id).val();
         var item_marker = $(item_marker_id).val();
-
         console.log(item_lat_id);
         console.log('Lat: ' + item_lat);
-
         console.log(item_lng_id);
         console.log('Lng: ' + item_lng);
-
         console.log(item_marker_id);
         console.log('Marker: ' + item_marker);
-
         if (item_lat == 0 || item_lat == '' || item_lng == '0' || item_lng == '' || item_marker == '') {
             $("#map_err").html('Please provide coordinates and marker text');
         }
         else {
             if (validateNum(item_lat) && validateNum(item_lng)) {
-                // Prepare and send AJAX request...
+// Prepare and send AJAX request...
                 $("#map_err").html('');
                 var url = "/lms/custom/google_map/edit.php";
                 var request = {
@@ -347,7 +339,6 @@ $(document).ready(function () {
             taxes = 0;
         }
         console.log('Taxes status: ' + taxes);
-
         if ($(expire_num).is(':checked')) {
             expire = 1;
         }
@@ -355,7 +346,6 @@ $(document).ready(function () {
             expire = 0;
         }
         console.log('Expiration status: ' + expire);
-
         if ($(installment_id).is(':checked')) {
             installment = 1;
             if (num_payments < 2) {
@@ -367,14 +357,12 @@ $(document).ready(function () {
             installment = 0;
         }
 
-        //var states_ident = $(states_id + ':selected');       
+//var states_ident = $(states_id + ':selected');       
         console.log(states_id);
-
         $(states_id).each(function (i, selected) {
             states[i] = $(selected).val();
         });
         console.log(states);
-
         if (states.length == 0 || states[0] == null) {
             $(price_id_err).html('Please select item states');
             return false;
@@ -383,7 +371,6 @@ $(document).ready(function () {
         var course_cost = $(course_cost_id).val();
         var course_discount = $(course_discount_id).val();
         var course_group_discount = $(course_group_discount_id).val();
-
         if (course_cost == '' || course_cost == 0) {
             $(price_id_err).html('Please provide item cost');
             return false;
@@ -392,7 +379,7 @@ $(document).ready(function () {
         if (course_cost != 0 && states.length > 0) {
             $(price_id_err).html('');
             if (validateNum(course_cost)) {
-                // Prepare and send AJAX request ...
+// Prepare and send AJAX request ...
                 $('#price_err').html('');
                 var url = "/lms/custom/prices/edit.php";
                 var request = {
@@ -406,7 +393,7 @@ $(document).ready(function () {
                     expire: expire,
                     states: JSON.stringify(states)};
                 $.post(url, request).done(function (data) {
-                    //alert ('Server response: '+data);
+//alert ('Server response: '+data);
                     $(price_id_err).html("<span style='color:green;'>" + data + "</span>");
                 });
             } // end if validateNum(course_cost
@@ -932,16 +919,16 @@ $(document).ready(function () {
     }
 
     function select_all() {
-        // console.log('Select all function ....');
+// console.log('Select all function ....');
         $('.cert').each(function () { //loop through each checkbox
-            this.checked = true;  //select all checkboxes with class "cert"              
+            this.checked = true; //select all checkboxes with class "cert"              
         });
     }
 
     function deselect_all() {
-        //console.log('Deselect all function ....');
+//console.log('Deselect all function ....');
         $('.cert').each(function () { //loop through each checkbox
-            this.checked = false;  //select all checkboxes with class "cert"              
+            this.checked = false; //select all checkboxes with class "cert"              
         });
     }
 
@@ -1037,6 +1024,15 @@ $(document).ready(function () {
         } // end else
     }
 
+    function create_cert() {
+        if ($('#cert_container').is(":visible")) {
+            $('#cert_container').hide();
+        }
+        else {
+            $('#cert_container').show();
+        }
+    }
+
     function recertificate() {
         var selected = new Array();
         $(".cert").each(function () {
@@ -1084,14 +1080,10 @@ $(document).ready(function () {
         var s_m = $('#s_m').val();
         var s_d = $('#s_d').val();
         var s_y = $('#s_y').val();
-
         var e_m = $('#e_m').val();
         var e_d = $('#e_d').val();
         var e_y = $('#e_y').val();
-
         if (s_m > 0 && s_d > 0 && s_y > 0 && e_m > 0 && e_d > 0 && e_y > 0) {
-            //var start = s_m + '-' + s_d + '-' + s_y;
-            //var end = e_m + '-' + e_d + '-' + e_y;
             var start = s_y + '-' + s_m + '-' + s_d;
             var end = e_y + '-' + e_m + '-' + e_d;
             $('#print_err').html('');
@@ -1163,7 +1155,6 @@ $(document).ready(function () {
             $('#ajax_loading').hide();
             $('#schedule_container').html(data);
         });
-
     }
 
     function change_students_course_status() {
@@ -1303,7 +1294,7 @@ $(document).ready(function () {
      * 
      ***********************************************************************/
 
-    // Main region events processing function
+// Main region events processing function
     $('#region-main').on('click', 'button', function (event) {
         console.log("Item clicked: " + event.target.id);
         // Save price item
@@ -1352,6 +1343,35 @@ $(document).ready(function () {
 
         if (event.target.id == 'invoice_data') {
             update_invoice_data();
+        }
+
+        if (event.target.id == 'create_cert_button') {
+            var courseid = $('#courses').val();
+            var userid = $('#users').val();
+            var s_m = $('#s_m').val();
+            var s_d = $('#s_d').val();
+            var s_y = $('#s_y').val();
+            var e_m = $('#e_m').val();
+            var e_d = $('#e_d').val();
+            var e_y = $('#e_y').val();
+            if (s_m > 0 && s_d > 0 && s_y > 0 && e_m > 0 && e_d > 0 && e_y > 0 && courseid > 0 && userid > 0) {
+                $('#print_err').html('');
+                var start = s_y + '-' + s_m + '-' + s_d;
+                var end = e_y + '-' + e_m + '-' + e_d;
+                $('#print_err').html('');
+                $('#ajax_loader').show();
+                console.log('Issue date: ' + start);
+                console.log('Expire date: ' + end);
+                var url = "/lms/custom/certificates/create_certificate.php";
+                $.post(url, {courseid: courseid, userid: userid, start: start, end: end}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    get_certificates_page();
+                });
+            } // end if
+            else {
+                $('#print_err').html('Please select program, user and certificate dates');
+            }
+
         }
 
         if (event.target.id == 'send_cert') {
@@ -1582,6 +1602,10 @@ $(document).ready(function () {
             recertificate();
         }
 
+        if (event.target.id == 'create_cert') {
+            create_cert();
+        }
+
         if (event.target.id == 'add_partial') {
             if ($('#add_payment_container').is(':visible')) {
                 $('#add_payment_container').hide();
@@ -1593,7 +1617,7 @@ $(document).ready(function () {
 
         if (event.target.id == 'students_all') {
             $('.students').each(function () { //loop through each checkbox
-                this.checked = true;  //select all checkboxes with class "cert"              
+                this.checked = true; //select all checkboxes with class "cert"              
             });
         }
 
@@ -1611,7 +1635,7 @@ $(document).ready(function () {
 
         if (event.target.id == 'students_none') {
             $('.students').each(function () { //loop through each checkbox
-                this.checked = false;  //select all checkboxes with class "cert"              
+                this.checked = false; //select all checkboxes with class "cert"              
             });
         }
 
@@ -1666,7 +1690,6 @@ $(document).ready(function () {
         }
 
     });
-
     $('#region-main').on('change', 'select', function (event) {
         console.log(event.target.id);
         if (event.target.id == 'course_categories') {
@@ -1734,11 +1757,9 @@ $(document).ready(function () {
         var delay_id = "#fee_delay_" + courseid;
         var amount_id = "#fee_amount_" + courseid;
         var err_id = '#late_err_' + courseid;
-
         var url = "/lms/custom/late/edit.php";
         var fee_delay = $(delay_id).val();
         var fee_amount = $(amount_id).val();
-
         //console.log('Course id: '+courseid);
         //console.log('Fee delay: '+fee_delay);
         //console.log('Fee amount: '+fee_amount);        
@@ -1791,7 +1812,7 @@ $(document).ready(function () {
     function get_partial_payments_page() {
         var url = "/lms/custom/partial/get_partial_payments_page.php";
         $.post(url, {id: 1}).done(function (data) {
-            //console.log(data);
+//console.log(data);
             $('#region-main').html(data);
         });
     }
@@ -1813,176 +1834,136 @@ $(document).ready(function () {
     $("#prices").click(function (event) {
         get_price_items_from_category(event.target.id);
     });
-
     $("#FAQ").click(function (event) {
         update_navigation_status__menu('FAQ');
         get_faq_edit_page();
     });
-
     $("#index").click(function (event) {
         update_navigation_status__menu('Index page');
         get_index_page();
     });
-
     $("#about").click(function (event) {
         update_navigation_status__menu('About');
         get_about_edit_page();
     });
-
     $("#feedback").click(function (event) {
         update_navigation_status__menu('Feedback');
         get_feedback_page();
     });
-
-
     $("#Google_Map").click(function (event) {
         update_navigation_status__menu('Google Map');
         get_google_map_page();
     });
-
     $("#Certificates").click(function (event) {
         update_navigation_status__menu('Certificates');
         get_certificates_page();
     });
-
     $("#Testimonial").click(function (event) {
         update_navigation_status__menu('Testimonial');
         get_testimonial_page();
     });
-
     $("#Photo_Gallery").click(function (event) {
         update_navigation_status__menu('Photo Gallery');
         get_gallery_index_page();
     });
-
     $("#Groups").click(function (event) {
         update_navigation_status__menu('Private Groups');
         get_private_groups_requests_list();
     });
-
     $("#taxes").click(function (event) {
         update_navigation_status__menu('State taxes');
         get_state_taxes_list();
     });
-
     $("#data_inv").click(function (event) {
         update_navigation_status__menu('Invoice');
         get_invoice_spec_page();
     });
-
     $("#send_inv").click(function (event) {
         update_navigation_status__menu('Send invoice');
-
     });
-
     $("#send_inv").click(function (event) {
         update_navigation_status__menu('Send invoice');
         send_invoice_to_user();
     });
-
     $("#opn_inv").click(function (event) {
         update_navigation_status__menu('Open invoices');
         get_open_invoices_page();
-
     });
-
     $("#paid_inv").click(function (event) {
         update_navigation_status__menu('Paid invoices');
         get_paid_invoice_page();
     });
-
     $("#installment").click(function (event) {
         update_navigation_status__menu('Installment users');
         get_installment_page();
     });
-
     $("#user_report").click(function (event) {
         update_navigation_status__menu('Users stats');
         get_users_stats_page();
     });
-
     $("#payments_report").click(function (event) {
         update_navigation_status__menu('Payments log');
         get_payment_log_page();
     });
-
     $("#cash").click(function (event) {
         update_navigation_status__menu('Cash payments');
         get_cash_payments_page()
     });
-
     $("#cheque").click(function (event) {
         update_navigation_status__menu('Cheque payments');
         get_check_payments_page();
-
     });
-
     $("#cards").click(function (event) {
         update_navigation_status__menu('Credit cards payments');
         get_credit_card_payments_page();
     });
-
     $("#free").click(function (event) {
         update_navigation_status__menu('Free');
         get_free_payments();
     });
-
     $("#refund").click(function (event) {
         update_navigation_status__menu('Refund');
-
     });
-
     $("#program_reports").click(function (event) {
         update_navigation_status__menu('Program reports');
         get_program_report();
     });
-
     $("#revenue_reports").click(function (event) {
         update_navigation_status__menu('Revenue reports');
         get_revenue_report();
-
     });
-
     $("#workshop_reports").click(function (event) {
         update_navigation_status__menu('Workshop reports');
         get_workshop_report();
     });
-
     $("#get_cert").click(function (event) {
         update_navigation_status__menu('Get Certificate');
         get_certificate();
     });
-
     $("#ren_cert").click(function (event) {
         update_navigation_status__menu('Renew Certificate');
         renew_certificate();
     });
-
     $("#renew_fee").click(function (event) {
         update_navigation_status__menu('Renew Fee');
         get_renew_fee_page();
     });
-
     $("#contact_page").click(function (event) {
         update_navigation_status__menu('Contact page');
         get_contact_page();
     });
-
     $("#late_fee").click(function (event) {
         update_navigation_status__menu('Late Fee Settings');
         get_late_fee_page();
     });
-
     $("#user_cred").click(function (event) {
         update_navigation_status__menu('User credentials');
         get_user_credentials_page();
     });
-
     $("#partial").click(function (event) {
         update_navigation_status__menu('Partial payments');
         get_partial_payments_page();
     });
-
     /************************************************************************
      * 
      *      Code related to courses selection by logged students
@@ -2004,7 +1985,6 @@ $(document).ready(function () {
         $.post(url, request).done(function (data) {
             $('#register_states_container').html(data);
         });
-
     }
 
     function get_register_course_cities() {
@@ -2033,7 +2013,6 @@ $(document).ready(function () {
         } // end if event.target.id == 'policy'
 
     });
-
     function assign_user_to_course() {
         var courseid = $('#register_courses').val();
         var slotid = $('#register_cities').val();
@@ -2066,7 +2045,6 @@ $(document).ready(function () {
                     });
                 } // end else when there is no course schedule
             });
-
         } // end if courseid>0
         else {
             $('#program_err').html('Please select program');
@@ -2079,7 +2057,6 @@ $(document).ready(function () {
             assign_user_to_course();
         }
     });
-
     $("body").click(function (event) {
         console.log('Element clicked: ' + event.target.id);
         if (event.target.id == 'add_user_to_slot') {
@@ -2091,8 +2068,9 @@ $(document).ready(function () {
         }
 
     });
+    $('body').on('change', 'select', function (event) {
 
 
-
+    });
 }); // end of $(document).ready(function()
 

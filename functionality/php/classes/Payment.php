@@ -256,7 +256,7 @@ class Payment {
         }
 
         $list.="<div class='panel panel-default' id='personal_payment_details'>";
-        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
         $list.="<div class='panel-body'>";
 
         $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
@@ -521,7 +521,7 @@ class Payment {
                 $mailer->send_invoice($users);
 
                 $list.="<div class='panel panel-default' id='payment_detailes'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                 $list.="<div class='panel-body'>";
 
                 $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -559,7 +559,7 @@ class Payment {
                     $mailer->send_invoice($user);
                 } // end foreach
                 $list.="<div class='panel panel-default' id='payment_detailes'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                 $list.="<div class='panel-body'>";
 
                 $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -581,7 +581,7 @@ class Payment {
     function get_group_offline_payment_section($group_data, $users, $participants) {
         $list = "";
         $list.="<div class='panel panel-default' id='payment_detailes'>";
-        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Group Owner Detailes</h5></div>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Group Owner Details</h5></div>";
         $list.="<div class='panel-body'>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -670,7 +670,7 @@ class Payment {
             $list.="<br/><div  class='form_div'>";
         }
         $list.="<div class='panel panel-default' id='payment_detailes'>";
-        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
         $list.="<div class='panel-body'>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -1183,10 +1183,10 @@ class Payment {
                 $status = $pr->make_transaction($order);
                 if ($status === false) {
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Transaction failed, please contact your bank for detailes.</span>";
+                    $list.= "<span class='span8'>Transaction failed, please contact your bank for details.</span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
@@ -1198,14 +1198,14 @@ class Payment {
                     $this->add_payment_to_db($card); // adds payment result to DB
                     $mailer->send_payment_confirmation_message($card);
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
                     if ($card->sum != $renew_fee) {
-                        $list.= "<span class='span8'>Payment is successfull. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
+                        $list.= "<span class='span8'>Payment is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
                     } // end if $card->sum != $renew_fee                    
                     else {
-                        $list.= "<span class='span8'>Payment is successfull. Thank you! Please use Renew Certificate option from <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/my' target='_blank'>your Dashboard</a></span>";
+                        $list.= "<span class='span8'>Payment is successful. Thank you! Please use Renew Certificate option from <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/my' target='_blank'>your Dashboard</a></span>";
                     } // end else
                     $list.="</div>";
                     $list.="</div>";
@@ -1239,10 +1239,10 @@ class Payment {
                 $status = $pr->make_transaction($order);
                 if ($status === false) {
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Transaction failed, please contact your bank for detailes.</span>";
+                    $list.= "<span class='span8'>Transaction failed, please contact your bank for details.</span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
@@ -1254,10 +1254,10 @@ class Payment {
                     $this->add_payment_to_db($card); // adds payment result to DB
                     $mailer->send_payment_confirmation_message($card);
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Payment is successfull. Thank you!</span>";
+                    $list.= "<span class='span8'>Payment is successful. Thank you!</span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
@@ -1290,10 +1290,10 @@ class Payment {
                 $status = $pr->make_transaction($order);
                 if ($status === false) {
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Transaction failed, please contact your bank for detailes.</span>";
+                    $list.= "<span class='span8'>Transaction failed, please contact your bank for details.</span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
@@ -1303,10 +1303,10 @@ class Payment {
                     $card->auth_code = $status['auth_code'];
                     //$mailer->send_payment_confirmation_message($card, 1); // user is not exists in the system
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    $list.= "<span class='span8'>Payment is successfull. Thank you!</span>";
+                    $list.= "<span class='span8'>Payment is successful. Thank you!</span>";
                     $list.="</div>";
                     $list.="</div>";
                     $list.="</div>";
@@ -1367,10 +1367,10 @@ class Payment {
                 $this->add_payment_to_db($card); // adds payment result to DB                    
                 $mailer->send_payment_confirmation_message($card);
                 $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                 $list.="<div class='panel-body'>";
                 $list.= "<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span8'>Installment payment is successfull. Thank you!.</span>";
+                $list.= "<span class='span8'>Installment payment is successful. Thank you!.</span>";
                 $list.="</div>";
                 $list.="</div>";
                 $list.="</div>";
@@ -1378,10 +1378,10 @@ class Payment {
             } // end if is_numeric($subscriptionID)
             else {
                 $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Detailes</h5></div>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                 $list.="<div class='panel-body'>";
                 $list.= "<div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span8'>Installment payment failed, please contact your bank for detailes.</span>";
+                $list.= "<span class='span8'>Installment payment failed, please contact your bank for details.</span>";
                 $list.="</div>";
                 $list.="</div>";
                 $list.="</div>";

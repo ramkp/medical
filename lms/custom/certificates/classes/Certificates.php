@@ -93,6 +93,7 @@ class Certificates extends Util {
         $list = "";
         if (count($certificates) > 0) {
             if ($toolbar == true) {
+                $create_cert_block = $this->get_create_box();
                 $list.="<div class='container-fluid' style='text-align:center;'>";
                 $list.="<span class='span2'>Search</span>";
                 $list.="<span class='span2'><input type='text' id='search_certificate' style='width:125px;' /></span>";
@@ -107,6 +108,8 @@ class Certificates extends Util {
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='deselect_all'>Deselect all</a></span>";
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='print_certs'>Print Certificate</a></span>";
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='print_labels'>Print Label</a></span>";
+                $list.="<span class='span2'><a href='#' onclick='return false;' id='create_cert'>Create Certificate</a></span>";
+
                 if ($this->user->id == 2) {
                     $list.="<span class='span2'><a href='#' onclick='return false;' id='recertificate'>Re-Certificate</a></span>";
                 } // end if $this->user->id==2
@@ -115,6 +118,11 @@ class Certificates extends Util {
                 }
 
                 $list.="</div>";
+
+                $list.="<div class='container-fluid' id='cert_container' style='text-align:center;display:none;'>";
+                $list.=$create_cert_block;
+                $list.="</div>";
+
                 $list.="<div class='container-fluid' style='text-align:center;'>";
                 $list.="<span class='span10' id='print_err'></span>";
                 $list.="</div>";
@@ -816,7 +824,7 @@ class Certificates extends Util {
         } // end if num>0
         else {
             $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span6'>No Ecrtificates found</span>";
+            $list.="<span class='span6'>No Certificates found</span>";
             $list.="</div>";
         }
         return $list;
@@ -903,7 +911,7 @@ class Certificates extends Util {
         return $list;
     }
 
-    function get_start_unputs() {
+    function get_start_unputs($modal = TRUE) {
         $list = "";
         // **************** Month drop-box *********************
         $m_list = "";
@@ -929,16 +937,26 @@ class Certificates extends Util {
             $y_list.="<option value='$i'>$i</option>";
         }
         $y_list.="</select>";
-        $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span1'>Issue</span>";
-        $list.="<span class='span1'>$m_list</span>";
-        $list.="<span class='span1'>$d_list</span>";
-        $list.="<span class='span1'>$y_list</span>";
-        $list.="</div>";
+        if ($modal == true) {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span1'>Issue</span>";
+            $list.="<span class='span1'>$m_list</span>";
+            $list.="<span class='span1'>$d_list</span>";
+            $list.="<span class='span1'>$y_list</span>";
+            $list.="</div>";
+        } // end if $modal == true
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span3'>Issue</span>";
+            $list.="<span class='span3'>$m_list</span>";
+            $list.="<span class='span3'>$d_list</span>";
+            $list.="<span class='span3'>$y_list</span>";
+            $list.="</div>";
+        }
         return $list;
     }
 
-    function get_end_inputs() {
+    function get_end_inputs($modal = TRUE) {
         $list = "";
         // **************** Month drop-box *********************
         $m_list = "";
@@ -964,12 +982,22 @@ class Certificates extends Util {
             $y_list.="<option value='$i'>$i</option>";
         }
         $y_list.="</select>";
-        $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span1'>Expire</span>";
-        $list.="<span class='span1'>$m_list</span>";
-        $list.="<span class='span1'>$d_list</span>";
-        $list.="<span class='span1'>$y_list</span>";
-        $list.="</div>";
+        if ($modal == true) {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span1'>Expire</span>";
+            $list.="<span class='span1'>$m_list</span>";
+            $list.="<span class='span1'>$d_list</span>";
+            $list.="<span class='span1'>$y_list</span>";
+            $list.="</div>";
+        } // end if $modal == true
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span3'>Expire</span>";
+            $list.="<span class='span3'>$m_list</span>";
+            $list.="<span class='span3'>$d_list</span>";
+            $list.="<span class='span3'>$y_list</span>";
+            $list.="</div>";
+        }
         return $list;
     }
 
@@ -1044,14 +1072,14 @@ class Certificates extends Util {
         $renew_status = $this->get_course_renew_status($cert->courseid);
         $title = $this->get_certificate_title($cert->courseid);
         $expiration_date = strtoupper(date('m-d-Y', $expire));
-          /*  
-          echo "Certificate ID: " . $cert->id;  
+        /*
+          echo "Certificate ID: " . $cert->id;
           echo "User ID: " . $userid . "<br>";
           echo "User credentials: " . $firstname . "&nbsp;" . $lastname . "<br>";
           echo "Course name: " . $coursename . "<br>";
           echo "Issue date: " . $issue_date . "<br>";
           echo "Expiration date: " . $expiration_date . "<br>";
-          */  
+         */
         switch ($cert->courseid) {
             case 45:
                 $list.="<!DOCTYPE HTML SYSTEM>";
@@ -1201,6 +1229,71 @@ class Certificates extends Util {
                 $pdf->Output($path, 'F');
                 break;
         } // end switch
+    }
+
+    function get_create_box() {
+        $list = "";
+        $program_types = $this->get_course_categories();
+        $issue = $this->get_start_unputs(FALSE);
+        $expire = $this->get_end_inputs(FALSE);
+        $list.="<div class='container-fluid'>
+                <span class='span6'>$program_types</span>
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span6' id='category_courses'></span>
+                </div>
+        
+                <div class='container-fluid'>
+                <span class='span6' id='enrolled_users'></span>
+                </div>                
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span9'>$issue</span>    
+                </div>
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span9'>$expire</span>                  
+                </div>
+        
+                <div class='container-fluid' style='text-align:center;'>
+                <span class='span9'><button class='btn btn-primary' id='create_cert_button'>Create</button></span>                  
+                </div>";
+
+        return $list;
+    }
+
+    function add_certificate_data($cert, $issue, $expire) {
+        $path = $this->cert_path . "/$cert->userid/certificate.pdf";
+        $query = "insert into mdl_certificates "
+                . "(courseid,"
+                . "userid,"
+                . "cert_no,"
+                . "path,"
+                . "issue_date,"
+                . "expiration_date) "
+                . "values($cert->courseid,"
+                . "$cert->userid,"
+                . "'$cert->code',"
+                . "'$path',"
+                . "'$issue',"
+                . "'$expire')";
+        $this->db->query($query);
+    }
+
+    function create_certificate($courseid, $userid, $start, $end) {
+        $list = "";
+        $issue = strtotime($start);
+        $expire = strtotime($end);
+        $code = $this->get_course_code($courseid, $userid);
+        $cert = new stdClass();
+        $cert->courseid = $courseid;
+        $cert->userid = $userid;
+        $cert->code = $code;
+        $this->create_new_certificate($cert, $issue, $expire);
+        $this->add_certificate_data($cert, $issue, $expire);
+        $list.="Certificate has been created";
+        return $list;
     }
 
 }
