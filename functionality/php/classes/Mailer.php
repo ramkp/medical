@@ -113,7 +113,7 @@ class Mailer {
         return $grand_total;
     }
 
-    function get_account_confirmation_message($user,$printed_data = null) {
+    function get_account_confirmation_message($user, $printed_data = null) {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
@@ -264,7 +264,7 @@ class Mailer {
                 $list.="<p>Payment of $$payment->sum has been received. Thank you. All your group accounts are active now.</p>";
             } // end if $free == null
             else {
-                $list.="<p>Your group membes got free access to the system. All your group accounts are active now.</p>";
+                $list.="<p>Your group members got free access to the system. All your group accounts are active now.</p>";
             } // end else
         } // end else
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
@@ -274,12 +274,83 @@ class Mailer {
         return $list;
     }
 
+    function get_renew_fee() {
+        $query = "select * from mdl_renew_fee";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $fee = $row['fee_sum'];
+        }
+        return $fee;
+    }
+
+    function get_renew_certificate_message($user) {
+        $list = "";
+        $course_name = $this->get_course_name($user);
+        $renew_fee = $this->get_renew_fee();
+        $list.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
+        $list.="</head>";
+        $list.="<body><br/><br/><br/><br/>";
+        $list.="<div class='datagrid'>            
+        <table style='table-layout: fixed;' width='360'>
+        <thead>";
+
+        $list.="<tr>";
+        $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/5.png' width='360' height='90'></th>";
+        $list.="</tr>";
+
+        $list.="</thead>
+        <tbody>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>First name</td><td>$user->first_name</td>
+        </tr>
+        
+        <tr>
+        <td>Last name</td><td>$user->last_name</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Email</td><td>$user->email</td>
+        </tr>
+        
+        <tr>
+        <td>Phone</td><td>$user->phone</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Applied Progarm</td><td>$course_name</td>
+        </tr> 
+        
+        <tr>
+        <td>Paid Certificate renew fee</td><td>$$renew_fee</td>
+        </tr> 
+        
+        </table>";
+        return $list;
+    }
+
     function send_payment_confirmation_message($payment, $group = null, $free = null) {
-        $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
-        $subject = "Medical2 Career College - payment confirmation";
-        $message = $this->get_payment_confirmation_message($payment, $group, $free);
-        $recipient = $payment->bill_email;
-        $this->send_email($subject, $message, $recipient);
+        $renew_fee = $this->get_renew_fee();
+        if ($payment->sum != $renew_fee) {
+            $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
+            $subject = "Medical2 Career College - payment confirmation";
+            $message = $this->get_payment_confirmation_message($payment, $group, $free);
+            $recipient = $payment->bill_email;
+            $this->send_email($subject, $message, $recipient);
+        } // end if $payment->sum!=$renew_fee
+        else {
+            $subject = "Medical2 Career College - Certificate Renew Payment";
+            $message = $this->get_renew_certificate_message($payment);
+            $recipient = $payment->bill_email;
+            $this->send_email($subject, $message, $recipient);
+
+            // Send copy of message to info@medical2.com and sirromas@gmail.com
+            $recipient = 'info@medical2.com';
+            $this->send_email($subject, $message, $recipient);
+
+            $recipient = 'sirromas@gmail.com';
+            $this->send_email($subject, $message, $recipient);
+        } // end else
     }
 
     function get_payment_group_confirmation_message($user) {
