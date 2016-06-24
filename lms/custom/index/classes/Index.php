@@ -137,7 +137,7 @@ class Index extends Util {
                 $banner = $this->get_banner($slide);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span5'><img src='$img_path'></span><span class='span7'>$banner</span>";
-                $list.="<span class='span2'><button class='btn btn-primary' id='del_slide_$slide->id'>Delete</button>";
+                $list.="<span class='span4'><button class='btn btn-primary' id='edit_slide_$slide->id'>Edit</button><span class='span4'><button class='btn btn-primary' id='del_slide_$slide->id'>Delete</button>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span8'><hr/></id>";

@@ -126,8 +126,7 @@ class navClass extends Util {
                                 </ul>
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
-                                <ul class='dropdown-menu'>
-                                    <li><a href='#' title='Index page' id='index'>Index page</a></li>
+                                <ul class='dropdown-menu'>                                   
                                     <li><a href='#' title='About' id='about'>About page</a></li>
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>
@@ -305,7 +304,7 @@ class navClass extends Util {
         if ($completion_status > 0) {
             $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>Print Certificate</a></li>";
             $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>Renew Certificate</a></li>";
-            $list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
+            //$list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
         } // end if $compleation_status!=0        
         $list.="</ul>
                         </li>                        
@@ -533,6 +532,7 @@ class navClass extends Util {
         $courseid = $this->get_user_course($this->user->id);        
         $sum = $this->check_user_balance($courseid, $this->user->id);
         if ($sum > 0) {
+            /*
             $this->make_student_course_completed($courseid, $this->user->id);
             $user = $this->get_user_details($this->user->id);
             $cert = new Certificates();
@@ -542,8 +542,10 @@ class navClass extends Util {
             $renew = true;
             $cert->send_certificate($courseid, $this->user->id, $new_date, true, $code, $renew);
             $this->update_user_balance($courseid, $this->user->id);
+            */
+            
             $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>New Certificate has been sent to $user->email.</span>";
+            $list.="<span class='span9'>Please contact site manager to get your updated certificate info@medical2.com.</span>";
             $list.="</div>";
         } // end if $sum>0
         else {
