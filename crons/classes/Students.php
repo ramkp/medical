@@ -203,10 +203,10 @@ class Students {
         $cc_partials = $this->get_partial_cc_payments();
         $of_partials = $this->get_partial_offline_payments();
         $partials_arr = array_merge($cc_partials, $of_partials);
-        if (count($partials_arr)>0) {
+        if (count($partials_arr) > 0) {
             foreach ($partials_arr as $p) {
                 $wsdate = $this->get_workshop_date($p->slotid);
-                $partials[$wsdate]=$p;
+                $partials[$wsdate] = $p;
             }
         } // end if count($partials_arr)>0
         ksort($partials);
@@ -254,6 +254,27 @@ class Students {
         return $date;
     }
 
+    function get_workshop_location($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $loc = $row['appointmentlocation'];
+        }
+        $loc_arr = explode("/", $loc);
+        $location = $loc_arr[1] . "," . $loc_arr[0];
+        return $location;
+    }
+
+    function get_workshop_participants($slotid) {
+        $query = "select count(id) as total from mdl_scheduler_appointment "
+                . "where slotid=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $total = $row['total'];
+        }
+        return $total;
+    }
+
     function prepare_message($partial) {
         $list = "";
         date_default_timezone_set('Pacific/Wallis');
@@ -271,11 +292,23 @@ class Students {
         $list.="<tr>";
         $list.="<td>Applied program</td>";
         $list.="<td style='margin:10px;'>&nbsp;&nbsp;$coursename</td>";
-        $list.="</tr>";
+        $list.="</tr>";        
 
         $list.="<tr>";
         $list.="<td>Program start date</td>";
         $list.="<td style='margin:10px;'>&nbsp;&nbsp;$start_date</td>";
+        $list.="</tr>";
+        
+        $list.="<tr>";
+        $list.="<td>Workshop venue</td>";
+        $location=$this->get_workshop_location($partial->slotid);
+        $list.="<td style='margin:10px;'>&nbsp;&nbsp;$location</td>";
+        $list.="</tr>";
+        
+        $list.="<tr>";
+        $list.="<td>Total students</td>";
+        $total=$this->get_workshop_participants($partial->slotid);
+        $list.="<td style='margin:10px;'>&nbsp;&nbsp;$total</td>";
         $list.="</tr>";
 
         $list.="<tr>";
@@ -316,7 +349,8 @@ class Students {
 
         if ($message != '') {
             $a_email = 'a1b1c777@gmail.com';
-            $m_email='manager@medical2.com';
+            //$a_email = 'sirromas@gmail.com';
+            $m_email = 'manager@medical2.com';
             $mail = new PHPMailer;
             $mail->isSMTP();
             $mail->Host = $this->mail_smtp_host;
@@ -337,12 +371,12 @@ class Students {
             $mail->Body = $message;
 
             if (!$mail->send()) {
-                echo "Message could not be sent to $email \n";
+                echo "Message could not be sent to $a_email \n";
                 echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
             } // end if !$mail->send()        
             else {
                 echo "Message has been sent to ' . $a_email \n";
-                 echo "Message has been sent to ' . $m_email \n";
+                echo "Message has been sent to ' . $m_email \n";
             }
         } // end if $message!=''
         else {
