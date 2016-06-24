@@ -145,16 +145,17 @@ class Students {
     function get_partial_cc_payments() {
         $partials = array();
         $query = "select * from mdl_card_payments "
-                . "where pdate>1464074847 order by pdate desc";
+                . "where pdate>1464074847 order by pdate asc";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $renew_fee = $this->get_renew_fee();
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $user_payment = $row['psum'];                
+                $user_payment = $row['psum'];
                 $course_cost = $this->get_course_cost($row['courseid']);
                 $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
                 if ($user_payment < $course_cost && $user_payment != $renew_fee) {
+                    $wsdate = $this->get_workshop_date($slotid);
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
                     $partial->courseid = $row['courseid'];
@@ -162,16 +163,17 @@ class Students {
                     $partial->cost = $course_cost;
                     $partial->slotid = $slotid;
                     $partial->pdate = $row['pdate'];
-                    $partials[] = $partial;
+                    $partials[$wsdate] = $partial;
                 } // end if $user_payment!=$course_cost
             } // end while
-        } // end if $num > 0
+        } // end if $num > 0    
+        ksort($partials);
         return $partials;
     }
 
     function get_partial_offline_payments() {
         $partials = array();
-        $query = "select * from mdl_partial_payments";
+        $query = "select * from mdl_partial_payments where pdate>1464074847 order by pdate asc";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -181,6 +183,7 @@ class Students {
                 $course_cost = $this->get_course_cost($row['courseid']);
                 $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
                 if ($user_payment < $course_cost) {
+                    $wsdate = $this->get_workshop_date($slotid);
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
                     $partial->courseid = $row['courseid'];
@@ -188,10 +191,10 @@ class Students {
                     $partial->cost = $course_cost;
                     $partial->pdate = $row['pdate'];
                     $partial->slotid = $slotid;
-                    $partials[] = $partial;
+                    $partials[$wsdate] = $partial;
                 } // end if $user_payment!=$course_cost
             } // end while
-        } // end if $num > 0        
+        } // end if $num > 0    
         return $partials;
     }
 
@@ -199,7 +202,15 @@ class Students {
         $list = "";
         $cc_partials = $this->get_partial_cc_payments();
         $of_partials = $this->get_partial_offline_payments();
-        $partials = array_merge($cc_partials, $of_partials);
+        $partials_arr = array_merge($cc_partials, $of_partials);
+        if (count($partials_arr)>0) {
+            foreach ($partials_arr as $p) {
+                $wsdate = $this->get_workshop_date($p->slotid);
+                $partials[$wsdate]=$p;
+            }
+        } // end if count($partials_arr)>0
+        ksort($partials);
+        //print_r($partials);
         if (count($partials) > 0) {
             $list.=$this->process_receivers($partials);
         } // end if count($partials)>0
@@ -211,30 +222,27 @@ class Students {
 
     function process_receivers($partials) {
         $list = "";
-        $clean_teachers = array();
+        date_default_timezone_set('Pacific/Wallis');
+        $now = time();
+        $diff = 43200; // 24h in secs 
+        $i = 0;
         if (count($partials) > 0) {
             foreach ($partials as $partial) {
                 if ($partial->slotid > 0) {
-                    $teachers = $this->get_course_teachers($partial->courseid);
-                    array_push($teachers, 2); // add admin user to list of receivers
-                    if (count($teachers) > 0) {
-                        foreach ($teachers as $teacher) {
-                            if (is_numeric($teacher)) {
-                                $clean_teachers[] = $teacher;
-                            } // end if is_number($teacher)
-                        } // end foreach
-                        $list.=$this->notify_user($partial, $clean_teachers);
-                    } // end if count($teachers) > 0
+                    $wsdate = $this->get_workshop_date($partial->slotid);
+                    echo "Current date: " . date('m-d-Y', $now) . "<br>";
+                    echo "Workshop date: " . date('m-d-Y', $wsdate) . "<br>";
+                    if ($wsdate - $now >= $diff) {
+                        echo "Inside if ...<br>";
+                        $list.=$this->prepare_message($partial);
+                        $i++;
+                    } // end if $wsdate - $now <= $diff
+                    echo "<br>-----------------------------------------------<br>";
                 } // end if $partial->slotid>0
-                else {
-                    $list.="Current user (User ID: $partial->userid) does not have scheduled workshops \n";
-                } // end else
             } // end foreach
-        } // end if count($partials)>0
-        else {
-            $list.="There are no partial payments \n";
-        }
-        return $list;
+            echo "Total students: $i<br>";
+            $list.=$this->notify_user($list);
+        } // end if count($partials)>0        
     }
 
     function get_workshop_date($slotid) {
@@ -298,60 +306,47 @@ class Students {
         return $list;
     }
 
-    function notify_user($partial, $teachers) {
+    function notify_user($message) {
         $list = "";
-        date_default_timezone_set('Pacific/Wallis');
-        $now = time();
-        $diff = 43200; // 12h in secs        
-        $wsdate = $this->get_workshop_date($partial->slotid);
-        $start_date = date('m-d-Y h:i:s', $wsdate);
-        $wsname = $this->get_course_name($partial->courseid);
-        $user_data = $this->get_user_data($partial->userid);
-        if ($wsdate - $now <= $diff) {
-            $message = $this->prepare_message($partial);
-            foreach ($teachers as $teacherid) {
-                $list.=$this->send_notification_message($message, $teacherid);
-            } // end foreach
-        } // end if $wsdate-$now<=$diff
-        else {
-            $list.="User $user_data->firstname $user_data->lastname scheduled Workshop $wsname $start_date is still ahead \n";
-        } // end else
+        $list.=$this->send_notification_message($message);
         return $list;
     }
 
-    function send_notification_message($message, $teacherid) {
-        $user_date = $this->get_user_data($teacherid);
-        $email = $user_date->email;
+    function send_notification_message($message) {
 
-        //$email = 'sirromas@gmail.com'; // for testing;
+        if ($message != '') {
+            $a_email = 'a1b1c777@gmail.com';
+            $m_email='manager@medical2.com';
+            $mail = new PHPMailer;
+            $mail->isSMTP();
+            $mail->Host = $this->mail_smtp_host;
+            $mail->SMTPAuth = true;
+            $mail->Username = $this->mail_smtp_user;
+            $mail->Password = $this->mail_smtp_pwd;
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = $this->mail_smtp_port;
 
-        $mail = new PHPMailer;
-        //$user->email = 'sirromas@gmail.com'; // temp workaround
-        //$mail->SMTPDebug = 3;                                
+            $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+            $mail->addAddress($a_email);
+            $mail->addAddress($m_email);
+            $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
 
-        $mail->isSMTP();
-        $mail->Host = $this->mail_smtp_host;
-        $mail->SMTPAuth = true;
-        $mail->Username = $this->mail_smtp_user;
-        $mail->Password = $this->mail_smtp_pwd;
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = $this->mail_smtp_port;
+            $mail->isHTML(true);
 
-        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
-        $mail->addAddress($email);
-        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+            $mail->Subject = 'Workshop owe students';
+            $mail->Body = $message;
 
-        $mail->isHTML(true);
-
-        $mail->Subject = 'Workshop owe students';
-        $mail->Body = $message;
-
-        if (!$mail->send()) {
-            echo "Message could not be sent to $email \n";
-            echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
-        } // end if !$mail->send()        
+            if (!$mail->send()) {
+                echo "Message could not be sent to $email \n";
+                echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
+            } // end if !$mail->send()        
+            else {
+                echo "Message has been sent to ' . $a_email \n";
+                 echo "Message has been sent to ' . $m_email \n";
+            }
+        } // end if $message!=''
         else {
-            echo "Message has been sent to ' . $email \n";
+            echo "There no workshop students in near 24h ... <br>";
         }
     }
 
