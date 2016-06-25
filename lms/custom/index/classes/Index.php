@@ -18,6 +18,7 @@ class Index extends Util {
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span8'>Please note at least one slide must be ticked as first, otherwise you will have empty slider section</span>";
+        $list.="<input type='hidden' id='slide_id'></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -54,6 +55,7 @@ class Index extends Util {
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'><button class='btn btn-primary' id='upload_slide'>Upload</button></span>";
+        $list.="<span class='span2'><button class='btn btn-primary' id='update_slide'>Update</button></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
@@ -92,33 +94,36 @@ class Index extends Util {
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Slogan1</span>";
         $list.="<span class='span8'><input id='input_slogan_1_$slide->id' value='$slide->slogan1'></span>";
-        $list.="<span class='span1'><a href='#' onClick='return false;' id='upd_slogan_1_$slide->id'>Update</a></span>";
+        //$list.="<span class='span1'><a href='#' onClick='return false;' id='upd_slogan_1_$slide->id'>Update</a></span>";
         $list.="</div>";
 
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Slogan2</span>";
         $list.="<span class='span8'><input id='input_slogan_2_$slide->id' value='$slide->slogan2'></span>";
-        $list.="<span class='span1'><a href='#' onClick='return false;' id='upd_slogan_2_$slide->id'>Update</a></span>";
+        //$list.="<span class='span1'><a href='#' onClick='return false;' id='upd_slogan_2_$slide->id'>Update</a></span>";
         $list.="</div>";
 
 
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'>Slogan3</span>";
         $list.="<span class='span8'><input id='input_slogan_3_$slide->id' value='$slide->slogan3'></span>";
-        $list.="<span class='span1'><a href='#' onClick='return false;' id='upd_slogan_3_$slide->id'>Update</a></span>";
+        //$list.="<span class='span1'><a href='#' onClick='return false;' id='upd_slogan_3_$slide->id'>Update</a></span>";
         $list.="</div>";
 
+        $list.="<div class='container-fluid' style=''>";
         if ($slide->active == 1) {
-            $list.="<div class='container-fluid' style='font-weight:bold;'>";
             $list.="<span class='span2'>Status</span><span class='span3'>First slide</span>";
-            $list.="</div>";
         } //end if $slide->active == 1
         else {
-            $list.="<div class='container-fluid' style='font-weight:bold;'>";
             $list.="<span class='span2'>Status</span><span class='span3'><a href='#' onClick='return false;' id='first_$slide->id'>Make it first</a></span>";
-            $list.="</div>";
         }
+
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style=''>";
+        $list.="<span class='span2'>&nbsp;</span><span class='span2'><a href='#' onCLick='return false;' id='edit_slide_$slide->id'>Edit</a></span>";
+        $list.="</div>";
 
         return $list;
     }
@@ -136,8 +141,8 @@ class Index extends Util {
                 $img_path = 'https://' . $_SERVER['SERVER_NAME'] . "/assets/slides/thumbs/$file";
                 $banner = $this->get_banner($slide);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span5'><img src='$img_path'></span><span class='span7'>$banner</span>";
-                $list.="<span class='span4'><button class='btn btn-primary' id='edit_slide_$slide->id'>Edit</button><span class='span4'><button class='btn btn-primary' id='del_slide_$slide->id'>Delete</button>";
+                $list.="<span class='span5'><img src='$img_path' style='width:200px;'></span><span class='span7'>$banner</span>";
+                $list.="<span class='span4'><span class='span4'><button class='btn btn-primary' id='del_slide_$slide->id'>Delete</button>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span8'><hr/></id>";
@@ -268,6 +273,30 @@ class Index extends Util {
 
         $query = "update mdl_slides set active=1 where id=$id";
         $this->db->query($query);
+    }
+
+    function get_slide_detailes($id) {
+        $query = "select * from mdl_slides where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $banner = new stdClass();
+            foreach ($row as $key => $value) {
+                $banner->$key = $value;
+            }
+        }
+        return json_encode($banner);
+    }
+
+    function update_slide($id, $title, $slogan1, $slogan2, $slogan3) {
+        $query = "update mdl_slides "
+                . "set "
+                . "title='$title', "
+                . "slogan1='$slogan1',"
+                . "slogan2='$slogan2',"
+                . "slogan3='$slogan3' "
+                . "where id=$id";
+        $this->db->query($query);
+        echo 'ok';
     }
 
 }
