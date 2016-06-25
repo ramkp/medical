@@ -448,11 +448,29 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_user_partial_payments($userid, $courseid) {
+        $list = "";
+        $query = "select * from mdl_partial_payments  "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $list.="Paid by cash/cheque $" . $row['psum'] . "&nbsp;";
+            } // end while
+        } // end if $num>0
+        else {
+            $list.="Paid by cheque: N/A &nbsp;";
+        }
+        return $list;
+    }
+
     function get_user_payments($userid, $courseid) {
         $list = "";
         $card_payments = $this->get_user_card_payments($userid, $courseid);
         //$invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
-        $list.=$card_payments;
+        $partial_payments = $this->get_user_partial_payments($userid, $courseid);
+        $list.=$card_payments . "&nbsp;" . $partial_payments;
         //$list.=$invoice_payments;
         return $list;
     }
@@ -576,7 +594,7 @@ class Dashboard extends Util {
         return $list;
     }
 
-    function get_courses_questions_context() {        
+    function get_courses_questions_context() {
         $courses = $this->get_exam_courses();
         $contexts = array();
         if (count($courses) > 0) {

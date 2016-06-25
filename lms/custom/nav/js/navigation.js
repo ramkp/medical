@@ -1345,6 +1345,30 @@ $(document).ready(function () {
             update_invoice_data();
         }
 
+        if (event.target.id == 'update_slide') {
+            var id = $('#slide_id').val();
+            var title = $('#title').val();
+            var slogan1 = $('#slogan1').val();
+            var slogan2 = $('#slogan2').val();
+            var slogan3 = $('#slogan3').val();
+            if (id > 0 && title != '' && slogan1 != '' && slogan2 != '' && slogan3 != '') {
+                $('#slide_err').html('');
+                $('#ajax_loader').show();
+                var url = "/lms/custom/index/update_slide.php";
+                $.post(url, {id: id, title: title, slogan1: slogan1, slogan2: slogan2, slogan3: slogan3}).done(function (data) {
+                    console.log(data);
+                    $('#ajax_loader').hide();
+                    get_index_page();
+                });
+            } // end if id>0 && title!='' && slogan1!='' && slogan2!='' && slogan3!=''
+            else {
+                $('#slide_err').html('Please provide banner title and slogans');
+            } // end else
+
+
+        }
+
+
         if (event.target.id == 'create_cert_button') {
             var courseid = $('#courses').val();
             var userid = $('#users').val();
@@ -1540,6 +1564,20 @@ $(document).ready(function () {
         if (event.target.id.indexOf("group_") >= 0) {
             var id = event.target.id.replace("group_", "");
             show_private_group_request_detailes(id);
+        }
+
+        if (event.target.id.indexOf("edit_slide_") >= 0) {
+            var id = event.target.id.replace("edit_slide_", "");
+            var url = "/lms/custom/index/edit_slide.php";
+            $.post(url, {id: id}).done(function (data) {
+                slide = $.parseJSON(data);
+                $('#slide_id').val(id);
+                $('#title').val(slide.title);
+                $('#slogan1').val(slide.slogan1);
+                $('#slogan2').val(slide.slogan2);
+                $('#slogan3').val(slide.slogan3);
+                //get_index_page();
+            });
         }
 
         if (event.target.id == 'cert_send_page') {
