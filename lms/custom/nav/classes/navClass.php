@@ -304,7 +304,7 @@ class navClass extends Util {
         if ($completion_status > 0) {
             $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>Print Certificate</a></li>";
             $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>Renew Certificate</a></li>";
-            //$list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
+            $list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
         } // end if $compleation_status!=0        
         $list.="</ul>
                         </li>                        
@@ -509,49 +509,59 @@ class navClass extends Util {
     }
 
     function get_course_completion($courseid, $userid) {
+        $timecompleted = '';
         $query = "select * from mdl_course_completions "
                 . "where course=$courseid "
                 . "and userid=$userid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $timecompleted = $row['timecompleted'];
-        }
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $timecompleted = $row['timecompleted'];
+            } // end while
+        } // end if $num>0
         return $timecompleted;
-    }    
-    
-
+    }
 
     function renew_certificate() {
-        
-        /***************************************************************
+
+        /* **************************************************************
          *  Certificate validation is one year. So whenever user clicks
          *  Renew Certificate it sould be prolonged for one year from
          *  course completion moment, no other cases 
-         ***************************************************************/
-        
-        $courseid = $this->get_user_course($this->user->id);        
+         * ************************************************************* */
+
+        $courseid = $this->get_user_course($this->user->id);
         $sum = $this->check_user_balance($courseid, $this->user->id);
         if ($sum > 0) {
-            /*
-            $this->make_student_course_completed($courseid, $this->user->id);
-            $user = $this->get_user_details($this->user->id);
+            $diff = 7776000; // 3 months in secs
+            $now = time();
             $cert = new Certificates();
             $date = $this->get_course_completion($courseid, $this->user->id);
-            $new_date = $date + 31536000; // one year later after course completion
-            $code = ''; 
-            $renew = true;
-            $cert->send_certificate($courseid, $this->user->id, $new_date, true, $code, $renew);
-            $this->update_user_balance($courseid, $this->user->id);
-            */
-            
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Please contact site manager to get your updated certificate info@medical2.com.</span>";
-            $list.="</div>";
+            if ($date > 0) {
+                $new_date = $date + 31536000; // one year later after course completion
+                if ($new_date - $now >= $diff) {
+                    $code = '';
+                    $renew = true;
+                    // We renew certificate only for one year (one year is added at Certificates module)
+                    $cert->send_certificate($courseid, $this->user->id, $date, true, $code, $renew);                   
+                } // end if 
+                else {
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span9'>Please contact site manager to get your updated certificate info@medical2.com.</span>";
+                    $list.="</div>";
+                } // end else
+            } // end if $date>0
+            else {
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span9'>You did not complete the course. Certificate is not available</span>";
+                $list.="</div>";
+            } // end else             
         } // end if $sum>0
         else {
             $list.="<div class='container-fluid'>";
             $userid = $this->user->id;
-            $renew_fee=$this->get_renew_fee();
+            $renew_fee = $this->get_renew_fee();
             $list.="<span class='span9'>Certificate renew is a paid service. Please click <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$renew_fee' target='_blank'>here</a> to pay by card.</span>";
             $list.="</div>";
             return $list;

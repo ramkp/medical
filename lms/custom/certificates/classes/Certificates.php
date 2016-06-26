@@ -335,6 +335,16 @@ class Certificates extends Util {
         return $exp_date;
     }
 
+    function update_certificate_data2($courseid, $userid, $expiration) {
+        //echo "Expiration date: ". date('m-d-Y', $expiration)."<br>";
+        $query = "update mdl_certificates "
+                . "set expiration_date='$expiration' "
+                . "where courseid=$courseid and userid=$userid";
+        //echo "Query: ".$query."<br>";
+        $this->db->query($query);
+        echo "Certificate has been renewed";
+    }
+
     function get_certificate_template($courseid, $userid, $date = 0, $code = '', $renew = false) {
         $list = "";
         $coursename = $this->get_course_name($courseid); // string
@@ -342,7 +352,7 @@ class Certificates extends Util {
         $firstname = strtoupper($userdetails->firstname);
         $lastname = strtoupper($userdetails->lastname);
         // This is expiration date
-        if ($date == 0) {
+        if ($date == '') {
             $date = time();
         }
         $cert_issue_date = $this->get_certificate_issue_date($courseid, $userid);
@@ -356,18 +366,16 @@ class Certificates extends Util {
             $code = $this->get_course_code($courseid, $userid);
         } // end if $code==''
         if ($renew_status == 1) {
-            // new expiration date
-            //echo "Expiration date: " . date('m-d-Y', $date) . "<br>";
-
             if ($renew == true) {
-                //  echo "Inside renew ....<br>";
+                //  renew existing certificate
                 $expiration_date_sec = $date + 31536000;
+                $this->update_certificate_data2($courseid, $userid, $expiration_date_sec);
             } // end if $renew==true
             else {
-                //echo "Inside issue ....<br>";
+                // create new one certificate 
                 $expiration_date_sec = $issue_date + 31536000;
             }
-        }
+        } // end if $renew_status == 1
         $expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
         //echo "Expiration date: ".$expiration_date."<br>";
         switch ($courseid) {
@@ -571,20 +579,24 @@ class Certificates extends Util {
           $list.="</div>";
           $list.="</body>";
           $list.="</html>";
-         */
 
-        $pdf = new mPDF('utf-8', 'A4-L');
-        $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-        $pdf->WriteHTML($stylesheet, 1);
-        $pdf->WriteHTML($list, 2);
+
+          $pdf = new mPDF('utf-8', 'A4-L');
+          $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+          $pdf->WriteHTML($stylesheet, 1);
+          $pdf->WriteHTML($list, 2);
+          $dir_path = $this->cert_path . "/$userid";
+          if (!is_dir($dir_path)) {
+          if (!mkdir($dir_path)) {
+          die('Could not write to disk');
+          } // end if !mkdir($dir_path)
+          } // end if !is_dir($dir_path)
+          $path = $dir_path . "/certificate.pdf";
+          $pdf->Output($path, 'F');
+         * 
+         */
         $dir_path = $this->cert_path . "/$userid";
-        if (!is_dir($dir_path)) {
-            if (!mkdir($dir_path)) {
-                die('Could not write to disk');
-            } // end if !mkdir($dir_path)
-        } // end if !is_dir($dir_path)
         $path = $dir_path . "/certificate.pdf";
-        $pdf->Output($path, 'F');
         return $path;
     }
 
