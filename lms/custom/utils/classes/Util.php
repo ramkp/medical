@@ -38,7 +38,7 @@ class Util {
             //  header('Location: ' . $_SERVER['PHP_SELF']);
         } // end else if        
         else {
-            echo '<script type="text/javascript">window.location = "' . $_SERVER['PHP_SELF'] . '?width="+$(window).width()+"&height="+$(window).height();</script>';
+            //echo '<script type="text/javascript">window.location = "' . $_SERVER['PHP_SELF'] . '?width="+$(window).width()+"&height="+$(window).height();</script>';
         }
     }
 
@@ -101,7 +101,7 @@ class Util {
     function get_course_by_category($id) {
         $list = "";
         $items = array();
-        $query = "select id, fullname from mdl_course where category=$id and cost>0";
+        $query = "select id, fullname from mdl_course where category=$id and cost>0 and visible=1";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);

@@ -162,6 +162,7 @@ if (empty($CFG->forcedefaultmymoodle) && $PAGE->user_allowed_editing()) {
 
 echo $OUTPUT->header();
 
+ 
 $ds = new Dashboard();
 $roleid = $ds->get_user_role($USER->id);
 if ($USER->id!=2 && ($roleid == 5 || $roleid=='')) {

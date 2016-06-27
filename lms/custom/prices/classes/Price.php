@@ -99,7 +99,7 @@ class Price extends Util {
                 . "discount_size, "
                 . "taxes, expired "
                 . "from mdl_course "
-                . "where category=$id";
+                . "where category=$id and visible=1";
         $num = $this->db->numrows($query);
         if ($num) {
             $result = $this->db->query($query);
