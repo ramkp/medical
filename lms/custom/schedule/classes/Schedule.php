@@ -35,7 +35,7 @@ class Schedule extends Util {
     function get_course_slots($toolbar, $schedulerid, $search = null, $start = null, $end = null) {
         date_default_timezone_set('Pacific/Wallis');
         $slots = array();
-        $now = time()-86400;
+        $now = time() - 86400;
         if ($search == null) {
             if ($start == null && $end == null) {
                 $query = "select * from mdl_scheduler_slots "
@@ -422,6 +422,37 @@ class Schedule extends Util {
         return $list;
     }
 
+    function get_workshops_list($students, $schedulerid) {
+        $list = "";
+        $slots = $this->get_students_course_slots($schedulerid);
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+                <h4 class='modal-title'>Workshops list</h4>
+            </div>
+            <div class='modal-body'>
+            
+            <div class='container-fluid' style='text-align:left;'>
+            <span class='span2'><input type='hidden' id='students' value='$students'></span>                
+            </div>
+            
+            <div class='container-fluid' style='text-align:left;'>
+            <span class='span2'>$slots</span>    
+            </div>
+                
+            </div>
+            <div class='modal-footer'>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='move_user_to_slot'>Move</button></span>
+            </div>
+        </div>
+    </div>
+</div>";
+        return $list;
+    }
+
     function add_user_to_slot($lsotid, $userid) {
         $query = "select * from mdl_scheduler_appointment "
                 . "where slotid=$lsotid and studentid=$userid";
@@ -432,6 +463,70 @@ class Schedule extends Util {
                     . "values ($lsotid,$userid,0)";
             $this->db->query($query);
         } // end if $num==0
+    }
+
+    function make_students_pending($courseid, $students) {
+        $students_arr = explode(",", $students);
+        if (count($students_arr) > 0) {
+            foreach ($students_arr as $studentid) {
+                $query = "delete from mdl_course_completions "
+                        . "where course=$courseid and userid=$studentid";
+                $this->db->query($query);
+            } // end foreach
+        } // end if count($students_arr) > 0
+    }
+
+    function get_current_student_slot($studentid, $schedulerid) {
+        $slots = array();
+        // Get course slots
+        $query = "select * from mdl_scheduler_slots "
+                . "where schedulerid=$schedulerid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slots[] = $row['id'];
+        }
+        $slots_str = implode(',', $slots);
+        // Get student slot
+        $query = "select * from mdl_scheduler_appointment "
+                . "where studentid=$studentid and slotid in ($slots_str)";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slotid = $row['slotid'];
+        }
+        return $slotid;
+    }
+
+    function move_students($newslotid, $students, $schedulerid) {
+        $students_arr = explode(",", $students);
+        if (count($students_arr) > 0) {
+            foreach ($students_arr as $studentid) {
+                $oldslotid = $this->get_current_student_slot($studentid, $schedulerid);
+                $query = "update mdl_scheduler_appointment "
+                        . "set slotid=$newslotid "
+                        . "where studentid=$studentid and slotid=$oldslotid";
+                //echo "Query: " . $query . "<br>";
+                $this->db->query($query);
+
+                $query2 = "update mdl_slots set slotid=$newslotid "
+                        . "where userid=$studentid "
+                        . "and slotid=$oldslotid";
+                //echo "Query: " . $query2 . "<br>";
+                $this->db->query($query2);
+            } // end foreach
+        } // end if count($students_arr) > 0
+    }
+
+    function remove_students($students, $schedulerid) {
+        $students_arr = explode(",", $students);
+        if (count($students_arr) > 0) {
+            foreach ($students_arr as $studentid) {
+                $oldslotid = $this->get_current_student_slot($studentid, $schedulerid);
+                $query = "delete from mdl_scheduler_appointment "
+                        . "where studentid=$studentid "
+                        . "and slotid=$oldslotid";
+                $this->db->query($query);
+            } // end foreach
+        }
     }
 
 }

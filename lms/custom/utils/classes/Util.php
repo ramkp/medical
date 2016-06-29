@@ -25,7 +25,7 @@ class Util {
         $this->user = $USER;
         $this->course = $COURSE;
         $this->host = $_SERVER['SERVER_NAME'];
-        $this->editor_path='https://'.$_SERVER['SERVER_NAME']."/lms/editor/";
+        $this->editor_path = 'https://' . $_SERVER['SERVER_NAME'] . "/lms/editor/";
     }
 
     function get_screen_resolution() {
@@ -149,6 +149,7 @@ class Util {
     }
 
     function get_course_users($id, $output = true) {
+        //echo "Course id: ".$id."<br>";
         $list = "";
         $users = array();
         //1. Get course context
@@ -169,17 +170,22 @@ class Util {
                     foreach ($row as $key => $value) {
                         $user->$key = $value;
                     } // end foreach
-                    $users[] = $user;
+                    $user_detailes = $this->get_user_details($user->userid);
+                    if ($user_detailes->firstname != '' && $user_detailes->lastname != '') {
+                        $users[strtolower(trim($user_detailes->lastname))] = $user;
+                    } // end if $user_details->firstname != '' && $user_details->lastname != ''
+                    //$users[] = $user;
                 } // end if $status==0
             } // end while
         } // end if $num > 0
+        ksort($users);
         if (count($users) > 0) {
             $list.="<span class='span3'>Enrolled users:</span><span class='span4'><select id='users'>";
             $list.="<option value='0' selected>Select user</option>";
             foreach ($users as $user) {
                 $user_details = $this->get_user_details($user->userid);
                 if ($user_details->firstname != '' && $user_details->lastname != '') {
-                    $list.="<option value='$user->userid'>$user_details->firstname &nbsp; $user_details->lastname </option>";
+                    $list.="<option value='$user->userid'>" . ucfirst(strtolower(trim($user_details->lastname))) . " &nbsp;" . ucfirst(strtolower(trim($user_details->firstname))) . "</option>";
                 }
             } // end foreach            
             $list.="</select></span>";

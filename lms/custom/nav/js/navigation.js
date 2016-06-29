@@ -1084,13 +1084,12 @@ $(document).ready(function () {
         var e_d = $('#e_d_c').val();
         var e_y = $('#e_y_c').val();
         var start = s_y + '-' + s_m + '-' + s_d;
-        console.log('Start: '+start);        
+        console.log('Start: ' + start);
         var end = e_y + '-' + e_m + '-' + e_d;
-        console.log('End: '+end);
-        console.log('Certs: '+certs);
-        
+        console.log('End: ' + end);
+        console.log('Certs: ' + certs);
         if (s_m > 0 && s_d > 0 && s_y > 0 && e_m > 0 && e_d > 0 && e_y > 0) {
-            
+
             $('#print_err').html('');
             $('#ajax_loader').show();
             console.log('Issue date: ' + start);
@@ -1669,26 +1668,86 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'pending') {
-            if (confirm('Change selected students to pending status?')) {
-                
-            }
-        }
-
-        if (event.target.id == 'move') {
-            if (confirm('Move selected students to pending status?')) {
-                
+            var selected = new Array();
+            $("input:checked").each(function () {
+                selected.push($(this).val());
+            });
+            if (selected.length > 0) {
+                $('#sch_err').html('');
+                var students = selected.join();
+                var courseid = $('#courseid').val();
+                console.log('Course ID: ' + courseid);
+                console.log('Students: ' + students);
+                if (confirm('Change selected students to pending status?')) {
+                    var url = "/lms/custom/schedule/pending.php";
+                    $.post(url, {students: students, courseid: courseid}).done(function () {
+                        document.location.reload();
+                    });
+                } // end if condifrm
+            } // end if selected.length > 0
+            else {
+                $('#sch_err').html('Please select at least one student');
             }
         }
 
         if (event.target.id == 'delete') {
-            if (confirm('Remove selected students from current workshop')) {
-
+            var scheduler = $('#scheduler').val();
+            var selected = new Array();
+            $("input:checked").each(function () {
+                selected.push($(this).val());
+            });
+            if (selected.length > 0) {
+                $('#sch_err').html('');
+                var students = selected.join();
+                if (confirm('Remove selected students from this class/workshop?')) {
+                    var url = "/lms/custom/schedule/remove.php";
+                    $.post(url, {students: students, schedulerid: scheduler}).done(function () {
+                        document.location.reload();
+                    });
+                } // end if condifrm
+            } // end if // end if selected.length > 0
+            else {
+                $('#sch_err').html('Please select at least one student');
             }
         }
 
-        //pending
-        //move
-        // delete
+        if (event.target.id == 'move') {
+            var scheduler = $('#scheduler').val();
+            var selected = new Array();
+            $("input:checked").each(function () {
+                selected.push($(this).val());
+            });
+            if (selected.length > 0) {
+                $('#sch_err').html('');
+                var students = selected.join();
+                if (dialog_loaded !== true) {
+                    console.log('Script is not yet loaded starting loading ...');
+                    dialog_loaded = true;
+                    var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                    $.getScript(js_url)
+                            .done(function () {
+                                console.log('Script bootstrap.min.js is loaded ...');
+                                var url = "/lms/custom/schedule/get_workshops_list.php";
+                                var request = {students: students, scheduler: scheduler};
+                                $.post(url, request).done(function (data) {
+                                    $("body").append(data);
+                                    $("#myModal").modal('show');
+                                });
+                            })
+                            .fail(function () {
+                                console.log('Failed to load bootstrap.min.js');
+                            });
+                } // dialog_loaded!=true
+                else {
+                    console.log('Script already loaded');
+                    $("#myModal").modal('show');
+                } // end else
+
+            } // end if selected.length > 0
+            else {
+                $('#sch_err').html('Please select at least one student');
+            }
+        }
 
 
         if (event.target.id == 'print') {
@@ -2125,8 +2184,31 @@ $(document).ready(function () {
     });
     $("body").click(function (event) {
         console.log('Element clicked: ' + event.target.id);
+
+        if (event.target.id == 'cancel') {
+            $("#myModal").remove();
+            dialog_loaded = false;
+        }
+
         if (event.target.id == 'add_user_to_slot') {
             add_user_to_slot();
+        }
+
+        if (event.target.id == 'move_user_to_slot') {
+            var users = $('#students').val();
+            var slotid = $('#slots').val();
+            var scheduler = $('#scheduler').val();
+            console.log('Students list: ' + users);
+            console.log('Slot id: ' + slotid);
+            if (confirm('Move selected students to another workshop?')) {
+                var url = "/lms/custom/schedule/move_students.php";
+                var request = {users: users, slotid: slotid, schedulerid: scheduler};
+                $.post(url, request).done(function (data) {
+                    $('#program_err').html(data);
+                    //console.log('Server response: ' + data);
+                    document.location.reload();
+                });
+            } // end if confirm
         }
 
         if (event.target.id == 'recreate') {
