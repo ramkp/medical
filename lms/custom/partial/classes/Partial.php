@@ -100,12 +100,45 @@ class Partial extends Util {
         } // end if $num > 0        
         return $partials;
     }
+    
+    function get_workshop_date($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $date = $row['starttime'];
+        } // end while
+        return $date;
+    }
+    
+    function get_user_slot($courseid, $userid) {
+        $slotid = 0;
+        $query = "select * from mdl_slots "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['slotid'];
+            } // end while
+        } // end if $num > 0
+        return $slotid;
+    }
 
     function get_partial_payments_list() {
         $list = "";
+        $partials=array();
         $cc_partials = $this->get_partial_cc_payments();
         $of_partials = $this->get_partial_offline_payments();
         $partials = array_merge($cc_partials, $of_partials);
+        
+        /*
+        foreach ($partials_arr as $p) {
+            $slotid=$this->get_user_slot($p->courseid, $p->userid);
+            $wsdate=$this->get_workshop_date($slotid);
+            $partials[$wsdate]=$p;
+        }
+        ksort($partials);
+        */
         $list.=$this->create_partial_payments_list($partials);
         return $list;
     }

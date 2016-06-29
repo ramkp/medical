@@ -189,7 +189,10 @@ class Schedule extends Util {
             $list.= "<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'><a href='#' id='students_all' onClick='return false;'>Select all</a></span>";
             $list.="<span class='span2'><a href='#' id='students_none' onClick='return false;'>Deselct all</a></span>";
-            $list.="<span class='span2'><a href='#' id='complete' onClick='return false;'>Change status</a></span>";
+            $list.="<span class='span2'><a href='#' id='complete' onClick='return false;'>Make passed</a></span>";
+            $list.="<span class='span2'><a href='#' id='pending' onClick='return false;'>Make pending</a></span>";
+            $list.="<span class='span2'><a href='#' id='move' onClick='return false;'>Move</a></span>";
+            $list.="<span class='span2'><a href='#' id='delete' onClick='return false;'>Remove</a></span>";
             $list.="<span class='span2'><a href='#' id='print' onClick='return false;'>Print certificates</a></span>";
             $list.="<span class='span2'><a href='#' id='send' onClick='return false;'>Send certificates</a></span>";
             $list.="<span class='span2'><a href='#' id='add_students' onClick='return false;'>Add students</a></span>";
@@ -228,7 +231,7 @@ class Schedule extends Util {
                             $status = "Passed " . date('m-d-Y', completed) . "";
                         } // end if $completion_arr['passed']==1
                         else {
-                            $status = "Student did not pass the workshop";
+                            $status = "Pending";
                         } // end else
                         $list.= "<div class='container-fluid' style='text-align:left;'>";
                         $list.="<span class='span1'><input type='checkbox' class='students' name='studentid' value='$student->studentid'></span>";

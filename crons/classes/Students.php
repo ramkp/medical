@@ -81,14 +81,16 @@ class Students {
     }
 
     function get_user_data($userid) {
-        $query = "select * from mdl_user where id=$userid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $user = new stdClass();
-            foreach ($row as $key => $value) {
-                $user->$key = $value;
-            } // end foreach
-        } // end while
+        if ($userid > 0) {
+            $query = "select * from mdl_user where id=$userid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user = new stdClass();
+                foreach ($row as $key => $value) {
+                    $user->$key = $value;
+                } // end foreach
+            } // end while
+        } // end if $userid>0
         return $user;
     }
 
@@ -198,11 +200,31 @@ class Students {
         return $partials;
     }
 
+    function get_future_workshops() {
+        $now = time();
+        $ws = array();
+        $query = "select * from mdl_scheduler_slots where starttime>$now";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $ws[$row['starttime']] = $row['id'];
+            } // end while
+            ksort($ws);
+        } // end if $num > 0
+        return $ws;
+    }
+
+    // *************************** Entry point *******************************
     function check_owe_students() {
         $list = "";
+        $clear_workshops = array();
+        $partials = array();
+        // Get CC & Offline partials
         $cc_partials = $this->get_partial_cc_payments();
         $of_partials = $this->get_partial_offline_payments();
         $partials_arr = array_merge($cc_partials, $of_partials);
+        // Sort workshops by date
         if (count($partials_arr) > 0) {
             foreach ($partials_arr as $p) {
                 $wsdate = $this->get_workshop_date($p->slotid);
@@ -210,13 +232,219 @@ class Students {
             }
         } // end if count($partials_arr)>0
         ksort($partials);
+
+
+        //echo "<br>-----------Partial payment users-----------<br>";
         //print_r($partials);
-        if (count($partials) > 0) {
-            $list.=$this->process_receivers($partials);
+        //echo "<br>--------------------------------------------<br>";
+        // Get Workshops in future periods
+        $workshops = $this->get_future_workshops();
+        //echo "<br>------------ Future workshops --------------<br>";
+        //print_r($workshops);
+        //echo "<br>---------------------------------------------<br>";
+
+
+
+        if (count($workshops) > 0) {
+            foreach ($workshops as $slotid) {
+                $total_students = $this->get_total_workshop_participants($slotid);
+
+                if ($total_students > 0) {
+                    // Get workshop date and participants
+                    date_default_timezone_set('Pacific/Wallis');                    
+                    //echo "Workshop name: $ws_detailes->notes<br>";
+                    //echo "Workshop location: $ws_detailes->appointmentlocation <br>";
+                    //echo "Workshop date: " . date('m-d-Y', $ws_detailes->starttime) . "<br>";
+                    $wsdate = $this->get_workshop_date($slotid);
+                    //echo "Workshop date: " . date('m-d-Y', $wsdate) . "<br>";
+                    $participants = $this->get_workshop_participants($slotid); // array
+                    //echo "<br>------------------ Workshop participants >------------------<br>";
+                    //print_r($participants);
+                    //echo "<br>-------------------------------------------------------------<br>";
+                    //echo "Total students in current workshop: $total_students<br>";
+                    // Check if workshop contains partial payment students?
+                    foreach ($participants as $p) {
+                        //echo "Current user id: $p<br>";
+                        if (in_array($p, $partials)) {
+                            //echo "Inside if .... <br>";
+                            $clear_workshops[$wsdate] = $slotid;
+                        } // end if in_array($p, $partials)
+                    } // end foreach
+                } // end if $total_students>0
+                //echo "<br>/////////////////////////////////////////////////////////////////////////////////////////////////////<br>";
+            } // end foreach
+        } // end if count($workshops)>0
+        //print_r($partials);
+        if (count($clear_workshops) > 0) {            
+            $list.=$this->prepare_report($clear_workshops); // prepare report
+            $this->send_notification_message($list); // send report
         } // end if count($partials)>0
         else {
             $list.="There are no users with partial payments \n";
         }
+        return $list;
+    }
+
+    function get_workshop_details($id) {
+        $query = "select * from mdl_scheduler_slots where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $ws = new stdClass();
+            foreach ($row as $key => $value) {
+                $ws->$key = $value;
+            } // end foreach
+        } // end while
+        return $ws;
+    }
+
+    function get_workshop_course($slotid) {
+        $courseid = 0;
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $sch = $row['schedulerid'];
+        } // end while 
+
+        $query = "select * from mdl_scheduler where id=$sch";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courseid = $row['course'];
+            } // end while 
+        } // end if $num > 0
+        return $courseid;
+    }
+
+    function get_student_payments($courseid, $userid) {
+        $query = "select * from mdl_card_payments "
+                . "where pdate>1464074847 "
+                . "and courseid=$courseid "
+                . "and userid=$userid";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $renew_fee = $this->get_renew_fee();
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_payment = $row['psum'];
+                $course_cost = $this->get_course_cost($row['courseid']);
+                $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
+                if ($user_payment < $course_cost && $user_payment != $renew_fee) {
+                    $partial = new stdClass();
+                    $partial->userid = $row['userid'];
+                    $partial->courseid = $row['courseid'];
+                    $partial->payment = $row['psum'];
+                    $partial->cost = $course_cost;
+                    $partial->slotid = $slotid;
+                    $partial->pdate = $row['pdate'];
+                } // end if $user_payment!=$course_cost
+            } // end while
+        } // end if $num > 0    
+
+        $query = "select * from mdl_partial_payments where pdate>1464074847 "
+                . "and courseid=$courseid "
+                . "and userid=$userid ";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $renew_fee = $this->get_renew_fee();
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_payment = $row['psum'];
+                $course_cost = $this->get_course_cost($row['courseid']);
+                $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
+                if ($user_payment < $course_cost && $user_payment != $renew_fee) {
+                    $partial = new stdClass();
+                    $partial->userid = $row['userid'];
+                    $partial->courseid = $row['courseid'];
+                    $partial->payment = $row['psum'];
+                    $partial->cost = $course_cost;
+                    $partial->pdate = $row['pdate'];
+                    $partial->slotid = $slotid;
+                } // end if $user_payment!=$course_cost
+            } // end while
+        } // end if $num > 0
+        return $partial;
+    }
+
+    function prepare_report($workshops) {
+        $list = "";
+        foreach ($workshops as $ws) {
+            $courseid = $this->get_workshop_course($ws);
+            if ($courseid > 0) {
+                $total = $this->get_total_workshop_participants($ws);
+                $participants = $this->get_workshop_participants($ws);
+                date_default_timezone_set('Pacific/Wallis');
+                $coursename = $this->get_course_name($courseid);
+                $cost = $this->get_course_cost($courseid);
+                $wsdate = $this->get_workshop_date($ws);
+                $start_date = date('m-d-Y h:i:s', $wsdate);
+                $list.="<table >";
+
+                $list.="<tr>";
+                $list.="<td>Program/workshop</td>";
+                $list.="<td style='margin:10px;'>&nbsp;&nbsp;$coursename</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Program start date</td>";
+                $list.="<td style='margin:10px;'>&nbsp;&nbsp;$start_date</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Workshop venue</td>";
+                $location = $this->get_workshop_location($ws);
+                $list.="<td style='margin:10px;'>&nbsp;&nbsp;$location</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Program fee</td>";
+                $list.="<td>&nbsp;&nbsp;$$cost</td>";
+                $list.="</tr>";
+
+                if (count($participants) > 0) {
+                    foreach ($participants as $p) {
+                        //echo "Current userid : $p.<br>";
+                        $partial = $this->get_student_payments($courseid, $p);
+                        $diff = $partial->cost - $partial->payment;
+                        $user_data = $this->get_user_data($p);
+                        $date_h = date('m-d-Y', $partial->pdate);
+
+                        $list.="<tr>";
+                        $list.="<td >Student</td>";
+                        $list.="<td>&nbsp;&nbsp;<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$p' target='_blank'>$user_data->firstname $user_data->lastname</a></td>";
+                        $list.="</tr>";
+
+                        $list.="<tr>";
+                        $list.="<td>Student paid</td>";
+                        $list.="<td>&nbsp;&nbsp;$$partial->payment</td>";
+                        $list.="</tr>";
+
+                        $list.="<tr>";
+                        $list.="<td>Student owes</td>";
+                        $list.="<td>&nbsp;&nbsp;$$diff  </td>";
+                        $list.="</tr>";
+
+                        $list.="<tr>";
+                        $list.="<td>Payment date</td>";
+                        $list.="<td>&nbsp;&nbsp;$date_h</td>";
+                        $list.="</tr>";
+                    } // end foreach
+                } // end if count($participants)>0
+
+                $list.="<tr>";
+                $list.="<td>Total students</td>";
+                $list.="<td style='margin:10px;'>&nbsp;&nbsp;$total</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td colspan='2'><hr/></td>";
+                $list.="</tr>";
+
+                $list.="</table>";
+            } // end if $courseid > 0
+        } // end foreach
         return $list;
     }
 
@@ -232,7 +460,7 @@ class Students {
                     $wsdate = $this->get_workshop_date($partial->slotid);
                     echo "Current date: " . date('m-d-Y', $now) . "<br>";
                     echo "Workshop date: " . date('m-d-Y', $wsdate) . "<br>";
-                    if ($wsdate - $now >= $diff) {
+                    if ($wsdate > $now) {
                         echo "Inside if ...<br>";
                         $list.=$this->prepare_message($partial);
                         $i++;
@@ -265,7 +493,7 @@ class Students {
         return $location;
     }
 
-    function get_workshop_participants($slotid) {
+    function get_total_workshop_participants($slotid) {
         $query = "select count(id) as total from mdl_scheduler_appointment "
                 . "where slotid=$slotid";
         $result = $this->db->query($query);
@@ -273,6 +501,20 @@ class Students {
             $total = $row['total'];
         }
         return $total;
+    }
+
+    function get_workshop_participants($slotid) {
+        $students = array();
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid=$slotid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $students[] = $row['studentid'];
+            } // end while
+        } // end if $num > 0
+        return $students;
     }
 
     function prepare_message($partial) {
@@ -292,22 +534,22 @@ class Students {
         $list.="<tr>";
         $list.="<td>Applied program</td>";
         $list.="<td style='margin:10px;'>&nbsp;&nbsp;$coursename</td>";
-        $list.="</tr>";        
+        $list.="</tr>";
 
         $list.="<tr>";
         $list.="<td>Program start date</td>";
         $list.="<td style='margin:10px;'>&nbsp;&nbsp;$start_date</td>";
         $list.="</tr>";
-        
+
         $list.="<tr>";
         $list.="<td>Workshop venue</td>";
-        $location=$this->get_workshop_location($partial->slotid);
+        $location = $this->get_workshop_location($partial->slotid);
         $list.="<td style='margin:10px;'>&nbsp;&nbsp;$location</td>";
         $list.="</tr>";
-        
+
         $list.="<tr>";
         $list.="<td>Total students</td>";
-        $total=$this->get_workshop_participants($partial->slotid);
+        $total = $this->get_workshop_participants($partial->slotid);
         $list.="<td style='margin:10px;'>&nbsp;&nbsp;$total</td>";
         $list.="</tr>";
 
@@ -350,7 +592,7 @@ class Students {
         if ($message != '') {
             $a_email = 'a1b1c777@gmail.com';
             //$a_email = 'sirromas@gmail.com';
-            $m_email = 'manager@medical2.com';
+            $m_email = 'sirromas@gmail.com';
             $mail = new PHPMailer;
             $mail->isSMTP();
             $mail->Host = $this->mail_smtp_host;

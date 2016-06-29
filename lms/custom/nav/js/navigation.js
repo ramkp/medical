@@ -1077,15 +1077,20 @@ $(document).ready(function () {
 
     function recertificate_done() {
         var certs = $('#certs').val();
-        var s_m = $('#s_m').val();
-        var s_d = $('#s_d').val();
-        var s_y = $('#s_y').val();
-        var e_m = $('#e_m').val();
-        var e_d = $('#e_d').val();
-        var e_y = $('#e_y').val();
+        var s_m = $('#s_m_c').val();
+        var s_d = $('#s_d_c').val();
+        var s_y = $('#s_y_c').val();
+        var e_m = $('#e_m_c').val();
+        var e_d = $('#e_d_c').val();
+        var e_y = $('#e_y_c').val();
+        var start = s_y + '-' + s_m + '-' + s_d;
+        console.log('Start: '+start);        
+        var end = e_y + '-' + e_m + '-' + e_d;
+        console.log('End: '+end);
+        console.log('Certs: '+certs);
+        
         if (s_m > 0 && s_d > 0 && s_y > 0 && e_m > 0 && e_d > 0 && e_y > 0) {
-            var start = s_y + '-' + s_m + '-' + s_d;
-            var end = e_y + '-' + e_m + '-' + e_d;
+            
             $('#print_err').html('');
             $('#ajax_loader').show();
             console.log('Issue date: ' + start);
@@ -1662,6 +1667,29 @@ $(document).ready(function () {
         if (event.target.id == 'complete') {
             change_students_course_status();
         }
+
+        if (event.target.id == 'pending') {
+            if (confirm('Change selected students to pending status?')) {
+                
+            }
+        }
+
+        if (event.target.id == 'move') {
+            if (confirm('Move selected students to pending status?')) {
+                
+            }
+        }
+
+        if (event.target.id == 'delete') {
+            if (confirm('Remove selected students from current workshop')) {
+
+            }
+        }
+
+        //pending
+        //move
+        // delete
+
 
         if (event.target.id == 'print') {
             print_certificates();
