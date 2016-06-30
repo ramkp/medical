@@ -1055,6 +1055,9 @@ class Certificates extends Util {
         if ($modal == true) {
             $m_list.="<select id='s_m_c'>";
         }
+        else {
+            $m_list.="<select id='s_m'>";
+        }
         $m_list.="<option value='0' selected>Month</option>";
         for ($i = 1; $i <= 12; $i++) {
             $m_list.="<option value='$i'>$i</option>";
@@ -1065,6 +1068,9 @@ class Certificates extends Util {
         if ($modal == true) {
             $d_list.="<select id='s_d_c'>";
         }
+        else {
+            $d_list.="<select id='s_d'>";
+        }
         $d_list.="<option value='0' selected>Day</option>";
         for ($i = 1; $i <= 31; $i++) {
             $d_list.="<option value='$i'>$i</option>";
@@ -1074,6 +1080,9 @@ class Certificates extends Util {
         $y_list = "";
         if ($modal == true) {
             $y_list .= "<select id='s_y_c'>";
+        }
+        else {
+            $y_list .= "<select id='s_y'>";
         }
         $y_list.="<option value='0' selected>Year</option>";
         for ($i = 2000; $i <= 2075; $i++) {
@@ -1106,6 +1115,9 @@ class Certificates extends Util {
         if ($modal == true) {
             $m_list.="<select id='e_m_c'>";
         }
+        else {
+            $m_list.="<select id='e_m'>";
+        }
         $m_list.="<option value='0' selected>Month</option>";
         for ($i = 1; $i <= 12; $i++) {
             $m_list.="<option value='$i'>$i</option>";
@@ -1116,6 +1128,9 @@ class Certificates extends Util {
         if ($modal == true) {
             $d_list.="<select id='e_d_c'>";
         }
+        else {
+            $d_list.="<select id='e_d'>";
+        }
         $d_list.="<option value='0' selected>Day</option>";
         for ($i = 1; $i <= 31; $i++) {
             $d_list.="<option value='$i'>$i</option>";
@@ -1125,6 +1140,9 @@ class Certificates extends Util {
         $y_list = "";
         if ($modal == true) {
             $y_list .= "<select id='e_y_c'>";
+        }
+        else {
+            $y_list .= "<select id='e_y'>";
         }
         $y_list.="<option value='0' selected>Year</option>";
         for ($i = 2000; $i <= 2075; $i++) {
