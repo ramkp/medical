@@ -263,10 +263,10 @@ class Schedule extends Programs {
         //echo "Course id: ".$courseid."<br>";
         date_default_timezone_set('Pacific/Wallis');
         $list = "";
-        if ($courseid == 44 || $courseid == 45) {
-            $list.=$this->get_shared_schedule($courseid, $state);
-        } // end if $courseid==44 || $courseid==45
-        else {
+        //if ($courseid == 44 || $courseid == 45) {
+          //  $list.=$this->get_shared_schedule($courseid, $state);
+        //} // end if $courseid==44 || $courseid==45
+        //else {
             // 1.Get scheduler id
             $query = "select id from mdl_scheduler where course=$courseid";
             $result = $this->db->query($query);
@@ -336,7 +336,7 @@ class Schedule extends Programs {
                     $list.="</div>"; // end of panel panel-default           
                 }
             } // end if $num > 0 when scheduler is available at the course
-        } // end else 
+        //} // end else 
         return $list;
     }
 

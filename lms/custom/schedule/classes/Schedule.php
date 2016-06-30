@@ -529,4 +529,31 @@ class Schedule extends Util {
         }
     }
 
+    function save_additional_slot($slot) {
+        
+        //print_r($slot);
+        //die();
+        //$date=date('m-d-Y', $slot->starttime);
+        //echo "Slot date: ".$date."<br>";
+        $query = "insert into mdl_scheduler_slots "
+                . "(schedulerid,"
+                . "starttime,"
+                . "duration,"
+                . "teacherid,"
+                . "appointmentlocation,"
+                . "timemodified,"
+                . "notes,"
+                . "hideuntil) "
+                . "values($slot->schedulerid,"
+                . "'$slot->starttime',"
+                . "'480',"
+                . "'234',"
+                . "'$slot->appointmentlocation',"
+                . "'$slot->timemodified',"
+                . "'$slot->notes',"
+                . "'$slot->timemodified')";
+        //echo "Query: ".$query."<br>";
+        $this->db->query($query);
+    }
+
 }
