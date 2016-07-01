@@ -279,7 +279,7 @@ class Register {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'><a href='#' id='manual_group_registration' onClick='return false;'>Proceed to participants</a></span>";
+        $list.="<span class='span2'><a href='#' id='manual_group_registration' onClick='return false;'>Next</a></span>";
         $list.="<span class='span4'>Have a lot of group participants? <a href='#' id='upload_group_file' onClick='return false;'>Upload users file</a></span><span class='span2' style='color:red;' id='group_common_errors'></span>";
         $list.="</div>";
 

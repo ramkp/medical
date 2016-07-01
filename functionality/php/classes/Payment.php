@@ -114,7 +114,9 @@ class Payment {
         $_SESSION['users'] = $user;
         $_SESSION['tot_participants'] = 1;
         $this->user = $user;
-        $list = $this->get_payment_options($user->courseid);
+        //$list = $this->get_payment_options($user->courseid);
+        $list=$this->get_payment_with_options('online_personal');
+        
         return $list;
     }
 

@@ -401,7 +401,7 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -442,7 +442,7 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -461,6 +461,42 @@ class Certificates extends Util {
                 $path = $dir_path . "/certificate.pdf";
                 $pdf->Output($path, 'F');
 
+                break;
+                
+            case 47:
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="<link rel='stylesheet' type='text/css' href='cert.css'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div class='cert'>";
+                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                }
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
+                $list.="</div>";
+                $list.="</body>";
+                $list.="</html>";
+
+                $pdf = new mPDF('utf-8', 'A4-L');
+                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+                $pdf->WriteHTML($stylesheet, 1);
+                $pdf->WriteHTML($list, 2);
+                $dir_path = $this->cert_path . "/$userid";
+                if (!is_dir($dir_path)) {
+                    if (!mkdir($dir_path)) {
+                        die('Could not write to disk');
+                    } // end if !mkdir($dir_path)
+                } // end if !is_dir($dir_path)
+                $path = $dir_path . "/certificate.pdf";
+                $pdf->Output($path, 'F');
                 break;
 
             case 48:
@@ -481,7 +517,7 @@ class Certificates extends Util {
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
@@ -519,7 +555,7 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><br><br><br><div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><br><br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -559,7 +595,7 @@ class Certificates extends Util {
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
@@ -596,7 +632,7 @@ class Certificates extends Util {
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
@@ -633,7 +669,7 @@ class Certificates extends Util {
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
@@ -1273,7 +1309,7 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -1314,7 +1350,7 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -1334,6 +1370,43 @@ class Certificates extends Util {
                 $pdf->Output($path, 'F');
 
                 break;
+                
+                case 47:
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="<link rel='stylesheet' type='text/css' href='cert.css'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div class='cert'>";
+                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                }
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
+                $list.="</div>";
+                $list.="</body>";
+                $list.="</html>";
+
+                $pdf = new mPDF('utf-8', 'A4-L');
+                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+                $pdf->WriteHTML($stylesheet, 1);
+                $pdf->WriteHTML($list, 2);
+                $dir_path = $this->cert_path . "/$userid";
+                if (!is_dir($dir_path)) {
+                    if (!mkdir($dir_path)) {
+                        die('Could not write to disk');
+                    } // end if !mkdir($dir_path)
+                } // end if !is_dir($dir_path)
+                $path = $dir_path . "/certificate.pdf";
+                $pdf->Output($path, 'F');
+                break;                
+                
             case 48:
                 $coursename = "IV Therapy Exam";
                 $list.="<!DOCTYPE HTML SYSTEM>";
@@ -1352,7 +1425,7 @@ class Certificates extends Util {
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
@@ -1388,7 +1461,7 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><br><br><br><div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><br><br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -1427,7 +1500,7 @@ class Certificates extends Util {
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
@@ -1463,7 +1536,7 @@ class Certificates extends Util {
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
@@ -1483,7 +1556,6 @@ class Certificates extends Util {
 
                 break;
 
-
             default:
                 $list.="<!DOCTYPE HTML SYSTEM>";
                 $list.="<head>";
@@ -1501,7 +1573,7 @@ class Certificates extends Util {
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";

@@ -1098,7 +1098,9 @@ $(document).ready(function () {
             var url = "/lms/custom/certificates/recertificate.php";
             $.post(url, {certs: certs, start: start, end: end}).done(function (data) {
                 $('#ajax_loader').hide();
-                $('#print_err').html(data);
+                //$('#print_err').html(data);
+                //document.location.reload();
+                get_certificates_page();
             });
         } // end if selected.length > 0
         else {
