@@ -984,7 +984,8 @@ class Payment {
         $_SESSION['group_common_section'] = $group_common_section;
         $_SESSION['users'] = $users;
         $_SESSION['tot_participants'] = $tot_participants;
-        $list = $this->get_payment_options($group_common_section->courseid, 1);
+        //$list = $this->get_payment_options($group_common_section->courseid, 1);
+        $list=$this->get_payment_with_options('online_whole_group_payment');
         //$list = "<p align='center'>Please contact site administrator for payment options help@medical2.com</p>";
         return $list;
     }

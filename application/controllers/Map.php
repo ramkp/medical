@@ -10,7 +10,7 @@ class Map extends CI_Controller {
         $list = '';
         $list.="<br/><div  class='form_div'>";
         $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
-        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Site Map/h5></div>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Site Map</div>";
         $list.="<div class='panel-body'>";
 
 
