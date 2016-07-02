@@ -128,6 +128,7 @@ class navClass extends Util {
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                   
                                     <li><a href='#' title='About' id='about'>About page</a></li>
+                                    <li><a href='#' title='Promotions' id='promote'>Promotions</a></li>
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>
                                     <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
@@ -216,6 +217,7 @@ class navClass extends Util {
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Index page' id='index'>Index page</a></li>
                                     <li><a href='#' title='About' id='about'>About page</a></li>
+                                    <li><a href='#' title='Promotions' id='promote'>Promotions</a></li>
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>
                                     <li><a href='#' title='Renew fee' id='renew_fee'>Renew Fee</a></li>
@@ -478,7 +480,21 @@ class navClass extends Util {
                 . "and psum='$fee' "
                 . "and pdate<$exp";
         //echo "Query: ".$query."<br>";
-        $num = $this->db->numrows($query);
+        $num1 = $this->db->numrows($query);
+
+        $query = "select * from mdl_partial_payments "
+                . "where courseid=$courseid"
+                . " and userid=$userid "
+                . "and psum='$fee' "
+                . "and pdate<$exp";
+        $num2 = $this->db->numrows($query);
+        if ($num1 > 0 || $num2 > 0) {
+            $num = 1;
+        } // end if $num1>0 || $num2>0
+        else {
+            $num = 0;
+        } // end else       
+
         return $num;
     }
 
@@ -527,7 +543,7 @@ class navClass extends Util {
 
         /* **************************************************************
          *  Certificate validation is one year. So whenever user clicks
-         *  Renew Certificate it sould be prolonged for one year from
+         *  Renew Certificate it should be prolonged for one year from
          *  course completion moment, no other cases 
          * ************************************************************* */
 
@@ -544,7 +560,7 @@ class navClass extends Util {
                     $code = '';
                     $renew = true;
                     // We renew certificate only for one year (one year is added at Certificates module)
-                    $cert->send_certificate($courseid, $this->user->id, $date, true, $code, $renew);                   
+                    $cert->send_certificate($courseid, $this->user->id, $date, true, $code, $renew);
                 } // end if 
                 else {
                     $list.="<div class='container-fluid'>";

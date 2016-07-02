@@ -252,6 +252,14 @@ $(document).ready(function () {
         }
     }
 
+    function get_promotion_page() {
+        var url = "/lms/custom/promotion/get_promotion_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        })
+
+    }
+
     function refresh_map() {
         var url = "/lms/custom/google_map/refresh.php";
         var category_id = 5; // Nursing school category id
@@ -1306,7 +1314,7 @@ $(document).ready(function () {
         // Save price item
         if (event.target.id.indexOf("price_") >= 0) {
             update_item_price(event.target.id);
-        }
+        }       
 
         if (event.target.id.indexOf("_faq") >= 0) {
             var oEditor = FCKeditorAPI.GetInstance('editor');
@@ -1349,7 +1357,7 @@ $(document).ready(function () {
 
         if (event.target.id == 'invoice_data') {
             update_invoice_data();
-        }
+        }   
 
         if (event.target.id == 'update_slide') {
             var id = $('#slide_id').val();
@@ -1985,6 +1993,11 @@ $(document).ready(function () {
         update_navigation_status__menu('Certificates');
         get_certificates_page();
     });
+    $("#promote").click(function (event) {
+        update_navigation_status__menu('Promotions');
+        get_promotion_page();
+    });    
+
     $("#Testimonial").click(function (event) {
         update_navigation_status__menu('Testimonial');
         get_testimonial_page();
@@ -2185,7 +2198,16 @@ $(document).ready(function () {
         }
     });
     $("body").click(function (event) {
-        console.log('Element clicked: ' + event.target.id);
+        //console.log('Element clicked: ' + event.target.id);
+        
+        if (event.target.id == 'create_campaign') {
+            if ($('#new_campaign_container').is(':visible')) {
+                $('#new_campaign_container').hide();
+            } // end if 
+            else {
+                $('#new_campaign_container').show();
+            } // end else
+        }
 
         if (event.target.id == 'cancel') {
             $("#myModal").remove();
