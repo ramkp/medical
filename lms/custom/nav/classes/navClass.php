@@ -128,7 +128,7 @@ class navClass extends Util {
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                   
                                     <li><a href='#' title='About' id='about'>About page</a></li>
-                                    <li><a href='#' title='Promotions' id='promote'>Promotions</a></li>
+                                    <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>
                                     <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
@@ -217,7 +217,7 @@ class navClass extends Util {
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Index page' id='index'>Index page</a></li>
                                     <li><a href='#' title='About' id='about'>About page</a></li>
-                                    <li><a href='#' title='Promotions' id='promote'>Promotions</a></li>
+                                    <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>
                                     <li><a href='#' title='Renew fee' id='renew_fee'>Renew Fee</a></li>

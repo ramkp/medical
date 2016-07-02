@@ -88,7 +88,7 @@ class Util {
             $items[] = $item;
         } // end while
         if (count($items) > 0) {
-            $list.="<span class='span3'>Program type</span><span class='span4'><select id='course_categories'>";
+            $list.="<span class='span3'>Program type</span><span class='span4'><select id='course_categories' style='width:275px;'>";
             $list.="<option value='0' selected>Program type</option>";
             foreach ($items as $item) {
                 $list.="<option value='$item->id'>$item->name</option>";
@@ -112,7 +112,7 @@ class Util {
                 } // end foreach
                 $items[] = $item;
             } // end while
-            $list.="<span class='span3'>Programs:</span><span class='span4'><select id='courses' >";
+            $list.="<span class='span3'>Programs:</span><span class='span4'><select id='courses' style='width:275px;'>";
             $list.="<option value='0' selected>Program</option>";
             foreach ($items as $item) {
                 $list.="<option value='$item->id'>$item->fullname</option>";
@@ -148,8 +148,9 @@ class Util {
         return $status;
     }
 
-    function get_course_users($id, $output = true) {
+    function get_course_users($id, $output = true, $mutliple = false) {
         //echo "Course id: ".$id."<br>";
+        //$mutliple=true; // temp workaround
         $list = "";
         $users = array();
         //1. Get course context
@@ -180,7 +181,66 @@ class Util {
         } // end if $num > 0
         ksort($users);
         if (count($users) > 0) {
-            $list.="<span class='span3'>Enrolled users:</span><span class='span4'><select id='users'>";
+            $list.="<span class='span3'>Enrolled users:</span><span class='span4'>";
+            if ($mutliple == true) {
+                $list.="<select id='users' multiple style='width:275px;'>";
+            } // end if $mutliple==true
+            else {
+                $list.="<select id='users' style='width:275px;'>";
+            }
+
+            $list.="<option value='0' selected>Select user</option>";
+            foreach ($users as $user) {
+                $user_details = $this->get_user_details($user->userid);
+                if ($user_details->firstname != '' && $user_details->lastname != '') {
+                    $list.="<option value='$user->userid'>" . ucfirst(strtolower(trim($user_details->lastname))) . " &nbsp;" . ucfirst(strtolower(trim($user_details->firstname))) . "</option>";
+                }
+            } // end foreach            
+            $list.="</select></span>";
+        } // end if count($users)>0
+        else {
+            $list.="<span class='span3'>Enrolled users:</span><span class='span4'>n/a</span>";
+        }
+        if ($output == true) {
+            return $list;
+        } // end if $output == true
+        else {
+            return $users;
+        }
+    }
+
+    function get_course_promotion_users($id, $output = true) {
+        $list = "";
+        $users = array();
+        //1. Get course context
+        $instanceid = $this->get_course_context($id);
+
+        //2. Get course users
+        $query = "select id, roleid, contextid, userid "
+                . "from mdl_role_assignments "
+                . "where roleid=$this->student_role and contextid=$instanceid";
+        //echo "Query: ".$query."<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $status = $this->is_user_deleted($row['userid']);
+                if ($status == 0) {
+                    $user = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $user->$key = $value;
+                    } // end foreach
+                    $user_detailes = $this->get_user_details($user->userid);
+                    if ($user_detailes->firstname != '' && $user_detailes->lastname != '') {
+                        $users[strtolower(trim($user_detailes->lastname))] = $user;
+                    } // end if $user_details->firstname != '' && $user_details->lastname != ''                   
+                } // end if $status==0
+            } // end while
+        } // end if $num > 0
+        ksort($users);
+        if (count($users) > 0) {
+            $list.="<span class='span3'>Enrolled users:</span><span class='span4'>";
+            $list.="<select id='users' name[]='users'  multiple style='width:275px;'>";
             $list.="<option value='0' selected>Select user</option>";
             foreach ($users as $user) {
                 $user_details = $this->get_user_details($user->userid);
@@ -218,6 +278,78 @@ class Util {
         $list.="Email: $user_detailes->email<br>";
         $list.="$user_detailes->address<br>";
         $list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
+        return $list;
+    }
+
+    function get_course_scheduler($id) {
+        $schedulerid = 0;
+        $query = "select * from mdl_scheduler where course=$id";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $schedulerid = $row['id'];
+            } // end while
+        } // end if $num > 0
+        return $schedulerid;
+    }
+
+    function get_course_workshops($id) {
+        $slots = array();
+        date_default_timezone_set('Pacific/Wallis');
+        $schedulerid = $this->get_course_scheduler($id);
+        $list = "";
+        $list.="<span class='span3'>Workshops:</span><span class='span4'>";
+        $list.="<select id='workshops' style='width:275px;'>";
+        $list.="<option value='0' selected>Classes/Workshops</option>";
+        if ($schedulerid > 0) {
+            $query = "select * from mdl_scheduler_slots "
+                    . "where schedulerid=$schedulerid";
+            $num = $this->db->numrows($query);
+            //echo "Num: ".$num."<br>";
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    if ($row['starttime']) {
+                        $slotobj = new stdClass();
+                        $slotobj->id = $row['id'];
+                        $slotobj->starttime = $row['starttime'];
+                        $slotobj->location = $row['appointmentlocation'];
+                        $slots[$row['starttime']] = $slotobj;
+                    } // end if $location_arr[0] && $location_arr[0] && $row['starttime']
+                } // end while
+                ksort($slots);
+                foreach ($slots as $slot) {
+                    $date = date('m-d-Y', $slot->starttime);
+                    $list.="<option value='" . $slot->id . "' >" . $slot->location . " - " . $date . "</option>";
+                } // end foreach
+            } // end if $num > 0
+        } // end if $schedulerid>0
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_workshop_users($id) {
+        $users = array();
+        $list = "";
+        $list.="<span class='span3'>Users:</span><span class='span4'>";
+        $list.="<select id='ws_users' name[]='ws_users' multiple style='width:275px;'>";
+        $list.="<option value='0' selected>Select user</option>";
+        $query = "select * from mdl_scheduler_appointment where slotid=$id";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user = $this->get_user_details($row['studentid']);
+                $users[ucfirst(strtolower($user->lastname))] = $user;
+            } // end while
+            ksort($users);
+            foreach ($users as $user) {
+                $data = ucfirst($user->lastname) . " " . ucfirst($user->firstname);
+                $list.="<option value='" . $user->id . "'>$data</option>";
+            } // end foreach
+        } // end if $num > 0
+        $list.="</select>";
         return $list;
     }
 

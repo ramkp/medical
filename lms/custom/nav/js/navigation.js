@@ -440,6 +440,13 @@ $(document).ready(function () {
         });
     }
 
+    function get_course_promotion_users(id) {
+        var url = "/lms/custom/promotion/get_course_promotion_users.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#promotion_users').html(data);
+        });
+    }
+
     function send_invoice_to_user() {
         var url = "/lms/custom/invoices/send_invoice.php";
         $.post(url, {id: 1}).done(function (data) {
@@ -503,6 +510,14 @@ $(document).ready(function () {
         var url = "/lms/custom/payments/get_cheque_payments.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+        });
+    }
+
+    function get_course_workshops(id) {
+        console.log('Course ID: ' + id);
+        var url = "/lms/custom/promotion/get_course_workshops.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#course_workshops').html(data);
         });
     }
 
@@ -1077,9 +1092,13 @@ $(document).ready(function () {
         else {
             $('#print_err').html('Please select at least one certificate');
         } // end else
+    }
 
-
-
+    function get_workshop_users(id) {
+        var url = "/lms/custom/promotion/get_workshop_users.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#workshop_users').html(data);
+        });
     }
 
 
@@ -1314,7 +1333,7 @@ $(document).ready(function () {
         // Save price item
         if (event.target.id.indexOf("price_") >= 0) {
             update_item_price(event.target.id);
-        }       
+        }
 
         if (event.target.id.indexOf("_faq") >= 0) {
             var oEditor = FCKeditorAPI.GetInstance('editor');
@@ -1357,7 +1376,44 @@ $(document).ready(function () {
 
         if (event.target.id == 'invoice_data') {
             update_invoice_data();
-        }   
+        }
+
+        if (event.target.id == 'create_campaign') {
+            var enrolled = $('select#users').val();
+            var enrolled_users = enrolled.join();
+            console.log('Enrolled users: ' + enrolled_users);
+
+            var ws = $('select#ws_users').val();
+            var workshop_users = ws.join();
+            console.log('Workshop users: ' + workshop_users);
+
+            var oEditor = FCKeditorAPI.GetInstance('editor');
+            var data = oEditor.GetHTML();
+            console.log('Editor data: ' + data);
+
+            if (data == '') {
+                $('#prom_err').html('Please provide message text');
+            }
+            else {
+                $('#prom_err').html('');
+                if (enrolled_users != 0 || workshop_users != 0) {
+                    $('#prom_err').html('');
+                    if (confirm('Send message to selected users?')) {
+                        $('#ajax_loader').show();
+                        var url = "/lms/custom/promotion/add_new_campaign.php";
+                        $.post(url, {data: data, enrolled_users: enrolled_users, workshop_users: workshop_users}).done(function (data) {
+                            $('#ajax_loader').hide();
+                            $('#prom_err').html(data);
+                        });
+                    } // end if confirm
+                } // end if enrolled_users != 0 || workshop_users != 0
+                else {
+                    $('#prom_err').html('Please select users to be messaged');
+                }
+            } // end else
+        }
+
+
 
         if (event.target.id == 'update_slide') {
             var id = $('#slide_id').val();
@@ -1835,6 +1891,13 @@ $(document).ready(function () {
         if (event.target.id == 'courses') {
             var id = $('#courses').val();
             get_course_users(id);
+            get_course_promotion_users(id);
+            get_course_workshops(id);
+        }
+
+        if (event.target.id == 'workshops') {
+            var id = $('#workshops').val();
+            get_workshop_users(id);
         }
 
         if (event.target.id == 'users') {
@@ -1996,7 +2059,7 @@ $(document).ready(function () {
     $("#promote").click(function (event) {
         update_navigation_status__menu('Promotions');
         get_promotion_page();
-    });    
+    });
 
     $("#Testimonial").click(function (event) {
         update_navigation_status__menu('Testimonial');
@@ -2199,15 +2262,7 @@ $(document).ready(function () {
     });
     $("body").click(function (event) {
         //console.log('Element clicked: ' + event.target.id);
-        
-        if (event.target.id == 'create_campaign') {
-            if ($('#new_campaign_container').is(':visible')) {
-                $('#new_campaign_container').hide();
-            } // end if 
-            else {
-                $('#new_campaign_container').show();
-            } // end else
-        }
+
 
         if (event.target.id == 'cancel') {
             $("#myModal").remove();
