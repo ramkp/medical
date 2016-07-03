@@ -1379,13 +1379,24 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'create_campaign') {
-            var enrolled = $('select#users').val();
-            var enrolled_users = enrolled.join();
-            console.log('Enrolled users: ' + enrolled_users);
-
-            var ws = $('select#ws_users').val();
-            var workshop_users = ws.join();
-            console.log('Workshop users: ' + workshop_users);
+            console.log('Enrolled users: ' + $('select#users').val());
+            if (typeof $('select#users').val() !== 'undefined') {
+                var enrolled = $('select#users').val();
+                var enrolled_users = enrolled.join();
+                console.log('Enrolled users: ' + enrolled_users);
+            } // end if typeof enr != 'undefined'
+            else {
+                $('#prom_err').html('Please select users to be messaged');
+            }
+            console.log('WS users: ' + $('select#ws_users').val());
+            if (typeof $('select#ws_users').val() !== 'undefined') {
+                var ws = $('select#ws_users').val();
+                var workshop_users = ws.join();
+                console.log('Workshop users: ' + workshop_users);
+            } // end if typeof wsr != 'undefined'
+            else {
+                $('#prom_err').html('Please select users to be messaged');
+            }
 
             var oEditor = FCKeditorAPI.GetInstance('editor');
             var data = oEditor.GetHTML();
@@ -1396,7 +1407,7 @@ $(document).ready(function () {
             }
             else {
                 $('#prom_err').html('');
-                if (enrolled_users != 0 || workshop_users != 0) {
+                if ((typeof $('select#users').val() !== 'undefined' && enrolled_users != 0) || (typeof $('select#ws_users').val() !== 'undefined' && workshop_users != 0)) {
                     $('#prom_err').html('');
                     if (confirm('Send message to selected users?')) {
                         $('#ajax_loader').show();
@@ -2296,7 +2307,15 @@ $(document).ready(function () {
 
     });
     $('body').on('change', 'select', function (event) {
-
+        if (event.target.id == 'camapaign') {
+            var id = $('#camapaign').val();
+            console.log('Campaign id: ' + id);
+            var url = "/lms/custom/promotion/get_campaign_stat.php";
+            var request = {id: id};
+            $.post(url, request).done(function (data) {
+                $('#campaign_container').html(data);
+            });
+        }
 
     });
 }); // end of $(document).ready(function()
