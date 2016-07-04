@@ -175,7 +175,8 @@ class Students {
 
     function get_partial_offline_payments() {
         $partials = array();
-        $query = "select * from mdl_partial_payments where pdate>1464074847 order by pdate asc";
+        $query = "select * from mdl_partial_payments "
+                . "where pdate>1464074847 order by pdate asc";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -251,7 +252,7 @@ class Students {
 
                 if ($total_students > 0) {
                     // Get workshop date and participants
-                    date_default_timezone_set('Pacific/Wallis');                    
+                    date_default_timezone_set('Pacific/Wallis');
                     //echo "Workshop name: $ws_detailes->notes<br>";
                     //echo "Workshop location: $ws_detailes->appointmentlocation <br>";
                     //echo "Workshop date: " . date('m-d-Y', $ws_detailes->starttime) . "<br>";
@@ -275,7 +276,7 @@ class Students {
             } // end foreach
         } // end if count($workshops)>0
         //print_r($partials);
-        if (count($clear_workshops) > 0) {            
+        if (count($clear_workshops) > 0) {
             $list.=$this->prepare_report($clear_workshops); // prepare report
             $this->send_notification_message($list); // send report
         } // end if count($partials)>0
@@ -624,6 +625,113 @@ class Students {
         else {
             echo "There no workshop students in near 24h ... <br>";
         }
+    }
+
+    /* ************** Process Campaign emails functionality **************** */
+
+    function get_campaign_content($id) {
+        $query = "select * from mdl_campaign where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $content = $row['content'];
+        }
+        return $content;
+    }
+
+    function update_campaign_status($camid) {
+        
+        $query = "select count(id) as total "
+                . "from mdl_campaign_log "
+                . "where camid=$camid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $total = $row['total'];
+        }
+        
+        $query = "select count(id) as total "
+                . "from mdl_campaign_log "
+                . "where camid=$camid and status='ok'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $processed = $row['total'];
+        }
+        
+        
+
+        if ($processed < $total) {
+            $query = "update mdl_campaign "
+                    . "set processed=$processed where id=$camid";
+        } else {
+            $query = "update mdl_campaign "
+                    . "set processed=$processed , "
+                    . "status='finished' "
+                    . "where id=$camid";
+        }
+        $this->db->query($query);
+    }
+
+    function get_user_message($detailes, $content) {
+        $list = "";
+        $list.="<html>";
+        $list.="<body>";
+        $list.="<p align='center'>Dear " . ucfirst($detailes->firstname) . "&nbsp;" . ucfirst($detailes->lastname) . "!</p>";
+        $list.="<p align='justify'>$content</p>";
+        $list.="<p align='justify'>Best regards,</p>";
+        $list.="<p align='justify'>Mediacl2 team.</p>";
+        $list.="</body>";
+        $list.="</html>";
+        return $list;
+    }
+
+    function send_email($camid, $userid) {
+        $content = $this->get_campaign_content($camid);
+        $user_details = $this->get_user_data($userid);
+        //$user_details->email = "sirromas@gmail.com"; // temp workaroud 
+        $message = $this->get_user_message($user_details, $content);
+        $mail = new PHPMailer;
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->addAddress($user_details->email);
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->isHTML(true);
+        $mail->Subject = 'Medical2 Career College';
+        $mail->Body = $message;
+        if (!$mail->send()) {
+            $query = "update mdl_campaign_log "
+                    . "set status='failed' "
+                    . "where camid=$camid "
+                    . "and userid=$userid";
+            $this->db->query($query);
+        } // end if !$mail->send()        
+        else {
+            $query = "update mdl_campaign_log "
+                    . "set status='ok' "
+                    . "where camid=$camid "
+                    . "and userid=$userid";
+            $this->db->query($query);
+            $this->update_campaign_status($camid);
+        } // end else        
+    }
+
+    function process_emails() {
+        $query = "select * from mdl_campaign_log "
+                . "where status='pending' "
+                . "order by dated desc limit 0,1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $camid = $row['camid'];
+                $userid = $row['userid'];
+            } // end while
+            $this->send_email($camid, $userid);
+        } // end if $num > 0
     }
 
 }
