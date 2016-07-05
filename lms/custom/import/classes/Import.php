@@ -1108,6 +1108,34 @@ class Import extends Util {
         return $stamp;
     }
 
+    function import_faq_questions($filepath) {
+        $handle = @fopen($filepath, "r");
+        $i = 0;
+        if ($handle) {
+            while (($buffer = fgets($handle, 4096)) !== false) {
+                $clean_buffer = str_replace(',,', ',', $buffer);
+                $clean_buffer2 = str_replace('"', '', $clean_buffer);
+                $q_arr = explode("\t", $clean_buffer2);
+                $q = $q_arr[1];
+                $a = $q_arr[2];
+                $catid = $q_arr[3];
+                if ($q != '' && $a != '' && $catid > 0) {
+                    $query = "insert into mdl_faq_old "
+                            . "(q,"
+                            . "a,"
+                            . "catid) "
+                            . "values('" . mysql_real_escape_string($q) . "',"
+                            . "'" . mysql_real_escape_string($a) . "',$catid)";
+                    echo "Query: " . $query . "<br>";
+                    $this->db->query($query);
+                }  // end if $q!='' && $a!='' && $catid>0
+            } // end while
+        } // end if $handle
+        else {
+            echo "Could not open file ... <br>";
+        }
+    }
+
     function process_exam_questions($filepath) {
         $handle = @fopen($filepath, "r");
         $i = 0;
@@ -1138,7 +1166,7 @@ class Import extends Util {
                 if ($catid > 0 && $q != '' && $a != '' && $b != '' && $c != '' && $d != '' && $ca != '') {
                     $question = new stdClass();
                     $question->category = $catid;
-                    $question->name = $q;                    
+                    $question->name = $q;
 
                     $questionid = $this->add_question($question);
                     echo "Question ID: " . $questionid . "<br>";

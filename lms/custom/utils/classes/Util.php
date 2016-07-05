@@ -130,10 +130,8 @@ class Util {
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $user = new stdClass();
-            if ($row['firstname'] != '' && $row['lastname'] != '') {
-                foreach ($row as $key => $value) {
-                    $user->$key = $value;
-                } // end foreach
+            foreach ($row as $key => $value) {
+                $user->$key = $value;
             } // end if $row['firstname'] != '' && $row['lastname'] != ''
         } // end while
         return $user;
@@ -172,14 +170,32 @@ class Util {
                         $user->$key = $value;
                     } // end foreach
                     $user_detailes = $this->get_user_details($user->userid);
-                    if ($user_detailes->firstname != '' && $user_detailes->lastname != '') {
-                        $users[strtolower(trim($user_detailes->lastname))] = $user;
+
+                    if ($user_detailes->lastname != '') {
+                        
+                        //echo "<br><pre>";
+                        //print_r($user_detailes);
+                        //echo "</pre><br>";
+
+                        $users[strtolower(trim($user_detailes->lastname)).".". strtolower(trim($user_detailes->firstname))] = $user;
                     } // end if $user_details->firstname != '' && $user_details->lastname != ''
                     //$users[] = $user;
                 } // end if $status==0
             } // end while
         } // end if $num > 0
+        
+        
+        //echo "<br>Users array before sort<pre>";
+        // print_r($users);
+        // echo "</pre><br>";
+        
         ksort($users);
+
+        //echo "<br>Users array after sort<pre>";
+        //print_r($users);
+        //echo "</pre><br>";
+
+
         if (count($users) > 0) {
             $list.="<span class='span3'>Enrolled users:</span><span class='span4'>";
             if ($mutliple == true) {
@@ -192,9 +208,7 @@ class Util {
             $list.="<option value='0' selected>Select user</option>";
             foreach ($users as $user) {
                 $user_details = $this->get_user_details($user->userid);
-                if ($user_details->firstname != '' && $user_details->lastname != '') {
-                    $list.="<option value='$user->userid'>" . ucfirst(strtolower(trim($user_details->lastname))) . " &nbsp;" . ucfirst(strtolower(trim($user_details->firstname))) . "</option>";
-                }
+                $list.="<option value='$user->userid'>" . ucfirst(strtolower(trim($user_details->lastname))) . " &nbsp;" . ucfirst(strtolower(trim($user_details->firstname))) . "</option>";
             } // end foreach            
             $list.="</select></span>";
         } // end if count($users)>0
