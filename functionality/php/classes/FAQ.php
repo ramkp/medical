@@ -28,4 +28,25 @@ class FAQ {
         return $list;
     }
 
+    function get_faq_by_category_id($id) {
+        $list = "";
+        $query = "select * from mdl_faq_old where catid=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span1' style='font-weight:bold;'>Q:</span><span class='span9'>" . $row['q'] . "</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span1' style='font-weight:bold;'>A:</span><span class='span9'>" . $row['a'] . "</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9'><hr/></span>";
+            $list.="</div>";
+        } // end foreach
+
+        return $list;
+    }
+
 }

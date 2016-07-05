@@ -1750,6 +1750,15 @@ $(document).ready(function () {
         }); // post(url, request).done(function (data)
     } // end if url.indexOf("school") >= 0
 
+    $("#faq_cat").change(function () {
+        var id = $('#faq_cat').val();
+        var url = "http://" + domain + "/functionality/php/get_category_faqs.php";
+        var request = {id: id};
+        $.post(url, request).done(function (data) {
+            $('#q_container').html(data)
+        });
+    });
+
     $("body").click(function (event) {
         //console.log('Element clicked: ' + event.target.id);
         if (event.target.id == 'ok') {
@@ -1781,7 +1790,7 @@ $(document).ready(function () {
      }
      });
      */
-    
+
 
 
 
