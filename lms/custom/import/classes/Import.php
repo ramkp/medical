@@ -1336,4 +1336,48 @@ class Import extends Util {
         } // end foreach
     }
 
+    function is_user_card_paid($userid) {
+        $query = "select * from mdl_card_payments where userid=$userid";        
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function is_user_invoice_paid($userid) {
+        $query = "select * from mdl_invoice where userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_non_paid_registrations() {
+        $list = "";
+        $query = "select id, "
+                . "firstname, "
+                . "lastname, "
+                . "email, "
+                . "phone1 "
+                . "from mdl_user "
+                . "where deleted=0 "
+                . "and phone1<>'' "
+                . "and firstname not like '%some%'";
+        $result = $this->db->query($query);
+        $i = 0;
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+
+            /*
+              echo "<br><pre>";
+              print_r($row);
+              echo "</pre><br>";
+             */
+
+            $is_card_paid = $this->is_user_card_paid($row['id']);
+            $is_invoice_paid = $this->is_user_invoice_paid($row['id']);
+            if ($is_card_paid == 0 && $is_invoice_paid == 0) {
+                $list.= "<p>" . $row['firstname'] . " " . $row['lastname'] . " " . $row['email'] . " " . $row['phone1'] . "</p>";
+                $i++;
+            } // end if $is_paid==0
+        } // end while
+        $list.="Total items: $i";
+        return $list;
+    }
+
 }

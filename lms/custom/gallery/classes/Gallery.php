@@ -79,12 +79,8 @@ class Gallery extends Util {
         $list.= "<span class='span1'>$year</span>";
         $list.= "<span class='span1'><button type='button' class='btn btn-primary' id='filter'>Filter</button></span>";
         if ($upload == true) {
-            $list = $list . "<span class='span1'>
-                    <button type='button' class='btn btn-primary start' id='start_upload'>                    
-                    <span name='start_upload'>Add</span></button></span>";
-            $list = $list . "<span class='span2'>
-                <button type='button' class='btn btn-danger delete' id='delete_img'>                    
-                    <span id='delete_img' >Delete</span></button></span>";
+            $list = $list . "<span class='span1'><button type='button' class='btn btn-primary start' id='start_upload'>Add</button></span>";
+            $list = $list . "<span class='span2'><button type='button' class='btn btn-danger delete' id='delete_img'>Delete</button></span>";
         } // end if $upload==true        
         return $list;
     }

@@ -1324,7 +1324,7 @@ $(document).ready(function () {
          $('#gallery_container').html(data);
          });
          */
-        var url = "https://" + domain + "/index.php/gallery/matched/" + state + "/" + month + "/" + year;
+        var url = "http://" + domain + "/index.php/gallery/matched/" + state + "/" + month + "/" + year;
         window.location = url;
     }
 
@@ -1505,7 +1505,7 @@ $(document).ready(function () {
 
     // ***********************Links processing events **********************
     $('.form_div').on('click', 'a', function (event) {
-        console.log("form_div" + event.target.id);
+        //console.log("form_div" + event.target.id);
         if (event.target.id.indexOf("cat_") >= 0) {
             var category_id = event.target.id.replace("cat_", "");
             $(".dropdown li a").click(function () {
@@ -1752,17 +1752,23 @@ $(document).ready(function () {
 
     $("#faq_cat").change(function () {
         var id = $('#faq_cat').val();
+        $('#ajax_loader').show();
         var url = "http://" + domain + "/functionality/php/get_category_faqs.php";
         var request = {id: id};
         $.post(url, request).done(function (data) {
+            $('#ajax_loader').hide();
             $('#q_container').html(data)
         });
     });
 
     $("body").click(function (event) {
-        //console.log('Element clicked: ' + event.target.id);
+        console.log('Element clicked: ' + event.target.id);
         if (event.target.id == 'ok') {
             $('#policy_checkbox').prop("checked", true);
+        }
+        
+        if (event.target.id == 'close') {
+            $("#myModal").remove();
         }
 
         if (event.target.id == 'prev_slide') {
@@ -1772,6 +1778,43 @@ $(document).ready(function () {
         if (event.target.id == 'next_slide') {
             console.log('Next is clicked ...');
         }
+
+        if (event.target.id.indexOf("img_") >= 0) {
+            var img = event.target.id.replace('img_', '');
+            var image = 'http://medical2.com/lms/custom/gallery/files/' + img;
+            var width=$(window).width();
+            console.log('Screen width: '+width);
+            console.log('Dialog loaded: ' + dialog_loaded);
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "http://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
+                            var request = {image: image, width:width};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
+                var request = {image: image, width:width};
+                $.post(url, request).done(function (data) {
+                    $("body").append(data);
+                    $("#myModal").modal('show');
+                });                
+            } // end else
+        }
+
+
+
     }); // end of $("body").click(function (event) {    
 
     $("body").bind('cssClassChanged', function (event) {

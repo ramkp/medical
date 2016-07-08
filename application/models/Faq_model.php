@@ -73,6 +73,10 @@ class Faq_model extends CI_Model {
         $list.="<br/><div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span9'>$cat</span>";
         $list.="</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:center;display:none;' id='ajax_loader'>";
+        $list.="<span class='span12'><img src='/assets/img/ajax.gif'></span>";
+        $list.="</div>";
 
         $list.="<br/><div class='container-fluid' style='text-align:left;' id='q_container'>";
         $list.="<span class='span10'>$q</span>";

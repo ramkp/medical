@@ -5,6 +5,8 @@
  *
  * @author sirromas
  */
+//require_once $_SERVER['DOCUMENT_ROOT']. '/lms/custom/gallery/classes/Gallery.php';
+
 class Gallery_model extends CI_Model {
 
     public $gl;
@@ -12,6 +14,7 @@ class Gallery_model extends CI_Model {
     function __construct() {
         parent::__construct();
         $this->load->database();
+        //$this->gl=new Gallery();
     }
 
     function get_states_list($upload = false) {
@@ -78,7 +81,7 @@ class Gallery_model extends CI_Model {
         $list.="</tr></td></table></div>";
         return $list;
     }
-    
+
     function get_image_sql_criteria($state = null, $month = null, $year = null) {
         if ($state == null && $month == null && $year == null) {
             $query = "select * from mdl_gallery";
@@ -126,26 +129,56 @@ class Gallery_model extends CI_Model {
         return $query;
     }
 
+    function get_galllery_thumbs($state = null, $month = null, $year = null, $full = false) {
+
+        /*
+         *          
+          echo "State: " . $state . "<br>";
+          echo "Month: " . $month . "<br>";
+          echo "Year: " . $year . "<br>";
+         * 
+         */
+
+        $list = "";        
+        $query = $this->get_image_sql_criteria($state, $month, $year);
+        //echo "Query: ".$query."<br>";
+        $result = $this->db->query($query);
+        if ($result->num_rows() > 0) {
+            foreach ($result->result() as $row) {
+                $files[] = $row->path;
+            } // end foreach
+            $list = $list . "<div class='container-fluid'>";
+            for ($i = 0; $i <= count($files) - 1; $i++) {
+                if ($files[$i] != '.' && $files[$i] != '..') {
+                    if ($full == false) {
+                        $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/thumbs/" . $files[$i];
+                    } // end if $full==false
+                    else {
+                        $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/" . $files[$i];
+                    } // end else   
+                        $list.="<div class='col-lg-3 col-md-4 col-xs-6 thumb'>
+                                <a class='thumbnail' href='#' onClick='return false;'>
+                                <img class='img-responsive' src='$img_http_path' alt='' id='img_$files[$i]'>
+                                </a>
+                                </div>";
+                } // end if $files[$i] != '.' && $files[$i] != '..'        
+            } // end for            
+            $list.= "</div>";
+        } // end if $result->num_rows() > 0
+        else {
+            $list.= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
+            $list.="<span class='span10' style='text-align:center;'>There are no images matched criteria</span>";
+            $list.= "</div>";
+        } // end else
+        return $list;
+    }
+
     function get_images_list($state = null, $month = null, $year = null) {
         $toolbar = $this->get_toolbar();
         $list = "";
         $list.="<div class='form_div'>" . $toolbar . "<br>";
-        //$query = "select * from mdl_gallery";
-        $query=$this->get_image_sql_criteria($state, $month, $year);
-        $result = $this->db->query($query);
-        if ($result->num_rows() > 0) {
-            $list.="<div class='fotorama' id='fotorama'>";
-            foreach ($result->result() as $row) {
-                $file_path = 'http://' . $_SERVER['SERVER_NAME'] . '/lms/custom/gallery/files/' . $row->path;
-                $list.="<img src='$file_path' alt='image' width='300px;' height='200px;'>";
-            } // end foreach
-            $list.="</div></div>";
-        } // end if $result->num_rows() > 0
-        else {
-            $list.="<div class='container-fluid' style=''>";
-            $list.="<span class='span9'>There are no images</span>";
-            $list.="</div></div>";
-        }
+        $list.=$this->get_galllery_thumbs($state,$month,$year);
+        $list.="</div>";      
         return $list;
     }
 

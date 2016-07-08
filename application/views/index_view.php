@@ -32,21 +32,33 @@ class slides {
 
     function get_active_banner() {
         $list = "";
-        $list.="<div id='title_" . $row['id'] . "'>
-                    <h3 class='panel-title' 
-                            style='background: #e2a500 none repeat scroll 0 0;
-                            color: #fff;display: block;font-size: 2.2em;
-                            line-height: 1.5em;margin-right: 5%;
-                            padding-left: 10px;
-                            text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);'>
-                            <span id='banner_title'>Certifications</span></h3>
-                    </div>";
+
+        /*
+          $list.="<div id='title_" . $row['id'] . "'>
+          <h3 class='panel-title'
+          style='background: #e2a500 none repeat scroll 0 0;
+          color: #fff;display: block;font-size: 2.2em;
+          line-height: 1.5em;margin-right: 5%;
+          padding-left: 10px;
+          text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);'>
+          <span id='banner_title'>Certifications</span></h3>
+          </div>";
+         */
         $query = "select * from mdl_slides ";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $title = $row['title'];
             $slogans = $row['slogan1'] . "<br>" . $row['slogan2'] . "<br>" . $row['slogan3'];
             if ($row['active'] == 1) {
+                $list.="<div id='title_" . $row['id'] . "' class='title'>
+                    <h3 class='panel-title' 
+                            style='background: #e2a500 none repeat scroll 0 0;
+                            color: #fff;display: block;font-size: 2.2em;
+                            line-height: 1.5em;margin-right: 5%;
+                            padding-left: 10px;
+                            text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);'>
+                            <span id='banner_title'>$title</span></h3>
+                    </div>";
                 $list.="<div id='" . $row['id'] . "' class='slogans'>
                         <span style='background: rgba(0, 0, 0, 0.5) none repeat scroll 0 0;
                               border-left: 4px solid #e2a500;
@@ -60,7 +72,17 @@ class slides {
                               <span id='banner_slogans'>$slogans</span>
                     </div>";
             } // end if ($row['active1']==1) {
-            else {                
+            else {
+                $list.="<div id='title_" . $row['id'] . "' style='display:none;' class='title'>
+                    <h3 class='panel-title' 
+                            style='background: #e2a500 none repeat scroll 0 0;
+                            color: #fff;display: block;font-size: 2.2em;
+                            line-height: 1.5em;margin-right: 5%;
+                            padding-left: 10px;                            
+                            text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);'>
+                            <span id='banner_title'>$title</span></h3>
+                    </div>";
+
                 $list.="<div id='" . $row['id'] . "' style='display: none;' class='slogans'>
                         <span style='background: rgba(0, 0, 0, 0.5) none repeat scroll 0 0;
                               border-left: 4px solid #e2a500;
@@ -128,6 +150,8 @@ $logans = $sl->get_slogans_array();
 <script type="text/javascript">
 
     var visible;
+    var index=0;
+    var first_time=0;
 
     function updateBanner() {
         var slogans = [];
@@ -135,14 +159,51 @@ $logans = $sl->get_slogans_array();
             var id = $(item).attr('id');
             slogans.push(id);
         });
-        var item = slogans[Math.floor(Math.random() * slogans.length)];
-        var velid = "#" + visible;        
-        var selid = "#" + item;
-        visible = item;
-        console.log('Visible ID: ' + velid);
-        console.log('Selected ID: ' + selid);
-        $(velid).hide();        
-        $(selid).show('slow');
+        var arr_length = slogans.length;
+        //console.log('Slogans: ' + slogans);
+        //console.log('Array length: '+arr_length);
+        //var item = slogans[Math.floor(Math.random() * slogans.length)];
+
+        /*
+         var title_visible_id = "#title_" + visible;
+         var title_selected_id = "#title_" + item;
+         var velid = "#" + visible;
+         var selid = "#" + item;
+         visible = item;
+         */
+
+
+        console.log('Current Index: ' + index);
+        if (index <= arr_length-1) {           
+             
+            if (first_time==0)  {
+                index++;
+                first_time=1;
+            }
+            
+            var item = slogans[index];
+            console.log('Item: ' + item);
+
+            //do what you need here
+            var title_visible_id = "#title_" + visible;
+            var title_selected_id = "#title_" + item;
+            var velid = "#" + visible;
+            var selid = "#" + item;
+            visible = item;
+
+            //console.log('Visible id: ' + visible);
+            //console.log('Selected id:' + item);
+
+            $(title_visible_id).hide();
+            $(title_selected_id).show();
+
+            $(velid).hide();
+            $(selid).show('slow');
+            index++;
+        } // end if new_index<=arr_length
+        else {
+            index = 0;
+        }
     }
 
     $('.slogans').each(function (index, item) {
@@ -153,7 +214,16 @@ $logans = $sl->get_slogans_array();
         }
     }); // end of each
 
-    var banners = setInterval('updateBanner()', 15000);
+
+    var banners = setInterval('updateBanner()', 10000);
+
+    /*
+     setTimeout(function () {
+     updateBanner();
+     }, 2000);
+     */
+
+
 
 
 </script>

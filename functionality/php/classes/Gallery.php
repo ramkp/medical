@@ -76,7 +76,7 @@ class Gallery {
         //echo "Query: " . $query . "<br>";
         return $query;
     }
-    
+
     function get_gallery_pics($state = null, $month = null, $year = null) {
         $list = "";
         $query = $this->get_image_sql_criteria($state, $month, $year);
@@ -98,6 +98,36 @@ class Gallery {
             $list.="<span class='span10' style='text-align:center;'>There are no images matched criteria</span>";
             $list.= "</div>";
         } // end else
+        return $list;
+    }
+
+    function show_image($image, $width) {
+        $list = "";
+        if ($width >= 768) {
+            $list.="<div id='myModal' class='modal responsive' style='display: inline; width: 90%; height:80%;  margin-left:-45%;'>";
+        } // end if $width >= 768 
+        else {
+            $list.="<div id='myModal' class='modal responsive' style='display: inline; width: 90%; height:80%;'>";
+        }
+
+        $list.="<div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>
+                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>                
+            </div>
+            <div class='modal-body' style='text-align:center;'>                
+                    <div class='col-lg-3 col-md-4 col-xs-6 thumb'>
+                      <a class='thumbnail' href='#' onClick='return false;'>
+                         <img class='img-responsive' src='$image' alt='' id='img_$files[$i]'>
+                      </a>
+                   </div>
+            </div>
+            <div class='modal-footer' style='text-align:center;>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='close'>Close</button></span>                
+            </div>
+         </div>
+        </div>
+        </div>";
         return $list;
     }
 
