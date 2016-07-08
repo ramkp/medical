@@ -322,7 +322,11 @@ class Mailer {
         </tr> 
         
         <tr>
-        <td>Paid Certificate renew fee</td><td>$$renew_fee</td>
+        <td>Amount paid</td><td>$$renew_fee</td>
+        </tr> 
+        
+        <tr>
+        <td colspan='2' align='center'>This certification has been renewed</td>
         </tr> 
         
         </table>";
