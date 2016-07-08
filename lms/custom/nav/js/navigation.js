@@ -424,6 +424,13 @@ $(document).ready(function () {
             $('#category_courses').html(data);
         });
     }
+    
+    function get_category_courses2(id) {
+        var url = "/lms/custom/certificates/get_category_courses2.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#send_category_courses').html(data);
+        });
+    }
 
     function get_certificate_item(id) {
         console.log('Page: ' + id);
@@ -437,6 +444,14 @@ $(document).ready(function () {
         var url = "/lms/custom/certificates/get_course_users.php";
         $.post(url, {id: id}).done(function (data) {
             $('#enrolled_users').html(data);
+        });
+    }
+    
+    function get_course_users2(id) {
+        console.log('Course ID: '+id);
+        var url = "/lms/custom/certificates/get_course_users2.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#send_enrolled_users').html(data);
         });
     }
 
@@ -627,8 +642,8 @@ $(document).ready(function () {
     }
 
     function send_certicicate_to_user() {
-        var courseid = $('#courses').val();
-        var userid = $('#users').val();
+        var courseid = $('#send_courses').val();
+        var userid = $('#send_users').val();
         if (userid > 0 && courseid > 0) {
             var url = "/lms/custom/certificates/get_course_completion.php";
             $.post(url, {userid: userid, courseid: courseid}).done(function (completion_date) {
@@ -1894,9 +1909,17 @@ $(document).ready(function () {
     });
     $('#region-main').on('change', 'select', function (event) {
         console.log(event.target.id);
+        
         if (event.target.id == 'course_categories') {
             var id = $('#course_categories').val();
+            console.log('Category id: ' + id);
             get_category_courses(id);
+        }        
+        
+        if (event.target.id == 'send_course_categories') {
+            var id = $('#send_course_categories').val();
+            console.log('Category id: ' + id);
+            get_category_courses2(id);
         }
 
         if (event.target.id == 'courses') {
@@ -1904,6 +1927,12 @@ $(document).ready(function () {
             get_course_users(id);
             get_course_promotion_users(id);
             get_course_workshops(id);
+        }
+        
+        if (event.target.id == 'send_courses') {
+            var id = $('#send_courses').val();
+            get_course_users2(id);
+            
         }
 
         if (event.target.id == 'workshops') {
@@ -2316,7 +2345,6 @@ $(document).ready(function () {
                 $('#campaign_container').html(data);
             });
         }
-
-    });
+    }); // end of body
 }); // end of $(document).ready(function()
 

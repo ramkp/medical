@@ -220,7 +220,7 @@ class Certificates extends Util {
 
     function get_send_certificate_page() {
         $list = "";
-        $programs_category = $this->get_course_categories();
+        $programs_category = $this->get_course_categories(true);
         $list.="<div id='send_cert_container' style='display:none;'>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span6' id='send_cert_err'></span>";
@@ -229,10 +229,10 @@ class Certificates extends Util {
         $list.="<span class='span8'>$programs_category</span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span8' id='category_courses'></span>";
+        $list.="<span class='span8' id='send_category_courses'></span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span8' id='enrolled_users'></span>";
+        $list.="<span class='span8' id='send_enrolled_users'></span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'><button type='button' id='send_cert' class='btn btn-primary'>Send</button></span>";
@@ -590,7 +590,7 @@ class Certificates extends Util {
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
-                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
@@ -627,7 +627,7 @@ class Certificates extends Util {
                 $list.="<br><span style='align:center;font-weight:bold;font-size:25pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Phlebotomy Technician Certificate<br><br><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day th of $month $year To:</span>";
                 $list.="<br><br><br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
-                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of the Phlebotomy Technician Written Exam. </span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam. </span>";
                 $list.="<br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
@@ -866,7 +866,10 @@ class Certificates extends Util {
 
     function verify_certificate($cert_fio, $cert_no) {
         $list = "";
-        $query = "select * from mdl_certificates where cert_no='$cert_no'";
+        $cert_arr= explode('-', $cert_no);
+        
+        $query = "select * from mdl_certificates where cert_no like '%$cert_arr[1]%'";
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -874,7 +877,7 @@ class Certificates extends Util {
                 $exp_date = $row['expiration_date'];
             } //end while
             if ($exp_date != 'n/a') {
-                $cert_exp_date = date('Y-m-d', $exp_date);
+                $cert_exp_date = date('m-d-Y', $exp_date);
                 $list.="Your Certificate will expire at $cert_exp_date";
             } // end if $exp_date!='n/a'
             else {
@@ -1495,7 +1498,7 @@ class Certificates extends Util {
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
-                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $cert->code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
@@ -1531,7 +1534,7 @@ class Certificates extends Util {
                 $list.="<br><span style='align:center;font-weight:bold;font-size:25pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Phlebotomy Technician Certificate<br><br><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day th of $month $year To:</span>";
                 $list.="<br><br><br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
-                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of the Phlebotomy Technician Written Exam. </span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam. </span>";
                 $list.="<br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
