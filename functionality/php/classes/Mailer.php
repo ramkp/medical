@@ -326,7 +326,11 @@ class Mailer {
         </tr> 
         
         <tr>
-        <td colspan='2' align='center'>This certification has been renewed</td>
+        <td colspan='2' align='left'>&nbsp;</td>
+        </tr> 
+        
+        <tr>
+        <td colspan='2' align='left'>This certification has been renewed</td>
         </tr> 
         
         </table>";
