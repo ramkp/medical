@@ -84,7 +84,7 @@ class Gallery_model extends CI_Model {
 
     function get_image_sql_criteria($state = null, $month = null, $year = null) {
         if ($state == null && $month == null && $year == null) {
-            $query = "select * from mdl_gallery";
+            $query = "select * from mdl_gallery order by date_added";
         }
 
         if ($state != null && $month == null && $year == null) {
@@ -139,7 +139,7 @@ class Gallery_model extends CI_Model {
          * 
          */
 
-        $list = "";        
+        $list = "";
         $query = $this->get_image_sql_criteria($state, $month, $year);
         //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
@@ -147,7 +147,8 @@ class Gallery_model extends CI_Model {
             foreach ($result->result() as $row) {
                 $files[] = $row->path;
             } // end foreach
-            $list = $list . "<div class='container-fluid'>";
+            $list.="<div class='row-fluid'>";
+            //$list.="<ul class='thumbnails'>";
             for ($i = 0; $i <= count($files) - 1; $i++) {
                 if ($files[$i] != '.' && $files[$i] != '..') {
                     if ($full == false) {
@@ -155,15 +156,27 @@ class Gallery_model extends CI_Model {
                     } // end if $full==false
                     else {
                         $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/" . $files[$i];
-                    } // end else   
-                        $list.="<div class='col-lg-3 col-md-4 col-xs-6 thumb'>
-                                <a class='thumbnail' href='#' onClick='return false;'>
-                                <img class='img-responsive' src='$img_http_path' alt='' id='img_$files[$i]'>
-                                </a>
-                                </div>";
-                } // end if $files[$i] != '.' && $files[$i] != '..'        
-            } // end for            
-            $list.= "</div>";
+                    } // end else                                       
+                    if ($i % 2 == 0) {
+                        $list = $list . "<ul class='thumbnails'>";
+                        $list = $list . "<li class='span6'>
+                    <div class='thumbnail' style='text-align:center'>                        
+                            <img alt='Gallery file' src='$img_http_path' id='img_$files[$i]' alt='Gallery file' width='300px;' height='200px;' style='cursor:pointer;'>                        
+                    </div>
+                    </li> ";
+                        $list = $list . "<ul class='thumbnails'>";
+                    } // end if $i%2==0
+                    else {
+                        $list = $list . "<li class='span6'>
+                    <div class='thumbnail' style='text-align:center'>                        
+                            <img alt='Gallery file' src='$img_http_path' id='img_$files[$i]' alt='Gallery file' width='300px;' height='200px;' style='cursor:pointer;'>                        
+                    </div>
+                    </li> &nbsp;&nbsp;&nbsp;";
+                    } // end else
+                } // end if $files[$i] != '.' && $files[$i] != '..'
+                //$list.="<li class='span5'><a href='#' class='thumbnail' onClick='return false;'><img src='$img_http_path' alt='' id='img_$files[$i]' width='300' height='200'></a></li>";
+            } // end for
+            $list.= "</ul></div>";
         } // end if $result->num_rows() > 0
         else {
             $list.= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
@@ -176,9 +189,10 @@ class Gallery_model extends CI_Model {
     function get_images_list($state = null, $month = null, $year = null) {
         $toolbar = $this->get_toolbar();
         $list = "";
-        $list.="<div class='form_div'>" . $toolbar . "<br>";
-        $list.=$this->get_galllery_thumbs($state,$month,$year);
-        $list.="</div>";      
+        $list.="<div class='form_div' style='text-align:center;'>" . $toolbar . "<br>";
+        //$list.="<div>" . $toolbar . "<br>";
+        $list.=$this->get_galllery_thumbs($state, $month, $year);
+        $list.="</div>";
         return $list;
     }
 

@@ -103,6 +103,7 @@ class Gallery {
 
     function show_image($image, $width) {
         $list = "";
+        $images = "";
         if ($width >= 768) {
             $list.="<div id='myModal' class='modal responsive' style='display: inline; width: 90%; height:80%;  margin-left:-45%;'>";
         } // end if $width >= 768 
@@ -110,17 +111,28 @@ class Gallery {
             $list.="<div id='myModal' class='modal responsive' style='display: inline; width: 90%; height:80%;'>";
         }
 
+        $query = "select * from mdl_gallery order by date_added desc";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $selected_img = trim(str_replace('http://medical2.com/lms/custom/gallery/files/', '', $image));
+            if ($row['path'] != $selected_img) {
+                $images.="<img src='http://medical2.com/lms/custom/gallery/files/" . $row['path'] . "' class='img-responsive'  alt='Gallery image'>";
+            } // end if 
+        } // end while
+
+
         $list.="<div class='modal-dialog'>
+        <link  href='http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel='stylesheet'> <!-- 3 KB -->
+        <script src='http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js'></script> <!-- 16 KB -->
         <div class='modal-content'>
             <div class='modal-header'>
                 <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>                
             </div>
-            <div class='modal-body' style='text-align:center;'>                
-                    <div class='col-lg-3 col-md-4 col-xs-6 thumb'>
-                      <a class='thumbnail' href='#' onClick='return false;'>
-                         <img class='img-responsive' src='$image' alt='' id='img_$files[$i]'>
-                      </a>
-                   </div>
+            <div class='modal-body' style='text-align:center;height:768px;'>                
+                    <div class='fotorama' style='text-align:center;'>
+                    <image src='$image' class='img-responsive' alt='Gallery image' >
+                    $images;    
+                    </div>
             </div>
             <div class='modal-footer' style='text-align:center;>
                 <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='close'>Close</button></span>                
