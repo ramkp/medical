@@ -424,7 +424,7 @@ $(document).ready(function () {
             $('#category_courses').html(data);
         });
     }
-    
+
     function get_category_courses2(id) {
         var url = "/lms/custom/certificates/get_category_courses2.php";
         $.post(url, {id: id}).done(function (data) {
@@ -446,9 +446,9 @@ $(document).ready(function () {
             $('#enrolled_users').html(data);
         });
     }
-    
+
     function get_course_users2(id) {
-        console.log('Course ID: '+id);
+        console.log('Course ID: ' + id);
         var url = "/lms/custom/certificates/get_course_users2.php";
         $.post(url, {id: id}).done(function (data) {
             $('#send_enrolled_users').html(data);
@@ -1728,6 +1728,32 @@ $(document).ready(function () {
             print_labels();
         }
 
+        if (event.target.id == 'labels') {
+            //console.log('Print labels from Workshop Schedule page ...');
+            var selected = new Array();
+            $("input:checked").each(function () {
+                selected.push($(this).val());
+            });
+            if (selected.length > 0) {
+                $('#sch_err').html('');
+                var students = selected.join();
+                var courseid = $('#courseid').val();
+                if (confirm('Print labels for selected users?')) {
+                    $('#ajax_loading').show();
+                    var url = "/lms/custom/schedule/print_workshop_labels.php";
+                    $.post(url, {courseid: courseid, students: students}).done(function () {
+                        $('#ajax_loading').hide();
+                        var url = "http://medical2.com/print/merged.pdf";
+                        var oWindow = window.open(url, "print");
+                    });
+                } // end if confirm
+            } // end if selected.length > 0
+            else {
+                $('#sch_err').html('Please select at least one student');
+            }
+
+        }
+
         if (event.target.id == 'renew_cert') {
             renew_certificates();
         }
@@ -1909,13 +1935,13 @@ $(document).ready(function () {
     });
     $('#region-main').on('change', 'select', function (event) {
         console.log(event.target.id);
-        
+
         if (event.target.id == 'course_categories') {
             var id = $('#course_categories').val();
             console.log('Category id: ' + id);
             get_category_courses(id);
-        }        
-        
+        }
+
         if (event.target.id == 'send_course_categories') {
             var id = $('#send_course_categories').val();
             console.log('Category id: ' + id);
@@ -1928,11 +1954,11 @@ $(document).ready(function () {
             get_course_promotion_users(id);
             get_course_workshops(id);
         }
-        
+
         if (event.target.id == 'send_courses') {
             var id = $('#send_courses').val();
             get_course_users2(id);
-            
+
         }
 
         if (event.target.id == 'workshops') {

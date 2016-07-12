@@ -8,15 +8,18 @@
 //session_start();
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.php';
 
 class Schedule extends Util {
 
     public $courseid;
+    public $labels_path;
 
     function __construct() {
         global $COURSE;
         parent::__construct();
         $this->courseid = $COURSE->id;
+        $this->labels_path = $_SERVER['DOCUMENT_ROOT'] . '/print';
     }
 
     function get_course_scheduler($courseid) {
@@ -194,6 +197,7 @@ class Schedule extends Util {
             $list.="<span class='span2'><a href='#' id='move' onClick='return false;'>Move</a></span>";
             $list.="<span class='span2'><a href='#' id='delete' onClick='return false;'>Remove</a></span>";
             $list.="<span class='span2'><a href='#' id='print' onClick='return false;'>Print certificates</a></span>";
+            $list.="<span class='span2'><a href='#' id='labels' onClick='return false;'>Print labels</a></span>";
             $list.="<span class='span2'><a href='#' id='send' onClick='return false;'>Send certificates</a></span>";
             $list.="<span class='span2'><a href='#' id='add_students' onClick='return false;'>Add students</a></span>";
             $list.="</div>";
@@ -530,7 +534,7 @@ class Schedule extends Util {
     }
 
     function save_additional_slot($slot) {
-        
+
         //print_r($slot);
         //die();
         //$date=date('m-d-Y', $slot->starttime);
@@ -554,6 +558,43 @@ class Schedule extends Util {
                 . "'$slot->timemodified')";
         //echo "Query: ".$query."<br>";
         $this->db->query($query);
+    }
+
+    function get_user_address_data($userid) {
+        $query = "SELECT firstname, lastname, email, phone1, address, city, state, zip
+                FROM  `mdl_user` where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $user = new stdClass();
+            foreach ($row as $key => $value) {
+                $user->$key = $value;
+            }
+            $user->group_name = '';
+        } // end while
+        return $user;
+    }
+
+    function print_certificate_labels($courseid, $students) {
+        $students_arr = explode(',', $students);
+        if (count($students_arr) > 0) {
+            $pdf = new PDF_Label('L7163');
+            $pdf->AddPage();
+            if (!is_dir($this->labels_path)) {
+                if (!mkdir($dir_path)) {
+                    die('Could not write to disk');
+                } // end if !mkdir($dir_path)
+            } // end if !is_dir($dir_path)                
+            foreach ($students_arr as $userid) {
+                $user_address = $this->get_user_address_data($userid);
+                //$text = sprintf("%s\n%s\n%s\n%s %s, %s", "$user_address->firstname , $user_address->lastname", "$user_address->address", "$user_address->state" . $user_address->city . "", "$user_address->zip");
+                //$text = sprintf("%s\n%s\n%s\n%s %s, %s", "$user_address->firstname , $user_address->lastname", "$user_address->address", "$user_address->state", "$user_address->zip", "$user_address->city", 'USA');
+                $text = sprintf("%s\n%s\n%s %s %s", "$user_address->firstname  $user_address->lastname", "$user_address->address", "$user_address->city ,", "$user_address->state", "$user_address->zip");
+                $pdf->Add_Label($text);
+            } // end foreach
+
+            $path = $this->labels_path . "/merged.pdf";
+            $pdf->Output($path, 'F');
+        } // end if count($students_arr)>0
     }
 
 }
