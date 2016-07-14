@@ -218,7 +218,7 @@ class Schedule extends Util {
                 $addr_block = $addr_array[1] . " , " . $addr_array[0];
                 $list.="<div class='panel panel-default'>";
                 $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a><br> $slot->notes</h5></div>";
-                $list.="<div class='panel-body'>";
+                $list.="<div class='panel-body' id='$slotid'>";
                 $slot_students = $this->get_slot_students($slot->id);
                 $courseid = $this->get_course_id($slot->id);
                 if (count($slot_students) > 0) {
@@ -226,6 +226,10 @@ class Schedule extends Util {
                     $list.="<span class='span1'></span>";
                     $list.="<span class='span3'>Student</span>";
                     $list.="<span class='span4'>Course completion status</span>";
+                    $list.="</div>";
+                    $list.= "<div class='container-fluid' style='text-align:left;'>";
+                    $list.="<span class='span1'><input type='checkbox' name='studentid' id='slot_students_$slotid' value=''></span>";
+                    $list.="<span class='span3'>Select all</span>";
                     $list.="</div>";
                     foreach ($slot_students as $student) {
                         $user_data = $this->get_user_details($student->studentid);
@@ -236,7 +240,7 @@ class Schedule extends Util {
                         } // end if $completion_arr['passed']==1
                         else {
                             $status = "Pending";
-                        } // end else
+                        } // end else                        
                         $list.= "<div class='container-fluid' style='text-align:left;'>";
                         $list.="<span class='span1'><input type='checkbox' class='students' name='studentid' value='$student->studentid'></span>";
                         $list.="<span class='span3'><a href='https://medical2.com/lms/user/profile.php?id=$student->studentid'  target='_blank'>$user_data->firstname $user_data->lastname</a></span>";
@@ -337,8 +341,10 @@ class Schedule extends Util {
                 //exec("convert -density 300 $pdf_file $jpg_file");
                 $certs[] = $pdf_file;
             }
+            //print_r($certs);
             $datadir = $_SERVER['DOCUMENT_ROOT'] . "/print/";
-            $outputName = $datadir . "merged.pdf";
+            //$outputName = $datadir . "merged.pdf";
+            $outputName = $datadir . $now . "_merged.pdf";
             $cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$outputName ";
             foreach ($certs as $certificate) {
                 $cmd .= $certificate . " ";
@@ -357,6 +363,10 @@ class Schedule extends Util {
               $this->db->query($query2);
              */
         } // end if count($students_arr) > 0
+        else {
+            echo "No students selected ...";
+        }
+        return $now . "_merged.pdf";
     }
 
     function get_print_job() {
@@ -586,15 +596,14 @@ class Schedule extends Util {
             } // end if !is_dir($dir_path)                
             foreach ($students_arr as $userid) {
                 $user_address = $this->get_user_address_data($userid);
-                //$text = sprintf("%s\n%s\n%s\n%s %s, %s", "$user_address->firstname , $user_address->lastname", "$user_address->address", "$user_address->state" . $user_address->city . "", "$user_address->zip");
-                //$text = sprintf("%s\n%s\n%s\n%s %s, %s", "$user_address->firstname , $user_address->lastname", "$user_address->address", "$user_address->state", "$user_address->zip", "$user_address->city", 'USA');
                 $text = sprintf("%s\n%s\n%s %s %s", "$user_address->firstname  $user_address->lastname", "$user_address->address", "$user_address->city ,", "$user_address->state", "$user_address->zip");
                 $pdf->Add_Label($text);
             } // end foreach
-
-            $path = $this->labels_path . "/merged.pdf";
+            $now = time();
+            $path = $this->labels_path . "/" . $now . "_merged.pdf";
             $pdf->Output($path, 'F');
         } // end if count($students_arr)>0
+        return $now . "_merged.pdf";
     }
 
 }

@@ -1766,7 +1766,7 @@ $(document).ready(function () {
         if (event.target.id == 'ok') {
             $('#policy_checkbox').prop("checked", true);
         }
-        
+
         if (event.target.id == 'close') {
             $("#myModal").remove();
         }
@@ -1782,8 +1782,8 @@ $(document).ready(function () {
         if (event.target.id.indexOf("img_") >= 0) {
             var img = event.target.id.replace('img_', '');
             var image = 'http://medical2.com/lms/custom/gallery/files/' + img;
-            var width=$(window).width();
-            console.log('Screen width: '+width);
+            var width = $(window).width();
+            console.log('Screen width: ' + width);
             console.log('Dialog loaded: ' + dialog_loaded);
             if (dialog_loaded !== true) {
                 console.log('Script is not yet loaded starting loading ...');
@@ -1793,7 +1793,7 @@ $(document).ready(function () {
                         .done(function () {
                             console.log('Script bootstrap.min.js is loaded ...');
                             var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
-                            var request = {image: image, width:width};
+                            var request = {image: image, width: width};
                             $.post(url, request).done(function (data) {
                                 $("body").append(data);
                                 $("#myModal").modal('show');
@@ -1805,11 +1805,11 @@ $(document).ready(function () {
             } // dialog_loaded!=true
             else {
                 var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
-                var request = {image: image, width:width};
+                var request = {image: image, width: width};
                 $.post(url, request).done(function (data) {
                     $("body").append(data);
                     $("#myModal").modal('show');
-                });                
+                });
             } // end else
         }
 

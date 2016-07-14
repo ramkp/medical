@@ -1258,7 +1258,9 @@ $(document).ready(function () {
     function print_certificates() {
         var selected = new Array();
         $("input:checked").each(function () {
-            selected.push($(this).val());
+            if ($(this).val() != '') {
+                selected.push($(this).val());
+            }
         });
         if (selected.length > 0) {
             $('#sch_err').html('');
@@ -1267,9 +1269,10 @@ $(document).ready(function () {
             if (confirm('Print certificates for selected users?')) {
                 $('#ajax_loading').show();
                 var url = "/lms/custom/schedule/print_certificates.php";
-                $.post(url, {courseid: courseid, students: students}).done(function () {
+                $.post(url, {courseid: courseid, students: students}).done(function (filename) {
                     $('#ajax_loading').hide();
-                    var url = "http://medical2.com/print/merged.pdf";
+                    //var url = "http://medical2.com/print/merged.pdf";
+                    var url = "http://medical2.com/print/" + filename;
                     var oWindow = window.open(url, "print");
                 });
             } // end if confirm
@@ -1656,6 +1659,12 @@ $(document).ready(function () {
 
     }); // end of #region-main click', 'button',
 
+    $('#region-main').on('click', 'checkbox', function (event) {
+        console.log('Event: ' + event);
+    });
+
+
+
     $('#region-main').on('click', 'a', function (event) {
         if (event.target.id.indexOf("group_") >= 0) {
             var id = event.target.id.replace("group_", "");
@@ -1732,7 +1741,9 @@ $(document).ready(function () {
             //console.log('Print labels from Workshop Schedule page ...');
             var selected = new Array();
             $("input:checked").each(function () {
-                selected.push($(this).val());
+                if ($(this).val() != '') {
+                    selected.push($(this).val());
+                }
             });
             if (selected.length > 0) {
                 $('#sch_err').html('');
@@ -1741,9 +1752,10 @@ $(document).ready(function () {
                 if (confirm('Print labels for selected users?')) {
                     $('#ajax_loading').show();
                     var url = "/lms/custom/schedule/print_workshop_labels.php";
-                    $.post(url, {courseid: courseid, students: students}).done(function () {
+                    $.post(url, {courseid: courseid, students: students}).done(function (filename) {
                         $('#ajax_loading').hide();
-                        var url = "http://medical2.com/print/merged.pdf";
+                        //var url = "http://medical2.com/print/merged.pdf";
+                        var url = "http://medical2.com/print/" + filename;
                         var oWindow = window.open(url, "print");
                     });
                 } // end if confirm
@@ -1917,19 +1929,37 @@ $(document).ready(function () {
     }); // end of $('#region-main').on('click', 'a'
 
     $(document).on('change', '[type=checkbox]', function (event) {
-        console.log('Event id: ' + event.target.id);
+        //console.log('Event id: ' + event.target.id);
         var courseid = event.target.id.replace('installment_', '');
         var installment_el = '#installment_' + courseid;
-        console.log('Installment: ' + installment_el);
+        //console.log('Installment: ' + installment_el);
         var num_payments_el = '#num_payments_' + courseid;
-        console.log('Num payments: ' + num_payments_el);
+        //console.log('Num payments: ' + num_payments_el);
         var installment_status = $(installment_el).is(':checked');
-        console.log('Installment status: ' + installment_status);
+        //console.log('Installment status: ' + installment_status);
         if (installment_status == true) {
             $(num_payments_el).prop("disabled", false);
         }
         else {
             $(num_payments_el).prop("disabled", true);
+        }
+
+        if (event.target.id.indexOf("slot_students_") >= 0) {
+            var id = event.target.id.replace('slot_students_', "");
+            var divid = '#' + id;
+            var main_checkbox_id = '#slot_students_' + id;
+            var status = $(main_checkbox_id).prop("checked");
+            console.log('Main checkbox status:' + status);
+            var checkboxes = $(divid).find("input[type='checkbox']");
+            $.each(checkboxes, function (i, item) {
+                if (status == true) {
+                    $(item).prop("checked", true);
+                    //item.attr("checked", true);
+                } // end if $(main_checkbox_id).attr("checked") != 'checked'
+                else {
+                    $(item).prop("checked", false);
+                } // end else
+            }); // end each
         }
 
     });

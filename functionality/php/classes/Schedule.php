@@ -316,7 +316,7 @@ class Schedule extends Programs {
                         $list.= "<span class='span2'>$location</span>";
                         $list.= "<span class='span3'>" . $row['notes'] . "</span>";
                         $list.= "<span class='span1'>9am -  5pm</span>";
-                        $list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid/" . $row['id'] . "'><button class='btn btn-primary'>Register</button></a></span>";
+                        $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register/index/$courseid/" . $row['id'] . "'><button class='btn btn-primary'>Register</button></a></span>";
                         $list.="</div>";
 
                         $list.="<div class='container-fluid' style='text-align:left;'>";
