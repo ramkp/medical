@@ -135,7 +135,7 @@ class Dashboard extends Util {
         return $list;
     }
 
-    function get_course_categories() {
+    function get_course_categories($send = NULL) {
         $drop_down = "";
         $drop_down.="<select id='categories' style='width:120px;'>";
         $drop_down.="<option value='0' selected='selected'>Program type</option>";

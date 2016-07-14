@@ -152,7 +152,9 @@ $(document).ready(function () {
         var items = new Array();
         //$( "input:checked" ).val()
         $("input:checked").each(function () {
-            items.push($(this).val());
+            if ($(this).val() != '') {
+                items.push($(this).val());
+            }
         });
         console.log('Items array: ' + items);
         if (items.length > 0) {
@@ -1208,7 +1210,9 @@ $(document).ready(function () {
     function change_students_course_status() {
         var selected = new Array();
         $("input:checked").each(function () {
-            selected.push($(this).val());
+            if ($(this).val() != '') {
+                selected.push($(this).val());
+            }
         });
         if (selected.length > 0) {
             $('#sch_err').html('');
@@ -1800,7 +1804,9 @@ $(document).ready(function () {
         if (event.target.id == 'pending') {
             var selected = new Array();
             $("input:checked").each(function () {
-                selected.push($(this).val());
+                if ($(this).val() != '') {
+                    selected.push($(this).val());
+                }
             });
             if (selected.length > 0) {
                 $('#sch_err').html('');
@@ -1845,7 +1851,9 @@ $(document).ready(function () {
             var scheduler = $('#scheduler').val();
             var selected = new Array();
             $("input:checked").each(function () {
-                selected.push($(this).val());
+                if ($(this).val() != '') {
+                    selected.push($(this).val());
+                }
             });
             if (selected.length > 0) {
                 $('#sch_err').html('');
