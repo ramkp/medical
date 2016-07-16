@@ -271,7 +271,7 @@ class Schedule extends Programs {
             $query = "select id from mdl_scheduler where course=$courseid";
             $result = $this->db->query($query);
             $num = $this->db->numrows($query);
-            $now = time() + 86400;
+            $now = time() - 86400;
             if ($num > 0) {
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                     $schedulerid = $row['id'];

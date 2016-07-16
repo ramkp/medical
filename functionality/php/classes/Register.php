@@ -472,7 +472,7 @@ class Register {
     function get_course_slots($courseid) {
         $slots = array();
         $schedulerid = $this->get_schedulerid($courseid);
-        $now = time() + 86400;
+        $now = time() - 86400;
         if ($schedulerid > 0) {
             $query = "select DISTINCT id from mdl_scheduler_slots "
                     . "where schedulerid=$schedulerid "
