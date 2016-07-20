@@ -2,5 +2,6 @@
 
 require_once '/home/cnausa/public_html/crons/classes/Students.php';
 $student = new Students();
-$list=$student->check_owe_students();
+//$list=$student->check_owe_students();
+$list = $student->get_workshop_students();
 echo $list;

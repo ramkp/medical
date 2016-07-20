@@ -154,13 +154,15 @@ class Enroll {
 
         $context = stream_context_create($options);
         $response = @file_get_contents($this->signup_url, false, $context);
+        //$response = file_get_contents($this->signup_url, false, $context);
+        //print_r($response);
 
         if ($response !== false) {
             // 2. Enroll user into course
             $this->enroll_user_to_course($user);
         }  // end if $response !== false        
         else {
-            $list.="<div class='container-fluid'>";
+            $list.="<div class='container-fluid'>";            
             $list.="<span class='span9'>Signup error happened </span>";
             $list.="</div>";
             echo $list;

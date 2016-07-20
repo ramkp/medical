@@ -10,14 +10,16 @@ if (!$authplugin->can_signup()) {
     print_error('notlocalisederrormessage', 'error', '', 'Sorry, you may not use this page.');
 }
 
-if ($_POST) { 
+//print_r($_REQUEST);
+
+if ($_REQUEST) { 
     
-    $user_data = $_POST['user'];
+    $user_data = $_REQUEST['user'];
     $posted_user = json_decode(base64_decode($user_data));
 
     $user = new stdClass();
     $user->confirmed = 0; // It is alwayes confirmed, but we check payment status after user login
-    $user->username = $posted_user->email;
+    $user->username = strtolower($posted_user->email);
     $user->password = $posted_user->pwd;
     $user->purepassword = $posted_user->pwd;    
     $user->email = $posted_user->email;
@@ -40,11 +42,14 @@ if ($_POST) {
     $user->auth = $CFG->registerauth;      
     
     /*
+     * 
     echo "<br>----------------<br>";
     print_r($user);
     echo "<br>----------------<br>";
     die();
-    */
+     * 
+     */
+    
     
     // Initialize alternate name fields to empty strings.
     $namefields = array_diff(get_all_user_name_fields(), useredit_get_required_name_fields());

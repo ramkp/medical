@@ -202,21 +202,31 @@ class Students {
     }
 
     function get_future_workshops() {
-        $now = time();
+        $now = time() - 86400;
         $ws = array();
-        $query = "select * from mdl_scheduler_slots where starttime>$now";
+        $query = "select * from mdl_scheduler_slots where starttime>$now order by starttime";
+        //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $ws[$row['starttime']] = $row['id'];
-            } // end while
-            ksort($ws);
+                $ws[] = $row['id'];
+            } // end while            
         } // end if $num > 0
         return $ws;
     }
 
     // *************************** Entry point *******************************
+
+    function get_workshop_students() {
+        $list = "";
+        $workshops = $this->get_future_workshops();
+        if (count($workshops) > 0) {
+            $list.=$this->prepare_report($workshops);
+            $this->send_notification_message($list);
+        } // end if count($workshops)>0
+    }
+
     function check_owe_students() {
         $list = "";
         $clear_workshops = array();
@@ -319,11 +329,11 @@ class Students {
 
     function get_student_payments($courseid, $userid) {
         $query = "select * from mdl_card_payments "
-                . "where pdate>1464074847 "
-                . "and courseid=$courseid "
+                . "where courseid=$courseid "
                 . "and userid=$userid";
         //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
+        //echo "Payment num: " . $num . "<br>";
         if ($num > 0) {
             $renew_fee = $this->get_renew_fee();
             $result = $this->db->query($query);
@@ -331,7 +341,7 @@ class Students {
                 $user_payment = $row['psum'];
                 $course_cost = $this->get_course_cost($row['courseid']);
                 $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
-                if ($user_payment < $course_cost && $user_payment != $renew_fee) {
+                if ($user_payment != $renew_fee) {
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
                     $partial->courseid = $row['courseid'];
@@ -345,7 +355,7 @@ class Students {
 
         $query = "select * from mdl_partial_payments where pdate>1464074847 "
                 . "and courseid=$courseid "
-                . "and userid=$userid ";
+                . "and userid=$userid limit 0,1";
         //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -355,7 +365,7 @@ class Students {
                 $user_payment = $row['psum'];
                 $course_cost = $this->get_course_cost($row['courseid']);
                 $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
-                if ($user_payment < $course_cost && $user_payment != $renew_fee) {
+                if ($user_payment != $renew_fee) {
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
                     $partial->courseid = $row['courseid'];
@@ -369,14 +379,153 @@ class Students {
         return $partial;
     }
 
+    function prepare_intructor_report($courseid, $slotid) {
+        $list = "";
+        $owe_sum = 0;
+        date_default_timezone_set('Pacific/Wallis');
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $userid = $row['studentid'];
+            $roleid = $this->get_user_course_role($courseid, $userid);
+            echo "User id: " . $userid . "<br>";
+            echo "Role id: " . $roleid . "<br>";
+            echo "<br>--------------------------------------------------<br>";
+            if ($roleid == 3) {
+                // It is instructor
+                $tutorid = $userid;
+                $participants = $this->get_workshop_participants($slotid);
+                $coursename = $this->get_course_name($courseid);
+                $cost = $this->get_course_cost($courseid);
+                $wsdate = $this->get_workshop_date($slotid);
+                $start_date = date('m-d-Y h:i:s', $wsdate);
+                $list.="<table>";
+
+                $list.="<tr>";
+                $list.="<td>Program/workshop</td>";
+                $list.="<td style='margin:10px;'>&nbsp;&nbsp;$coursename</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Program start date</td>";
+                $list.="<td style='margin:10px;'>&nbsp;&nbsp;$start_date</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Workshop venue</td>";
+                $location = $this->get_workshop_location($slotid);
+                $list.="<td style='margin:10px;'>&nbsp;&nbsp;$location</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Program fee</td>";
+                $list.="<td>&nbsp;&nbsp;$$cost</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Total students</td>";
+                $list.="<td style='margin:10px;'>&nbsp;&nbsp;" . count($participants) . "</td>";
+                $list.="</tr>";
+
+                foreach ($participants as $p) {
+
+                    $user_data = $this->get_user_data($p);
+
+                    $list.="<tr>";
+                    $list.="<td >Student</td>";
+                    $list.="<td>&nbsp;&nbsp;<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$p' target='_blank'>$user_data->firstname $user_data->lastname</a></td>";
+                    $list.="</tr>";
+
+                    $partial = $this->get_student_payments($courseid, $p);
+                    if (is_object($partial)) {
+                        if ($partial->cost >= $partial->payment) {
+                            $diff = $partial->cost - $partial->payment;
+                        } // end if $partial->cost>=$partial->payment
+                        else {
+                            $diff = 0;
+                        } // end else
+                        $list.="<tr>";
+                        $list.="<td>Student paid</td>";
+                        $list.="<td>&nbsp;&nbsp;$" . round($partial->payment) . "</td>";
+                        $list.="</tr>";
+
+                        $list.="<tr>";
+                        $list.="<td>Student owes</td>";
+                        $list.="<td>&nbsp;&nbsp;$$diff  </td>";
+                        $list.="</tr>";
+
+                        $owe_sum = $owe_sum + $diff;
+                    } //end if is_object($partial)
+                    else {
+                        $list.="<tr>";
+                        $list.="<td>Student paid</td>";
+                        $list.="<td>&nbsp;&nbsp;N/A</td>";
+                        $list.="</tr>";
+
+                        $list.="<tr>";
+                        $list.="<td>Student owes</td>";
+                        $list.="<td>&nbsp;&nbsp;N/A  </td>";
+                        $list.="</tr>";
+                    } // end else
+                } // end foreach
+
+                $list.="<tr>";
+                $list.="<td>Total to be collected</td>";
+                $list.="<td>$$owe_sum</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td colspan='2'><hr/></td>";
+                $list.="</tr>";
+
+                $list.="</table>";
+            } // end if $roleid==3
+        } // end while
+
+        $report = array('report' => $list, 'tutor' => $tutorid);
+        return $report;
+    }
+
+    function get_user_course_role($courseid, $userid) {
+        $contextid = $this->get_course_context($courseid);
+        $query = "select * from mdl_role_assignments "
+                . "where contextid=$contextid and userid=$userid";
+        //echo "Query: ".$query."<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $roleid = $row['roleid'];
+        }
+        return $roleid;
+    }
+
+    function get_course_instructors($courseid) {
+        $instructors = array();
+        $contextid = $this->get_course_context($courseid);
+        $query = "select * from mdl_role_assignments "
+                . "where contextid=$contextid and roleid=3";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $instructors[] = $row['userid'];
+            } // end while
+        } // end if $num > 0
+        return $instructors;
+    }
+
     function prepare_report($workshops) {
         $list = "";
+        $i = 0;
+
         foreach ($workshops as $ws) {
-            $courseid = $this->get_workshop_course($ws);
-            if ($courseid > 0) {
-                $total = $this->get_total_workshop_participants($ws);
-                $participants = $this->get_workshop_participants($ws);
+
+            $participants = $this->get_workshop_participants($ws);
+            if (count($participants) > 0) {
+
+                $owe_sum = 0;
                 date_default_timezone_set('Pacific/Wallis');
+                $courseid = $this->get_workshop_course($ws);
                 $coursename = $this->get_course_name($courseid);
                 $cost = $this->get_course_cost($courseid);
                 $wsdate = $this->get_workshop_date($ws);
@@ -404,22 +553,33 @@ class Students {
                 $list.="<td>&nbsp;&nbsp;$$cost</td>";
                 $list.="</tr>";
 
-                if (count($participants) > 0) {
-                    foreach ($participants as $p) {
-                        //echo "Current userid : $p.<br>";
-                        $partial = $this->get_student_payments($courseid, $p);
-                        $diff = $partial->cost - $partial->payment;
-                        $user_data = $this->get_user_data($p);
-                        $date_h = date('m-d-Y', $partial->pdate);
+                $list.="<tr>";
+                $list.="<td>Total students</td>";
+                $list.="<td style='margin:10px;'>&nbsp;&nbsp;" . count($participants) . "</td>";
+                $list.="</tr>";
 
-                        $list.="<tr>";
-                        $list.="<td >Student</td>";
-                        $list.="<td>&nbsp;&nbsp;<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$p' target='_blank'>$user_data->firstname $user_data->lastname</a></td>";
-                        $list.="</tr>";
 
+
+                foreach ($participants as $p) {
+
+                    $user_data = $this->get_user_data($p);
+
+                    $list.="<tr>";
+                    $list.="<td >Student</td>";
+                    $list.="<td>&nbsp;&nbsp;<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$p' target='_blank'>$user_data->firstname $user_data->lastname</a></td>";
+                    $list.="</tr>";
+
+                    $partial = $this->get_student_payments($courseid, $p);
+                    if (is_object($partial)) {
+                        if ($partial->cost >= $partial->payment) {
+                            $diff = $partial->cost - $partial->payment;
+                        } // end if $partial->cost>=$partial->payment
+                        else {
+                            $diff = 0;
+                        } // end else
                         $list.="<tr>";
                         $list.="<td>Student paid</td>";
-                        $list.="<td>&nbsp;&nbsp;$$partial->payment</td>";
+                        $list.="<td>&nbsp;&nbsp;$" . round($partial->payment) . "</td>";
                         $list.="</tr>";
 
                         $list.="<tr>";
@@ -427,16 +587,24 @@ class Students {
                         $list.="<td>&nbsp;&nbsp;$$diff  </td>";
                         $list.="</tr>";
 
+                        $owe_sum = $owe_sum + $diff;
+                    } //end if is_object($partial)
+                    else {
                         $list.="<tr>";
-                        $list.="<td>Payment date</td>";
-                        $list.="<td>&nbsp;&nbsp;$date_h</td>";
+                        $list.="<td>Student paid</td>";
+                        $list.="<td>&nbsp;&nbsp;N/A</td>";
                         $list.="</tr>";
-                    } // end foreach
-                } // end if count($participants)>0
+
+                        $list.="<tr>";
+                        $list.="<td>Student owes</td>";
+                        $list.="<td>&nbsp;&nbsp;N/A  </td>";
+                        $list.="</tr>";
+                    } // end else
+                } // end foreach
 
                 $list.="<tr>";
-                $list.="<td>Total students</td>";
-                $list.="<td style='margin:10px;'>&nbsp;&nbsp;$total</td>";
+                $list.="<td>Total to be collected</td>";
+                $list.="<td>$$owe_sum</td>";
                 $list.="</tr>";
 
                 $list.="<tr>";
@@ -444,8 +612,14 @@ class Students {
                 $list.="</tr>";
 
                 $list.="</table>";
-            } // end if $courseid > 0
+
+                $tutor_report = $this->prepare_intructor_report($courseid, $ws);
+                $this->send_instructor_report($tutor_report);
+
+                $i++;
+            } // end if count($participants)>0                       
         } // end foreach
+        echo "<br><p style='font-weight:bold;'>Total items: " . $i . "</p><br>";
         return $list;
     }
 
@@ -508,7 +682,9 @@ class Students {
         $students = array();
         $query = "select * from mdl_scheduler_appointment "
                 . "where slotid=$slotid";
+        //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
+        //echo "Students num: " . $num . "<br>";
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -588,11 +764,51 @@ class Students {
         return $list;
     }
 
+    function send_instructor_report($tutor_report) {
+        if ($tutor_report['tutor'] != '' && $tutor_report['report'] != '') {
+            $user = $this->get_user_data($tutor_report['tutor']);
+            $message = $tutor_report['report'];
+            $email = $user->email;
+            echo "Tutor email: " . $email . "<br>";
+            $email2 = 'sirromas@gmail.com'; // copy for me
+
+            $mail = new PHPMailer;
+            $mail->isSMTP();
+            $mail->Host = $this->mail_smtp_host;
+            $mail->SMTPAuth = true;
+            $mail->Username = $this->mail_smtp_user;
+            $mail->Password = $this->mail_smtp_pwd;
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = $this->mail_smtp_port;
+
+            $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+            $mail->addAddress($email);
+            $mail->addAddress($email2);
+            $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+
+            $mail->isHTML(true);
+
+            $mail->Subject = 'Workshop students';
+            $mail->Body = $message;
+
+            if (!$mail->send()) {
+                echo "Message could not be sent to $email \n";
+                echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
+            } // end if !$mail->send()        
+            else {
+                echo "Message has been sent to ' . $email \n";
+            }
+        } // end if $tutor_report['tutor']!='' && $tutor_report['report']!=''
+        else {
+            echo "<br>There are no instructors at current workshop<br>";
+        }
+    }
+
     function send_notification_message($message) {
 
         if ($message != '') {
-            $a_email = 'a1b1c777@gmail.com';
-            //$a_email = 'sirromas@gmail.com';
+            $a_email = 'a1b1c777@gmail.com';            
+            $b_email='donnasteele7817@gmail.com';
             $m_email = 'sirromas@gmail.com';
             $mail = new PHPMailer;
             $mail->isSMTP();
@@ -605,6 +821,7 @@ class Students {
 
             $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
             $mail->addAddress($a_email);
+            $mail->addAddress($b_email);
             $mail->addAddress($m_email);
             $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
 
@@ -615,10 +832,13 @@ class Students {
 
             if (!$mail->send()) {
                 echo "Message could not be sent to $a_email \n";
+                echo "Message could not be sent to $b_email \n";
+                echo "Message could not be sent to $m_email \n";
                 echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
             } // end if !$mail->send()        
             else {
                 echo "Message has been sent to ' . $a_email \n";
+                echo "Message could not be sent to $b_email \n";
                 echo "Message has been sent to ' . $m_email \n";
             }
         } // end if $message!=''
@@ -627,7 +847,7 @@ class Students {
         }
     }
 
-    /* ************** Process Campaign emails functionality **************** */
+    /*     * ************* Process Campaign emails functionality **************** */
 
     function get_campaign_content($id) {
         $query = "select * from mdl_campaign where id=$id";
@@ -639,7 +859,7 @@ class Students {
     }
 
     function update_campaign_status($camid) {
-        
+
         $query = "select count(id) as total "
                 . "from mdl_campaign_log "
                 . "where camid=$camid";
@@ -647,7 +867,7 @@ class Students {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $total = $row['total'];
         }
-        
+
         $query = "select count(id) as total "
                 . "from mdl_campaign_log "
                 . "where camid=$camid and status='ok'";
@@ -655,8 +875,8 @@ class Students {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $processed = $row['total'];
         }
-        
-        
+
+
 
         if ($processed < $total) {
             $query = "update mdl_campaign "
