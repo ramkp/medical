@@ -1168,7 +1168,7 @@ class Payment {
             if ($user_group == '' && $userid > 0) {
                 $user_payment_data = $this->get_user_payment_credentials($userid);
                 $order = new stdClass();
-                $order->cds_name = "$user_payment_data->firstname $user_payment_data->lastname";
+                $order->cds_name = "$user_payment_data->firstname/$user_payment_data->lastname";
                 $order->cds_address_1 = $card->bill_addr;
                 $order->cds_city = $card->bill_city;
                 $order->cds_state = "$user_payment_data->state_code";

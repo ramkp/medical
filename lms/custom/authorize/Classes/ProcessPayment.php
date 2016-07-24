@@ -77,7 +77,7 @@ class ProcessPayment {
         $customer->setId($custID);
         $customer->setEmail($post_order->cds_email);
 
-        $names = explode(" ", $post_order->cds_name);
+        $names = explode("/", $post_order->cds_name);
 
         /*
          * 
@@ -88,8 +88,11 @@ class ProcessPayment {
          * 
          */
 
-        $firstname = ($names[0] == '') ? "Loyal" : $names[0];
-        $lastname = ($names[1] == '') ? 'Client' : $names[1];
+        //$firstname = ($names[0] == '') ? "Loyal" : $names[0];
+        //$lastname = ($names[1] == '') ? 'Client' : $names[1];
+        
+        $firstname = $names[0];
+        $lastname = $names[1];
 
         //Ship To Info
         $shipto = new AnetAPI\NameAndAddressType();
