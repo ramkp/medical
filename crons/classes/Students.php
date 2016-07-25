@@ -328,12 +328,14 @@ class Students {
     }
 
     function get_student_payments($courseid, $userid) {
+
+        $partial1 = array(); // CC payments
+        $partial2 = array(); // Other payments
+        // CC payments
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid "
                 . "and userid=$userid";
-        //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
-        //echo "Payment num: " . $num . "<br>";
         if ($num > 0) {
             $renew_fee = $this->get_renew_fee();
             $result = $this->db->query($query);
@@ -350,13 +352,13 @@ class Students {
                     $partial->slotid = $slotid;
                     $partial->pdate = $row['pdate'];
                 } // end if $user_payment!=$course_cost
+                $partial1[] = $partial;
             } // end while
         } // end if $num > 0    
-
-        $query = "select * from mdl_partial_payments where pdate>1464074847 "
-                . "and courseid=$courseid "
-                . "and userid=$userid limit 0,1";
-        //echo "Query: " . $query . "<br>";
+        // Other payments
+        $query = "select * from mdl_partial_payments "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $renew_fee = $this->get_renew_fee();
@@ -365,18 +367,20 @@ class Students {
                 $user_payment = $row['psum'];
                 $course_cost = $this->get_course_cost($row['courseid']);
                 $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
-                if ($user_payment != $renew_fee) {
-                    $partial = new stdClass();
-                    $partial->userid = $row['userid'];
-                    $partial->courseid = $row['courseid'];
-                    $partial->payment = $row['psum'];
-                    $partial->cost = $course_cost;
-                    $partial->pdate = $row['pdate'];
-                    $partial->slotid = $slotid;
-                } // end if $user_payment!=$course_cost
+                //if ($user_payment != $renew_fee) {
+                $partial = new stdClass();
+                $partial->userid = $row['userid'];
+                $partial->courseid = $row['courseid'];
+                $partial->payment = $row['psum'];
+                $partial->cost = $course_cost;
+                $partial->pdate = $row['pdate'];
+                $partial->slotid = $slotid;
+                //} // end if $user_payment != $renew_fee
+                $partial2[] = $partial;
             } // end while
         } // end if $num > 0
-        return $partial;
+        $payments = array('p1' => $partial1, 'p2' => $partial2);
+        return $payments;
     }
 
     function prepare_intructor_report($courseid, $slotid) {
@@ -389,9 +393,9 @@ class Students {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $userid = $row['studentid'];
             $roleid = $this->get_user_course_role($courseid, $userid);
-            echo "User id: " . $userid . "<br>";
-            echo "Role id: " . $roleid . "<br>";
-            echo "<br>--------------------------------------------------<br>";
+            //echo "User id: " . $userid . "<br>";
+            //echo "Role id: " . $roleid . "<br>";
+            //echo "<br>--------------------------------------------------<br>";
             if ($roleid == 3) {
                 // It is instructor
                 $tutorid = $userid;
@@ -558,8 +562,6 @@ class Students {
                 $list.="<td style='margin:10px;'>&nbsp;&nbsp;" . count($participants) . "</td>";
                 $list.="</tr>";
 
-
-
                 foreach ($participants as $p) {
 
                     $user_data = $this->get_user_data($p);
@@ -569,43 +571,112 @@ class Students {
                     $list.="<td>&nbsp;&nbsp;<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$p' target='_blank'>$user_data->firstname $user_data->lastname</a></td>";
                     $list.="</tr>";
 
-                    $partial = $this->get_student_payments($courseid, $p);
-                    if (is_object($partial)) {
-                        if ($partial->cost >= $partial->payment) {
-                            $diff = $partial->cost - $partial->payment;
-                        } // end if $partial->cost>=$partial->payment
-                        else {
-                            $diff = 0;
-                        } // end else
-                        $list.="<tr>";
-                        $list.="<td>Student paid</td>";
-                        $list.="<td>&nbsp;&nbsp;$" . round($partial->payment) . "</td>";
-                        $list.="</tr>";
+                    $payments = $this->get_student_payments($courseid, $p);
+                    $cc_payments = $payments['p1'];
+                    $other_payments = $payments['p2'];
 
+                    $fname = $user_data->firstname;
+                    $lname = $user_data->lastname;
+                    echo "Student: " . $fname . "&nbsp;" . $lname . "<br>";
+
+                    echo "<pre>";
+                    print_r($cc_payments);
+                    echo "/<pre><br>";
+
+                    echo "<pre>";
+                    print_r($other_payments);
+                    echo "/<pre><br>";
+
+                    if (count($cc_payments) > 0) {
+                        $total_paid = 0;
+                        foreach ($cc_payments as $partial) {
+                            if (is_object($partial)) {
+                                if ($partial->cost >= $partial->payment) {
+                                    $diff = $partial->cost - $partial->payment;
+                                } // end if $partial->cost>=$partial->payment
+                                else {
+                                    $diff = 0;
+                                } // end else
+                                $list.="<tr>";
+                                $list.="<td>Student paid</td>";
+                                $list.="<td>&nbsp;&nbsp;$" . round($partial->payment) . "</td>";
+                                $list.="</tr>";
+
+                                $total_paid = $total_paid + $partial->payment;
+                            } //end if is_object($partial)
+                            else {
+                                $list.="<tr>";
+                                $list.="<td>Student paid</td>";
+                                $list.="<td>&nbsp;&nbsp;N/A</td>";
+                                $list.="</tr>";
+                            } // end else
+                        } // end foreach
+                        //$list.="<tr>";
+                        //$list.="<td>Total paid :</td>";
+                        //$list.="<td>&nbsp;&nbsp; $" . $total_paid . "  </td>";
+                        //$list.="</tr>";
+                        $owe_sum = $owe_sum + round($partial->cost - $total_paid);
                         $list.="<tr>";
                         $list.="<td>Student owes</td>";
-                        $list.="<td>&nbsp;&nbsp;$$diff  </td>";
+                        $list.="<td>&nbsp;&nbsp; $" . round($partial->cost - $total_paid) . "  </td>";
                         $list.="</tr>";
+                    } // end if count($cc_payments)>0
 
-                        $owe_sum = $owe_sum + $diff;
-                    } //end if is_object($partial)
-                    else {
-                        $list.="<tr>";
-                        $list.="<td>Student paid</td>";
-                        $list.="<td>&nbsp;&nbsp;N/A</td>";
-                        $list.="</tr>";
+                    if (count($other_payments) > 0) {
+                        $total_paid = 0;
+                        foreach ($other_payments as $partial) {
+                            if (is_object($partial)) {
+                                if ($partial->cost >= $partial->payment) {
+                                    $diff = $partial->cost - $partial->payment;
+                                } // end if $partial->cost>=$partial->payment
+                                else {
+                                    $diff = 0;
+                                } // end else
+                                $list.="<tr>";
+                                $list.="<td>Student paid</td>";
+                                $list.="<td>&nbsp;&nbsp;$" . round($partial->payment) . "</td>";
+                                $list.="</tr>";
 
+                                $total_paid = $total_paid + $partial->payment;
+                            } //end if is_object($partial)
+                            else {
+                                $list.="<tr>";
+                                $list.="<td>Student paid</td>";
+                                $list.="<td>&nbsp;&nbsp;N/A</td>";
+                                $list.="</tr>";
+
+                                $list.="<tr>";
+                                $list.="<td>Student owes</td>";
+                                $list.="<td>&nbsp;&nbsp;N/A  </td>";
+                                $list.="</tr>";
+                            } // end else
+                        } // end foreach
+                        //$list.="<tr>";
+                        //$list.="<td>Total paid :</td>";
+                        //$list.="<td>&nbsp;&nbsp; $" . $total_paid . "  </td>";
+                        //$list.="</tr>";
+
+                        $owe_sum = $owe_sum + round($partial->cost - $total_paid);
                         $list.="<tr>";
                         $list.="<td>Student owes</td>";
-                        $list.="<td>&nbsp;&nbsp;N/A  </td>";
+                        $list.="<td>&nbsp;&nbsp; $" . round($partial->cost - $total_paid) . "  </td>";
                         $list.="</tr>";
-                    } // end else
-                } // end foreach
+                    } // end if count($other_payments)>0               
+                } // end foreach patricipants
 
-                $list.="<tr>";
-                $list.="<td>Total to be collected</td>";
-                $list.="<td>$$owe_sum</td>";
-                $list.="</tr>";
+                //echo "Owe sum: ".$owe_sum."<br>";
+                if ($owe_sum >= 0) {
+                    $list.="<tr>";
+                    $list.="<td>Total to be collected</td>";
+                    $list.="<td>$$owe_sum</td>";
+                    $list.="</tr>";
+                } // end if $owe_sum>0
+                else {
+                    $list.="<tr>";
+                    $list.="<td>Total to be collected</td>";
+                    $list.="<td>Students overpayments?</td>";
+                    $list.="</tr>";
+                }
 
                 $list.="<tr>";
                 $list.="<td colspan='2'><hr/></td>";
@@ -807,8 +878,8 @@ class Students {
     function send_notification_message($message) {
 
         if ($message != '') {
-            $a_email = 'a1b1c777@gmail.com';            
-            $b_email='donnasteele7817@gmail.com';
+            $a_email = 'a1b1c777@gmail.com';
+            $b_email = 'donnasteele7817@gmail.com';
             $m_email = 'sirromas@gmail.com';
             $mail = new PHPMailer;
             $mail->isSMTP();
