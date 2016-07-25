@@ -879,7 +879,7 @@ class Students {
 
         if ($message != '') {
             $a_email = 'a1b1c777@gmail.com';
-            $b_email = 'donnasteele7817@gmail.com';
+            $b_email = 'help@medical2.com';
             $m_email = 'sirromas@gmail.com';
             $mail = new PHPMailer;
             $mail->isSMTP();
