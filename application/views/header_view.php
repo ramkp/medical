@@ -75,8 +75,12 @@ $host = $_SERVER['HTTP_HOST'];
         <link rel="stylesheet" type="text/css" href="https://<?php echo $host ?>/lms/theme/lambda/style/nojs.css" />
 
         </noscript>
-        <!-- Google web fonts -->
-
+        
+        <!--
+        <link rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+        <link rel='stylesheet' href='//blueimp.github.io/Gallery/css/blueimp-gallery.min.css'>
+        <link rel='stylesheet' href='//assets/gallery/css/bootstrap-image-gallery.min.css'>
+        -->
 
     </head>
 
@@ -229,7 +233,7 @@ $host = $_SERVER['HTTP_HOST'];
                                 <?php
                                 $url = $_SERVER['REQUEST_URI'];
                                 //echo "Url: " . $url . "<br>";                                
-                                if (strpos($url, 'register') === FALSE && strpos($url, 'login') === FALSE && strpos($url, 'certs') === FALSE && strpos($url, 'groups') === FALSE && strpos($url, 'payment') === FALSE) {
+                                if (strpos($url, 'register') === FALSE && strpos($url, 'login') === FALSE && strpos($url, 'certs') === FALSE && strpos($url, 'groups') === FALSE && strpos($url, 'payment') === FALSE && strpos($url, 'gallery') === FALSE) {
                                     echo "<script type='text/javascript' src='http://w.sharethis.com/button/buttons.js'></script>";
                                     echo "<script type='text/javascript'>stLight.options({publisher: 'eda8d1a9-031a-4879-9550-5afd52ee1ddf', doNotHash: false, doNotCopy: false, hashAddressBar: false});</script>";
                                 }

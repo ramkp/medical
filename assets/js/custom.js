@@ -1778,7 +1778,8 @@ $(document).ready(function () {
         if (event.target.id == 'next_slide') {
             console.log('Next is clicked ...');
         }
-
+        
+        /*
         if (event.target.id.indexOf("img_") >= 0) {
             var img = event.target.id.replace('img_', '');
             var image = 'http://medical2.com/lms/custom/gallery/files/' + img;
@@ -1811,8 +1812,8 @@ $(document).ready(function () {
                     $("#myModal").modal('show');
                 });
             } // end else
-        }
-
+        }   // end if event.target.id.indexOf("img_") >= 0
+        */
 
 
     }); // end of $("body").click(function (event) {    

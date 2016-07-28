@@ -103,43 +103,59 @@ class Gallery {
 
     function show_image($image, $width) {
         $list = "";
-        $images = "";
-        if ($width >= 768) {
-            $list.="<div id='myModal' class='modal responsive' style='display: inline; width: 90%; height:80%;  margin-left:-45%;'>";
-        } // end if $width >= 768 
-        else {
-            $list.="<div id='myModal' class='modal responsive' style='display: inline; width: 90%; height:80%;'>";
-        }
-
+        $img_block = "";
         $query = "select * from mdl_gallery order by date_added desc";
         $result = $this->db->query($query);
+        $img_block.="<div id='links'>";
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $selected_img = trim(str_replace('http://medical2.com/lms/custom/gallery/files/', '', $image));
-            if ($row['path'] != $selected_img) {
-                $images.="<img src='http://medical2.com/lms/custom/gallery/files/" . $row['path'] . "' class='img-responsive'  alt='Gallery image'>";
-            } // end if 
+            $img_block.="<a href='http://medical2.com/lms/custom/gallery/files/" . $row['path'] . "' title='Gallery image' data-gallery>
+                         <img src='http://medical2.com/lms/custom/gallery/files/thumbs/" . $row['path'] . "' alt='Galley image'></a>";
         } // end while
+        $img_block.="</div>";
 
+        $list.="
+        <link rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+        <link rel='stylesheet' href='//blueimp.github.io/Gallery/css/blueimp-gallery.min.css'>
+        <link rel='stylesheet' href='//assets/gallery/css/bootstrap-image-gallery.min.css'>
 
-        $list.="<div class='modal-dialog'>
-        <link  href='http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css' rel='stylesheet'> <!-- 3 KB -->
-        <script src='http://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js'></script> <!-- 16 KB -->
-        <div class='modal-content'>
-            <div class='modal-header'>
-                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>                
-            </div>
-            <div class='modal-body' style='text-align:center;height:768px;'>                
-                    <div class='fotorama' style='text-align:center;'>
-                    <image src='$image' class='img-responsive' alt='Gallery image' >
-                    $images;    
+         <!-- The Bootstrap Image Gallery lightbox, should be a child element of the document body -->
+        <div id='blueimp-gallery' class='blueimp-gallery'>
+        <!-- The container for the modal slides -->
+        <div class='slides'></div>
+        <!-- Controls for the borderless lightbox -->
+        <h3 class='title'></h3>
+        <a class='prev'>‹</a>
+        <a class='next'>›</a>
+        <a class='close'>×</a>
+        <a class='play-pause'></a>
+        <ol class='indicator'></ol>
+        <!-- The modal dialog, which will be used to wrap the lightbox content -->
+        <div class='modal fade'>
+            <div class='modal-dialog'>
+                <div class='modal-content'>
+                    <div class='modal-header'>
+                        <button type='button' class='close' aria-hidden='true'>&times;</button>
+                        <h4 class='modal-title'></h4>
                     </div>
+                    <div class='modal-body next'></div>
+                    <div class='modal-footer'>
+                        <button type='button' class='btn btn-default pull-left prev'>
+                            <i class='glyphicon glyphicon-chevron-left'></i>
+                            Previous
+                        </button>
+                        <button type='button' class='btn btn-primary next'>
+                            Next
+                            <i class='glyphicon glyphicon-chevron-right'></i>
+                        </button>
+                    </div>
+                    </div>
+                </div>
             </div>
-            <div class='modal-footer' style='text-align:center;>
-                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='close'>Close</button></span>                
-            </div>
-         </div>
         </div>
-        </div>";
+        $img_block 
+        <script src='//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script>
+        <script src='//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js'></script>
+        <script src='//assets/galley/js/bootstrap-image-gallery.min.js'></script>";
         return $list;
     }
 

@@ -100,7 +100,7 @@ class Partial extends Util {
         } // end if $num > 0        
         return $partials;
     }
-    
+
     function get_workshop_date($slotid) {
         $query = "select * from mdl_scheduler_slots where id=$slotid";
         $result = $this->db->query($query);
@@ -109,7 +109,7 @@ class Partial extends Util {
         } // end while
         return $date;
     }
-    
+
     function get_user_slot($courseid, $userid) {
         $slotid = 0;
         $query = "select * from mdl_slots "
@@ -126,19 +126,19 @@ class Partial extends Util {
 
     function get_partial_payments_list() {
         $list = "";
-        $partials=array();
+        $partials = array();
         $cc_partials = $this->get_partial_cc_payments();
         $of_partials = $this->get_partial_offline_payments();
         $partials = array_merge($cc_partials, $of_partials);
-        
+
         /*
-        foreach ($partials_arr as $p) {
-            $slotid=$this->get_user_slot($p->courseid, $p->userid);
-            $wsdate=$this->get_workshop_date($slotid);
-            $partials[$wsdate]=$p;
-        }
-        ksort($partials);
-        */
+          foreach ($partials_arr as $p) {
+          $slotid=$this->get_user_slot($p->courseid, $p->userid);
+          $wsdate=$this->get_workshop_date($slotid);
+          $partials[$wsdate]=$p;
+          }
+          ksort($partials);
+         */
         $list.=$this->create_partial_payments_list($partials);
         return $list;
     }
@@ -268,8 +268,15 @@ class Partial extends Util {
 
         $list.="<div class='container-fluid' style='text-align:left;display:none;' id='payment_options'>";
         $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cc' checked>Card payment</span>";
-        $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cash' >Cash payment</span>";
-        $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cheque' >Cheque payment</span>";
+        
+        $username=$this->user->username;
+        //echo "User: ".$username."<br>";
+
+        //if ($username == 'admin') {
+            $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cash' >Cash payment</span>";
+            $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cheque' >Cheque payment</span>";
+        //} // end if $USER->username = 'admin'
+
         $list.="<span class='span3'><input type='text' id='sum' style='width:120px;' /></span>";
         $list.="<span class='span3'><button class='btn btn-primary' id='get_partial_payment_section'>Add</button></span>";
         $list.="</div>";

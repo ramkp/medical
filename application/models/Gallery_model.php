@@ -185,13 +185,91 @@ class Gallery_model extends CI_Model {
         } // end else
         return $list;
     }
+    
+    function get_galllery_thumbs2($state = null, $month = null, $year = null, $full = false) {
+        $list = "";
+        $list.="<link rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+                <link rel='stylesheet' href='//blueimp.github.io/Gallery/css/blueimp-gallery.min.css'>
+                <link rel='stylesheet' href='http://mdeical2.com/css/bootstrap-image-gallery.min.css'>";
+        
+        $list.="<!-- The Bootstrap Image Gallery lightbox, should be a child element of the document body -->
+        <div id='blueimp-gallery' class='blueimp-gallery'>
+            <!-- The container for the modal slides -->
+            <div class='slides'></div>
+            <!-- Controls for the borderless lightbox -->
+            <h3 class='title'></h3>
+            <a class='prev'>‹</a>
+            <a class='next'>›</a>
+            <a class='close'>×</a>
+            <a class='play-pause'></a>
+            <ol class='indicator'></ol>
+            <!-- The modal dialog, which will be used to wrap the lightbox content -->
+            <div class='modal fade'>
+                <div class='modal-dialog'>
+                    <div class='modal-content'>
+                        <div class='modal-header'>
+                            <button type='button' class='close' aria-hidden='true'>&times;</button>
+                            <h4 class='modal-title'></h4>
+                        </div>
+                        <div class='modal-body next'></div>
+                        <div class='modal-footer'>
+                            <button type='button' class='btn btn-default pull-left prev'>
+                                <i class='glyphicon glyphicon-chevron-left'></i>
+                                Previous
+                            </button>
+                            <button type='button' class='btn btn-primary next'>
+                                Next
+                                <i class='glyphicon glyphicon-chevron-right'></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script src='//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script>
+        <script src='//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js'></script>
+        <script src='http://mdeical2.com/js/bootstrap-image-gallery.min.js'></script>";
+        
+        $query = $this->get_image_sql_criteria($state, $month, $year);
+        //echo "Query: ".$query."<br>";
+        $result = $this->db->query($query);
+        if ($result->num_rows() > 0) {
+            foreach ($result->result() as $row) {
+                $files[] = $row->path;
+            } // end foreach
+            $list.="<div id='links'>";
+            //$list.="<ul class='thumbnails'>";
+            for ($i = 0; $i <= count($files) - 1; $i++) {
+                if ($files[$i] != '.' && $files[$i] != '..') {
+                    if ($full == false) {
+                        $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/thumbs/" . $files[$i];
+                    } // end if $full==false
+                    else {
+                        $img_http_path = 'http://' . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/" . $files[$i];
+                    } // end else                                       
+                    $list.="<a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/gallery/files/" . $files[$i]."' title='Gallery images' data-gallery>
+                            <img src='$img_http_path' alt='Galley images' ></a>";
+                } // end if $files[$i] != '.' && $files[$i] != '..'
+                //$list.="<li class='span5'><a href='#' class='thumbnail' onClick='return false;'><img src='$img_http_path' alt='' id='img_$files[$i]' width='300' height='200'></a></li>";
+            } // end for
+            $list.= "</div>";
+        } // end if $result->num_rows() > 0
+        else {
+            $list.= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
+            $list.="<span class='span10' style='text-align:center;'>There are no images matched criteria</span>";
+            $list.= "</div>";
+        } // end else
+        return $list;
+    }
 
     function get_images_list($state = null, $month = null, $year = null) {
         $toolbar = $this->get_toolbar();
         $list = "";
         $list.="<div class='form_div' style='text-align:center;'>" . $toolbar . "<br>";
         //$list.="<div>" . $toolbar . "<br>";
-        $list.=$this->get_galllery_thumbs($state, $month, $year);
+        //$list.=$this->get_galllery_thumbs($state, $month, $year);
+        $list.=$this->get_galllery_thumbs2($state, $month, $year);
         $list.="</div>";
         return $list;
     }

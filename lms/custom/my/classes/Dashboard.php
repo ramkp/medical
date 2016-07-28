@@ -30,17 +30,17 @@ class Dashboard extends Util {
         $invoice = new Invoice();
         $installment_status = $invoice->is_installment_user($userid, $courseid);
         if ($installment_status == 0) {
-            // 1. Check among card payments
+// 1. Check among card payments
             $query = "select * from mdl_card_payments "
                     . "where userid=$userid and courseid=$courseid";
             $card_payments_num = $this->db->numrows($query);
 
-            // 2. Check among invoice payments
+// 2. Check among invoice payments
             $query = "select * from mdl_invoice "
                     . "where userid=$userid and courseid=$courseid and i_status=1";
             $invoice_payments_num = $this->db->numrows($query);
 
-            // 3. Check among partial payments
+// 3. Check among partial payments
             $query = "select * from mdl_partial_payments "
                     . "where userid=$userid and courseid=$courseid";
             $partial_num = $this->db->numrows($query);
@@ -78,17 +78,17 @@ class Dashboard extends Util {
     }
 
     function get_user_status() {
-        //print_r($this->user);
-        //echo "Username: " . $this->user->username . "<br>";
+//print_r($this->user);
+//echo "Username: " . $this->user->username . "<br>";
         $username = $this->user->username;
-        //echo "Username: " . $username . "<br>";
+//echo "Username: " . $username . "<br>";
         if ($username != 'manager') {
             $roleid = $this->get_user_role($this->user->id);
             if ($roleid == 5) {
                 $status = $this->is_user_paid();
             } // end if $roleid == 5
             else {
-                // It is Manager 
+// It is Manager 
                 $status = 1;
             }
         } // end if $username != 'manager'
@@ -175,7 +175,7 @@ class Dashboard extends Util {
             $query = "";
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                //$drop_down.="<option value='$row->id'>$row->state</option>";
+//$drop_down.="<option value='$row->id'>$row->state</option>";
             } // end while
         } // end if $courseid != null
         $drop_down.="</select>";
@@ -185,13 +185,13 @@ class Dashboard extends Util {
     public function get_register_course_cities_list($courseid = null) {
         $drop_down = "";
         $drop_down.="<select id='register_cities' style='width:120px;'>";
-        //$drop_down.="<select id='register_cities'>";
+//$drop_down.="<select id='register_cities'>";
         $drop_down.="<option value='0' selected>All Cities</option>";
         if ($courseid != null) {
             $query = "";
             $result = $this->db->query($query);
             foreach ($result->result() as $row) {
-                //$drop_down.="<option value='$row->id'>$row->state</option>";
+//$drop_down.="<option value='$row->id'>$row->state</option>";
             } // end while
         } // end if $courseid != null
         $drop_down.="</select>";
@@ -210,8 +210,8 @@ class Dashboard extends Util {
         $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Available courses</h5></div>";
         $list.="<div class='panel-body' style='text-align:center;'>";
         $list.="<input type='hidden' value='$userid' id='userid'>";
-        //echo "Width: " . htmlentities($screen_width) . "<br>";
-        //echo "Screen type: " . gettype($screen_width) . "<br>";
+//echo "Width: " . htmlentities($screen_width) . "<br>";
+//echo "Screen type: " . gettype($screen_width) . "<br>";
         if ($screen_width > 1024) {
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span3'>$cats</span>";
@@ -265,16 +265,16 @@ class Dashboard extends Util {
 
     function is_course_has_schedule($courseid, $stateid = null) {
         $num = 0;
-        //echo "Function course id: $courseid";
+//echo "Function course id: $courseid";
         $query = "select id from mdl_scheduler where course=$courseid";
         $num = $this->db->numrows($query);
-        //echo "Scheduler num: $num";
+//echo "Scheduler num: $num";
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $schedulerid = $row['id'];
             } // end foreach            
-            // 2. Get slots list
+// 2. Get slots list
             if ($state == null) {
                 $query = "select * from mdl_scheduler_slots "
                         . "where schedulerid=$schedulerid order by starttime";
@@ -293,12 +293,12 @@ class Dashboard extends Util {
 
     function is_user_already_enrolled($courseid, $userid) {
         $contextid = $this->get_course_context($courseid);
-        //echo "Context id: ".$contextid."<br>";
+//echo "Context id: ".$contextid."<br>";
         $query = "select * from mdl_role_assignments "
                 . "where roleid=5 "
                 . "and contextid=$contextid "
                 . "and userid=$userid";
-        //echo "Query: ".$query."<br>";
+//echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         return $num;
     }
@@ -330,7 +330,7 @@ class Dashboard extends Util {
                         '2',
                          '" . time() . "',
                          '" . time() . "')";
-        //echo "Query: ".$query."<br/>";
+//echo "Query: ".$query."<br/>";
         $this->db->query($query);
 
         $query = "insert into mdl_role_assignments"
@@ -370,7 +370,7 @@ class Dashboard extends Util {
 
     function enrol_user_to_course($courseid, $slotid, $userid) {
         $enrolled = $this->is_user_already_enrolled($courseid, $userid);
-        //echo "Enrolled status: ".$enrolled."<br>";
+//echo "Enrolled status: ".$enrolled."<br>";
         if ($enrolled == 0) {
             $this->enroll_user($courseid, $userid);
         } // end if $enrolled==0
@@ -398,17 +398,17 @@ class Dashboard extends Util {
     function get_course_slots($courseid) {
         $slotids = array();
         $query = "select * from mdl_scheduler where course=$courseid";
-        //echo "Query: " . $query . "<br>";
+//echo "Query: " . $query . "<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $schedulerid = $row['id'];
         } // end while
-        //echo "SchedulerID: " . $schedulerid . "<br>";
+//echo "SchedulerID: " . $schedulerid . "<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $query = "select * from mdl_scheduler_slots "
                     . "where schedulerid=$schedulerid";
-            //echo "Query: " . $query . "<br>";
+//echo "Query: " . $query . "<br>";
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $slotids[] = $row['id'];
@@ -471,10 +471,10 @@ class Dashboard extends Util {
     function get_user_payments($userid, $courseid) {
         $list = "";
         $card_payments = $this->get_user_card_payments($userid, $courseid);
-        //$invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
+//$invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
         $list.=$card_payments . "&nbsp;" . $partial_payments;
-        //$list.=$invoice_payments;
+//$list.=$invoice_payments;
         return $list;
     }
 
@@ -501,7 +501,7 @@ class Dashboard extends Util {
                         $list.="<b>Payment status:</b> $user_payments";
                     } // end if $cslot==$slotid
                     else {
-                        //$list.="Program detailes: N/A";
+//$list.="Program detailes: N/A";
                     }
                 } // end foreach
             } // end foreach
@@ -538,7 +538,7 @@ class Dashboard extends Util {
     }
 
     function get_course_questions_category($contextid) {
-        //mdl_question_categories
+//mdl_question_categories
         $query = "select * from mdl_question_categories where contextid=$contextid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -606,6 +606,186 @@ class Dashboard extends Util {
             } // end foreach
         } // end if count($courses)>0
         return $contexts;
+    }
+
+    function get_course_cost($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cost = $row['cost'];
+        }
+        return $cost;
+    }
+
+    function get_course_category($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $category = $row['category'];
+        }
+        return $category;
+    }
+
+    function get_payments_history_block($courseid, $userid) {
+        $list = "";
+        $cc_list = "";
+        $pp_list = "";
+        $inv_list = "";
+        $cc_payments = array();
+        $cash_payments = array();
+        $invoice_payments = array();
+        $course_category = $this->get_course_category($courseid);
+
+        date_default_timezone_set('Pacific/Wallis');
+
+
+// 1. Get data from mdl_card_payments // payments made by card
+        $query = "select * from mdl_card_payments "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $cc_payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+//2. Get data from mdl_partial_payments  // cash payments
+        $query = "select * from mdl_partial_payments "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $cash_payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+//3. Check invoice table
+        $query = "select * from mdl_invoice "
+                . "where userid=$userid "
+                . "and courseid=$courseid "
+                . "and i_status=1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $invoice_payments[] = $payment;
+            } // end while
+        } // end if $num>0
+
+
+        $coursename = $this->get_course_name($courseid);
+        $coursecost = $this->get_course_cost($courseid);
+        $renew_fee = $this->get_renew_fee();
+        $total_paid = 0;
+
+        if (count($cc_payments) > 0) {
+            $cc_list.="<table>";
+            foreach ($cc_payments as $payment) {
+                $date = date('m-d-Y', $payment->pdate);
+                $cc_list.="<tr>";
+                if ($payment->psum != $renew_fee) {
+                    $cc_list.="<td style='padding:15px;'>Program/Workshop payment</td><td style='padding:15px;'>$$payment->psum</td><td style='padding:15px;'>$date</td>";
+                } // end if $payment->psum!=$renew_fee
+                else {
+                    $cc_list.="<td style='padding:15px;'>Certificate renew payment</td><td style='padding:15px;'>$$payment->psum</td><td style='padding:15px;'>$date</td>";
+                } // end else
+                $cc_list.="</tr>";
+                $total_paid = $total_paid + $payment->psum;
+            } // end foreach
+            $cc_list.="</table>";
+        } // end if count($cc_payments)>0
+
+
+        if (count($cash_payments) > 0) {
+            $pp_list.="<table>";
+            foreach ($cash_payments as $payment) {
+                $date = date('m-d-Y', $payment->pdate);
+                $pp_list.="<tr>";
+                $pp_list.="<td style='padding:15px;'>Program/Workshop payment</td><td style='padding:15px;'>$$payment->psum</td><td style='padding:15px;'>$date</td>";
+                $pp_list.="</tr>";
+                $total_paid = $total_paid + $payment->psum;
+            } // end foreach            
+            $pp_list.="</table>";
+        } // end if count($cash_payments) > 0
+
+        if (count($invoice_payments) > 0) {
+            $inv_list.="<table>";
+            foreach ($invoice_payments as $payment) {
+                $date = date('m-d-Y', $payment->i_pdate);
+                $inv_list.="<tr>";
+                $inv_list.="<td style='padding:15px;'>Program/Workshop payment</td><td style='padding:15px;'>$$payment->i_sum</td><td style='padding:15px;'>$date</td>";
+                $inv_list.="</tr>";
+                $total_paid = $total_paid + $payment->i_sum;
+            } // end foreach
+            $inv_list.="</table>";
+        } // end if count($invoice_payments)>0        
+//echo "Course cost: " . $coursecost . "<br>";
+//echo "Total paid: " . $total_paid . "<br>";
+        $balance = $coursecost - $total_paid;
+        if ($balance >= 0) {
+            $clear_balance = $balance;
+        } // end if $balance>=0
+        else {
+            $clear_balance = 0;
+        } // end else
+
+        $list.="<table>";
+        $list.="<tr>";
+        $list.="<th>$coursename - payments history</th>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<th>Program/Workshop fee - $$coursecost</th>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td>$cc_list</td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td>$pp_list</td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td>$inv_list</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Your unpaid balance - $$clear_balance</td>";
+        $list.="</tr>";
+
+        $list.="</table><br>";
+
+        if ($course_category == 5) {
+            // It is college programs            
+            $slotid = $this->get_user_course_slot($courseid, $userid);
+            $list.="<input type='hidden' id='courseid' value='$courseid'>";
+            $list.="<input type='hidden' id='userid' value='$userid'>";
+            $list.="<input type='hidden' id='slotid' value='$slotid'>";
+            $list.="<table border='0'>";
+            $list.="<tr valign='middle'>";
+            $list.="<td style='padding:15px;'><input  type='text' id='amount' name='amount' ></td><td style='padding:15px;'><button id='make_college_strudent_partial_payment'>Make Payment</button></td>";
+            $list.="</tr>";
+            $list.="<tr>";
+            $list.="<td style='padding:15px;' colspan='2'><span id='partial_err'></span></td>";
+            $list.="</tr>";
+            $list.="</table>";
+            //<a href = 'https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/$slotid/0
+        } // end if $course_category == 5
+
+
+
+        return $list;
     }
 
 }

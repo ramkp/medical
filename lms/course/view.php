@@ -255,6 +255,8 @@ if ($completion->is_enabled()) {
     echo html_writer::end_tag('form');
 }
 
+
+/* Payment status */
 $ds = new Dashboard();
 $status = $ds->get_user_status();
 if ($status == 0) {
@@ -262,6 +264,14 @@ if ($status == 0) {
     echo $message;
     die();
 }
+
+/* Payments history */
+$roleid = $ds->get_user_role($USER->id);
+if ($roleid == 5 && $USER->username != 'manager' && $USER->username != 'admin') {
+    $payments_history = $ds->get_payments_history_block($COURSE->id, $USER->id);
+    echo $payments_history;
+}
+
 
 // Course wrapper start.
 echo html_writer::start_tag('div', array('class' => 'course-content'));

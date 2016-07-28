@@ -10,7 +10,7 @@
                     <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/about">About Us</a>&nbsp;
                     <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/map">Site Map</a>&nbsp;
                     <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/contact">Contact US</a>&nbsp;
-                    
+
                     <!-- Social sharing buttons -->
                     <span class='st_facebook_large' displayText='Facebook'></span>
                     <span class='st_twitter_large' displayText='Tweet'></span>
@@ -20,7 +20,7 @@
                     <span class='st__large' displayText=''></span>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.bbb.org/mississippi/business-reviews/schools-business-and-vocational/medical-2-training-institute-in-tupelo-ms-235827408/#bbbonlineclick" target="_blank" rel="nofollow"><img src="http://seal-ms.bbb.org/seals/blue-seal-200-65-bbb-235827408.png" style="border: 0;" alt="Medical 2 Training Institute BBB Business Review" /></a>
                 </p>
-                
+
             </div>
 
             <script type="text/javascript">
@@ -146,11 +146,14 @@
             jQuery('html, body').animate({scrollTop: 0}, duration);
             return false;
         })
-    });
-
-
+    });    
 
 </script>
+<!--
+<script src = '//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js' ></script>
+<script src='//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js'></script>
+<script src='//assets/galley/js/bootstrap-image-gallery.min.js'></script>";
+-->
 
 </body>
 </html>

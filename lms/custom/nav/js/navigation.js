@@ -2364,6 +2364,23 @@ $(document).ready(function () {
             assign_user_to_course();
         }
     });
+
+    $('#make_college_strudent_partial_payment').on('click', function () {
+        var courseid = $('#courseid').val();
+        var userid = $('#userid').val();
+        var slotid = $('#slotid').val();
+        var amount = $('#amount').val();
+        if (amount != '' && $.isNumeric(amount)) {
+            $('#partial_err').html('');
+            var url = "http://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + amount;
+            window.open(url, "Payment");
+        } // end if amount!='' &&  $.isNumeric(amount)
+        else {
+            $('#partial_err').html('Please provide amount to be charged');
+        }
+
+    });
+
     $("body").click(function (event) {
         //console.log('Element clicked: ' + event.target.id);
 
