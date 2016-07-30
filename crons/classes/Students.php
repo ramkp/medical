@@ -616,10 +616,18 @@ class Students {
                         //$list.="<td>&nbsp;&nbsp; $" . $total_paid . "  </td>";
                         //$list.="</tr>";
                         $owe_sum = $owe_sum + round($partial->cost - $total_paid);
-                        $list.="<tr>";
-                        $list.="<td>Student owes</td>";
-                        $list.="<td>&nbsp;&nbsp; $" . round($partial->cost - $total_paid) . "  </td>";
-                        $list.="</tr>";
+                        if ($owe_sum >= 0) {
+                            $list.="<tr>";
+                            $list.="<td>Student owes</td>";
+                            $list.="<td>&nbsp;&nbsp; $" . round($partial->cost - $total_paid) . "  </td>";
+                            $list.="</tr>";
+                        } // end if $owe_sum>=0
+                        else {
+                            $list.="<tr>";
+                            $list.="<td>Student owes</td>";
+                            $list.="<td>&nbsp;&nbsp; $0 </td>";
+                            $list.="</tr>";
+                        } // end else
                     } // end if count($cc_payments)>0
 
                     if (count($other_payments) > 0) {
@@ -655,12 +663,19 @@ class Students {
                         //$list.="<td>Total paid :</td>";
                         //$list.="<td>&nbsp;&nbsp; $" . $total_paid . "  </td>";
                         //$list.="</tr>";
-
-                        $owe_sum = $owe_sum + round($partial->cost - $total_paid);
-                        $list.="<tr>";
-                        $list.="<td>Student owes</td>";
-                        $list.="<td>&nbsp;&nbsp; $" . round($partial->cost - $total_paid) . "  </td>";
-                        $list.="</tr>";
+                        if ($owe_sum >= 0) {
+                            $owe_sum = $owe_sum + round($partial->cost - $total_paid);
+                            $list.="<tr>";
+                            $list.="<td>Student owes</td>";
+                            $list.="<td>&nbsp;&nbsp; $" . round($partial->cost - $total_paid) . "  </td>";
+                            $list.="</tr>";
+                        } // end if $owe_sum >= 0
+                        else {
+                            $list.="<tr>";
+                            $list.="<td>Student owes</td>";
+                            $list.="<td>&nbsp;&nbsp; $0</td>";
+                            $list.="</tr>";
+                        } // end else
                     } // end if count($other_payments)>0               
                 } // end foreach patricipants
                 //echo "Owe sum: ".$owe_sum."<br>";
