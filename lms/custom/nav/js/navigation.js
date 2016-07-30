@@ -744,7 +744,7 @@ $(document).ready(function () {
         var courseid = $('#courses').val();
         var from = $('#datepicker1').val();
         var to = $('#datepicker2').val();
-        if (courseid > 0 && from != '' && to != '') {
+        if (from != '' && to != '') {
             $('#revenue_report_err').html('');
             $('#ajax_loading').show();
             var url = "/lms/custom/reports/get_revenue_report_data.php";

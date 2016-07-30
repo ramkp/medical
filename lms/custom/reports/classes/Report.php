@@ -243,16 +243,25 @@ class Report extends Util {
     }
 
     function get_revenue_report_data($courseid, $from, $to, $status = true, $output = true) {
-        //echo "From: ".$from."<br>";
-        //echo "To: ".$to."<br>";                
+
+        date_default_timezone_set('Pacific/Wallis');
         $this->courseid = $courseid;
         $this->from = $from;
         $this->to = $to;
         $list = "";
         $list2 = "";
-        $one_day_sec = 86400;
-        $unix_to = strtotime($to);
-        $query_to = $unix_to + $one_day_sec;
+
+        if ($from == $to) {
+            $timestamp = time();
+            $unix_from = strtotime("midnight", $timestamp);
+            $unix_to = strtotime("tomorrow", $unix_from) - 1;
+        } // end if $from==$to
+        else {
+            $unix_from = strtotime($from);
+            $unix_to = strtotime($to);
+        } // end else
+
+
         $coursename = $this->get_course_name($courseid);
         if ($status == true) {
             $list.="<div class='container-fluid' style='font-weight:bold'>";
@@ -260,11 +269,17 @@ class Report extends Util {
             $list.="</div>";
         }
         //1. Get credit cards payment
-        $query = "select * from mdl_card_payments "
-                . "where courseid=$courseid "
-                . "and pdate>='" . strtotime($from) . "' "
-                . "and pdate<='" . $query_to . "'  "
-                . "order by pdate desc ";
+        if ($courseid > 0) {
+            $query = "select * from mdl_card_payments "
+                    . "where courseid=$courseid "
+                    . "and pdate between $unix_from and $unix_to "
+                    . "order by pdate desc ";
+        } // end if $courseid>0
+        else {
+            $query = "select * from mdl_card_payments "
+                    . "where pdate between $unix_from and $unix_to "
+                    . "order by pdate desc ";
+        } // end else
         //echo "<br/>Query: $query<br/>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -277,12 +292,19 @@ class Report extends Util {
             } // end while
         } // end if $num > 0
         //2. Get cash payments - ptype=1
-        $query = "select * from mdl_invoice "
-                . "where courseid=$courseid  "
-                . "and i_status=1 "
-                . "and i_pdate>='" . strtotime($from) . "' "
-                . "and i_pdate<='" . $query_to . "' "
-                . "and i_ptype=1";
+        if ($courseid > 0) {
+            $query = "select * from mdl_invoice "
+                    . "where courseid=$courseid  "
+                    . "and i_status=1 "
+                    . "and i_pdate between $unix_from and $unix_to "
+                    . " and i_ptype=1";
+        } // end if $courseid > 0
+        else {
+            $query = "select * from mdl_invoice "
+                    . "where i_status=1 "
+                    . "and i_pdate between $unix_from and $unix_to "
+                    . " and i_ptype=1";
+        }
         //echo "<br/>Query: $query<br/>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -295,12 +317,19 @@ class Report extends Util {
             } // end while
         } // end if $num > 0
         //3. Get cheque payments - ptype=2
-        $query = "select * from mdl_invoice "
-                . "where courseid=$courseid  "
-                . "and i_status=1 "
-                . "and i_pdate>='" . strtotime($from) . "' "
-                . "and i_pdate<='" . $query_to . "' "
-                . "and i_ptype=2";
+        if ($courseid > 0) {
+            $query = "select * from mdl_invoice "
+                    . "where courseid=$courseid  "
+                    . "and i_status=1 "
+                    . "and i_pdate between $unix_from and $unix_to"
+                    . " and i_ptype=2";
+        } // end if $courseid > 0
+        else {
+            $query = "select * from mdl_invoice "
+                    . "where i_status=1 "
+                    . "and i_pdate between $unix_from and $unix_to"
+                    . " and i_ptype=2";
+        } // end else
         //echo "<br/>Query: $query<br/>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -312,6 +341,51 @@ class Report extends Util {
                 }
             } // end while
         } // end if $num > 0
+        //4. Get partial cash payments
+        if ($courseid > 0) {
+            $query = "select * from mdl_partial_payments "
+                    . "where courseid=$courseid "
+                    . "and ptype=1 "
+                    . " and pdate between $unix_from and $unix_to";
+        } // end if $courseid > 0
+        else {
+            $query = "select * from mdl_partial_payments "
+                    . "where ptype=1 "
+                    . " and pdate between $unix_from and $unix_to";
+        } // end else
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_status = $this->is_user_deleted($row['userid']);
+                if ($user_status == 0) {
+                    $this->cash_sum = $this->cash_sum + $row['psum'];
+                }
+            } // end while
+        } // end if $num > 0
+        //5. Get partial cheque payments 
+        if ($courseid > 0) {
+            $query = "select * from mdl_partial_payments "
+                    . "where courseid=$courseid "
+                    . "and ptype=2 "
+                    . " and pdate between $unix_from and $unix_to";
+        } // end if $courseid > 0
+        else {
+            $query = "select * from mdl_partial_payments "
+                    . "where ptype=2 "
+                    . " and pdate between $unix_from and $unix_to";
+        }
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_status = $this->is_user_deleted($row['userid']);
+                if ($user_status == 0) {
+                    $this->cheque_sum = $this->cheque_sum + $row['psum'];
+                }
+            } // end while
+        } // end if $num > 0
+
         $grand_total = $this->card_sum + $this->cash_sum + $this->cheque_sum;
         $list2.="<div class='container-fluid' style='padding-right:0px;'>";
         $list2.="<span class='span3'>Card</span><span class='span1'>$$this->card_sum</span>";

@@ -208,9 +208,9 @@ class navClass extends Util {
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' id='user_report' title='Users stats'>Users stats</a></li>
                                     <li><a href='#' id='payments_report' title='Payments log'>Payments log</a></li>                                    
-                                    <li><a href='#' id='program_reports' title='Program reports'>Program reports</a></li>
+                                    <!--<li><a href='#' id='program_reports' title='Program reports'>Program reports</a></li>-->
                                     <li><a href='#' id='revenue_reports' title='Revenue reports'>Revenue reports</a></li>
-                                    <li><a href='#' id='workshop_reports' title='Workshop reports'>Workshop reports</a></li>
+                                    <!--<li><a href='#' id='workshop_reports' title='Workshop reports'>Workshop reports</a></li>-->
                                 </ul>
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>

@@ -663,7 +663,6 @@ class Students {
                         $list.="</tr>";
                     } // end if count($other_payments)>0               
                 } // end foreach patricipants
-
                 //echo "Owe sum: ".$owe_sum."<br>";
                 if ($owe_sum >= 0) {
                     $list.="<tr>";
@@ -1023,6 +1022,385 @@ class Students {
             } // end while
             $this->send_email($camid, $userid);
         } // end if $num > 0
+    }
+
+    /*     * ************Code related to financial report ******************** */
+
+    function get_report_credit_card_payments($start, $end) {
+        $payments = array();
+        $query = "select * from mdl_card_payments "
+                . "where pdate between $start and $end";
+        //echo "CC Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        return $payments;
+    }
+
+    function get_report_invoice_payments($start, $end) {
+        $payments = array();
+        $query = "select * from mdl_invoice "
+                . "where i_status=1 and i_pdate between $start and $end";
+        //echo "Invoice Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        return $payments;
+    }
+
+    function get_report_partial_payments($start, $end) {
+        $payments = array();
+        $query = "select * from mdl_partial_payments "
+                . "where pdate between $start and $end";
+        //echo "Partial Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        return $payments;
+    }
+
+    function prepare_financial_report($type, $start, $end, $card_payments, $invoice_payments, $parial_payments) {
+
+        //echo "<br>Type: " . $type . "<br>";
+        //echo "Start: " . $start . "<br>";
+        //echo "End: " . $end . "<br>";
+        $renew_fee = $this->get_renew_fee();
+        $list = "";
+        $cc_list = "";
+        $cc_subtotal = 0;
+        $in_list = "";
+        $in_subtotal = 0;
+        $pp_list = "";
+        $cash_subtotal = 0;
+        $total = 0;
+        date_default_timezone_set('Pacific/Wallis');
+        switch ($type) {
+            case 1:
+                $date = date('m-d-Y', time());
+                $title = "<span style='font-weight:bold;'>Daily Financial Report - $date</span>";
+                break;
+            case 2:
+                $h_start = date('m-d-Y', $start);
+                $h_end = date('m-d-Y', $end);
+                $title = "<span style='font-weight:bold;'>Weekly Financial Report - $h_start - $h_end</span>";
+                break;
+            case 3:
+                $h_start = date('m-d-Y', $start);
+                $h_end = date('m-d-Y', $end);
+                $title = "<span style='font-weight:bold;'>Monthly Financial Report - $h_start - $h_end</span>";
+                break;
+            case 4:
+                $title = "";
+                break;
+        } // end switch
+        // Credit card payments
+        if (count($card_payments) > 0) {
+            $cc_list.="<table>";
+            $cc_list.="<th>";
+            $cc_list.="<td style='padding:15px;font-weight:bold;' colspan='2' align='center'>Credit Card Payments</td>";
+            $cc_list.="</th>";
+            foreach ($card_payments as $payment) {
+
+                /*
+                 * 
+                  echo "<br><pre>";
+                  print_r($payment);
+                  echo "</pre><br>";
+                 * 
+                 */
+
+                $coursename = $this->get_course_name($payment->courseid);
+                $date = date('m-d-Y', $payment->pdate);
+                $userdata = $this->get_user_data($payment->userid);
+                $firstname = $userdata->firstname;
+                $lastname = $userdata->lastname;
+                $amount = $payment->psum;
+                $cc_list.="<tr>";
+                if ($amount != $renew_fee) {
+                    $cc_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
+                } // end if $amount!=$renew_fee
+                else {
+                    $cc_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename - Certificate Renew Payment</td>";
+                }
+                $cc_list.="</tr>";
+                $cc_list.="<tr>";
+                $cc_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
+                $cc_list.="</tr>";
+                $cc_list.="<tr>";
+                $cc_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
+                $cc_list.="</tr>";
+                $cc_list.="<tr>";
+                $cc_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
+                $cc_list.="</tr>";
+                $cc_list.="<tr>";
+                $cc_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
+                $cc_list.="</tr>";
+                $cc_subtotal = $cc_subtotal + $amount;
+            } // end foreach
+            $cc_list.="<tr>";
+            $cc_list.="<td style='padding:15px;font-weight:bold;'>Subtotal:</td><td style='padding:15px;font-weight:bold;'>$$cc_subtotal</td>";
+            $cc_list.="</tr>";
+            $cc_list.="</table>";
+        } // end if count($card_payments)>0
+        // Invoice payments
+        if (count($invoice_payments) > 0) {
+            $in_list.="<table>";
+            $in_list.="<th>";
+            $in_list.="<td style='padding:15px;font-weight:bold;' colspan='2' align='center'>Invoice Payments</td>";
+            $in_list.="</th>";
+            foreach ($invoice_payments as $payment) {
+
+                /*
+                 * 
+                  echo "<br><pre>";
+                  print_r($payment);
+                  echo "</pre><br>";
+                 * 
+                 */
+
+                $coursename = $this->get_course_name($payment->courseid);
+                $date = date('m-d-Y', $payment->i_pdate);
+                $userdata = $this->get_user_data($payment->userid);
+                $firstname = $userdata->firstname;
+                $lastname = $userdata->lastname;
+                $amount = $payment->i_sum;
+                $in_list.="<tr>";
+                if ($amount != $renew_fee) {
+                    $in_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
+                } // end if  $amount != $renew_fee
+                else {
+                    $in_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename - Certificate Renew Payment</td>";
+                } // end else
+                $in_list.="</tr>";
+                $in_list.="<tr>";
+                $in_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
+                $in_list.="</tr>";
+                $in_list.="<tr>";
+                $in_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
+                $in_list.="</tr>";
+                $in_list.="<tr>";
+                $in_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
+                $in_list.="</tr>";
+                $in_list.="<tr>";
+                $in_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
+                $in_list.="</tr>";
+                $in_subtotal = $in_subtotal + $amount;
+            } // end foreach
+            $in_list.="<tr>";
+            $in_list.="<td style='padding:15px;font-weight:bold;'>Subtotal:</td><td style='padding:15px;font-weight:bold;'>$$in_subtotal</td>";
+            $in_list.="</tr>";
+            $in_list.="</table>";
+        } // end if count($invoice_payments)>0
+        // Partia/Cash payments
+        if (count($parial_payments) > 0) {
+            $pp_list.="<table>";
+            $pp_list.="<th>";
+            $pp_list.="<td style='padding:15px;font-weight:bold;' colspan='2' align='center'>Cash/Partial Payments</td>";
+            $pp_list.="</th>";
+            foreach ($parial_payments as $payment) {
+
+                /*
+                 * 
+                  echo "<br><pre>";
+                  print_r($payment);
+                  echo "</pre><br>";
+                 * 
+                 */
+
+                $coursename = $this->get_course_name($payment->courseid);
+                $date = date('m-d-Y', $payment->pdate);
+                $userdata = $this->get_user_data($payment->userid);
+                $firstname = $userdata->firstname;
+                $lastname = $userdata->lastname;
+                $amount = $payment->psum;
+                $pp_list.="<tr>";
+                if ($amount != $renew_fee) {
+                    $pp_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
+                } // end if $amount != $renew_fee
+                else {
+                    $pp_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename - Certificate Renew Payment</td>";
+                } // end else
+                $pp_list.="</tr>";
+                $pp_list.="<tr>";
+                $pp_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
+                $pp_list.="</tr>";
+                $pp_list.="<tr>";
+                $pp_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
+                $pp_list.="</tr>";
+                $pp_list.="<tr>";
+                $pp_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
+                $pp_list.="</tr>";
+                $pp_list.="<tr>";
+                $pp_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
+                $pp_list.="</tr>";
+                $cash_subtotal = $cash_subtotal + $amount;
+            } // end foreach
+            $pp_list.="<tr>";
+            $pp_list.="<td style='padding:15px;font-weight:bold;'>Subtotal:</td><td style='padding:15px;font-weight:bold;'>$$cash_subtotal</td>";
+            $pp_list.="</tr>";
+            $pp_list.="</table>";
+        } // end if count($parial_payments)>0
+
+
+        $total = $cc_subtotal + $in_subtotal + $cash_subtotal;
+        $list.="<table>";
+        $list.="<tr>";
+        $list.="<td align='center'>$title</td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td>$cc_list</td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td>$in_list</td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td>$pp_list</td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td style='padding:15px;font-weight:bold;'>Grand total &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $$total</td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+        return $list;
+    }
+
+    function get_report_payments($type) {
+        $list = "";
+        date_default_timezone_set('Pacific/Wallis');
+        switch ($type) {
+            case 1:
+                // Daily report
+                //echo "Date to be reported: " . date('m-d-Y', time());
+                $timestamp = time();
+                $start = strtotime("midnight", $timestamp);
+                $end = strtotime("tomorrow", $start) - 1;
+                $card_payments = $this->get_report_credit_card_payments($start, $end);
+                $invoice_payments = $this->get_report_invoice_payments($start, $end);
+                $parial_payments = $this->get_report_partial_payments($start, $end);
+                $list.=$this->prepare_financial_report($type, $start, $end, $card_payments, $invoice_payments, $parial_payments);
+                $this->send_financial_report($type, $timestamp, $timestamp, $list);
+                break;
+            case 2:
+                // Weekly report
+                $start = new DateTime('last monday');
+                $end = new DateTime('this sunday');
+
+                echo "<br><pre>";
+                print_r($start);
+                echo "</pre><br>";
+                echo "<br><pre>";
+                print_r($end);
+                echo "</pre><br>";
+
+                $card_payments = $this->get_report_credit_card_payments(strtotime($start->date), strtotime($end->date));
+                $invoice_payments = $this->get_report_invoice_payments(strtotime($start->date), strtotime($end->date));
+                $parial_payments = $this->get_report_partial_payments(strtotime($start->date), strtotime($end->date));
+                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $invoice_payments, $parial_payments);
+                $this->send_financial_report($type, strtotime($start->date), strtotime($end->date), $list);
+                break;
+            case 3:
+                // Montly report
+                $start = new DateTime('first day of this month');
+                $end = new DateTime('last day of this month');
+
+                echo "<br><pre>";
+                print_r($start);
+                echo "</pre><br>";
+                echo "<br><pre>";
+                print_r($end);
+                echo "</pre><br>";
+
+                $card_payments = $this->get_report_credit_card_payments(strtotime($start->date), strtotime($end->date));
+                $invoice_payments = $this->get_report_invoice_payments(strtotime($start->date), strtotime($end->date));
+                $parial_payments = $this->get_report_partial_payments(strtotime($start->date), strtotime($end->date));
+                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $invoice_payments, $parial_payments);
+                $this->send_financial_report($type, strtotime($start->date), strtotime($end->date), $list);
+                break;
+            case 4:
+                // Year report
+                break;
+        }
+
+
+        return $list;
+    }
+
+    function send_financial_report($type, $start, $end, $message) {
+
+        switch ($type) {
+            case 1:
+                $date = date('m-d-Y', time());
+                $title = "Daily Financial Report - $date";
+                break;
+            case 2:
+                $h_start = date('m-d-Y', $start);
+                $h_end = date('m-d-Y', $end);
+                $title = "Weekly Financial Report - $h_start - $h_end";
+                break;
+            case 3:
+                $h_start = date('m-d-Y', $start);
+                $h_end = date('m-d-Y', $end);
+                $title = "Monthly Financial Report - $h_start - $h_end";
+                break;
+            case 4:
+                $title = "";
+                break;
+        } // end switch
+
+        $a_email = 'a1b1c777@gmail.com';
+        $m_email = 'sirromas@gmail.com';
+        $mail = new PHPMailer;
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->addAddress($a_email);
+        $mail->addAddress($m_email);
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+
+        $mail->isHTML(true);
+
+        $mail->Subject = $title;
+        $mail->Body = $message;
+
+        if (!$mail->send()) {
+            echo "Message could not be sent to $a_email \n";
+            echo "Message could not be sent to $m_email \n";
+            echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
+        } // end if !$mail->send()        
+        else {
+            echo "Message has been sent to ' . $a_email \n";
+            echo "Message has been sent to ' . $m_email \n";
+        }
     }
 
 }
