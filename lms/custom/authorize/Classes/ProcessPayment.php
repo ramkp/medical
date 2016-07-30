@@ -176,7 +176,7 @@ class ProcessPayment {
         $start_date_h = date('Y-m-d', time()); // first subscription payment today
         $total_occurences = $post_order->payments_num;
         $expiration = $post_order->cds_cc_year . "-" . $post_order->cd_cc_month;
-        $names = explode(" ", $post_order->cds_name);
+        $names = explode("/", $post_order->cds_name);
 
         // Customer info 
         $custID = round(time() / 3785);
@@ -196,10 +196,10 @@ class ProcessPayment {
          */
 
         $firstname = $names[0];
-        $lastname = $names[2];
+        $lastname = $names[1];
 
-        $firstname = ($names[0] == '') ? "Loyal" : $names[0];
-        $lastname = ($names[2] == '') ? 'Client' : $names[2];
+        //$firstname = ($names[0] == '') ? "Loyal" : $names[0];
+        //$lastname = ($names[2] == '') ? 'Client' : $names[2];
 
         // Subscription Type Info
         $subscription = new AnetAPI\ARBSubscriptionType();
