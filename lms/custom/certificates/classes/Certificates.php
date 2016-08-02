@@ -1661,5 +1661,20 @@ class Certificates extends Util {
         $list.="Certificate has been created";
         return $list;
     }
+    
+    function create_certificate2($courseid, $userid, $start, $end) {
+        $list = "";
+        $issue = $start;
+        $expire = $end;
+        $code = $this->get_course_code($courseid, $userid);
+        $cert = new stdClass();
+        $cert->courseid = $courseid;
+        $cert->userid = $userid;
+        $cert->code = $code;
+        $this->create_new_certificate($cert, $issue, $expire);
+        $this->add_certificate_data($cert, $issue, $expire);
+        $list.="Certificate has been created";
+        return $list;
+    }
 
 }

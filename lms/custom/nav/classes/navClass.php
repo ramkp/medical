@@ -51,7 +51,7 @@ class navClass extends Util {
         $list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
-                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
+                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2</a>
                 <a class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
                     <span class='icon-bar'></span>
                     <span class='icon-bar'></span>
@@ -282,16 +282,35 @@ class navClass extends Util {
         return $expired;
     }
 
+    function get_user_courses($userid) {
+        $contexts = array();
+        $courses = array();
+        $query = "select * from mdl_role_assignments "
+                . "where roleid=5 and userid=$userid ";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $contexts[] = $row['contextid'];
+        } // end while
+        if (count($contexts) > 0) {
+            foreach ($contexts as $contextid) {
+                $query = "select * from mdl_context where id=$contextid";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $courses[] = $row['instanceid'];
+                } // end while
+            } // end foreach
+        } // end if count($contexts)>0
+        return $courses;
+    }
+
     function get_students_menu_items() {
         $userid = $this->user->id;
-        $courseid = $this->get_user_course($userid);
-        $expired = $this->is_course_expired($courseid);
-        $completion_status = $this->is_course_completed($courseid, $this->user->id);
+        $courses = $this->get_user_courses($userid);
         $list = "";
         $list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
-                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
+                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2</a>
                 <a class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
                     <span class='icon-bar'></span>
                     <span class='icon-bar'></span>
@@ -303,11 +322,26 @@ class navClass extends Util {
                         <li></li>                        
                         <li class='dropdown'><a href='#cm_submenu_2' class='dropdown-toggle' title='Cerrtificate'>Certtificate<b class='caret'></b></a>                        
                         <ul class='dropdown-menu' style='display: none;'>";
-        if ($completion_status > 0) {
-            $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>Print Certificate</a></li>";
-            $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>Renew Certificate</a></li>";
-            //$list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
-        } // end if $compleation_status!=0        
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $completion_status = $this->is_course_completed($courseid, $this->user->id);
+                if ($completion_status > 0) {
+                    $coursename = $this->get_course_name($courseid);
+                    $cert = new Certificates();
+                    $exists = $cert->is_certificate_exists($courseid, $this->user->id);
+                    if ($exists == 0) {
+                        // We need to create new certificate
+                        $start = $this->get_course_completion_date($courseid, $this->user->id);
+                        $year_expiration_sec = 31104000; // 12 month expiration in secs
+                        $end = $start + $year_expiration_sec;
+                        $cert->create_certificate2($courseid, $this->user->id, $start, $end);
+                    } // end if $exists==0                    
+                    $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>$coursename - Print Certificate</a></li>";
+                    $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>$coursename - Renew Certificate</a></li>";
+                    //$list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
+                } // end if $compleation_status!=0        
+            } // end foreach
+        } // end if count($courses)>0
         $list.="</ul>
                         </li>                        
                     </ul>                            
@@ -341,7 +375,7 @@ class navClass extends Util {
         $list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
-                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2 Training Institute</a>
+                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2</a>
                 <a class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
                     <span class='icon-bar'></span>
                     <span class='icon-bar'></span>
@@ -541,7 +575,7 @@ class navClass extends Util {
 
     function renew_certificate() {
 
-        /* **************************************************************
+        /*         * *************************************************************
          *  Certificate validation is one year. So whenever user clicks
          *  Renew Certificate it should be prolonged for one year from
          *  course completion moment, no other cases 

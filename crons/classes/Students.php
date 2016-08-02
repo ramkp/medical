@@ -11,6 +11,13 @@ class Students {
     public $mail_smtp_user = 'info@medical2.com';
     public $mail_smtp_pwd = 'aK6SKymc';
     public $contextlevel = 50;
+    public $phleb_courseid = 57;
+    public $obs_courseid = 49;
+    public $threrapy_courseid = 47;
+    public $therapy_quizid = 103;
+    public $obs_quizid = 102;
+    public $phleb_quizid = 101;
+    public $passing_grade = 75;
 
     function __construct() {
         $db = new pdo_db();
@@ -1416,6 +1423,180 @@ class Students {
             echo "Message has been sent to ' . $a_email \n";
             echo "Message has been sent to ' . $m_email \n";
         }
+    }
+
+    /* Code related to exam passed students */
+
+    function get_users_grades($id) {
+        $grades = array();
+        $query = "SELECT * FROM `mdl_grade_grades` WHERE itemid =$id "
+                . "AND rawgrade IS NOT NULL";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $grade = new stdClass();
+                foreach ($row as $key => $value) {
+                    $grade->$key = $value;
+                } // end foreach
+                $grades[] = $grade;
+            } // end while
+        } // end if $num > 0
+        return $grades;
+    }
+
+    function make_students_course_course_completed($courseid, $userid, $users) {
+        $query = "select * from mdl_course_completions "
+                . "where course=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        $userdata = $this->get_user_data($userid);
+        if ($num > 0) {
+            echo "$userdata->firstname $userdata->lastname" . " already exists in course completion table <br>";
+        } // end if $num > 0
+        else {
+            $date = time();
+            $query = "insert into mdl_course_completions "
+                    . "(userid,"
+                    . "course,"
+                    . "timeenrolled,"
+                    . "timecompleted) "
+                    . "values ($userid,$courseid,$date,$date)";
+            $this->db->query($query);
+            $this->send_exam_passed_notification($users);
+            echo "$userdata->firstname $userdata->lastname" . " was added into course completion table <br>";
+        }
+    }
+
+    function send_exam_passed_notification($users) {
+        $a_email = 'help@medical2.com';
+        $b_email = 'a1b1c777@gmail.com';
+        $m_email = 'sirromas@gmail.com';
+        $mail = new PHPMailer;
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->addAddress($a_email);
+        $mail->addAddress($b_email);
+        $mail->addAddress($m_email);
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+
+        $mail->isHTML(true);
+
+        $message = "<html>";
+        $message.="<body>";
+        $message.="<br><br><table align='center'>";
+        $message.="<tr>";
+        $message.="<th style='padding:15px;'>Student</th>";
+        $message.="<th style='padding:15px;'>Progam name</th>";
+        $message.="<th style='padding:15px;'>Passing grade %</th>";
+        $message.="<th style='padding:15px;'>Exam date</th>";
+        $message.="</tr>";
+        foreach ($users as $user) {
+            $userdata = $this->get_user_data($user->userid);
+            $coursename = $this->get_course_name($user->courseid);
+            $date = date('m-d-Y h:i:s', $user->date);
+            $message.="<tr>";
+            $message.="<td style='padding:15px;'>$userdata->firstname $userdata->lastname</td>";
+            $message.="<td style='padding:15px;'>$coursename</td>";
+            $message.="<td style='padding:15px;'>$user->grade</td>";
+            $message.="<td style='padding:15px;'>$date</td>";
+            $message.="</tr>";
+        } // end foreach
+        $message.="</table>";
+        $message.="</body>";
+        $message.="</html>";
+
+        $mail->Subject = 'Medical2 Career College - students passed exam';
+        $mail->Body = $message;
+
+        if (!$mail->send()) {
+            echo "Message could not be sent to $a_email \n";
+            echo "Message could not be sent to $b_email \n";
+            echo "Message could not be sent to $m_email \n";
+            echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
+        } // end if !$mail->send()        
+        else {
+            echo "Message has been sent to ' . $a_email \n";
+            echo "Message could not be sent to $b_email \n";
+            echo "Message has been sent to ' . $m_email \n";
+        }
+    }
+
+    function check_exam_students() {
+        $therapy_users = $this->get_users_grades($this->therapy_quizid);
+        $obsterics_users = $this->get_users_grades($this->obs_quizid);
+        $phleb_users = $this->get_users_grades($this->phleb_quizid);
+
+        if (count($therapy_users) > 0) {
+            $passed_users = array();
+            echo "<br>Processing IV Terapy users (quizid=$this->therapy_quizid) ...<br>";
+            foreach ($therapy_users as $user) {
+                if ($user->rawgrade >= $this->passing_grade) {
+                    $passed = new stdClass();
+                    $passed->userid = $user->userid;
+                    $passed->courseid = $this->threrapy_courseid;
+                    $passed->grade = $user->rawgrade;
+                    $passed->date = $user->timecreated;
+                    $passed_users[] = $passed;
+
+                    $userdata = $this->get_user_data($user->userid);
+                    echo " $userdata->firstname $userdata->lastname" . " Passing grade: " . $user->rawgrade . "<br>";
+                    $this->make_students_course_course_completed($this->threrapy_courseid, $user->userid, $passed);
+                } // end if $user->rawgrade>=$this->passing_grade
+            } // end foreach
+            //$this->send_exam_passed_notification($passed_users);
+            echo "<br>---------------------------------------------------------------<br>";
+        } // end if count($therapy_users)>0
+
+        if (count($obsterics_users) > 0) {
+            $passed_users = array();
+            echo "<br>Processing Obsterics users (quizid=$this->obs_quizid)...<br>";
+            foreach ($obsterics_users as $user) {
+                if ($user->rawgrade >= $this->passing_grade) {
+                    $passed = new stdClass();
+                    $passed->userid = $user->userid;
+                    $passed->courseid = $this->obs_courseid;
+                    $passed->grade = $user->rawgrade;
+                    $passed->date = $user->timecreated;
+                    $passed_users[] = $passed;
+
+                    $userdata = $this->get_user_data($user->userid);
+                    echo " $userdata->firstname $userdata->lastname" . " Passing grade: " . $user->rawgrade . "<br>";
+                    $this->make_students_course_course_completed($this->obs_courseid, $user->userid, $passed);
+                } // end if $user->rawgrade>=$this->passing_grade
+            } // end foreach
+            //$this->send_exam_passed_notification($passed_users);
+            echo "<br>---------------------------------------------------------------<br>";
+        } // end if count($obsterics_users)>0
+
+
+        if (count($phleb_users) > 0) {
+            $passed_users = array();
+            echo "<br>Processing Phlebotomy users (quizid=$this->phleb_quizid)...<br>";
+            foreach ($phleb_users as $user) {
+                if ($user->rawgrade >= $this->passing_grade) {
+                    $passed = new stdClass();
+                    $passed->userid = $user->userid;
+                    $passed->courseid = $this->phleb_courseid;
+                    $passed->grade = $user->rawgrade;
+                    $passed->date = $user->timecreated;
+                    $passed_users[] = $passed;
+
+                    $userdata = $this->get_user_data($user->userid);
+                    echo " $userdata->firstname $userdata->lastname" . " Passing grade: " . $user->rawgrade . "<br>";
+                    $this->make_students_course_course_completed($this->phleb_courseid, $user->userid, $passed);
+                } // end if $user->rawgrade>=$this->passing_grade
+            } // end foreach
+            //$this->send_exam_passed_notification($passed_users);
+            echo "<br>---------------------------------------------------------------<br>";
+        } // end if count($phleb_users)>0
     }
 
 }
