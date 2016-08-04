@@ -20,4 +20,12 @@ class Groups extends CI_Controller {
         $this->load->view('footer_view');
     }
 
+    public function private_groups() {
+        $form = $this->groups_model->get_private_group_form();
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('groups_view', $data);
+        $this->load->view('footer_view');
+    }
+
 }
