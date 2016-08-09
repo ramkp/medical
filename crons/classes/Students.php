@@ -1051,8 +1051,27 @@ class Students {
     function get_report_credit_card_payments($start, $end) {
         $payments = array();
         $query = "select * from mdl_card_payments "
-                . "where pdate between $start and $end";
+                . "where refunded=0 and pdate between $start and $end";
         //echo "CC Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        return $payments;
+    }
+
+    function get_refund_data($start, $end) {
+        $payments = array();
+        $query = "select * from mdl_card_payments "
+                . "where refunded=1 and pdate between $start and $end";
+        //echo "CC Refund Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -1105,7 +1124,7 @@ class Students {
         return $payments;
     }
 
-    function prepare_financial_report($type, $start, $end, $card_payments, $invoice_payments, $parial_payments) {
+    function prepare_financial_report($type, $start, $end, $card_payments, $invoice_payments, $parial_payments, $refund_payments) {
 
         //echo "<br>Type: " . $type . "<br>";
         //echo "Start: " . $start . "<br>";
@@ -1113,12 +1132,13 @@ class Students {
         $renew_fee = $this->get_renew_fee();
         $list = "";
         $cc_list = "";
+        $refund_list = "";
+        $refund_subtotal = 0;
         $cc_subtotal = 0;
         $in_list = "";
         $in_subtotal = 0;
         $pp_list = "";
         $cash_subtotal = 0;
-        $total = 0;
         date_default_timezone_set('Pacific/Wallis');
         switch ($type) {
             case 1:
@@ -1146,15 +1166,6 @@ class Students {
             $cc_list.="<td style='padding:15px;font-weight:bold;' colspan='2' align='center'>Credit Card Payments</td>";
             $cc_list.="</th>";
             foreach ($card_payments as $payment) {
-
-                /*
-                 * 
-                  echo "<br><pre>";
-                  print_r($payment);
-                  echo "</pre><br>";
-                 * 
-                 */
-
                 $coursename = $this->get_course_name($payment->courseid);
                 $date = date('m-d-Y', $payment->pdate);
                 $userdata = $this->get_user_data($payment->userid);
@@ -1188,6 +1199,43 @@ class Students {
             $cc_list.="</tr>";
             $cc_list.="</table>";
         } // end if count($card_payments)>0
+
+        if (count($refund_payments) > 0) {
+            $refund_list.="<table>";
+            $refund_list.="<th>";
+            $refund_list.="<td style='padding:15px;font-weight:bold;' colspan='2' align='center'>Refund Payments</td>";
+            $refund_list.="</th>";
+            foreach ($refund_payments as $payment) {
+                $coursename = $this->get_course_name($payment->courseid);
+                $date = date('m-d-Y', $payment->pdate);
+                $userdata = $this->get_user_data($payment->userid);
+                $firstname = $userdata->firstname;
+                $lastname = $userdata->lastname;
+                $amount = $payment->psum;
+                $refund_list.="<tr>";
+                $refund_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
+                $refund_list.="</tr>";
+                $refund_list.="<tr>";
+                $refund_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
+                $refund_list.="</tr>";
+                $refund_list.="<tr>";
+                $refund_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>-$$amount</td>";
+                $refund_list.="</tr>";
+                $refund_list.="<tr>";
+                $refund_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
+                $refund_list.="</tr>";
+                $refund_list.="<tr>";
+                $refund_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
+                $refund_list.="</tr>";
+                $refund_subtotal = $refund_subtotal + $amount;
+            } // end foreach
+            $refund_list.="<tr>";
+            $refund_list.="<td style='padding:15px;font-weight:bold;'>Subtotal:</td><td style='padding:15px;font-weight:bold;'>-$$refund_subtotal</td>";
+            $refund_list.="</tr>";
+            $refund_list.="</table>";
+        } // end if count($refund_payments)>0
+        
+        
         // Invoice payments
         if (count($invoice_payments) > 0) {
             $in_list.="<table>";
@@ -1297,6 +1345,9 @@ class Students {
         $list.="<td>$cc_list</td>";
         $list.="</tr>";
         $list.="<tr>";
+        $list.="<td>$refund_list</td>";
+        $list.="</tr>";
+        $list.="<tr>";
         $list.="<td>$in_list</td>";
         $list.="</tr>";
         $list.="<tr>";
@@ -1321,9 +1372,10 @@ class Students {
                 $start = strtotime("midnight", $timestamp);
                 $end = strtotime("tomorrow", $start) - 1;
                 $card_payments = $this->get_report_credit_card_payments($start, $end);
+                $refund_payments = $this->get_refund_data($start, $end);
                 $invoice_payments = $this->get_report_invoice_payments($start, $end);
                 $parial_payments = $this->get_report_partial_payments($start, $end);
-                $list.=$this->prepare_financial_report($type, $start, $end, $card_payments, $invoice_payments, $parial_payments);
+                $list.=$this->prepare_financial_report($type, $start, $end, $card_payments, $invoice_payments, $parial_payments, $refund_payments);
                 $this->send_financial_report($type, $timestamp, $timestamp, $list);
                 break;
             case 2:

@@ -271,13 +271,14 @@ class Report extends Util {
         //1. Get credit cards payment
         if ($courseid > 0) {
             $query = "select * from mdl_card_payments "
-                    . "where courseid=$courseid "
+                    . "where courseid=$courseid and refunded=0 "
                     . "and pdate between $unix_from and $unix_to "
                     . "order by pdate desc ";
         } // end if $courseid>0
         else {
             $query = "select * from mdl_card_payments "
                     . "where pdate between $unix_from and $unix_to "
+                    . "and refunded=0 "
                     . "order by pdate desc ";
         } // end else
         //echo "<br/>Query: $query<br/>";

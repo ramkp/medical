@@ -7,6 +7,7 @@
  */
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/classes/Invoice.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Classes/ProcessPayment.php';
 
 class Payments extends Util {
 
@@ -90,14 +91,14 @@ class Payments extends Util {
                 $user = $this->get_user_details($payment->userid);
                 $course = $this->get_course_name($payment->courseid);
                 $date = date('Y-m-d', $payment->i_pdate);
-                $address_block=$this->get_user_address_block($payment->userid);
+                $address_block = $this->get_user_address_block($payment->userid);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span1'>User</span><span class='span3'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span1'>Address</span><span class='span3'>$address_block</span>";
                 $list.="</div>";
-                
+
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span1'>Program</span><span class='span3'>$course</span>";
                 $list.="</div>";
@@ -267,7 +268,7 @@ class Payments extends Util {
     function get_card_payments_page() {
         $payments = array();
         $query = "select * "
-                . "from mdl_card_payments "
+                . "from mdl_card_payments where refunded=0 "
                 . "order by pdate desc limit 0, $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -281,6 +282,90 @@ class Payments extends Util {
             } // end while
         } // end if $num>0
         $list = $this->create_card_payments_page($payments);
+        return $list;
+    }
+
+    function get_refund_page() {
+        $payments = array();
+        $query = "select * "
+                . "from mdl_card_payments where refunded=1 "
+                . "order by pdate desc limit 0, $this->limit";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach      
+                $payments[] = $payment;
+            } // end while
+        } // end if $num>0
+        $list = $this->create_refunded_payments_page($payments);
+        return $list;
+    }
+
+    function create_refunded_payments_page($payments, $toolbar = true, $search = false) {
+        $list = "";
+        if (count($payments) > 0) {
+            if ($toolbar == true) {
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span2'>Search</span>";
+                $list.="<span class='span2'><input type='text' id='search_payment' style='width:125px;' /></span>";
+                $list.="<span class='span3'><button class='btn btn-primary' id='search_refund_payment_button'>Search</button></span>";
+                $list.="<span class='span2'><button class='btn btn-primary' id='clear_refund_payment_button'>Clear filter</button></span>";
+                $list.="<span class='span2'><button class='btn btn-primary' id='make_refund_button' style='width:175px;'>Make Refund</button></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span8' style='color:red;' id='payment_err'></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+                $list.="<span class='span10'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+                $list.="</div>";
+            } // end if $toolbar==true            
+            $list.="<div id='card_payments_container'>";
+            $total = count($payments);
+            if ($total <= $this->limit && $search == false) {
+                $total = $this->get_total_refund_payments();
+            }
+            $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
+            $list.="<span class='span10'>Total payments: $total</span>";
+            $list.="</div>";
+            foreach ($payments as $payment) {
+                $user = $this->get_user_details($payment->userid);
+                $course = $this->get_course_name($payment->courseid);
+                $date = date('Y-m-d', $payment->pdate);
+                $user_payments = $this->get_user_address_block($payment->userid);
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>User</span><span class='span3'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname ($user->email)</a></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Address</span><span class='span3'>$user_payments</span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Program</span><span class='span6'>$course </span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>Refund sum</span><span class='span3'>$$payment->psum from $date</span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span7'><hr/></span>";
+                $list.="</div>";
+            } // end foreach
+            $list.="</div>";
+            if ($toolbar == true) {
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span6'  id='pagination'></span>";
+                $list.="</div>";
+            }
+        } // end if count($payments)>0
+        else {
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'>There are no refund payments</span>";
+            $list.="<span class='span2'><button class='btn btn-primary' id='make_refund_button' style='width:175px;'>Make Refund</button></span>";
+            $list.="</div>";
+        }
         return $list;
     }
 
@@ -313,14 +398,14 @@ class Payments extends Util {
                 $user = $this->get_user_details($payment->userid);
                 $course = $this->get_course_name($payment->courseid);
                 $date = date('Y-m-d', $payment->pdate);
-                $user_payments=$this->get_user_address_block($payment->userid);
+                $user_payments = $this->get_user_address_block($payment->userid);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>User</span><span class='span3'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Address</span><span class='span3'>$user_payments</span>";
                 $list.="</div>";
-                
+
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program</span><span class='span6'>$course </span>";
                 $list.="</div>";
@@ -352,6 +437,12 @@ class Payments extends Util {
         return $num;
     }
 
+    function get_total_refund_payments() {
+        $query = "select id from mdl_card_payments where refunded=1 order by pdate desc";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
     function get_card_payments_item($page) {
         $payments = array();
         $rec_limit = $this->limit;
@@ -362,7 +453,7 @@ class Payments extends Util {
             $page = $page - 1;
             $offset = $rec_limit * $page;
         }
-        $query = "select * from mdl_card_payments "
+        $query = "select * from mdl_card_payments where refunded=0 "
                 . "order by pdate desc "
                 . "LIMIT $offset, $rec_limit";
         //echo "Query: ".$query ."<br>";
@@ -375,6 +466,32 @@ class Payments extends Util {
             $payments[] = $payment;
         } // end while
         $list = $this->create_card_payments_page($payments, false);
+        return $list;
+    }
+
+    function get_refund_item($page) {
+        $payments = array();
+        $rec_limit = $this->limit;
+        if ($page == 1) {
+            $offset = 0;
+        } // end if $page==1
+        else {
+            $page = $page - 1;
+            $offset = $rec_limit * $page;
+        }
+        $query = "select * from mdl_card_payments where refunded=1 "
+                . "order by pdate desc "
+                . "LIMIT $offset, $rec_limit";
+        //echo "Query: ".$query ."<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $payment = new stdClass();
+            foreach ($row as $key => $value) {
+                $payment->$key = $value;
+            } // end foreach      
+            $payments[] = $payment;
+        } // end while
+        $list = $this->create_refunded_payments_page($payments, false);
         return $list;
     }
 
@@ -402,7 +519,7 @@ class Payments extends Util {
     }
 
     function search_item($item, $typeid) {
-        $list="";
+        $list = "";
         $invoices = array();
         $invoice = new Invoices();
         $users_list = implode(",", $invoice->search_invoice_users($item));
@@ -486,6 +603,152 @@ class Payments extends Util {
             $list.="</div>";
         } // end else 
         return $list;
+    }
+
+    function search_refund_payment($item) {
+        $list = "";
+        $payments = array();
+        $invoice = new Invoices();
+        $users_list = implode(",", $invoice->search_invoice_users($item));
+        $courses_list = implode(",", $invoice->search_invoice_courses($item));
+        if ($users_list != '' || $courses_list != '') {
+            if ($users_list != '') {
+                $query = "select * from mdl_card_payments "
+                        . "where userid in ($users_list) and refunded=1 order by pdate desc ";
+            } // end if $users_list != ''
+            if ($courses_list != '') {
+                $query = "select * from mdl_card_payments "
+                        . "where courseid in ($courses_list) and refunded=1 order by pdate desc ";
+            } // end if $courses_list != ''
+            if ($users_list != '' && $courses_list != '') {
+                $query = "select * from mdl_card_payments "
+                        . "where refunded=1 and ( courseid in ($courses_list) "
+                        . "or userid in ($users_list))  order by pdate desc ";
+            } // end if $users_list != '' && $courses_list != ''        
+            //echo "Query: ".$query."<br>";
+            $num = $this->db->numrows($query);
+        } // end if $users_list!='' || $courses_list!=''
+        else {
+            $num = 0;
+        }
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                }
+                $payments[] = $payment;
+            } // end while
+            $list.=$this->create_refunded_payments_page($payments, false, true);
+        } // end if $num > 0
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span6'>No refund payments found</span>";
+            $list.="</div>";
+        } // end else 
+        return $list;
+    }
+
+    function get_refund_courses() {
+        $list = "";
+        $list.="<select id='refund_courses' style='width:375px;'>";
+        $list.="<option value='0' selected>Programs</option>";
+        $query = "select * from mdl_course where cost>0 and visible=1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $list.="<option value='" . $row['id'] . "'>" . $row['fullname'] . "</option>";
+            } // end while
+        } // end if $num > 0
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_course_payments($courseid = null) {
+        $list = "";
+        $users = array();
+        date_default_timezone_set('Pacific/Wallis');
+        $list.="<select id='course_payments' style='width:375px;'>";
+        $list.="<option value='0' selected>Payments</option>";
+        if ($courseid != null) {
+            $query = "select * from mdl_card_payments "
+                    . "where courseid=$courseid "
+                    . "and exp_date>0 "
+                    . "and refunded=0 order by pdate desc";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $userdata = $this->get_user_details($row['userid']);
+                    $date = date('m-d-Y', $row['pdate']);
+                    $user = new stdClass();
+                    $user->id = $row['id'];
+                    $user->firstname = $userdata->firstname;
+                    $user->lastname = $userdata->lastname;
+                    $user->amount = $row['psum'];
+                    $user->date = $date;
+                    $users[$userdata->firstname] = $user;
+                } // end while
+                ksort($users);
+                foreach ($users as $user) {
+                    $list.="<option value='" . $user->id . "'>$user->firstname $user->lastname $" . $user->amount . " $user->date</option>";
+                } // end foreach
+            } // end if $num > 0
+        } // end if $courseid != null
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_refund_modal_dialog() {
+        $list = "";
+        $courses = $this->get_refund_courses();
+        $payments = $this->get_course_payments();
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+        <div class='modal-content'>
+            <div class='modal-header'>                
+                <h4 class='modal-title'>Make refund</h4>
+                </div>                
+                <div class='modal-body'>                                
+                <div class='container-fluid' style='text-align:center;'>
+                <span class='span5'>$courses</span>    
+                </div>            
+                <div class='container-fluid' style='text-align:center;'>
+                <span class='span5' id='course_payments_span'>$payments</span>                    
+                </div>                
+                </div>
+                
+                <div class='modal-footer'>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                <span align='center'><button type='button' class='btn btn-primary'  id='make_new_refund'>Go</button></span>
+                </div>
+        </div>
+        </div>
+        </div>";
+        return $list;
+    }
+
+    function make_refund($paymentid) {
+        echo "Payment id: $paymentid.....";
+        $query = "select * from mdl_card_payments where id=$paymentid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $card_last_four = $row['card_last_four'];
+            $exp_date = $row['exp_date'];
+            $amount = $row['psum'];
+            $trans_id = $row['trans_id'];
+        } // ebd while
+        $pr = new ProcessPayment();
+        $status = $pr->makeRefund($amount, $card_last_four, $exp_date, $trans_id);
+        if ($status == true) {
+            $query = "update mdl_card_payments set refunded=1 where id=$paymentid";
+            $this->db->query($query);
+        } // end if $status==true
+        else {
+            echo "Refund error ...";
+        }
     }
 
 }

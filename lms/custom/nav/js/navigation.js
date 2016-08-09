@@ -941,6 +941,23 @@ $(document).ready(function () {
         }
     }
 
+    function search_refund_page() {
+        var item = $('#search_payment').val();
+        if (item == '') {
+            $('#payment_err').html('Please provide search criteria');
+        }
+        else {
+            $('#payment_err').html('');
+            $('#ajax_loader').show();
+            var url = "/lms/custom/payments/search_refund_payment.php";
+            $.post(url, {item: item}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#card_payments_container').html(data);
+                $('#pagination').hide();
+            });
+        }
+    }
+
     function search_certificate() {
         var item = $('#search_certificate').val();
         if (item == '') {
@@ -1400,6 +1417,10 @@ $(document).ready(function () {
             update_invoice_data();
         }
 
+        if (event.target.id == 'make_refund_button') {
+            get_refund_modal_dialog();
+        }
+
         if (event.target.id == 'create_campaign') {
             console.log('Enrolled users: ' + $('select#users').val());
             if (typeof $('select#users').val() !== 'undefined') {
@@ -1604,6 +1625,14 @@ $(document).ready(function () {
             get_credit_card_payments_page();
         }
 
+        if (event.target.id == 'search_refund_payment_button') {
+            search_refund_page();
+        }
+
+        if (event.target.id == 'clear_refund_payment_button') {
+            get_refund_page();
+        }
+
         if (event.target.id == 'search_certificate_button') {
             search_certificate();
         }
@@ -1611,6 +1640,7 @@ $(document).ready(function () {
         if (event.target.id == 'clear_certificate_button') {
             get_certificates_page();
         }
+
 
         if (event.target.id == 'add_payment') {
             add_partial_payment();
@@ -1667,7 +1697,31 @@ $(document).ready(function () {
         console.log('Event: ' + event);
     });
 
-
+    function get_refund_modal_dialog() {
+        //console.log('Refund modal dialog ...');
+        if (dialog_loaded !== true) {
+            console.log('Script is not yet loaded starting loading ...');
+            dialog_loaded = true;
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "/lms/custom/payments/get_refund_modal_dialog.php";
+                        var request = {item: 1};
+                        $.post(url, request).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
+        } // dialog_loaded!=true
+        else {
+            console.log('Script already loaded');
+            $("#myModal").modal('show');
+        } // end else
+    }
 
     $('#region-main').on('click', 'a', function (event) {
         if (event.target.id.indexOf("group_") >= 0) {
@@ -1980,6 +2034,7 @@ $(document).ready(function () {
             get_category_courses(id);
         }
 
+
         if (event.target.id == 'send_course_categories') {
             var id = $('#send_course_categories').val();
             console.log('Category id: ' + id);
@@ -2126,6 +2181,14 @@ $(document).ready(function () {
         });
     }
 
+    function get_refund_page() {
+        //console.log('It is refund page ...');
+        var url = "/lms/custom/payments/get_refund_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     /************************************************************************
      * 
      *                   Menu processing items
@@ -2223,6 +2286,10 @@ $(document).ready(function () {
     $("#cards").click(function (event) {
         update_navigation_status__menu('Credit cards payments');
         get_credit_card_payments_page();
+    });
+    $("#refund").click(function (event) {
+        update_navigation_status__menu('Refund payments');
+        get_refund_page();
     });
     $("#free").click(function (event) {
         update_navigation_status__menu('Free');
@@ -2382,13 +2449,29 @@ $(document).ready(function () {
     });
 
     $("body").click(function (event) {
-        //console.log('Element clicked: ' + event.target.id);
+        console.log('Element clicked: ' + event.target.id);
 
 
         if (event.target.id == 'cancel') {
             $("#myModal").remove();
             dialog_loaded = false;
         }
+
+        if (event.target.id == 'make_new_refund') {
+            var paymentid = $('#course_payments').val();
+            console.log('Payment ID: ' + paymentid);
+            if (paymentid > 0) {
+                if (confirm('Make refund for current payment?')) {
+                    var url = "/lms/custom/payments/make_refund.php";
+                    var request = {paymentid: paymentid};
+                    $.post(url, request).done(function (data) {
+                        console.log('Server response: ' + data);
+                        $("[data-dismiss=modal]").trigger({ type: "click" });
+                    });                    
+                } // end if confirm
+            } // end if paymentid>0
+        }
+
 
         if (event.target.id == 'add_user_to_slot') {
             add_user_to_slot();
@@ -2426,6 +2509,21 @@ $(document).ready(function () {
                 $('#campaign_container').html(data);
             });
         }
+
+        if (event.target.id == 'refund_courses') {
+            var courseid = $('#refund_courses').val();
+            console.log('Course id: ' + courseid);
+            if (courseid > 0) {
+                var url = "/lms/custom/payments/get_course_payments.php";
+                $.post(url, {id: courseid}).done(function (data) {
+                    console.log('Server response: ' + data);
+                    $('#course_payments_span').html(data);
+                }); // end if $.post
+
+            } // end if course_payment_id>0
+        }
+
+
     }); // end of body
 }); // end of $(document).ready(function()
 

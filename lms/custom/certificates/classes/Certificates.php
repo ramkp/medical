@@ -869,7 +869,7 @@ class Certificates extends Util {
         $cert_arr= explode('-', $cert_no);
         
         $query = "select * from mdl_certificates where cert_no like '%$cert_arr[1]%'";
-        echo "Query: ".$query."<br>";
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);

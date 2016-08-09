@@ -406,10 +406,48 @@ class program_model extends CI_Model {
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
         $has_schedule = $this->is_course_has_schedule($item->id);
         if ($has_schedule > 0) {
-            $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/programs/schedule/$item->id'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
+
+            switch ($item->id) {
+                case 41:
+                    $coursename = 'certified-nurse-assistant';
+                    break;
+                case 44:
+                    $coursename = 'phlebotomy-workshop';
+                    break;
+                case 45:
+                    $coursename = 'phlebotomy-with-ekg-workshop';
+                    break;
+                case 46:
+                    $coursename = 'picc-line-workshop';
+                    break;
+                case 47:
+                    $coursename = 'iv-therapy-certification-exam';
+                    break;
+                case 49:
+                    $coursename = 'ob-tech-certification-exam';
+                    break;
+                case 53:
+                    $coursename = 'ob-tech-technician-complete-program';
+                    break;
+                case 54:
+                    $coursename = 'iv-therapy-workshop';
+                    break;
+                case 55:
+                    $coursename = 'medical-assistant';
+                    break;
+                case 56:
+                    $coursename = 'medical-administrator-assistant';
+                    break;
+                case 57:
+                    $coursename = 'phlebotomy-technician-certification';
+                    break;
+            }
+
+            //$list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/programs/schedule/$item->id'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
+            $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/programs/schedule/$coursename'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
         } // end if $has_schedule>0
         else {
-            $list.="<a href='https://" . $_SERVER['SERVER_NAME'] . "/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
+            $list.="<a href='http://" . $_SERVER['SERVER_NAME'] . "/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
         } // end else         
         $list.="</div>";
 
@@ -452,7 +490,8 @@ class program_model extends CI_Model {
 
     public function get_courses_list($courseid) {
         $items = array();
-        $query = "select id, fullname from mdl_course where cost>0 order by fullname";
+        $query = "select id, fullname from mdl_course "
+                . "where cost>0 and visible=1 order by fullname";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
             $item = new stdClass();

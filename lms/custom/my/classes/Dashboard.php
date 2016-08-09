@@ -30,17 +30,17 @@ class Dashboard extends Util {
         $invoice = new Invoice();
         $installment_status = $invoice->is_installment_user($userid, $courseid);
         if ($installment_status == 0) {
-// 1. Check among card payments
+            // 1. Check among card payments
             $query = "select * from mdl_card_payments "
-                    . "where userid=$userid and courseid=$courseid";
+                    . "where userid=$userid and courseid=$courseid and refunded=0 ";
             $card_payments_num = $this->db->numrows($query);
 
-// 2. Check among invoice payments
+            // 2. Check among invoice payments
             $query = "select * from mdl_invoice "
                     . "where userid=$userid and courseid=$courseid and i_status=1";
             $invoice_payments_num = $this->db->numrows($query);
 
-// 3. Check among partial payments
+            // 3. Check among partial payments
             $query = "select * from mdl_partial_payments "
                     . "where userid=$userid and courseid=$courseid";
             $partial_num = $this->db->numrows($query);
@@ -66,7 +66,10 @@ class Dashboard extends Util {
                 } // end if $user_interval<=$interval
                 else {
                     $query = "select * from mdl_card_payments "
-                            . "where userid=$userid and courseid=$courseid and pdate>$subscription_start";
+                            . "where userid=$userid and "
+                            . "courseid=$courseid "
+                            . "and refunded=0 "
+                            . " and pdate>$subscription_start";
                     $status = $this->db->numrows($query);
                 } // end else
             } // end if is_numeric($subscription_id)
@@ -420,12 +423,12 @@ class Dashboard extends Util {
     function get_user_card_payments($userid, $courseid) {
         $list = "";
         $query = "select * from mdl_card_payments "
-                . "where courseid=$courseid and userid=$userid";
+                . "where courseid=$courseid and userid=$userid and refunded=0";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by card $" . $row['psum'] . "&nbsp;";
+                $list.="Paid by card $" . $row['psum'] . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ")";
             } // end while
         } // end if $num>0
         else {
@@ -442,7 +445,7 @@ class Dashboard extends Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by cash $" . $row['i_sum'] . "&nbsp;";
+                $list.="Paid by cash $" . $row['i_sum'] . "&nbsp;(" . date('m-d-Y', $row['i_pdate']) . ")";
             } // end while
         } // end if $num>0
         else {
@@ -459,7 +462,7 @@ class Dashboard extends Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by cash/cheque $" . $row['psum'] . "&nbsp;";
+                $list.="Paid by cash/cheque $" . $row['psum'] . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ")";
             } // end while
         } // end if $num>0
         else {
@@ -641,7 +644,7 @@ class Dashboard extends Util {
 
 // 1. Get data from mdl_card_payments // payments made by card
         $query = "select * from mdl_card_payments "
-                . "where courseid=$courseid "
+                . "where refunded=0 and courseid=$courseid "
                 . "and userid=$userid";
         $num = $this->db->numrows($query);
         if ($num > 0) {

@@ -115,8 +115,8 @@ class Payment {
         $_SESSION['tot_participants'] = 1;
         $this->user = $user;
         //$list = $this->get_payment_options($user->courseid);
-        $list=$this->get_payment_with_options('online_personal');
-        
+        $list = $this->get_payment_with_options('online_personal');
+
         return $list;
     }
 
@@ -985,7 +985,7 @@ class Payment {
         $_SESSION['users'] = $users;
         $_SESSION['tot_participants'] = $tot_participants;
         //$list = $this->get_payment_options($group_common_section->courseid, 1);
-        $list=$this->get_payment_with_options('online_whole_group_payment');
+        $list = $this->get_payment_with_options('online_whole_group_payment');
         //$list = "<p align='center'>Please contact site administrator for payment options help@medical2.com</p>";
         return $list;
     }
@@ -1031,15 +1031,18 @@ class Payment {
     }
 
     function add_payment_to_db($card) {
+        //$card_last_four = substr($card->card_no, -4);
+        // To make refund we need to store card no - base64 encode
+        $exp_date = $card->card_month . $card->card_year;
         $query = "insert into mdl_card_payments "
                 . "(userid,"
-                . "courseid,"
+                . "courseid, card_last_four, exp_date, "
                 . "psum, "
                 . "trans_id, "
                 . "auth_code, "
                 . "pdate) "
                 . "values('" . $card->userid . "',"
-                . "'" . $card->courseid . "',"
+                . "'" . $card->courseid . "', '".base64_encode($card->card_no)."', '$exp_date', "
                 . "'" . $card->sum . "', "
                 . "'$card->transid', "
                 . "'$card->auth_code', "

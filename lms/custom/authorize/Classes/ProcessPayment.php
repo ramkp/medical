@@ -52,21 +52,21 @@ class ProcessPayment {
         $order = new AnetAPI\OrderType();
         $order->setInvoiceNumber($invoiceNo);
         if ($order->group == 0) {
-            $order->setDescription("Payment for tuition $post_order->item");
+            $order->setDescription($post_order->item);
             $lineitem = new AnetAPI\LineItemType();
             $lineitem->setItemId(time());
-            $lineitem->setName("$post_order->item");
-            $lineitem->setDescription("Payment for tuition $post_order->item");
+            $lineitem->setName($post_order->item);
+            $lineitem->setDescription($post_order->item);
             $lineitem->setQuantity("1");
             $lineitem->setUnitPrice($post_order->sum);
             $lineitem->setTaxable("N");
         } // end if $order==0
         else {
-            $order->setDescription("Payment for group tuition $post_order->item");
+            $order->setDescription($post_order->item);
             $lineitem = new AnetAPI\LineItemType();
             $lineitem->setItemId(time());
             $lineitem->setName("$post_order->item");
-            $lineitem->setDescription("Payment for group tuition $post_order->item");
+            $lineitem->setDescription($post_order->item);
             $lineitem->setQuantity("1");
             $lineitem->setUnitPrice($post_order->sum);
             $lineitem->setTaxable("N");
@@ -90,7 +90,7 @@ class ProcessPayment {
 
         //$firstname = ($names[0] == '') ? "Loyal" : $names[0];
         //$lastname = ($names[1] == '') ? 'Client' : $names[1];
-        
+
         $firstname = $names[0];
         $lastname = $names[1];
 
@@ -200,7 +200,6 @@ class ProcessPayment {
 
         //$firstname = ($names[0] == '') ? "Loyal" : $names[0];
         //$lastname = ($names[2] == '') ? 'Client' : $names[2];
-
         // Subscription Type Info
         $subscription = new AnetAPI\ARBSubscriptionType();
         $subscription->setName("Subscription for $post_order->item");
@@ -252,6 +251,64 @@ class ProcessPayment {
             $msg = $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText();
         } // end else
         return $msg;
+    }
+
+    function prepareExpirationDate($exp_date) {
+        // MMYY - format
+        $mm = substr($exp_date, 0, 2);
+        $yy = substr($exp_date, 4);
+        $date = $mm . $yy;
+        return $date;
+    }
+
+    function makeRefund($amount, $card_last_four, $exp_date, $trans_id) {
+        echo "Card four last digits: " . $card_last_four . "<br>";
+        echo "Expiration date: " . $exp_date . "<br>";
+        $merchantAuthentication = $this->authorize();
+        $refId = 'ref' . time();
+        $date = $this->prepareExpirationDate($exp_date);
+
+        // Create the payment data for a credit card
+        $creditCard = new AnetAPI\CreditCardType();
+        $creditCard->setCardNumber(base64_decode($card_last_four));
+        $creditCard->setExpirationDate($date);
+        $paymentOne = new AnetAPI\PaymentType();
+        $paymentOne->setCreditCard($creditCard);
+        //create a transaction
+        $transactionRequest = new AnetAPI\TransactionRequestType();
+        $transactionRequest->setTransactionType("refundTransaction");
+        $transactionRequest->setAmount($amount);
+        //$transactionRequest->setCustomField("x_ref_trans_id", $trans_id);
+        $transactionRequest->setPayment($paymentOne);
+
+        $request = new AnetAPI\CreateTransactionRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setTransactionRequest($transactionRequest);
+        $controller = new AnetController\CreateTransactionController($request);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+        if ($response != null) {
+            $tresponse = $response->getTransactionResponse();
+
+            echo "Response: <pre>";
+            print_r($tresponse);
+            echo "</pre>";
+
+            if (($tresponse != null) && ($tresponse->getResponseCode() == "1" )) {
+                //echo "it is ok ....";
+                return TRUE;
+            } // end if ($tresponse != null) && ($tresponse->getResponseCode() == \SampleCode\Constants::RESPONSE_OK)            
+            else {
+                //echo "Wrong response ..."    ;
+                return FALSE;
+            }
+        } // end if $response != null 
+        else {
+            //echo "Null resposnse .. ...";
+            return FALSE;
+        }
+        return $response;
     }
 
 }

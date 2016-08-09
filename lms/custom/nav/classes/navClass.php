@@ -201,6 +201,7 @@ class navClass extends Util {
                                     <li><a href='#' id='cash' title='Cash'>Cash payments</a></li>
                                     <li><a href='#' id='cheque' title='Cheque'>Cheque payments</a></li>
                                     <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
+                                    <li><a href='#' id='refund' title='Refund'>Refund payments</a></li>
                                     <li><a href='#' id='free' title='Free'>Free</a></li>                                                                        
                                 </ul>
                             </li>

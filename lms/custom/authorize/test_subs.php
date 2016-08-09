@@ -17,8 +17,6 @@ $card->userid = 11557;
 $card->courseid = 53;
 $card->sum = 256;
 
-
-
 $invoice = new Invoice();
 $payment = new Payment();
 $installmentobj = $invoice->get_user_installment_payments($card->userid, $card->courseid);
@@ -46,5 +44,5 @@ echo "<br>-------------------------------------------<br>";
 print_r($card);
 echo "<br>-------------------------------------------<br>";
 
-$pr = new ProcessPayment();
-$pr->createSubscription($order);
+//$pr = new ProcessPayment();
+//$pr->createSubscription($order);
