@@ -1,9 +1,10 @@
 <?php
 
 require_once './classes/Certificates.php';
-$courseid = 4;
-$userid = 24;
-$certificate = new Certificates();
-$date = 0;
-$list = $certificate->prepare_ceriticate($courseid, $userid, $date);
-echo $list;
+$exp_date=1469534400;
+$new_exp=$exp_date+31104000+432000;
+echo "Original Expiration date unixtime: ".$exp_date."<br>";
+echo "New expiration date unixtime: ".$new_exp."<br>";
+
+echo "Original Expiration date: ".date('m-d-Y', $exp_date)."<br>";
+echo "New Expiration date: ".date('m-d-Y', $new_exp)."<br>";

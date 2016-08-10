@@ -307,6 +307,16 @@ class Payments extends Util {
 
     function create_refunded_payments_page($payments, $toolbar = true, $search = false) {
         $list = "";
+        $list.="<div class='container-fluid' style='text-align:center;' id='pwd_container'>";
+        $list.="<span class='span3'>Password*: </span><span class='span5'><input type='password' id='refund_pwd'></span><span class='span1'><button class='btn btn-primary' id='show_refund_page' >Ok</button></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;' id='pwd_container'>";
+        $list.="<span class='span12' id='refund_pwd_err' style='color:red;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='display:none;' id='refund_container'>";
+        $list.="<span class='span12'>";
         if (count($payments) > 0) {
             if ($toolbar == true) {
                 $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -336,7 +346,7 @@ class Payments extends Util {
                 $course = $this->get_course_name($payment->courseid);
                 $date = date('Y-m-d', $payment->pdate);
                 $user_payments = $this->get_user_address_block($payment->userid);
-                $list.="<div class='container-fluid'>";
+                $list.="<div class='container-fluid' style=''>";
                 $list.="<span class='span2'>User</span><span class='span3'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
@@ -366,6 +376,7 @@ class Payments extends Util {
             $list.="<span class='span2'><button class='btn btn-primary' id='make_refund_button' style='width:175px;'>Make Refund</button></span>";
             $list.="</div>";
         }
+        $list.="</span></div>";
         return $list;
     }
 
@@ -731,7 +742,6 @@ class Payments extends Util {
     }
 
     function make_refund($paymentid) {
-        echo "Payment id: $paymentid.....";
         $query = "select * from mdl_card_payments where id=$paymentid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -749,6 +759,51 @@ class Payments extends Util {
         else {
             echo "Refund error ...";
         }
+    }
+
+    function get_update_refund_pwd_page() {
+        $list = "";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span3'>Old password*:</span><span class='span3'><input type='password' id='old_pwd' style=''></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span3'>New password*:</span><span class='span3'><input type='password' id='new_pwd1' style=''></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span3'>New password again*:</span><span class='span3'><input type='password' id='new_pwd2' style=''></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span6' style='color:red;' id='pwd_err'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span3'>&nbsp;</span><span class='span3'><button type='button' class='btn btn-primary'  id='update_refund_pwd'>Update</button></span>";
+        $list.="</div>";
+        
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function update_refund_pwd($pwd) {
+        $query = "update mdl_refund_pwd set pwd='$pwd'";
+        $this->db->query($query);
+        $list = "Password has been updated.";
+        return $list;
+    }
+
+    function get_old_refund_pwd() {
+        $query = "select * from mdl_refund_pwd";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $pwd = $row['pwd'];
+        }
+        return $pwd;
     }
 
 }

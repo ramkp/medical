@@ -1,8 +1,8 @@
 <?php
 
 require_once './classes/Certificates.php';
-$certificate=new Certificates();
-$cert_fio=$_POST['cert_fio'];
-$cert_no=$_POST['cert_no'];
-$list=$certificate->verify_certificate($cert_fio, $cert_no);
+$certificate = new Certificates();
+$fname = $_POST['fname'];
+$lname = $_POST['lname'];
+$list = $certificate->verify_certificate($fname, $lname);
 echo $list;

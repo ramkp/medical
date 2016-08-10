@@ -2295,9 +2295,7 @@ $(document).ready(function () {
         update_navigation_status__menu('Free');
         get_free_payments();
     });
-    $("#refund").click(function (event) {
-        update_navigation_status__menu('Refund');
-    });
+
     $("#program_reports").click(function (event) {
         update_navigation_status__menu('Program reports');
         get_program_report();
@@ -2466,8 +2464,8 @@ $(document).ready(function () {
                     var request = {paymentid: paymentid};
                     $.post(url, request).done(function (data) {
                         console.log('Server response: ' + data);
-                        $("[data-dismiss=modal]").trigger({ type: "click" });
-                    });                    
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                    });
                 } // end if confirm
             } // end if paymentid>0
         }
@@ -2498,7 +2496,77 @@ $(document).ready(function () {
             recertificate_done();
         }
 
-    });
+        if (event.target.id == 'show_refund_page') {
+            var pwd = $('#refund_pwd').val();
+            if (pwd == '') {
+                $('#refund_pwd_err').html('Password field is required');
+            }
+            else {
+                var url = "/lms/custom/payments/get_old_refund_pwd.php";
+                var request = {id: 1};
+                $.post(url, request).done(function (data) {
+                    if (pwd == data) {
+                        $('#refund_pwd_err').html('');
+                        $('#pwd_container').hide();
+                        $('#refund_container').show('slow');
+                    }
+                    else {
+                        $('#refund_pwd_err').html('Wrong password');
+                    }
+                });
+            }
+        }
+
+        if (event.target.id == 'refund_pwd_link') {
+            update_navigation_status__menu('Refund password');
+            var url = "/lms/custom/payments/get_refund_pwd.php";
+            var request = {id: 1};
+            $.post(url, request).done(function (data) {
+                $('#region-main').html(data);
+            });
+        }
+
+        if (event.target.id == 'update_refund_pwd') {
+            var url = "/lms/custom/payments/get_old_refund_pwd.php";
+            var request = {id: 1};
+            $.post(url, request).done(function (data) {
+                var db_old_pwd = data;
+                var old_pwd = $('#old_pwd').val();
+                var new_pwd1 = $('#new_pwd1').val();
+                var new_pwd2 = $('#new_pwd2').val();
+
+                console.log('New pwd1: ' + new_pwd1);
+                console.log('New pwd2:' + new_pwd2);
+
+                if (old_pwd == '' || new_pwd1 == '' || new_pwd2 == '') {
+                    $('#pwd_err').html('All fields are required');
+                } // end if old_pwd == '' || new_pwd1 == '' || new_pwd2 == ''
+                else {
+                    if (old_pwd != db_old_pwd) {
+                        $('#pwd_err').html('Wrong old password');
+                    }
+                    else {
+                        if (new_pwd1 != new_pwd2) {
+                            $('#pwd_err').html('Passwords do not match');
+                        }
+                        else {
+                            if (old_pwd == db_old_pwd && new_pwd2 != '' && new_pwd1 == new_pwd2) {
+                                $('#pwd_err').html('');
+                                var url = "/lms/custom/payments/update_refund_pwd.php";
+                                var request = {pwd: new_pwd1};
+                                $.post(url, request).done(function (data) {
+                                    $('#pwd_err').html("<span style='color:black;'>" + data + "</span>");
+                                });
+                            }
+                        } // end else
+                    } //end else 
+                } // end else
+            });
+        }
+
+    }); // end of body click function
+
+
     $('body').on('change', 'select', function (event) {
         if (event.target.id == 'camapaign') {
             var id = $('#camapaign').val();

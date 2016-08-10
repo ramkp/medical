@@ -503,27 +503,18 @@ $(document).ready(function () {
      * 
      **************************************************************************/
     function submit_verify_cert_from() {
-        var cert_fio = $('#cert_fio').val();
-        var cert_no = $('#cert_no').val();
-        /*
-         * if (cert_fio == '') { $('#cert_err').html('Please provide Firstname
-         * and Lastname'); return false; }
-         */
-
-        if (cert_no == '') {
-            $('#cert_err').html('Please provide Certificate No');
-            return false;
-        }
-
-        if (cert_fio != '' && cert_no != '') {
+        var fname= $('#fname').val();
+        var lname= $('#lname').val();        
+        
+        if (fname!='' && lname!='' ) {
             var url = "https://" + domain + "/lms/custom/certificates/verify_certificate.php";
-            var request = {cert_fio: cert_fio, cert_no: cert_no};
+            var request = {fname:fname,lname:lname};
             $.post(url, request).done(function (data) {
                 $("#cert_err").html("<span style='color:green;'>" + data + "</span>");
             });
         } // end if cert_fio!='' && cert_no!=''
         else {
-            $('#cert_err').html('Please provide your First and Last name and Certificate # as well');
+            $('#cert_err').html('Please provide your First and Last name');
         } // end else
     }
 

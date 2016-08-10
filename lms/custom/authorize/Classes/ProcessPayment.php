@@ -261,9 +261,7 @@ class ProcessPayment {
         return $date;
     }
 
-    function makeRefund($amount, $card_last_four, $exp_date, $trans_id) {
-        echo "Card four last digits: " . $card_last_four . "<br>";
-        echo "Expiration date: " . $exp_date . "<br>";
+    function makeRefund($amount, $card_last_four, $exp_date, $trans_id) {        
         $merchantAuthentication = $this->authorize();
         $refId = 'ref' . time();
         $date = $this->prepareExpirationDate($exp_date);

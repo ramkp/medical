@@ -462,7 +462,7 @@ class Certificates extends Util {
                 $pdf->Output($path, 'F');
 
                 break;
-                
+
             case 47:
                 $list.="<!DOCTYPE HTML SYSTEM>";
                 $list.="<head>";
@@ -864,29 +864,47 @@ class Certificates extends Util {
         return $list;
     }
 
-    function verify_certificate($cert_fio, $cert_no) {
+    function verify_certificate($fname, $lname) {
+        $certs = array();
         $list = "";
-        $cert_arr= explode('-', $cert_no);
-        
-        $query = "select * from mdl_certificates where cert_no like '%$cert_arr[1]%'";
+        //echo "Certificate no: ".$cert_no."<br>";
+        //$cert_arr = explode('-', $cert_no);
+
+        $query = "SELECT * FROM `mdl_user` 
+            WHERE firstname = '".trim($fname)."'
+            AND lastname = '".trim($lname)."'";
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $exp_date = $row['expiration_date'];
-            } //end while
-            if ($exp_date != 'n/a') {
-                $cert_exp_date = date('m-d-Y', $exp_date);
-                $list.="Your Certificate will expire at $cert_exp_date";
-            } // end if $exp_date!='n/a'
+                $id = $row['id'];
+            } // end while
+            //echo "User id: ".$id."<br>";
+            $query = "select * from mdl_certificates where userid=$id";
+            //echo "Query: ".$query."<br>";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $cert = new stdClass();
+                    $cert->no = $row['cert_no'];
+                    $cert->expiration = date('m-d-Y', $row['expiration_date']);
+                    $certs[] = $cert;
+                } //end while
+                foreach ($certs as $cert) {
+                    $list.="<p>Certificate No: $cert->no &nbsp; Expiration date: $cert->expiration</p>";
+                }
+            } // end if $num > 0
             else {
-                $list.="Your Certificate has no expiration date";
+                $list.="Certificate is not found";
             }
         } // end if $num > 0
         else {
             $list.="Certificate is not found";
         }
+
+
         return $list;
     }
 
@@ -1093,8 +1111,7 @@ class Certificates extends Util {
         $m_list = "";
         if ($modal == true) {
             $m_list.="<select id='s_m_c'>";
-        }
-        else {
+        } else {
             $m_list.="<select id='s_m'>";
         }
         $m_list.="<option value='0' selected>Month</option>";
@@ -1106,8 +1123,7 @@ class Certificates extends Util {
         $d_list = "";
         if ($modal == true) {
             $d_list.="<select id='s_d_c'>";
-        }
-        else {
+        } else {
             $d_list.="<select id='s_d'>";
         }
         $d_list.="<option value='0' selected>Day</option>";
@@ -1119,8 +1135,7 @@ class Certificates extends Util {
         $y_list = "";
         if ($modal == true) {
             $y_list .= "<select id='s_y_c'>";
-        }
-        else {
+        } else {
             $y_list .= "<select id='s_y'>";
         }
         $y_list.="<option value='0' selected>Year</option>";
@@ -1153,8 +1168,7 @@ class Certificates extends Util {
         $m_list = "";
         if ($modal == true) {
             $m_list.="<select id='e_m_c'>";
-        }
-        else {
+        } else {
             $m_list.="<select id='e_m'>";
         }
         $m_list.="<option value='0' selected>Month</option>";
@@ -1166,8 +1180,7 @@ class Certificates extends Util {
         $d_list = "";
         if ($modal == true) {
             $d_list.="<select id='e_d_c'>";
-        }
-        else {
+        } else {
             $d_list.="<select id='e_d'>";
         }
         $d_list.="<option value='0' selected>Day</option>";
@@ -1179,8 +1192,7 @@ class Certificates extends Util {
         $y_list = "";
         if ($modal == true) {
             $y_list .= "<select id='e_y_c'>";
-        }
-        else {
+        } else {
             $y_list .= "<select id='e_y'>";
         }
         $y_list.="<option value='0' selected>Year</option>";
@@ -1373,8 +1385,8 @@ class Certificates extends Util {
                 $pdf->Output($path, 'F');
 
                 break;
-                
-                case 47:
+
+            case 47:
                 $list.="<!DOCTYPE HTML SYSTEM>";
                 $list.="<head>";
                 $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
@@ -1408,8 +1420,8 @@ class Certificates extends Util {
                 } // end if !is_dir($dir_path)
                 $path = $dir_path . "/certificate.pdf";
                 $pdf->Output($path, 'F');
-                break;                
-                
+                break;
+
             case 48:
                 $coursename = "IV Therapy Exam";
                 $list.="<!DOCTYPE HTML SYSTEM>";
@@ -1661,7 +1673,7 @@ class Certificates extends Util {
         $list.="Certificate has been created";
         return $list;
     }
-    
+
     function create_certificate2($courseid, $userid, $start, $end) {
         $list = "";
         $issue = $start;
