@@ -113,7 +113,7 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
         $ds->save_additional_slot($slot);
         //die();
     } // end if $courseid == 44 || $courseid == 45
-    
+
     $slot->save();
 }
 
@@ -207,6 +207,11 @@ if ($action != 'view') {
 
 echo $output->header();
 
+//echo "Action: " . $action . "<br>";
+//echo "Course id: " . $COURSE->id . "<br>";
+//echo "Module id: " . $cm->id . "<br>";
+
+
 /* * ********************************** View : New single slot form *************************************** */
 if ($action == 'addslot') {
     $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'addslot', 'subpage' => $subpage, 'id' => $cm->id));
@@ -236,9 +241,22 @@ if ($action == 'updateslot') {
     $slotid = required_param('slotid', PARAM_INT);
     $slot = $scheduler->get_slot($slotid);
     $data = scheduler_prepare_formdata($slot);
+      
+      /*
+       * 
+      echo "Module object: <pre>";
+      print_r($cm);
+      echo "</pre>";
+      echo "<br>Subpage: $subpage<br>";
+       * 
+       */
 
+    //echo "Module id: ".$cm->id."<br>";
     $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid, 'subpage' => $subpage, 'offset' => $offset));
     $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage, 'offset' => $offset));
+    
+    //echo "<br><Action URL: $actionurl><br>";
+    //echo "<br><Return URL: $returnurl><br>";
 
     $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee, array('slotid' => $slotid));
     $mform->set_data($data);

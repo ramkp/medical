@@ -1142,7 +1142,8 @@ class Students {
         date_default_timezone_set('Pacific/Wallis');
         switch ($type) {
             case 1:
-                $date = date('m-d-Y', time());
+                $stamp=time()-86400;
+                $date = date('m-d-Y', $stamp);
                 $title = "<span style='font-weight:bold;'>Daily Financial Report - $date</span>";
                 break;
             case 2:
@@ -1186,9 +1187,9 @@ class Students {
                 $cc_list.="<tr>";
                 $cc_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
                 $cc_list.="</tr>";
-                $cc_list.="<tr>";
-                $cc_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
-                $cc_list.="</tr>";
+                //$cc_list.="<tr>";
+                //$cc_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
+                //$cc_list.="</tr>";
                 $cc_list.="<tr>";
                 $cc_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $cc_list.="</tr>";
@@ -1221,9 +1222,9 @@ class Students {
                 $refund_list.="<tr>";
                 $refund_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>-$$amount</td>";
                 $refund_list.="</tr>";
-                $refund_list.="<tr>";
-                $refund_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
-                $refund_list.="</tr>";
+                //$refund_list.="<tr>";
+                //$refund_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
+                //$refund_list.="</tr>";
                 $refund_list.="<tr>";
                 $refund_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $refund_list.="</tr>";
@@ -1234,8 +1235,6 @@ class Students {
             $refund_list.="</tr>";
             $refund_list.="</table>";
         } // end if count($refund_payments)>0
-        
-        
         // Invoice payments
         if (count($invoice_payments) > 0) {
             $in_list.="<table>";
@@ -1272,9 +1271,9 @@ class Students {
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
                 $in_list.="</tr>";
-                $in_list.="<tr>";
-                $in_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
-                $in_list.="</tr>";
+                //$in_list.="<tr>";
+                //$in_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
+                //$in_list.="</tr>";
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $in_list.="</tr>";
@@ -1321,9 +1320,9 @@ class Students {
                 $pp_list.="<tr>";
                 $pp_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
                 $pp_list.="</tr>";
-                $pp_list.="<tr>";
-                $pp_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
-                $pp_list.="</tr>";
+                //$pp_list.="<tr>";
+                //$pp_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
+                //$pp_list.="</tr>";
                 $pp_list.="<tr>";
                 $pp_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $pp_list.="</tr>";
@@ -1363,14 +1362,19 @@ class Students {
 
     function get_report_payments($type) {
         $list = "";
-        date_default_timezone_set('Pacific/Wallis');
+        //date_default_timezone_set('Pacific/Wallis');
         switch ($type) {
             case 1:
                 // Daily report
-                //echo "Date to be reported: " . date('m-d-Y', time());
-                $timestamp = time();
+                $timestamp = time() - 86400;
+                //echo "Date to be reported: " . date('m-d-Y', $timestamp)."<br>";
+                echo "Current server time: ".date('m-d-Y h:i:s A', time())."<br>";
                 $start = strtotime("midnight", $timestamp);
                 $end = strtotime("tomorrow", $start) - 1;
+
+                echo "Start moment: " . date('m-d-Y h:i:s', $start) . "<br>";
+                echo "End moment: " . date('m-d-Y h:i:s', $end) . "<br>";
+
                 $card_payments = $this->get_report_credit_card_payments($start, $end);
                 $refund_payments = $this->get_refund_data($start, $end);
                 $invoice_payments = $this->get_report_invoice_payments($start, $end);
@@ -1380,7 +1384,7 @@ class Students {
                 break;
             case 2:
                 // Weekly report
-                $start = new DateTime('last monday');
+                $start = new DateTime('last sunday');
                 $end = new DateTime('this sunday');
 
                 echo "<br><pre>";
@@ -1392,8 +1396,9 @@ class Students {
 
                 $card_payments = $this->get_report_credit_card_payments(strtotime($start->date), strtotime($end->date));
                 $invoice_payments = $this->get_report_invoice_payments(strtotime($start->date), strtotime($end->date));
+                $refund_payments = $this->get_refund_data(strtotime($start->date), strtotime($end->date));
                 $parial_payments = $this->get_report_partial_payments(strtotime($start->date), strtotime($end->date));
-                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $invoice_payments, $parial_payments);
+                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $invoice_payments, $parial_payments, $refund_payments);
                 $this->send_financial_report($type, strtotime($start->date), strtotime($end->date), $list);
                 break;
             case 3:
@@ -1410,8 +1415,9 @@ class Students {
 
                 $card_payments = $this->get_report_credit_card_payments(strtotime($start->date), strtotime($end->date));
                 $invoice_payments = $this->get_report_invoice_payments(strtotime($start->date), strtotime($end->date));
+                $refund_payments = $this->get_refund_data(strtotime($start->date), strtotime($end->date));
                 $parial_payments = $this->get_report_partial_payments(strtotime($start->date), strtotime($end->date));
-                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $invoice_payments, $parial_payments);
+                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $invoice_payments, $parial_payments, $refund_payments);
                 $this->send_financial_report($type, strtotime($start->date), strtotime($end->date), $list);
                 break;
             case 4:
@@ -1427,7 +1433,8 @@ class Students {
 
         switch ($type) {
             case 1:
-                $date = date('m-d-Y', time());
+                $stamp = time() - 86400;
+                $date = date('m-d-Y', $stamp);
                 $title = "Daily Financial Report - $date";
                 break;
             case 2:

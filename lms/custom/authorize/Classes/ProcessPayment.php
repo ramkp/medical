@@ -138,11 +138,11 @@ class ProcessPayment {
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
 
-            /*
+              /*  
               echo "--------Card payment response <pre>";
               print_r($tresponse);
               echo "</pre><br>";
-             */
+              */  
 
 
             if (($tresponse != null) && ($tresponse->getResponseCode() == "1")) {
@@ -288,10 +288,10 @@ class ProcessPayment {
         $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
-
-            echo "Response: <pre>";
-            print_r($tresponse);
-            echo "</pre>";
+       		
+            //echo "Response: <pre>";
+            //print_r($tresponse);
+            //echo "</pre>";
 
             if (($tresponse != null) && ($tresponse->getResponseCode() == "1" )) {
                 //echo "it is ok ....";

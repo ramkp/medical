@@ -22,10 +22,18 @@ $action = optional_param('what', 'view', PARAM_ALPHA);
 $subaction = optional_param('subaction', '', PARAM_ALPHA);
 $offset = optional_param('offset', -1, PARAM_INT);
 
+ //$id=$COURSE->id;  // use global instance variable
+ 
 if ($id) {
     $cm = get_coursemodule_from_id('scheduler', $id, 0, false, MUST_EXIST);
     $scheduler = scheduler_instance::load_by_coursemodule_id($id);
-} else {
+} 
+
+else {
+   
+    //$id=$COURSE->id;  // use global instance variable
+    //echo "Course id: ".$id."<br>";
+    
     $a = required_param('a', PARAM_INT);     // Scheduler ID.
     $scheduler = scheduler_instance::load_by_id($a);
     $cm = $scheduler->get_cm();

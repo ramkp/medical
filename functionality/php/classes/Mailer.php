@@ -358,6 +358,9 @@ class Mailer {
 
             $recipient = 'sirromas@gmail.com';
             $this->send_email($subject, $message, $recipient);
+            
+            $recipient = 'help@medical2.com';
+            $this->send_email($subject, $message, $recipient);
         } // end else
     }
 

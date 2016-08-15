@@ -164,12 +164,28 @@ class Schedule extends Util {
         return $courseid;
     }
 
+    function get_scheduler_module_id($courseid) {
+        $query = "select * from mdl_course_modules "
+                . "where module=23 "
+                . "and course=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
+    }
+
     function create_slots_page($slots, $tools = true) {
         global $COURSE;
         $courseid = $COURSE->id;
         //echo "Course id: " . $courseid . "<br>";
         $qs = $_SERVER['QUERY_STRING'];
         $modid = trim(str_replace("id=", "", $qs));
+
+        if ($modid == '') {
+            $modid = $this->get_scheduler_module_id($courseid);
+        }
+
         $list = "";
         if ($tools == true) {
             $list.="<div class='panel panel-default'>";
