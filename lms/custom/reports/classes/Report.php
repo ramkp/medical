@@ -750,7 +750,72 @@ class Report extends Util {
     }
 
     function get_other_payment_report_data($courseid, $from, $to, $type) {
-        $query="";
+        date_default_timezone_set('Pacific/Wallis');
+        $payments = array();
+        $this->courseid = $courseid;
+        $this->from = $from;
+        $this->to = $to;
+        $list = "";
+
+        if ($from == $to) {
+            $timestamp = time();
+            $unix_from = strtotime("midnight", $timestamp);
+            $unix_to = strtotime("tomorrow", $unix_from) - 1;
+        } // end if $from==$to
+        else {
+            $unix_from = strtotime($from);
+            $unix_to = strtotime($to) + 86400;
+        } // end else
+        //1. Get partial payments
+        if ($courseid > 0) {
+            $query = "select * from mdl_partial_payments "
+                    . "where courseid=$courseid and ptype=$type "
+                    . "and pdate between $unix_from and $unix_to "
+                    . "order by pdate desc ";
+        } // end if $courseid>0
+        else {
+            $query = "select * from mdl_partial_payments "
+                    . "where pdate between $unix_from and $unix_to "
+                    . "and ptype=$type "
+                    . "order by pdate desc ";
+        } // end else
+        //echo "<br/>Query: $query<br/>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_status = $this->is_user_deleted($row['userid']);
+                if ($user_status == 0) {
+                    $payment = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $payment->$key = $value;
+                    }
+                    $payments[] = $payment;
+                } // end if $user_status==0
+            } // end while
+
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'>User</span>";
+            $list.="<span class='span3'>Program applied</span>";
+            $list.="<span class='span3'>Payment</span>";
+            $list.="<span class='span3'>Date</span>";
+            $list.="</div>";
+
+
+            foreach ($payments as $payment) {
+                $date = date('m-d-Y', $payment->pdate);
+                $coursename = $this->get_course_name($payment->courseid);
+                $userdata = $this->get_user_details($payments->userid);
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span3'>$userdata->firstname $userdata->lastname</span>";
+                $list.="<span class='span3'>$coursename</span>";
+                $list.="<span class='span3'>$$payment->psum</span>";
+                $list.="<span class='span3'>$date</span>";
+                $list.="</div>";
+            } // end for
+        } // end if $num > 0
+
+        return $list;
     }
 
 }

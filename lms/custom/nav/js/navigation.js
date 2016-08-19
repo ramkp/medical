@@ -165,8 +165,7 @@ $(document).ready(function () {
                     refresh_gallery_thumbs();
                 });
             }
-        }
-        else {
+        } else {
             $('#gallery_err').html('Please select items to be deleted');
         }
     }
@@ -232,8 +231,7 @@ $(document).ready(function () {
         console.log('Marker: ' + item_marker);
         if (item_lat == 0 || item_lat == '' || item_lng == '0' || item_lng == '' || item_marker == '') {
             $("#map_err").html('Please provide coordinates and marker text');
-        }
-        else {
+        } else {
             if (validateNum(item_lat) && validateNum(item_lng)) {
 // Prepare and send AJAX request...
                 $("#map_err").html('');
@@ -344,15 +342,13 @@ $(document).ready(function () {
 
         if ($(taxes_num).is(':checked')) {
             taxes = 1;
-        }
-        else {
+        } else {
             taxes = 0;
         }
         console.log('Taxes status: ' + taxes);
         if ($(expire_num).is(':checked')) {
             expire = 1;
-        }
-        else {
+        } else {
             expire = 0;
         }
         console.log('Expiration status: ' + expire);
@@ -727,8 +723,7 @@ $(document).ready(function () {
         console.log(status);
         if (status == false) {
             $(container_id).show();
-        }
-        else {
+        } else {
             $(container_id).hide();
         }
     }
@@ -928,8 +923,7 @@ $(document).ready(function () {
         var item = $('#search_payment').val();
         if (item == '') {
             $('#payment_err').html('Please provide search criteria');
-        }
-        else {
+        } else {
             $('#payment_err').html('');
             $('#ajax_loader').show();
             var url = "/lms/custom/payments/search_credit_card_payment.php";
@@ -945,8 +939,7 @@ $(document).ready(function () {
         var item = $('#search_payment').val();
         if (item == '') {
             $('#payment_err').html('Please provide search criteria');
-        }
-        else {
+        } else {
             $('#payment_err').html('');
             $('#ajax_loader').show();
             var url = "/lms/custom/payments/search_refund_payment.php";
@@ -1084,8 +1077,7 @@ $(document).ready(function () {
     function create_cert() {
         if ($('#cert_container').is(":visible")) {
             $('#cert_container').hide();
-        }
-        else {
+        } else {
             $('#cert_container').show();
         }
     }
@@ -1319,8 +1311,7 @@ $(document).ready(function () {
         var active;
         if ($('#active').is(":checked")) {
             active = 1;
-        }
-        else {
+        } else {
             active = 0;
         }
 
@@ -1447,8 +1438,7 @@ $(document).ready(function () {
 
             if (data == '') {
                 $('#prom_err').html('Please provide message text');
-            }
-            else {
+            } else {
                 $('#prom_err').html('');
                 if ((typeof $('select#users').val() !== 'undefined' && enrolled_users != 0) || (typeof $('select#ws_users').val() !== 'undefined' && workshop_users != 0)) {
                     $('#prom_err').html('');
@@ -2001,8 +1991,7 @@ $(document).ready(function () {
         //console.log('Installment status: ' + installment_status);
         if (installment_status == true) {
             $(num_payments_el).prop("disabled", false);
-        }
-        else {
+        } else {
             $(num_payments_el).prop("disabled", true);
         }
 
@@ -2353,24 +2342,7 @@ $(document).ready(function () {
         });
     });
 
-    $("#other_go").click(function () {
-        var courseid = $('#courses').val();
-        var from = $('#datepicker1').val();
-        var to = $('#datepicker2').val();
-        var type=$('#type').val();
-        if (from == '' || to == '') {
-            $('#other_report_container').html('Please select dates');
-        } // end if 
-        else {
-            $('#other_report_container').html('');
-            $('#ajax_loader').show();
-            var url = "/lms/custom/reports/get_other_payments_report_data.php";
-            $.post(url, {courseid: courseid, from: from, to: to, type:type}).done(function (data) {
-                $('#ajax_loader').hide();
-                $('#other_report_container').html(data);
-            });
-        } // end else 
-    });
+
 
     /************************************************************************
      * 
@@ -2536,8 +2508,7 @@ $(document).ready(function () {
             var pwd = $('#refund_pwd').val();
             if (pwd == '') {
                 $('#refund_pwd_err').html('Password field is required');
-            }
-            else {
+            } else {
                 var url = "/lms/custom/payments/get_old_refund_pwd.php";
                 var request = {id: 1};
                 $.post(url, request).done(function (data) {
@@ -2545,8 +2516,7 @@ $(document).ready(function () {
                         $('#refund_pwd_err').html('');
                         $('#pwd_container').hide();
                         $('#refund_container').show('slow');
-                    }
-                    else {
+                    } else {
                         $('#refund_pwd_err').html('Wrong password');
                     }
                 });
@@ -2580,12 +2550,10 @@ $(document).ready(function () {
                 else {
                     if (old_pwd != db_old_pwd) {
                         $('#pwd_err').html('Wrong old password');
-                    }
-                    else {
+                    } else {
                         if (new_pwd1 != new_pwd2) {
                             $('#pwd_err').html('Passwords do not match');
-                        }
-                        else {
+                        } else {
                             if (old_pwd == db_old_pwd && new_pwd2 != '' && new_pwd1 == new_pwd2) {
                                 $('#pwd_err').html('');
                                 var url = "/lms/custom/payments/update_refund_pwd.php";
@@ -2626,6 +2594,25 @@ $(document).ready(function () {
 
             } // end if course_payment_id>0
         }
+
+        $("#other_go").click(function () {
+            var courseid = $('#courses').val();
+            var from = $('#datepicker1').val();
+            var to = $('#datepicker2').val();
+            var type = $('#type').val();
+            if (from == '' || to == '') {
+                $('#other_report_container').html('Please select dates');
+            } // end if 
+            else {
+                $('#other_report_container').html('');
+                $('#ajax_loader').show();
+                var url = "/lms/custom/reports/get_other_payments_report_data.php";
+                $.post(url, {courseid: courseid, from: from, to: to, type: type}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#other_report_container').html(data);
+                });
+            } // end else 
+        });
 
 
     }); // end of body
