@@ -1457,7 +1457,25 @@ $(document).ready(function () {
             } // end else
         }
 
-
+        if (event.target.id == 'other_go') {
+            console.log('It is me ...');
+            var courseid = $('#courses').val();
+            var from = $('#datepicker1').val();
+            var to = $('#datepicker2').val();
+            var type = $('#type').val();
+            if (from == '' || to == '') {
+                $('#other_report_container').html('Please select dates');
+            } // end if 
+            else {
+                $('#other_report_container').html('');
+                $('#ajax_loading').show();
+                var url = "/lms/custom/reports/get_other_payments_report_data.php";
+                $.post(url, {courseid: courseid, from: from, to: to, type: type}).done(function (data) {
+                    $('#ajax_loading').hide();
+                    $('#other_report_container').html(data);
+                });
+            } // end else 
+        }
 
         if (event.target.id == 'update_slide') {
             var id = $('#slide_id').val();
@@ -2289,6 +2307,7 @@ $(document).ready(function () {
         update_navigation_status__menu('Program reports');
         get_program_report();
     });
+
     $("#revenue_reports").click(function (event) {
         update_navigation_status__menu('Revenue reports');
         get_revenue_report();
@@ -2337,6 +2356,14 @@ $(document).ready(function () {
     $("#cheque_report").click(function () {
         update_navigation_status__menu('Cheque report');
         var url = "/lms/custom/reports/get_cheque_report.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    });
+
+    $("#permissions").click(function () {
+        update_navigation_status__menu('Permissions');
+        var url = "/lms/custom/reports/get_permissions_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
@@ -2457,6 +2484,23 @@ $(document).ready(function () {
     $("body").click(function (event) {
         console.log('Element clicked: ' + event.target.id);
 
+        if (event.target.id.indexOf("permission_") >= 0) {
+            var moduleid = event.target.id.replace("permission_", "");
+            var status;
+            if ($('#' + event.target.id).is(':checked')) {
+                status = 1;
+            }
+            else {
+                status = 0;
+            }
+            if (confirm('Change permissions for current module?')) {
+                var url = "/lms/custom/reports/update_permission.php";
+                var request = {moduleid: moduleid, status: status};
+                $.post(url, request).done(function (data) {
+                    $("#status").html(data);
+                });
+            } // end if confirm
+        }
 
         if (event.target.id == 'cancel') {
             $("#myModal").remove();
@@ -2594,25 +2638,6 @@ $(document).ready(function () {
 
             } // end if course_payment_id>0
         }
-
-        $("#other_go").click(function () {
-            var courseid = $('#courses').val();
-            var from = $('#datepicker1').val();
-            var to = $('#datepicker2').val();
-            var type = $('#type').val();
-            if (from == '' || to == '') {
-                $('#other_report_container').html('Please select dates');
-            } // end if 
-            else {
-                $('#other_report_container').html('');
-                $('#ajax_loader').show();
-                var url = "/lms/custom/reports/get_other_payments_report_data.php";
-                $.post(url, {courseid: courseid, from: from, to: to, type: type}).done(function (data) {
-                    $('#ajax_loader').hide();
-                    $('#other_report_container').html(data);
-                });
-            } // end else 
-        });
 
 
     }); // end of body

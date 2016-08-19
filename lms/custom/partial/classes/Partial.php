@@ -268,14 +268,22 @@ class Partial extends Util {
 
         $list.="<div class='container-fluid' style='text-align:left;display:none;' id='payment_options'>";
         $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cc' checked>Card payment</span>";
-        
-        $username=$this->user->username;
-        //echo "User: ".$username."<br>";
 
-        //if ($username == 'admin') {
+        $enabled = $this->check_module_permission('cash');
+
+        if ($this->user->id == 2) {
+            // It is admin 
             $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cash' >Cash payment</span>";
             $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cheque' >Cheque payment</span>";
-        //} // end if $USER->username = 'admin'
+        }  // end if $this->user->id == 2
+        else {
+            if ($enabled == 1) {
+                $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cash' >Cash payment</span>";
+                $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cheque' >Cheque payment</span>";
+            } // end if $enabled == 1
+        } // end else
+
+
 
         $list.="<span class='span3'><input type='text' id='sum' style='width:120px;' /></span>";
         $list.="<span class='span3'><button class='btn btn-primary' id='get_partial_payment_section'>Add</button></span>";

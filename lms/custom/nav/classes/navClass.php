@@ -90,6 +90,7 @@ class navClass extends Util {
         $userid = $this->user->id;
         $list = "";
         $price_items = $this->get_price_items();
+        $permission = $this->check_module_permission('invoice');
         $list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
             <div class='container-fluid'>
@@ -108,19 +109,19 @@ class navClass extends Util {
                         <ul class='nav'>
                             <li class='dropdown'><a title='Programs' class='dropdown-toggle' href='#'>Courses<b class='caret'></b></a>                                
                             $price_items
-                            </li>                            
-                            <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Invoices<b class='caret'></b></a>
+                            </li>";
+        if ($permission == 1) {
+            $list.="<li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Invoices<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Invoice' id='data_inv'>Invoice</a></li>
                                     <li><a href='#' title='Open invoices' id='opn_inv'>Open invoices</a></li>
                                     <li><a href='#' title='Paid invoices' id='paid_inv'>Paid invoices</a></li>
                                     <li><a href='#' title='Send invoice' id='send_inv'>Send invoice</a></li>                                    
                                 </ul>
-                            </li>                            
-                            <li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
+                            </li>";
+        }
+        $list.="<li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
-                                    <li><a href='#' id='cash' title='Cash'>Cash payments</a></li>
-                                    <li><a href='#' id='cheque' title='Cheque'>Cheque payments</a></li>
                                     <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
                                     <li><a href='#' id='refund' title='Refund'>Refund payments</a></li>                                                                      
                                 </ul>
@@ -221,6 +222,7 @@ class navClass extends Util {
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Index page' id='index'>Index page</a></li>
                                     <li><a href='#' title='About' id='about'>About page</a></li>
+                                    <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>User credentials</a></li>

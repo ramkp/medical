@@ -130,7 +130,7 @@ class Util {
         }
         return $list;
     }
-    
+
     function get_course_by_category2($id) {
         $list = "";
         $items = array();
@@ -255,7 +255,7 @@ class Util {
         }
     }
 
-    function get_course_users2($id, $output = true, $mutliple = false) {        
+    function get_course_users2($id, $output = true, $mutliple = false) {
         $list = "";
         $users = array();
         //1. Get course context
@@ -265,7 +265,7 @@ class Util {
         $query = "select id, roleid, contextid, userid "
                 . "from mdl_role_assignments "
                 . "where roleid=$this->student_role and contextid=$instanceid";
-        
+
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -284,11 +284,11 @@ class Util {
                 } // end if $status==0
             } // end while
         } // end if $num > 0
-        
+
         ksort($users);
 
         if (count($users) > 0) {
-            $list.="<span class='span3'>Enrolled users:</span><span class='span4'>";            
+            $list.="<span class='span3'>Enrolled users:</span><span class='span4'>";
             $list.="<select id='send_users' style='width:275px;'>";
             $list.="<option value='0' selected>Select user</option>";
             foreach ($users as $user) {
@@ -450,6 +450,15 @@ class Util {
         } // end if $num > 0
         $list.="</select>";
         return $list;
+    }
+
+    function check_module_permission($mname) {
+        $query = "select * from mdl_permissions where module_name='$mname'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $enabled = $row['enabled'];
+        }
+        return $enabled;
     }
 
 }

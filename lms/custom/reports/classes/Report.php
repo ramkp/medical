@@ -744,8 +744,9 @@ class Report extends Util {
         $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
-        $list.="<div id='other_report_container'></div>";
-
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span12' id='other_report_container'></span>";
+        $list.="</div>";
         return $list;
     }
 
@@ -792,29 +793,92 @@ class Report extends Util {
                     }
                     $payments[] = $payment;
                 } // end if $user_status==0
-            } // end while
+            } // end while         
 
-            $list.="<div class='container-fluid'>";
+            $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
             $list.="<span class='span3'>User</span>";
             $list.="<span class='span3'>Program applied</span>";
             $list.="<span class='span3'>Payment</span>";
             $list.="<span class='span3'>Date</span>";
             $list.="</div>";
 
-
             foreach ($payments as $payment) {
+                //echo "Inside payments ...<br>";
                 $date = date('m-d-Y', $payment->pdate);
                 $coursename = $this->get_course_name($payment->courseid);
-                $userdata = $this->get_user_details($payments->userid);
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>$userdata->firstname $userdata->lastname</span>";
+                $userdata = $this->get_user_details($payment->userid);
+                $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.="<span class='span3'><a href='https://medical2.com/lms/user/profile.php?id=$payment->userid' target='_blank'>$userdata->firstname $userdata->lastname</a></span>";
                 $list.="<span class='span3'>$coursename</span>";
                 $list.="<span class='span3'>$$payment->psum</span>";
                 $list.="<span class='span3'>$date</span>";
                 $list.="</div>";
             } // end for
         } // end if $num > 0
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span12'>No data found</span>";
+            $list.="</div>";
+        }
+        return $list;
+    }
 
+    function get_pemissions_page() {
+        $list = "";
+        $permissions = array();
+        $query = "select * from mdl_permissions order by module_name";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $permission = new stdClass();
+            foreach ($row as $key => $value) {
+                $permission->$key = $value;
+            }
+            $permissions[] = $permission;
+        }
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span12' style='font-weight:bold;'>Permissions based list of modules</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+        $list.="<span class='span3'>Module name</span>";
+        $list.="<span class='span3'>Permission status</span>";
+        $list.="</div>";
+
+        foreach ($permissions as $permission) {
+            switch ($permission->module_name) {
+                case 'invoice':
+                    $moduleName = 'Invoices';
+                    break;
+                case 'cash':
+                    $moduleName = 'Cash/Cheque payments';
+                    break;
+            } // end switch
+
+            if ($permission->enabled == 0) {
+                $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id'>";
+            } // end if $permission->enabled==0
+            else {
+                $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id' checked>";
+            } // end else 
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span3'>$moduleName</span>";
+            $list.="<span class='span3'>$status</span>";
+            $list.="</div>";
+        } // end foreach
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span6' id='status'></span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function update_permission($moduleid, $status) {
+        $query = "update mdl_permissions "
+                . "set enabled=$status where id=$moduleid";
+        $this->db->query($query);
+        $list = "Module permissions updated";
         return $list;
     }
 
