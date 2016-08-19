@@ -1,13 +1,10 @@
 <?php
 
-function prepareExpirationDate($exp_date) {
-    // MMYY - format
-    $mm = substr($exp_date, 0, 2);
-    $yy = substr($exp_date, 4);
-    $date = $mm . $yy;
-    return $date;
-}
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Classes/ProcessPayment.php';
+$data1 = array('fname' => 'John', 'lname' => 'Connair', 'case' => 'Terminator');
+$data2 = array('fname' => 'AAAAAAAAA', 'lname' => 'Bbbbbbbbbbbbb', 'case' => 'Josher.kopo');
+$auth = new ProcessPayment();
+$auth->save_log($data1);
+$auth->save_log($data2);
 
-$exp_date = "062018";
-$date = prepareExpirationDate($exp_date);
-echo "Date: " . $date . "<br>";
+

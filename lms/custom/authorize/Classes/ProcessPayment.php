@@ -17,9 +17,19 @@ class ProcessPayment {
     private $LOGIN_ID = '83uKk2VcBBsC'; // production data
     private $TRANSACTION_KEY = '23P447taH34H26h5'; // production data
     public $period = 28; // 28 days of installment 
+    public $log_file_path;
 
     function __construct() {
         $this->AUTHORIZENET_LOG_FILE = 'phplog';
+        $this->log_file_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/failed_transactions.log';
+    }
+
+    function save_log($data) {
+        $fp = fopen($this->log_file_path, 'a');
+        $date=date('m-d-Y h:i:s', time());
+        fwrite($fp, $date ."\n");
+        fwrite($fp, print_r($data, TRUE));
+        fclose($fp);
     }
 
     function authorize() {
@@ -138,11 +148,11 @@ class ProcessPayment {
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
 
-              /*  
+            /*
               echo "--------Card payment response <pre>";
               print_r($tresponse);
               echo "</pre><br>";
-              */  
+             */
 
 
             if (($tresponse != null) && ($tresponse->getResponseCode() == "1")) {
@@ -155,7 +165,7 @@ class ProcessPayment {
                 return $status;
             } // end if ($tresponse != null) && ($tresponse->getResponseCode() == "1")
             else {
-                //echo "Charge Credit Card ERROR :  Invalid response\n";
+                $this->save_log($tresponse);
                 return false;
             }
         } // end if $response != null        
@@ -247,6 +257,7 @@ class ProcessPayment {
             //echo "Message: ".$msg."<br>";
         }  // end if ($response != null) && ($response->getMessages()->getResultCode() == "Ok")        
         else {
+            $this->save_log($response);
             $errorMessages = $response->getMessages()->getMessage();
             $msg = $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText();
         } // end else
@@ -261,7 +272,7 @@ class ProcessPayment {
         return $date;
     }
 
-    function makeRefund($amount, $card_last_four, $exp_date, $trans_id) {        
+    function makeRefund($amount, $card_last_four, $exp_date, $trans_id) {
         $merchantAuthentication = $this->authorize();
         $refId = 'ref' . time();
         $date = $this->prepareExpirationDate($exp_date);
@@ -288,7 +299,7 @@ class ProcessPayment {
         $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
-       		
+
             //echo "Response: <pre>";
             //print_r($tresponse);
             //echo "</pre>";
@@ -298,7 +309,7 @@ class ProcessPayment {
                 return TRUE;
             } // end if ($tresponse != null) && ($tresponse->getResponseCode() == \SampleCode\Constants::RESPONSE_OK)            
             else {
-                //echo "Wrong response ..."    ;
+                $this->save_log($tresponse);
                 return FALSE;
             }
         } // end if $response != null 
