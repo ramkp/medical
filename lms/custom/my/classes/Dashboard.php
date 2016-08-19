@@ -45,7 +45,11 @@ class Dashboard extends Util {
                     . "where userid=$userid and courseid=$courseid";
             $partial_num = $this->db->numrows($query);
 
-            if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0) {
+            //4. Check among free access 
+            $query = "select * from mdl_free where userid=$userid";
+            $free_num = $this->db->numrows($query);
+
+            if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $free_num > 0) {
                 $status = 1;
             } // end if $card_payments_num>0 || $invoice_payments_num>0
         } // end if $installment_status==0
@@ -629,6 +633,12 @@ class Dashboard extends Util {
         return $category;
     }
 
+    function check_free_access($userid) {
+        $query = "select * from mdl_free where userid=$userid";
+        $free_num = $this->db->numrows($query);
+        return $free_num;
+    }
+
     function get_payments_history_block($courseid, $userid) {
         $list = "";
         $cc_list = "";
@@ -736,8 +746,9 @@ class Dashboard extends Util {
             } // end foreach
             $inv_list.="</table>";
         } // end if count($invoice_payments)>0        
-//echo "Course cost: " . $coursecost . "<br>";
-//echo "Total paid: " . $total_paid . "<br>";
+        //echo "Course cost: " . $coursecost . "<br>";
+        //echo "Total paid: " . $total_paid . "<br>";    
+        
         $balance = $coursecost - $total_paid;
         if ($balance >= 0) {
             $clear_balance = $balance;
@@ -745,6 +756,11 @@ class Dashboard extends Util {
         else {
             $clear_balance = 0;
         } // end else
+        
+        $free_acces = $this->check_free_access($userid);       
+        if ($free_acces > 0) {
+            $clear_balance = 0;
+        }
 
         $list.="<table>";
         $list.="<tr>";
@@ -761,7 +777,7 @@ class Dashboard extends Util {
         $list.="</tr>";
         $list.="<tr>";
         $list.="<td>$inv_list</td>";
-        $list.="</tr>";
+        $list.="</tr>";        
 
         $list.="<tr>";
         $list.="<td style='padding:15px;'>Your unpaid balance - $$clear_balance</td>";

@@ -2336,6 +2336,42 @@ $(document).ready(function () {
         update_navigation_status__menu('Partial payments');
         get_partial_payments_page();
     });
+
+    $("#cash_report").click(function () {
+        update_navigation_status__menu('Cash report');
+        var url = "/lms/custom/reports/get_cash_report.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    });
+
+    $("#cheque_report").click(function () {
+        update_navigation_status__menu('Cheque report');
+        var url = "/lms/custom/reports/get_cheque_report.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    });
+
+    $("#other_go").click(function () {
+        var courseid = $('#courses').val();
+        var from = $('#datepicker1').val();
+        var to = $('#datepicker2').val();
+        var type=$('#type').val();
+        if (from == '' || to == '') {
+            $('#other_report_container').html('Please select dates');
+        } // end if 
+        else {
+            $('#other_report_container').html('');
+            $('#ajax_loader').show();
+            var url = "/lms/custom/reports/get_other_payments_report_data.php";
+            $.post(url, {courseid: courseid, from: from, to: to, type:type}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#other_report_container').html(data);
+            });
+        } // end else 
+    });
+
     /************************************************************************
      * 
      *      Code related to courses selection by logged students

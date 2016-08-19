@@ -688,12 +688,12 @@ class program_model extends CI_Model {
             // 2. Get slots list
             if ($state == null) {
                 $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid "
+                        . "where schedulerid=$schedulerid  "
                         . "and starttime>$now order by starttime";
             } // end if $state==null
             else {
                 $statename = $this->get_state_name($state);
-                $query = "select * from mdl_scheduler_slots "
+                $query = "select distinct * from mdl_scheduler_slots "
                         . "where schedulerid=$schedulerid "
                         . "and appointmentlocation like '%$statename%' "
                         . "order by starttime";

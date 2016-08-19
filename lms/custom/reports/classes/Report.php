@@ -258,7 +258,7 @@ class Report extends Util {
         } // end if $from==$to
         else {
             $unix_from = strtotime($from);
-            $unix_to = strtotime($to);
+            $unix_to = strtotime($to) + 86400;
         } // end else
 
 
@@ -721,6 +721,36 @@ class Report extends Util {
             $list.="</div>";
         }
         return $list;
+    }
+
+    function get_other_payments_report($type) {
+
+        // 1- cash
+        // 2- cheque
+
+        $list = "";
+        $courses = $this->get_courses_list();
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6' id='revenue_report_err'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<input type='hidden' id='type' value='$type'>";
+        $list.="<span class='span3'>$courses</span><span class='span1'>From</span><span class='span2'><input type='text' id='datepicker1' style='width:75px;'></span><span class='span1'>To</span><span class='span2'><input type='text' id='datepicker2' style='width:75px;'></span><span class='span1'><button type='button' id='other_go' class='btn btn-primary'>Go</button></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+
+        $list.="<div id='other_report_container'></div>";
+
+        return $list;
+    }
+
+    function get_other_payment_report_data($courseid, $from, $to, $type) {
+        $query="";
     }
 
 }

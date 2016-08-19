@@ -111,7 +111,8 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
         }
         $slot->schedulerid = $schedulerid;
         $ds->save_additional_slot($slot);
-        //die();
+        //die('Stopped');
+        
     } // end if $courseid == 44 || $courseid == 45
 
     $slot->save();

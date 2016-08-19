@@ -211,7 +211,9 @@ class navClass extends Util {
                                     <li><a href='#' id='user_report' title='Users stats'>Users stats</a></li>
                                     <li><a href='#' id='payments_report' title='Payments log'>Payments log</a></li>                                    
                                     <!--<li><a href='#' id='program_reports' title='Program reports'>Program reports</a></li>-->
-                                    <li><a href='#' id='revenue_reports' title='Revenue reports'>Revenue reports</a></li>
+                                    <li><a href='#' id='revenue_reports' title='Revenue report'>Revenue report</a></li>
+                                    <li><a href='#' id='cash_report' title='Cash report'>Cash report</a></li>
+                                    <li><a href='#' id='cheque_report' title='Cheque report'>Cheque report</a></li>
                                     <!--<li><a href='#' id='workshop_reports' title='Workshop reports'>Workshop reports</a></li>-->
                                 </ul>
                             </li>                            

@@ -559,47 +559,31 @@ class Schedule extends Util {
         }
     }
 
-    function is_slot_exists($slot) {
-
-        // $schedulerid = 5 - Phleb with EKG
-        // $schedulerid = 6 - Phleb 
-        $slotid = 0;
-        $query = "select * from mdl_scheduler_slots "
-                . "where schedulerid=$slot->schedulerid "
-                . "and appointmentlocation='$slot->appointmentlocation' "
-                . "and starttime='$slot->starttime'";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $slotid = $row['id'];
-            } // end while
-        } // end if $num > 0
-        return $num;
-    }
-
     function save_additional_slot($slot) {
-        if ($_REQUEST['what'] == 'addslot') {
-            $query = "insert into mdl_scheduler_slots "
-                    . "(schedulerid,"
-                    . "starttime,"
-                    . "duration,"
-                    . "teacherid,"
-                    . "appointmentlocation,"
-                    . "timemodified,"
-                    . "notes,"
-                    . "hideuntil) "
-                    . "values($slot->schedulerid,"
-                    . "'$slot->starttime',"
-                    . "'480',"
-                    . "'234',"
-                    . "'$slot->appointmentlocation',"
-                    . "'$slot->timemodified',"
-                    . "'$slot->notes',"
-                    . "'$slot->timemodified')";
-            //echo "Query: " . $query . "<br>";
-            $this->db->query($query);
-        } // end if $_REQUEST['what'] == 'addslot'
+
+        //print_r($slot);
+        //die();
+        //$date=date('m-d-Y', $slot->starttime);
+        //echo "Slot date: ".$date."<br>";
+        $query = "insert into mdl_scheduler_slots "
+                . "(schedulerid,"
+                . "starttime,"
+                . "duration,"
+                . "teacherid,"
+                . "appointmentlocation,"
+                . "timemodified,"
+                . "notes,"
+                . "hideuntil) "
+                . "values($slot->schedulerid,"
+                . "'$slot->starttime',"
+                . "'480',"
+                . "'234',"
+                . "'$slot->appointmentlocation',"
+                . "'$slot->timemodified',"
+                . "'$slot->notes',"
+                . "'$slot->timemodified')";
+        //echo "Query: ".$query."<br>";
+        $this->db->query($query);
     }
 
     function get_user_address_data($userid) {
@@ -636,71 +620,6 @@ class Schedule extends Util {
             $pdf->Output($path, 'F');
         } // end if count($students_arr)>0
         return $now . "_merged.pdf";
-    }
-
-    function is_has_students($slotid) {
-        $query = "select * from mdl_scheduler_appointment where slotid=$slotid";
-        $num = $this->db->numrows($query);
-        return $num;
-    }
-
-    function get_workshop_detailes($slotid) {
-        $query = "select *  from mdl_scheduler_slots where id=$slotid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $ws = new stdClass();
-            foreach ($row as $key => $value) {
-                $ws->$key = $value;
-            }
-        } // end while
-        return $ws;
-    }
-
-    function get_ekg_workshop($ws) {
-        $schedulerid = 5; // courseid=45 - Phleb with EKG
-        $query = "select *  from mdl_scheduler_slots "
-                . "where schedulerid=$schedulerid "
-                . "and appointmentlocation='$ws->appointmentlocation' "
-                . "and notes='$ws->notes' and starttime='$ws->starttime'";
-        $num = $this->db->numrows($query);
-        return $num;
-    }
-
-    function fix_phleb_ws() {
-        $non_exists = 0;
-        $exists = 0;
-        $workshops = array();
-        $schedulerid = 6; // courseid=44 - Phleb
-        $query = "select * from mdl_scheduler_slots  "
-                . "where schedulerid=$schedulerid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $slotid = $row['id'];
-            $has_students = $this->is_has_students($slotid);
-            if ($has_students == 0) {
-                // No students
-                $ws = $this->get_workshop_detailes($slotid);
-                $is_ekg_workshop_exists = $this->get_ekg_workshop($ws);
-                if ($is_ekg_workshop_exists == 0) {
-                    $non_exists++;
-                    $query = "delete from mdl_scheduler_slots where id=$slotid";
-                    echo "Query: " . $query . "<br>";
-                    $this->db->query($query);
-                } // end if $is_ekg_workshop_exists==0
-                else {
-                    $exists++;
-                } // end else
-
-                echo "<br><pre>";
-                print_r($ws);
-                echo "</pre>";
-
-                echo "EKG workshop exists: $is_ekg_workshop_exists";
-                echo "<br>------------------------------------------------<br>";
-            } // end if $has_students==0
-        } // end while
-        echo "<br>Total existed ws: " . $exists . "<br>";
-        echo "<br>Total non-exists: " . $non_exists . "<br>";
     }
 
 }
