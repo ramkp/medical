@@ -18,11 +18,18 @@ class Report extends Util {
     public $from;
     public $to;
     public $files_path;
+    public $card_report_csv_file;
+    public $cash_report_scv_file;
+    public $cheque_report_csv_file;
 
     function __construct() {
         parent::__construct();
         $this->cert_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates';
         $this->files_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/reports/files';
+        $this->card_report_csv_file='card_payments.csv';
+        $this->cash_report_scv_file='cash_payments_csv';
+        $this->cheque_report_csv_file='cheque_payment.csv';
+        
     }
 
     /*     * *********************************** Service functions ******************************** */
@@ -241,6 +248,22 @@ class Report extends Util {
         $list.="</div>";
         return $list;
     }
+    
+    
+    function create_csv_file ($filename, $payments) {
+    	// Write CSV data
+    	$path = $this->files_path . '/'.$filename;
+    	date_default_timezone_set('Pacific/Wallis');
+    	$output = fopen($path, 'w');
+    	fputcsv($output, array('User', 'Program applied', 'Payment', 'Date'));
+    	foreach ($payments as $payment) {
+    		$date = date('m-d-Y', $payment->pdate);
+    		$coursename = $this->get_course_name($payment->courseid);
+    		$userdata = $this->get_user_details($payment->userid);
+    		fputcsv($output, array("$userdata->firstname $userdata->lastname", $coursename, $payment->psum, $date));
+       	}
+       	fclose($output);
+    }
 
     function get_revenue_report_data($courseid, $from, $to, $status = true, $output = true) {
 
@@ -249,7 +272,6 @@ class Report extends Util {
         $this->from = $from;
         $this->to = $to;
         $list = "";
-        $list2 = "";
 
         if ($from == $to) {
             $timestamp = time();
@@ -291,57 +313,8 @@ class Report extends Util {
                     $this->card_sum = $this->card_sum + $row['psum'];
                 } // end if $user_status==0
             } // end while
-        } // end if $num > 0
-        //2. Get cash payments - ptype=1
-        if ($courseid > 0) {
-            $query = "select * from mdl_invoice "
-                    . "where courseid=$courseid  "
-                    . "and i_status=1 "
-                    . "and i_pdate between $unix_from and $unix_to "
-                    . " and i_ptype=1";
-        } // end if $courseid > 0
-        else {
-            $query = "select * from mdl_invoice "
-                    . "where i_status=1 "
-                    . "and i_pdate between $unix_from and $unix_to "
-                    . " and i_ptype=1";
-        }
-        //echo "<br/>Query: $query<br/>";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $user_status = $this->is_user_deleted($row['userid']);
-                if ($user_status == 0) {
-                    $this->cash_sum = $this->cash_sum + $row['i_sum'];
-                }
-            } // end while
-        } // end if $num > 0
-        //3. Get cheque payments - ptype=2
-        if ($courseid > 0) {
-            $query = "select * from mdl_invoice "
-                    . "where courseid=$courseid  "
-                    . "and i_status=1 "
-                    . "and i_pdate between $unix_from and $unix_to"
-                    . " and i_ptype=2";
-        } // end if $courseid > 0
-        else {
-            $query = "select * from mdl_invoice "
-                    . "where i_status=1 "
-                    . "and i_pdate between $unix_from and $unix_to"
-                    . " and i_ptype=2";
-        } // end else
-        //echo "<br/>Query: $query<br/>";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $user_status = $this->is_user_deleted($row['userid']);
-                if ($user_status == 0) {
-                    $this->cheque_sum = $this->cheque_sum + $row['i_sum'];
-                }
-            } // end while
-        } // end if $num > 0
+       } // end if $num > 0
+        
         //4. Get partial cash payments
         if ($courseid > 0) {
             $query = "select * from mdl_partial_payments "
@@ -386,38 +359,51 @@ class Report extends Util {
                 }
             } // end while
         } // end if $num > 0
+        
+        $card_payments_detailes=$this->get_card_payments_detailes($courseid, $from, $to);
+        $cash_payments_detailes=$this->get_other_payment_report_data($courseid, $from, $to, 1);
+        $cheque_payments_detailes=$this->get_other_payment_report_data($courseid, $from, $to, 2);
+        $list.="<div class='container-fluid'>";
+        $list.="<div class='span10'>
 
-        $grand_total = $this->card_sum + $this->cash_sum + $this->cheque_sum;
-        $list2.="<div class='container-fluid' style='padding-right:0px;'>";
-        $list2.="<span class='span3'>Card</span><span class='span1'>$$this->card_sum</span>";
-        $list2.="</div>";
-        $list2.="<div class='container-fluid' style='padding-right:0px;'>";
-        $list2.="<span class='span3'>Cash</span><span class='span1'>$$this->cash_sum</span>";
-        $list2.="</div>";
-        $list2.="<div class='container-fluid' style='padding-right:0px;'>";
-        $list2.="<span class='span3'>Cheque</span><span class='span1'>$$this->cheque_sum</span>";
-        $list2.="</div>";
-        $list2.="<div class='container-fluid' style='font-weight:bold;' style='padding-right:0px;'>";
-        $list2.="<span class='span3'>Total</span><span class='span1'>$$grand_total</span>";
-        $list2.="</div>";
+                    <ul class='nav nav-tabs '>
 
-        // Write CSV data
-        $path = $this->files_path . '/revenue_report_data.csv';
-        $output = fopen($path, 'w');
-        fputcsv($output, array('Card payments', 'Cash payments', 'Cheque payments'));
-        fputcsv($output, array($this->card_sum, $this->cash_sum, $this->cheque_sum));
-        fclose($output);
+                        <li class='active'><a href='#option1' data-toggle='tab'>Card payments</a></li>
 
-        $list.="<table border='0' style='padding-left: 20px;'>";
-        $list.="<tr>";
-        $list.="<td width='215px;'>$list2</td><td><span id='chart_div' align='left'></span></td>";
-        $list.="</tr>";
-        $list.="<tr>";
-        $list.="<td colspan='2'><div class='container-fluid'><span class='span3'><a href='/lms/custom/reports/files/revenue_report_data.csv' target='_blank'>Download CSV</a></span></div></td>";
-        $list.="</tr>";
-        $list.="<tr>";
-        $list.="<td colspan='2'><hr/></td>";
-        $list.="</tr>";
+                        <li><a href='#option2' data-toggle='tab'>Cash payments</a></li>
+
+                        <li><a href='#option3' data-toggle='tab'>Cheque payments</a></li>
+
+                    </ul>                    
+
+                    <div class='tab-content'>
+
+                        <div class='tab-pane active' id='option1'>
+
+                            <h3>Card payments - $$this->card_sum - <a href='http://".$_SERVER['SERVER_NAME']."/lms/custom/reports/files/".$this->card_report_csv_file."' target='_blank'>Export to CSV</a></h3>
+
+                            <p>$card_payments_detailes</p>
+
+                        </div>                    
+
+                        <div class='tab-pane' id='option2'>
+
+                            <h3>Cash payments - $$this->cash_sum - <a href='http://".$_SERVER['SERVER_NAME']."/lms/custom/reports/files/".$this->cash_report_scv_file."' target='_blank'>Export to CSV</a></h3>
+                            
+                            <p>$cash_payments_detailes</p>
+
+                        </div>              
+
+                        <div class='tab-pane' id='option3'>
+
+                            <h3>Cheque payments - $$this->cheque_sum - <a href='http://".$_SERVER['SERVER_NAME']."/lms/custom/reports/files/".$this->cheque_report_csv_file."' target='_blank'>Export to CSV</a></h3>
+                            <p>$cheque_payments_detailes</p> 
+
+                        </div>
+        		    </div>
+                </div>
+            </div>";
+        
         $list.="</table>";
         if ($output == true) {
             return $list;
@@ -722,6 +708,81 @@ class Report extends Util {
         }
         return $list;
     }
+    
+    function get_card_payments_detailes ($courseid, $from, $to) {
+    	date_default_timezone_set('Pacific/Wallis');
+    	$payments = array();
+    	$this->courseid = $courseid;
+    	$this->from = $from;
+    	$this->to = $to;
+    	$list = "";
+    	
+    	if ($from == $to) {
+    		$timestamp = time();
+    		$unix_from = strtotime("midnight", $timestamp);
+    		$unix_to = strtotime("tomorrow", $unix_from) - 1;
+    	} // end if $from==$to
+    	else {
+    		$unix_from = strtotime($from);
+    		$unix_to = strtotime($to) + 86400;
+    	} // end else
+    	//1. Get partial payments
+    	if ($courseid > 0) {
+    		$query = "select * from mdl_card_payments "
+    				. "where courseid=$courseid and refunded=0 "
+    				. "and pdate between $unix_from and $unix_to "
+    				. "order by pdate desc ";
+    	} // end if $courseid>0
+    	else {
+    		$query = "select * from mdl_card_payments "
+    				. "where pdate between $unix_from and $unix_to "
+    				. "and refunded=0 "
+    				. "order by pdate desc ";
+    	} // end else
+    	//echo "<br/>Query: $query<br/>";
+    	$num = $this->db->numrows($query);
+    	if ($num > 0) {
+    		$result = $this->db->query($query);
+    		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    			$user_status = $this->is_user_deleted($row['userid']);
+    			if ($user_status == 0) {
+    				$payment = new stdClass();
+    				foreach ($row as $key => $value) {
+    					$payment->$key = $value;
+    				}
+    				$payments[] = $payment;
+    			} // end if $user_status==0
+    		} // end while
+    		
+    		$csv_file=$this->create_csv_file($this->card_report_csv_file, $payments);
+    		$list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+    		$list.="<span class='span3'>User</span>";
+    		$list.="<span class='span3'>Program applied</span>";
+    		$list.="<span class='span3'>Payment</span>";
+    		$list.="<span class='span3'>Date</span>";
+    		$list.="</div>";
+    	
+    		foreach ($payments as $payment) {
+    			//echo "Inside payments ...<br>";
+    			$date = date('m-d-Y', $payment->pdate);
+    			$coursename = $this->get_course_name($payment->courseid);
+    			$userdata = $this->get_user_details($payment->userid);
+    			$list.="<div class='container-fluid' style='text-align:left;'>";
+    			$list.="<span class='span3'><a href='https://medical2.com/lms/user/profile.php?id=$payment->userid' target='_blank'>$userdata->firstname $userdata->lastname</a></span>";
+    			$list.="<span class='span3'>$coursename</span>";
+    			$list.="<span class='span3'>$$payment->psum</span>";
+    			$list.="<span class='span3'>$date</span>";
+    			$list.="</div>";
+    		} // end for
+    	} // end if $num > 0
+    	else {
+    		$list.="<div class='container-fluid' style='text-align:center;'>";
+    		$list.="<span class='span12'>No data found</span>";
+    		$list.="</div>";
+    	}
+    	return $list;
+    	 
+    }
 
     function get_other_payments_report($type) {
 
@@ -794,7 +855,11 @@ class Report extends Util {
                     $payments[] = $payment;
                 } // end if $user_status==0
             } // end while         
-
+			
+            $filename = ($type==1) ? $this->cash_report_scv_file : $this->cheque_report_csv_file;
+            $this->create_csv_file($filename, $payments);
+            
+            
             $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
             $list.="<span class='span3'>User</span>";
             $list.="<span class='span3'>Program applied</span>";

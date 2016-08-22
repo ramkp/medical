@@ -209,13 +209,16 @@ if (!$viewobj->quizhasquestions) {
             if ($viewobj->preventmessages) {
                 $viewobj->buttontext = '';
             } else if ($viewobj->numattempts == 0) {
-                $viewobj->buttontext = get_string('attemptquiznow', 'quiz');
+                //$viewobj->buttontext = get_string('attemptquiznow', 'quiz');
+                $viewobj->buttontext = 'Attempt exam now';
             } else {
-                $viewobj->buttontext = get_string('reattemptquiz', 'quiz');
+                //$viewobj->buttontext = get_string('reattemptquiz', 'quiz');
+                $viewobj->buttontext = 'Re-attempt exam now';
             }
 
         } else if ($canpreview) {
-            $viewobj->buttontext = get_string('previewquiznow', 'quiz');
+            //$viewobj->buttontext = get_string('previewquiznow', 'quiz');
+            $viewobj->buttontext = 'Preview exam now';
         }
     }
 
