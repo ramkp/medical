@@ -363,6 +363,7 @@ class Report extends Util {
         $card_payments_detailes=$this->get_card_payments_detailes($courseid, $from, $to);
         $cash_payments_detailes=$this->get_other_payment_report_data($courseid, $from, $to, 1);
         $cheque_payments_detailes=$this->get_other_payment_report_data($courseid, $from, $to, 2);
+        $grand_total=$this->card_sum+$this->cash_sum+$this->cheque_sum;
         $list.="<div class='container-fluid'>";
         $list.="<div class='span10'>
 
@@ -381,7 +382,7 @@ class Report extends Util {
                         <div class='tab-pane active' id='option1'>
 
                             <h3>Card payments - $$this->card_sum - <a href='http://".$_SERVER['SERVER_NAME']."/lms/custom/reports/files/".$this->card_report_csv_file."' target='_blank'>Export to CSV</a></h3>
-
+							<h5>Grand total (card payments, cash and cheque payments) - $$grand_total</h5>
                             <p>$card_payments_detailes</p>
 
                         </div>                    

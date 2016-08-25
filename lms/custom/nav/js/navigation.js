@@ -2206,10 +2206,7 @@ $(document).ready(function () {
     $("#prices").click(function (event) {
         get_price_items_from_category(event.target.id);
     });
-    $("#FAQ").click(function (event) {
-        update_navigation_status__menu('FAQ');
-        get_faq_edit_page();
-    });
+    
     $("#index").click(function (event) {
         update_navigation_status__menu('Index page');
         get_index_page();
@@ -2369,7 +2366,16 @@ $(document).ready(function () {
         });
     });
 
-
+    $("#faq").click(function() {
+		console.log('FAQ function ...');
+		update_navigation_status__menu('FAQ');
+		var url = "/lms/custom/faq/get_faq_page.php";
+		$.post(url, {
+			id : 1
+		}).done(function(data) {
+			$('#region-main').html(data);
+		});
+	});
 
     /************************************************************************
      * 
@@ -2483,6 +2489,110 @@ $(document).ready(function () {
 
     $("body").click(function (event) {
         console.log('Element clicked: ' + event.target.id);
+        
+        if (event.target.id.indexOf("faq_edit_") >= 0) {
+			var id = event.target.id.replace("faq_edit_", "");
+			console.log('ID '+id);
+			    var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+	            $.getScript(js_url).done(function () {
+	                      	var url = "https://" + domain + "/lms/custom/faq/get_faq_edit_page.php";
+	                        var request = {id:id};
+	                        $.post(url, request).done(function (data) {
+	                            //console.log('Server data ...' + data);
+	                        	$("body").append(data);
+	                            $("#myModal").modal('show');
+	                        });
+	                    }).fail(function () {
+	                        console.log('Failed to load bootstrap.min.js');
+	                    });
+	        
+		 }
+        
+        if (event.target.id=='cancel_faq_edit') {
+        	$("#myModal").remove();
+            dialog_loaded = false;
+        }
+        
+        if (event.target.id=='faq_add') {
+        	console.log('FAQ add ....');
+        	var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url).done(function () {
+                      	var url = "https://" + domain + "/lms/custom/faq/faq_add.php";
+                        var request = {id:id};
+                        $.post(url, request).done(function (data) {
+                            //console.log('Server data ...' + data);
+                        	$("body").append(data);
+                            $("#myModal").modal('show');
+                        });
+                    }).fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
+        	
+        }
+        
+        if (event.target.id=='add_faq') {
+        	var q=$('#q').val();
+        	var a=$('#a').val();
+        	var catid=$('#faq_categories').val();
+        	console.log('CATID: '+catid);
+        	if (catid>0) {
+        		if (q!='' && a!='') {
+            		var url = "/lms/custom/faq/add_faq.php";
+            		$("[data-dismiss=modal]").trigger({type: "click"});
+            		var request = {q : q, a:a, catid:catid};
+    				$.post(url, request).done(function(data) {
+    					console.log('Server response ...'+data);
+    					var url = "/lms/custom/faq/get_faq_page.php";
+    					$.post(url, {id : 1}).done(function(data) {
+    						$('#region-main').html(data);
+    					});
+    				});
+            	} // end if q!='' && a!=''
+            	else {
+            		$('#faq_err').html('Please provide FAQ question and answer');
+            	}
+        	} // end if catid>0
+        	else {
+        		$('#faq_err').html('Please select category');
+        	}
+        	
+        	
+        }
+        
+        
+        
+        if (event.target.id=='update_faq') {
+        	var id=$('#id').val();
+        	var q=$('#q').val();
+        	var a=$('#a').val();
+        	var url = "/lms/custom/faq/update_faq.php";
+			var request = {id : id, q:q, a:a};
+			$.post(url, request).done(function(data) {
+				update_navigation_status__menu('FAQ');
+				var url = "/lms/custom/faq/get_faq_page.php";
+				$.post(url, {id : 1}).done(function(data) {
+					$("#myModal").remove();
+		            dialog_loaded = false;
+					$('#region-main').html(data);
+				});  
+			});
+        	
+        }
+        
+
+		if (event.target.id.indexOf("faq_del_") >= 0) {
+			var id = event.target.id.replace("faq_del_", "");
+			if (confirm('Delete this item?')) {
+				var url = "/lms/custom/faq/delete_faq.php";
+				var request = {id : id};
+				$.post(url, request).done(function(data) {
+						var url = "/lms/custom/faq/get_faq_page.php";
+						$.post(url, {id : 1}).done(function(data) {
+							$('#region-main').html(data);
+						});
+					});
+			}
+		}
 
         if (event.target.id.indexOf("permission_") >= 0) {
             var moduleid = event.target.id.replace("permission_", "");
@@ -2616,7 +2726,19 @@ $(document).ready(function () {
 
 
     $('body').on('change', 'select', function (event) {
-        if (event.target.id == 'camapaign') {
+        
+    	if (event.target.id == 'faq_categories') {
+			var id = $('#faq_categories').val();
+			if (id > 0) {
+				var url = "/lms/custom/faq/get_faq_by_category.php";
+				var request = {id : id };
+				$.post(url, request).done(function(data) {
+					$('#faq_container').html(data);
+			    });
+			} // end if id>0
+		}
+    	
+    	if (event.target.id == 'camapaign') {
             var id = $('#camapaign').val();
             console.log('Campaign id: ' + id);
             var url = "/lms/custom/promotion/get_campaign_stat.php";

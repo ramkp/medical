@@ -1170,6 +1170,7 @@ class Students {
                 $coursename = $this->get_course_name($payment->courseid);
                 $date = date('m-d-Y', $payment->pdate);
                 $userdata = $this->get_user_data($payment->userid);
+                $workshop_data=$this->get_student_workshops_data($payment->userid);
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
                 $amount = $payment->psum;
@@ -1181,6 +1182,15 @@ class Students {
                     $cc_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename - Certificate Renew Payment</td>";
                 }
                 $cc_list.="</tr>";
+                
+                $cc_list.="<tr>";
+                $cc_list.="<td style='padding:15px;'>Workshop location</td><td style='padding:15px;'>".$workshop_data['location']."</td>";
+                $cc_list.="</tr>";
+                
+                $cc_list.="<tr>";
+                $cc_list.="<td style='padding:15px;'>Workshop date</td><td style='padding:15px;'>".$workshop_data['date']."</td>";
+                $cc_list.="</tr>";
+                
                 $cc_list.="<tr>";
                 $cc_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
                 $cc_list.="</tr>";
@@ -1213,9 +1223,20 @@ class Students {
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
                 $amount = $payment->psum;
+                $workshop_data=$this->get_student_workshops_data($payment->userid);
+                
                 $refund_list.="<tr>";
                 $refund_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
                 $refund_list.="</tr>";
+                
+                $refund_list.="<tr>";
+                $refund_list.="<td style='padding:15px;'>Workshop location</td><td style='padding:15px;'>".$workshop_data['location']."</td>";
+                $refund_list.="</tr>";
+                
+                $refund_list.="<tr>";
+                $refund_list.="<td style='padding:15px;'>Workshop date</td><td style='padding:15px;'>".$workshop_data['date']."</td>";
+                $refund_list.="</tr>";
+                
                 $refund_list.="<tr>";
                 $refund_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
                 $refund_list.="</tr>";
@@ -1250,13 +1271,16 @@ class Students {
                   echo "</pre><br>";
                  * 
                  */
-
+            	
+            	
                 $coursename = $this->get_course_name($payment->courseid);
                 $date = date('m-d-Y', $payment->i_pdate);
                 $userdata = $this->get_user_data($payment->userid);
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
                 $amount = $payment->i_sum;
+                $workshop_data=$this->get_student_workshops_data($payment->userid);
+                
                 $in_list.="<tr>";
                 if ($amount != $renew_fee) {
                     $in_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
@@ -1265,6 +1289,15 @@ class Students {
                     $in_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename - Certificate Renew Payment</td>";
                 } // end else
                 $in_list.="</tr>";
+                
+                $in_list.="<tr>";
+                $in_list.="<td style='padding:15px;'>Workshop location</td><td style='padding:15px;'>".$workshop_data['location']."</td>";
+                $in_list.="</tr>";
+                
+                $in_list.="<tr>";
+                $in_list.="<td style='padding:15px;'>Workshop date</td><td style='padding:15px;'>".$workshop_data['date']."</td>";
+                $in_list.="</tr>";
+                
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
                 $in_list.="</tr>";
@@ -1306,6 +1339,8 @@ class Students {
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
                 $amount = $payment->psum;
+                $workshop_data=$this->get_student_workshops_data($payment->userid);
+                
                 $pp_list.="<tr>";
                 if ($amount != $renew_fee) {
                     $pp_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
@@ -1314,6 +1349,15 @@ class Students {
                     $pp_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename - Certificate Renew Payment</td>";
                 } // end else
                 $pp_list.="</tr>";
+                
+                $pp_list.="<tr>";
+                $pp_list.="<td style='padding:15px;'>Workshop location</td><td style='padding:15px;'>".$workshop_data['location']."</td>";
+                $pp_list.="</tr>";
+                
+                $pp_list.="<tr>";
+                $pp_list.="<td style='padding:15px;'>Workshop date</td><td style='padding:15px;'>".$workshop_data['date']."</td>";
+                $pp_list.="</tr>";
+                
                 $pp_list.="<tr>";
                 $pp_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
                 $pp_list.="</tr>";
@@ -1358,6 +1402,29 @@ class Students {
 
         $list.="</table>";
         return $list;
+    }
+    
+    function get_student_workshops_data ($userid) {
+    	date_default_timezone_set('Pacific/Wallis');
+    	$query="select * from mdl_scheduler_appointment where studentid=$userid";
+    	$num = $this->db->numrows($query);
+    	if ($num > 0) {
+    		$result = $this->db->query($query);
+    		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    			$slotid=$row['slotid'];
+    		}
+    		$query="select * from mdl_scheduler_slots where id=$slotid";
+    		$result = $this->db->query($query);
+    		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    			$location=$row['appointmentlocation'];
+    			$date=date('m-d-Y', $row['starttime']);
+    		}
+    		$data=array('location'=>$location, 'date'=>$date);
+    	} // end if $num > 0
+    	else {
+    		$data=array('location'=>'N/A', 'date'=>'N/A');
+    	}
+    	return $data;
     }
 
     function get_report_payments($type) {
