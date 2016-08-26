@@ -169,9 +169,25 @@ class Mailer {
         </tr>";
 
         if (property_exists($user, 'payment_amount')) {
-            $list.="<tr style='background-color:#F5F5F5;'>
+        	date_default_timezone_set("America/New_York");
+        	$date=date('m-d-Y h:i:s', time());
+        	
+        	$list.="<tr style='background-color:#F5F5F5;'>
             <td>Payment status: </td><td>Paid by card: $$user->payment_amount</td>
             </tr>";
+            
+            $list.="<tr style='background-color:#F5F5F5;'>";
+            $list.="<td>Credit Card:</td><td>XXXX XXXX XXXX XXXX</td>";
+            $list.="</tr>";
+            
+            $list.="<tr>";
+            $list.="<td>Expiry date: </td><td>$user->card_month$user->card_year</td>";
+            $list.="</tr>";
+            
+            $list.="<tr style='background-color:#F5F5F5;'>";
+            $list.="<td>Order Date:</td><td>$date</td>";
+            $list.="</tr>";
+            
         } // end if $payment_amount != null
 
         $list.="<tr style='background-color:#F5F5F5;'>

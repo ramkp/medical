@@ -79,6 +79,10 @@ class Programs extends CI_Controller {
             case "phlebotomy-technician-certification":
                 $courseid = 57;
                 break;
+            case "cpr-program":
+                $courseid = 58;
+                break;
+                
         }
 
         $program_items = $this->program_model->get_schedule_page($courseid);
