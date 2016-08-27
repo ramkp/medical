@@ -175,6 +175,10 @@ class Mailer {
         	$list.="<tr style='background-color:#F5F5F5;'>
             <td>Payment status: </td><td>Paid by card: $$user->payment_amount</td>
             </tr>";
+        
+        	$list.="<tr>";
+        	$list.="<td>Card Holder:</td><td>$user->card_holder</td>";
+        	$list.="</tr>";
             
             $list.="<tr style='background-color:#F5F5F5;'>";
             $list.="<td>Credit Card:</td><td>XXXX XXXX XXXX XXXX</td>";
