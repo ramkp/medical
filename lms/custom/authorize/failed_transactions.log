@@ -1,0 +1,401 @@
+08-19-2016 12:47:44
+Array
+(
+    [fname] => John
+    [lname] => Connair
+    [case] => Terminator
+)
+08-19-2016 12:47:44
+Array
+(
+    [fname] => AAAAAAAAA
+    [lname] => Bbbbbbbbbbbbb
+    [case] => Josher.kopo
+)
+08-19-2016 07:13:48
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => Y
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => P
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 20142442516
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => 939EF5F7A9410C86E01FCFDB7C26E773
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX3073
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => Visa
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-19-2016 07:17:45
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => Y
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => P
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 20142457233
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => 2263E1F832C774C7692B6EB3F7839BB8
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX3073
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => Visa
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-19-2016 09:15:09
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => U
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => P
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 20142873717
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => EE27BA5102BE85D8FBE5B05C6555DCF5
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX4095
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => Visa
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-19-2016 09:19:41
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => U
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => P
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 20142887649
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => 61C4A5CD6FF68621245FFD131DE83B05
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX4095
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => Visa
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-19-2016 09:34:03
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => Y
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 20142932161
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => 397B7D6A0DFA7AA0CC99379253681842
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX8794
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => MasterCard
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-20-2016 11:21:04
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => Y
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => P
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 20144049110
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => 2CE8AF0FAADB9AFF327604A0694AF908
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX5315
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => Visa
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-21-2016 01:14:16
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => Y
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => P
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 20145997768
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => D130B54B8B6485B725FDEB722C3DE8B5
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX5357
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => Visa
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-22-2016 07:48:02
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => Y
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 20149644338
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => BD46C07C82FDF4267BFA2F8EE154F998
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX5519
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => MasterCard
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-26-2016 04:33:44
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => Y
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => P
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 8613203237
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => E6F47AD14B36D951880898827FB367BD
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX1109
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => Visa
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-26-2016 05:42:44
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-26-2016 07:28:52
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => Y
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => P
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 8613499008
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => E11B9AFE3E77FE8EFFCDDBFE76C387E6
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX1109
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => Visa
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
+08-28-2016 01:34:50
+net\authorize\api\contract\v1\TransactionResponseType Object
+(
+    [responseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 2
+    [rawResponseCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [authCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 000000
+    [avsResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => Y
+    [cvvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => P
+    [cavvResultCode:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transId:net\authorize\api\contract\v1\TransactionResponseType:private] => 8615895956
+    [refTransID:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [transHash:net\authorize\api\contract\v1\TransactionResponseType:private] => 07B24113D2B30D71B07F7B495701589B
+    [testRequest:net\authorize\api\contract\v1\TransactionResponseType:private] => 0
+    [accountNumber:net\authorize\api\contract\v1\TransactionResponseType:private] => XXXX1817
+    [accountType:net\authorize\api\contract\v1\TransactionResponseType:private] => Visa
+    [splitTenderId:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [prePaidCard:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [messages:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [errors:net\authorize\api\contract\v1\TransactionResponseType:private] => Array
+        (
+            [0] => net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType Object
+                (
+                    [errorCode:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => 2
+                    [errorText:net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType:private] => This transaction has been declined.
+                )
+
+        )
+
+    [splitTenderPayments:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [userFields:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [shipTo:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+    [secureAcceptance:net\authorize\api\contract\v1\TransactionResponseType:private] => 
+)
