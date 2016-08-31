@@ -1168,7 +1168,7 @@ class Students {
             $cc_list.="</th>";
             foreach ($card_payments as $payment) {
                 $coursename = $this->get_course_name($payment->courseid);
-                $date = date('m-d-Y', $payment->pdate);
+                $date = date('m-d-Y h:i:s', $payment->pdate);
                 $userdata = $this->get_user_data($payment->userid);
                 $workshop_data=$this->get_student_workshops_data($payment->userid);
                 $firstname = $userdata->firstname;
@@ -1197,9 +1197,9 @@ class Students {
                 $cc_list.="<tr>";
                 $cc_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
                 $cc_list.="</tr>";
-                //$cc_list.="<tr>";
-                //$cc_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
-                //$cc_list.="</tr>";
+                $cc_list.="<tr>";
+                $cc_list.="<td style='padding:15px;'>Transaction date:</td><td style='padding:15px;'>$date</td>";
+                $cc_list.="</tr>";
                 $cc_list.="<tr>";
                 $cc_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $cc_list.="</tr>";
@@ -1218,7 +1218,7 @@ class Students {
             $refund_list.="</th>";
             foreach ($refund_payments as $payment) {
                 $coursename = $this->get_course_name($payment->courseid);
-                $date = date('m-d-Y', $payment->pdate);
+                $date = date('m-d-Y h:i:s', $payment->pdate);
                 $userdata = $this->get_user_data($payment->userid);
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
@@ -1243,9 +1243,9 @@ class Students {
                 $refund_list.="<tr>";
                 $refund_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>-$$amount</td>";
                 $refund_list.="</tr>";
-                //$refund_list.="<tr>";
-                //$refund_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
-                //$refund_list.="</tr>";
+                $refund_list.="<tr>";
+                $refund_list.="<td style='padding:15px;'>Transaction date:</td><td style='padding:15px;'>$date</td>";
+                $refund_list.="</tr>";
                 $refund_list.="<tr>";
                 $refund_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $refund_list.="</tr>";
@@ -1274,7 +1274,7 @@ class Students {
             	
             	
                 $coursename = $this->get_course_name($payment->courseid);
-                $date = date('m-d-Y', $payment->i_pdate);
+                $date = date('m-d-Y h:i:s', $payment->i_pdate);
                 $userdata = $this->get_user_data($payment->userid);
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
@@ -1304,9 +1304,9 @@ class Students {
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
                 $in_list.="</tr>";
-                //$in_list.="<tr>";
-                //$in_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
-                //$in_list.="</tr>";
+                $in_list.="<tr>";
+                $in_list.="<td style='padding:15px;'>Transaction date:</td><td style='padding:15px;'>$date</td>";
+                $in_list.="</tr>";
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $in_list.="</tr>";
@@ -1334,7 +1334,7 @@ class Students {
                  */
 
                 $coursename = $this->get_course_name($payment->courseid);
-                $date = date('m-d-Y', $payment->pdate);
+                $date = date('m-d-Y h:i:s', $payment->pdate);
                 $userdata = $this->get_user_data($payment->userid);
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
@@ -1364,9 +1364,9 @@ class Students {
                 $pp_list.="<tr>";
                 $pp_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
                 $pp_list.="</tr>";
-                //$pp_list.="<tr>";
-                //$pp_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
-                //$pp_list.="</tr>";
+                $pp_list.="<tr>";
+                $pp_list.="<td style='padding:15px;'>Transaction date:</td><td style='padding:15px;'>$date</td>";
+                $pp_list.="</tr>";
                 $pp_list.="<tr>";
                 $pp_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $pp_list.="</tr>";
