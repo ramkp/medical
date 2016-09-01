@@ -12,6 +12,7 @@ class Report extends Util {
     public $card_sum = 0;
     public $cash_sum = 0;
     public $cheque_sum = 0;
+    public $refund_sum=0;
     public $program_sum = 0;
     public $cert_path;
     public $courseid;
@@ -21,6 +22,7 @@ class Report extends Util {
     public $card_report_csv_file;
     public $cash_report_scv_file;
     public $cheque_report_csv_file;
+    public $refund_report_csv_file;
 
     function __construct() {
         parent::__construct();
@@ -29,6 +31,7 @@ class Report extends Util {
         $this->card_report_csv_file='card_payments.csv';
         $this->cash_report_scv_file='cash_payments_csv';
         $this->cheque_report_csv_file='cheque_payment.csv';
+        $this->refund_report_csv_file='refund_payments.csv';
         
     }
 
@@ -303,7 +306,7 @@ class Report extends Util {
                     . "and refunded=0 "
                     . "order by pdate desc ";
         } // end else
-        //echo "<br/>Query: $query<br/>";
+        
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -314,9 +317,34 @@ class Report extends Util {
                 } // end if $user_status==0
             } // end while
        } // end if $num > 0
-        
-        //4. Get partial cash payments
-        if ($courseid > 0) {
+       
+       // 2. Get refund payments
+       if ($courseid > 0) {
+       	$query = "select * from mdl_card_payments "
+       			. "where courseid=$courseid and refunded=1 "
+       			. "and pdate between $unix_from and $unix_to "
+       			. "order by pdate desc ";
+       } // end if $courseid>0
+       else {
+       	$query = "select * from mdl_card_payments "
+       			. "where pdate between $unix_from and $unix_to "
+       			. "and refunded=1 "
+       					. "order by pdate desc ";
+       } // end else
+       
+       $num = $this->db->numrows($query);
+       if ($num > 0) {
+       	$result = $this->db->query($query);
+       	while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+       		$user_status = $this->is_user_deleted($row['userid']);
+       		if ($user_status == 0) {
+       			$this->refund_sum = $this->refund_sum + $row['psum'];
+       		} // end if $user_status==0
+       	} // end while
+       } // end if $num > 0
+  
+       //3. Get partial cash payments
+       if ($courseid > 0) {
             $query = "select * from mdl_partial_payments "
                     . "where courseid=$courseid "
                     . "and ptype=1 "
@@ -337,7 +365,8 @@ class Report extends Util {
                 }
             } // end while
         } // end if $num > 0
-        //5. Get partial cheque payments 
+        
+        //4. Get partial cheque payments 
         if ($courseid > 0) {
             $query = "select * from mdl_partial_payments "
                     . "where courseid=$courseid "
@@ -363,6 +392,8 @@ class Report extends Util {
         $card_payments_detailes=$this->get_card_payments_detailes($courseid, $from, $to);
         $cash_payments_detailes=$this->get_other_payment_report_data($courseid, $from, $to, 1);
         $cheque_payments_detailes=$this->get_other_payment_report_data($courseid, $from, $to, 2);
+        $refund_payment_detailes=$this->get_refund_payments_detailes($courseid, $from, $to);
+        
         $grand_total=$this->card_sum+$this->cash_sum+$this->cheque_sum;
         $list.="<div class='container-fluid'>";
         $list.="<div class='span10'>
@@ -374,6 +405,8 @@ class Report extends Util {
                         <li><a href='#option2' data-toggle='tab'>Cash payments</a></li>
 
                         <li><a href='#option3' data-toggle='tab'>Cheque payments</a></li>
+                        
+                        <li><a href='#option4' data-toggle='tab'>Refund payments</a></li>
 
                     </ul>                    
 
@@ -401,6 +434,14 @@ class Report extends Util {
                             <p>$cheque_payments_detailes</p> 
 
                         </div>
+                        
+						<div class='tab-pane' id='option4'>
+
+                            <h3>Refund payments - $$this->refund_sum - <a href='http://".$_SERVER['SERVER_NAME']."/lms/custom/reports/files/".$this->refund_report_csv_file."' target='_blank'>Export to CSV</a></h3>
+                            <p>$refund_payment_detailes</p> 
+
+                        </div>
+                        
         		    </div>
                 </div>
             </div>";
@@ -784,6 +825,80 @@ class Report extends Util {
     	return $list;
     	 
     }
+    
+    function get_refund_payments_detailes($courseid, $from, $to) {
+    	date_default_timezone_set('Pacific/Wallis');
+    	$payments = array();
+    	$this->courseid = $courseid;
+    	$this->from = $from;
+    	$this->to = $to;
+    	$list = "";
+    	 
+    	if ($from == $to) {
+    		$timestamp = time();
+    		$unix_from = strtotime("midnight", $timestamp);
+    		$unix_to = strtotime("tomorrow", $unix_from) - 1;
+    	} // end if $from==$to
+    	else {
+    		$unix_from = strtotime($from);
+    		$unix_to = strtotime($to) + 86400;
+    	} // end else
+    	//1. Get partial payments
+    	if ($courseid > 0) {
+    		$query = "select * from mdl_card_payments "
+    				. "where courseid=$courseid and refunded=1 "
+    				. "and pdate between $unix_from and $unix_to "
+    				. "order by pdate desc ";
+    	} // end if $courseid>0
+    	else {
+    		$query = "select * from mdl_card_payments "
+    				. "where pdate between $unix_from and $unix_to "
+    				. "and refunded=1 "
+    						. "order by pdate desc ";
+    	} // end else
+    	//echo "<br/>Query: $query<br/>";
+    	$num = $this->db->numrows($query);
+    	if ($num > 0) {
+    		$result = $this->db->query($query);
+    		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    			$user_status = $this->is_user_deleted($row['userid']);
+    			if ($user_status == 0) {
+    				$payment = new stdClass();
+    				foreach ($row as $key => $value) {
+    					$payment->$key = $value;
+    				}
+    				$payments[] = $payment;
+    			} // end if $user_status==0
+    		} // end while
+    	
+    		$csv_file=$this->create_csv_file($this->refund_report_csv_file, $payments);
+    		$list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+    		$list.="<span class='span3'>User</span>";
+    		$list.="<span class='span3'>Program applied</span>";
+    		$list.="<span class='span3'>Payment</span>";
+    		$list.="<span class='span3'>Date</span>";
+    		$list.="</div>";
+    		 
+    		foreach ($payments as $payment) {
+    			//echo "Inside payments ...<br>";
+    			$date = date('m-d-Y', $payment->pdate);
+    			$coursename = $this->get_course_name($payment->courseid);
+    			$userdata = $this->get_user_details($payment->userid);
+    			$list.="<div class='container-fluid' style='text-align:left;'>";
+    			$list.="<span class='span3'><a href='https://medical2.com/lms/user/profile.php?id=$payment->userid' target='_blank'>$userdata->firstname $userdata->lastname</a></span>";
+    			$list.="<span class='span3'>$coursename</span>";
+    			$list.="<span class='span3'>$$payment->psum</span>";
+    			$list.="<span class='span3'>$date</span>";
+    			$list.="</div>";
+    		} // end for
+    	} // end if $num > 0
+    	else {
+    		$list.="<div class='container-fluid' style='text-align:center;'>";
+    		$list.="<span class='span12'>No data found</span>";
+    		$list.="</div>";
+    	}
+    	return $list;
+     }
 
     function get_other_payments_report($type) {
 
