@@ -1168,7 +1168,7 @@ class Students {
             $cc_list.="</th>";
             foreach ($card_payments as $payment) {
                 $coursename = $this->get_course_name($payment->courseid);
-                $date = date('m-d-Y h:i:s', $payment->pdate);
+                $date = date('m-d-Y h:i:s', ($payment->pdate-86400));
                 $userdata = $this->get_user_data($payment->userid);
                 $workshop_data=$this->get_student_workshops_data($payment->userid);
                 $firstname = $userdata->firstname;
@@ -1218,7 +1218,7 @@ class Students {
             $refund_list.="</th>";
             foreach ($refund_payments as $payment) {
                 $coursename = $this->get_course_name($payment->courseid);
-                $date = date('m-d-Y h:i:s', $payment->pdate);
+                $date = date('m-d-Y h:i:s', ($payment->pdate-86400));
                 $userdata = $this->get_user_data($payment->userid);
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
@@ -1274,7 +1274,7 @@ class Students {
             	
             	
                 $coursename = $this->get_course_name($payment->courseid);
-                $date = date('m-d-Y h:i:s', $payment->i_pdate);
+                $date = date('m-d-Y h:i:s', ($payment->i_pdate-86400));
                 $userdata = $this->get_user_data($payment->userid);
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
@@ -1334,7 +1334,7 @@ class Students {
                  */
 
                 $coursename = $this->get_course_name($payment->courseid);
-                $date = date('m-d-Y h:i:s', $payment->pdate);
+                $date = date('m-d-Y h:i:s', ($payment->pdate-86400));
                 $userdata = $this->get_user_data($payment->userid);
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;

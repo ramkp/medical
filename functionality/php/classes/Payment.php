@@ -1033,7 +1033,7 @@ class Payment {
     function add_payment_to_db($card) {
         //$card_last_four = substr($card->card_no, -4);
         // To make refund we need to store card no - base64 encode
-    	date_default_timezone_set("America/New_York");
+    	//date_default_timezone_set("America/New_York");
         $exp_date = $card->card_month . $card->card_year;
         $query = "insert into mdl_card_payments "
                 . "(userid,"
