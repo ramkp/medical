@@ -17,6 +17,7 @@ class Util {
     public $course;
     public $student_role = 5;
     public $editor_path;
+    public $json_path;
 
     function __construct() {
         global $USER, $COURSE;
@@ -26,6 +27,45 @@ class Util {
         $this->course = $COURSE;
         $this->host = $_SERVER['SERVER_NAME'];
         $this->editor_path = 'https://' . $_SERVER['SERVER_NAME'] . "/lms/editor/";
+        $this->json_path=$_SERVER['DOCUMENT_ROOT'].'/lms/custom/utils/data.json';
+        //$this->create_typehead_data();
+    }
+
+    function create_typehead_data() {
+        $courses = array();
+        $firstname = array();
+        $lastname = array();
+        $emails = array();
+
+        $query = "select * from mdl_course where visible=1";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courses[] = $row['fullname'];
+        }
+
+        $query = "select * from mdl_user where deleted=0";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $lastname[] = $row['lastname'];
+            $firstname[] = $row['firstname'];
+            $emails[] = $row['email'];
+        }
+
+        $data = array_merge($lastname, $firstname, $emails, $courses);
+        
+        echo "<pre>";
+        print_r($data);
+        echo "</pre>";
+        
+        $json_data=json_encode($data);
+        
+        echo "<br>----------------------------------------------<br>";
+        
+        echo "<pre>";
+        print_r($json_data);
+        echo "</pre>";
+        
+        file_put_contents($this->json_path, $json_data);
     }
 
     function get_screen_resolution() {
