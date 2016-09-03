@@ -167,10 +167,10 @@ class Partial extends Util {
         $list = "";
         if ($toolbar == true) {
             $add_payment_block = $this->get_add_partial_payment_page();
-
+          
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span2'>Search</span>";
-            $list.="<span class='span2'><input type='text' id='search_partial' style='width:125px;' /></span>";
+            $list.="<span class='span2'><input type='text' id='search_partial' class='typehead' style='width:125px;' /></span>";
             $list.="<span class='span3'><button class='btn btn-primary' id='search_partial_button'>Search</button></span>";
             $list.="<span class='span2'><button class='btn btn-primary' id='clear_partial_button'>Clear filter</button></span>";
             $list.="</div>";
@@ -182,6 +182,10 @@ class Partial extends Util {
             $list.="<br><div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span12' id='add_payment_container'>$add_payment_block</span>";
             $list.="</div>";
+            
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span12' id='partial_err'></span>";
+            $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span12'><hr></span>";
@@ -190,6 +194,10 @@ class Partial extends Util {
 
         if (count($partials) > 0) {
             $list.="<div class='container-fluid' style='text-align:center;' id='partial_container'>";
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span12' style='font-weight:bold;'>Total items: ".count($partials)."</span>";
+            $list.="</div>";
+            
             foreach ($partials as $partial) {
                 $user_data = $this->get_user_details($partial->userid);
                 $coursename = $this->get_course_name($partial->courseid);
