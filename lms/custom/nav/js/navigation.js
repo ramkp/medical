@@ -2544,7 +2544,8 @@ $(document).ready(function () {
     });
 
     $("body").click(function (event) {
-        //console.log('Element clicked: ' + event.target.id);
+
+        console.log('Element clicked: ' + event.target.id);
 
         if (event.target.id.indexOf("faq_edit_") >= 0) {
             var id = event.target.id.replace("faq_edit_", "");
@@ -2563,6 +2564,8 @@ $(document).ready(function () {
             });
 
         }
+
+
 
         if (event.target.id == 'cancel_faq_edit') {
             $("#myModal").remove();
@@ -2633,6 +2636,18 @@ $(document).ready(function () {
                 });
             });
 
+        }
+
+        if (event.target.id.indexOf("del_slot_") >= 0) {
+            var id = event.target.id.replace("del_slot_", "");
+            console.log('Slot id: ' + id);
+            if (confirm('Delete current workshop?')) {
+                var url = "/lms/custom/schedule/delete_workskhop.php";
+                $.post(url, {id: id}).done(function (data) {
+                    console.log('Server response: ' + data);
+                    document.location.reload();
+                });
+            }
         }
 
 

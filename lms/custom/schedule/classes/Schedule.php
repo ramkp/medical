@@ -229,11 +229,19 @@ class Schedule extends Util {
             $list.="<div id='schedule_container'>";
             foreach ($slots as $slot) {
                 $slotid = $slot->id;
+                $has_students = $this->is_has_students($slotid);
                 $editactionurl = "https://medical2.com/lms/mod/scheduler/view.php?id=" . $modid . "&what=updateslot&subpage=myappointments&offset=-1&sesskey=" . sesskey() . "&slotid=" . $slotid . "";
                 $addr_array = explode("/", $slot->appointmentlocation);
                 $addr_block = $addr_array[1] . " , " . $addr_array[0];
                 $list.="<div class='panel panel-default'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a><br> $slot->notes</h5></div>";
+
+                if ($has_students > 0) {
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a><br> $slot->notes</h5></div>";
+                } // end if $has_students>0
+                else {
+                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;<a href='#' onClick='return false;'><img id='del_slot_$slotid' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete'></a><br> $slot->notes</h5></div>";
+                } // end else 
+
                 $list.="<div class='panel-body' id='$slotid'>";
                 $slot_students = $this->get_slot_students($slot->id);
                 $courseid = $this->get_course_id($slot->id);
@@ -280,6 +288,13 @@ class Schedule extends Util {
             $list.="</div>";
         }
         return $list;
+    }
+
+    function is_slot_has_has_students($slotid) {
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid=$slotid";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
     function get_slots_by_date($schedulerid, $start, $end) {
@@ -701,6 +716,13 @@ class Schedule extends Util {
         } // end while
         echo "<br>Total existed ws: " . $exists . "<br>";
         echo "<br>Total non-exists: " . $non_exists . "<br>";
+    }
+    
+    function delete_workshop($id) {
+        $query="delete from mdl_scheduler_slots where id=$id";
+        //echo "Query: ".$query."<br>";
+        $this->db->query($query);
+        echo "ok";
     }
 
 }
