@@ -36,36 +36,25 @@ class Util {
         $firstname = array();
         $lastname = array();
         $emails = array();
-
+		$users=array();
+        
         $query = "select * from mdl_course where visible=1";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $courses[] = $row['fullname'];
+            $courses[] = mb_convert_encoding($row['fullname'], 'UTF-8');
         }
 
         $query = "select * from mdl_user where deleted=0";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $lastname[] = $row['lastname'];
-            $firstname[] = $row['firstname'];
-            $emails[] = $row['email'];
+            $lastname[] = mb_convert_encoding($row['lastname'], 'UTF-8');
+            $firstname[] = mb_convert_encoding($row['firstname'], 'UTF-8');
+            $users[]=mb_convert_encoding($row['lastname'], 'UTF-8')." ".mb_convert_encoding($row['firstname'], 'UTF-8');
+            $emails[] = mb_convert_encoding($row['email'],'UTF-8');
         }
 
-        $data = array_merge($lastname, $firstname, $emails, $courses);
-        
-        echo "<pre>";
-        print_r($data);
-        echo "</pre>";
-        
-        $json_data=json_encode($data);
-        
-        echo "<br>----------------------------------------------<br>";
-        
-        echo "<pre>";
-        print_r($json_data);
-        echo "</pre>";
-        
-        file_put_contents($this->json_path, $json_data);
+        $data = array_merge($users, $emails, $courses);
+        file_put_contents($this->json_path, json_encode($data));
     }
 
     function get_screen_resolution() {

@@ -229,7 +229,7 @@ class Invoices extends Util {
         if ($toolbar == TRUE) {
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span2'>Search</span>";
-            $list.="<span class='span2'><input type='text' id='search_invoice_input' style='width:125px;' /></span>";
+            $list.="<span class='span2'><input type='text' id='search_invoice_input' class='typeahead’ autocomplete='off' spellcheck='false' style='width:125px;' /></span>";
             if ($paid == false) {
                 $list.="<span class='span3'><button class='btn btn-primary' id='search_open_invoice_user'>Search</button></span>";
                 $list.="<span class='span2'><button class='btn btn-primary' id='clear_open_invoice'>Clear filter</button></span>";
@@ -537,10 +537,11 @@ class Invoices extends Util {
 
     function search_invoice_users($item) {
         $users = array();
+        $data=explode(' ', $item);
+        $firstname=$data[1];
+        $lastname=$data[0];
         $query = "select id from mdl_user "
-                . "where firstname "
-                . "like '%$item%' "
-                . "or lastname like '%$item%' "
+                . "where (firstname='$firstname' and lastname='$lastname') "
                 . "or email like '%$item%' and deleted=0";
         $num = $this->db->numrows($query);
         if ($num > 0) {

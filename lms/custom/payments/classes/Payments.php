@@ -68,7 +68,7 @@ class Payments extends Util {
                 $list.="<div class='container-fluid' style='text-align:center;'>";
                 $list.="<span class='span2'>Search</span>";
                 $list.="<input type='hidden' id='ptype' value='$this->typeid'>";
-                $list.="<span class='span2'><input type='text' id='search_payment' style='width:125px;' /></span>";
+                $list.="<span class='span2'><input type='text' id='search_payment' class='typeahead' autocomplete='off' spellcheck='false' style='width:125px;' /></span>";
                 $list.="<span class='span3'><button class='btn btn-primary' id='search_payment_button'>Search</button></span>";
                 $list.="<span class='span2'><button class='btn btn-primary' id='clear_payment_button'>Clear filter</button></span>";
                 $list.="</div>";

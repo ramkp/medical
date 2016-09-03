@@ -35,30 +35,30 @@ echo "<script type = 'text/javascript' src = 'https://www.gstatic.com/charts/loa
 echo "<script type = 'text/javascript'>";
 echo "google.charts.load('current', {'packages': ['corechart']})";
 echo "</script>";
+
 echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
 echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
 echo"<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
-echo "<script src='https://cdnjs.cloudflare.com/ajax/libs/typeahead.js/0.11.1/typeahead.bundle.min.js'></script>";
+echo "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.js'></script>";
 
 ?>
 
 <script>
+
     /*
-     $(function () {
-     $('#fileupload').fileupload({
-     dataType: 'json',
-     done: function (e, data) {
-     $.each(data.result.files, function (index, file) {
-     $('<p/>').text(file.name).appendTo(document.body);
-     });
-     }
-     });
-     });
-     */
     $(function () {
         $("#start").datepicker();
         $("#end").datepicker();
     });
+    */
+
+    $(document).ready(function(){
+
+    	$("#start").datepicker();
+        $("#end").datepicker();
+
+      
+    }); // end of $(document).ready(function(){	
 
 </script>
 

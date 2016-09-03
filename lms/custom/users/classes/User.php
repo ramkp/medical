@@ -41,7 +41,7 @@ class User extends Util {
         if ($toolbar == true) {
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span2'>Search</span>";
-            $list.="<span class='span2'><input type='text' id='search_user_input' style='width:125px;' /></span>";
+            $list.="<span class='span2'><input type='text' id='search_user_input' class='typeahead' autocomplete='off' spellcheck='false' style='width:125px;' ></span>";
             $list.="<span class='span3'><button class='btn btn-primary' id='search_user'>Search</button></span>";
             $list.="<span class='span2'><button class='btn btn-primary' id='clear_user'>Clear filter</button></span>";
             $list.="</div>";

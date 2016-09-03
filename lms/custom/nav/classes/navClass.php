@@ -200,8 +200,10 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
+                                    <!--
                                     <li><a href='#' id='cash' title='Cash'>Cash payments</a></li>
                                     <li><a href='#' id='cheque' title='Cheque'>Cheque payments</a></li>
+                                    -->
                                     <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
                                     <li><a href='#' id='refund' title='Refund'>Refund payments</a></li>
                                     <li><a href='#' id='refund_pwd_link' title='Refund password'>Refund password</a></li>

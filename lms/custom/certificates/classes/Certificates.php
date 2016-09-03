@@ -96,7 +96,7 @@ class Certificates extends Util {
                 $create_cert_block = $this->get_create_box();
                 $list.="<div class='container-fluid' style='text-align:center;'>";
                 $list.="<span class='span2'>Search</span>";
-                $list.="<span class='span2'><input type='text' id='search_certificate' style='width:125px;' /></span>";
+                $list.="<span class='span2'><input type='text' id='search_certificate' class='typeahead' style='width:125px;' autocomplete='off' spellcheck='false' /></span>";
                 $list.="<span class='span3'><button class='btn btn-primary' id='search_certificate_button'>Search</button></span>";
                 $list.="<span class='span2'><button class='btn btn-primary' id='clear_certificate_button'>Clear filter</button></span>";
                 $list.="</div>";

@@ -4,6 +4,8 @@ $(document).ready(function () {
     var domain = 'medical2.com';
     var dialog_loaded;
     console.log("ready!");
+    
+    
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
         $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='https://" + domain + "/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
@@ -300,6 +302,12 @@ $(document).ready(function () {
         var url = "/lms/custom/certificates/list.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+            
+            $.get('/lms/custom/utils/data.json', function(data){
+    			$("#search_certificate").typeahead({ source:data , items: 24});
+    		},'json');
+            
+            
         });
     }
 
@@ -488,6 +496,11 @@ $(document).ready(function () {
         var url = "/lms/custom/invoices/open_invoices.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+            
+            $.get('/lms/custom/utils/data.json', function(data){
+    			$("#search_invoice_input").typeahead({ source:data , items: 24});
+    		},'json');
+            
         });
     }
 
@@ -495,6 +508,11 @@ $(document).ready(function () {
         var url = "/lms/custom/invoices/paid_invoices.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+            
+            $.get('/lms/custom/utils/data.json', function(data){
+    			$("#search_invoice_input").typeahead({ source:data , items: 24});
+    		},'json');
+            
         });
     }
 
@@ -517,12 +535,22 @@ $(document).ready(function () {
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
+        
+        $.get('/lms/custom/utils/data.json', function(data){
+			$("#search_payment").typeahead({ source:data , items: 24});
+		},'json');
+        
     }
 
     function get_check_payments_page() {
         var url = "/lms/custom/payments/get_cheque_payments.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+            
+            $.get('/lms/custom/utils/data.json', function(data){
+    			$("#search_payment").typeahead({ source:data , items: 24});
+    		},'json');
+            
         });
     }
 
@@ -538,6 +566,11 @@ $(document).ready(function () {
         var url = "/lms/custom/payments/get_card_payments.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+            
+            $.get('/lms/custom/utils/data.json', function(data){
+    			$("#search_payment").typeahead({ source:data , items: 24});
+    		},'json');
+            
         });
     }
 
@@ -2145,6 +2178,10 @@ $(document).ready(function () {
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
+        
+        $.get('/lms/custom/utils/data.json', function(data){
+			$("#search_user_input").typeahead({ source:data , items: 24});
+		},'json');
     }
 
     function search_user_by_email() {
@@ -2488,7 +2525,7 @@ $(document).ready(function () {
     });
 
     $("body").click(function (event) {
-        console.log('Element clicked: ' + event.target.id);
+        //console.log('Element clicked: ' + event.target.id);
         
         if (event.target.id.indexOf("faq_edit_") >= 0) {
 			var id = event.target.id.replace("faq_edit_", "");
@@ -2761,7 +2798,12 @@ $(document).ready(function () {
             } // end if course_payment_id>0
         }
 
-
     }); // end of body
+    
+    
+    
+ 
+    
+    
 }); // end of $(document).ready(function()
 
