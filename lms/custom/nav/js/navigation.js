@@ -2690,17 +2690,22 @@ $(document).ready(function () {
 
         if (event.target.id == 'make_new_refund') {
             var paymentid = $('#course_payments').val();
+            var amount = $('#refund_amount').val();
             console.log('Payment ID: ' + paymentid);
-            if (paymentid > 0) {
+            if (paymentid > 0 && amount != '' && $.isNumeric(amount)) {
+                $('#refund_err').html('');
                 if (confirm('Make refund for current payment?')) {
                     var url = "/lms/custom/payments/make_refund.php";
-                    var request = {paymentid: paymentid};
+                    var request = {paymentid: paymentid, amount: amount};
                     $.post(url, request).done(function (data) {
                         console.log('Server response: ' + data);
                         $("[data-dismiss=modal]").trigger({type: "click"});
                     });
                 } // end if confirm
             } // end if paymentid>0
+            else {
+                $('#refund_err').html('Please select user payment and amount');
+            }
         }
 
 

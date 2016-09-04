@@ -723,12 +723,25 @@ class Payments extends Util {
                 <h4 class='modal-title'>Make refund</h4>
                 </div>                
                 <div class='modal-body'>                                
-                <div class='container-fluid' style='text-align:center;'>
+                
+                <div class='container-fluid' style='text-align:left;'>
                 <span class='span5'>$courses</span>    
                 </div>            
-                <div class='container-fluid' style='text-align:center;'>
+                
+                <div class='container-fluid' style='text-align:left;'>
                 <span class='span5' id='course_payments_span'>$payments</span>                    
-                </div>                
+                </div>       
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span2'>Refund amount $</span>
+                <span class='span2'><input type='text' id='refund_amount' style='width:160px;'></span>                    
+                </div>
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span5' id='refund_err'></span>
+                </div>
+
+
                 </div>
                 
                 <div class='modal-footer'>
@@ -741,23 +754,32 @@ class Payments extends Util {
         return $list;
     }
 
-    function make_refund($paymentid) {
+    function make_refund($paymentid, $amount) {
         $query = "select * from mdl_card_payments where id=$paymentid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $card_last_four = $row['card_last_four'];
             $exp_date = $row['exp_date'];
-            $amount = $row['psum'];
+            $db_amount = $row['psum'];
             $trans_id = $row['trans_id'];
         } // ebd while
         $pr = new ProcessPayment();
         $status = $pr->makeRefund($amount, $card_last_four, $exp_date, $trans_id);
         if ($status == true) {
-            $query = "update mdl_card_payments set refunded=1 where id=$paymentid";
+            if ($amount == $db_amount) {
+                $query = "update mdl_card_payments set refunded=1 "
+                        . "where id=$paymentid";
+            } else {
+                // It is not possible to refund more than was paid so rest amount is positive
+                $rest_sum = $db_amount - $amount;
+                $query = "update mdl_card_payments set psum='$rest_sum' "
+                        . "where id=$paymentid";
+            }
             $this->db->query($query);
+            return true;
         } // end if $status==true
         else {
-            echo "Refund error ...";
+            return false;
         }
     }
 
@@ -784,7 +806,7 @@ class Payments extends Util {
         $list.="<div class='container-fluid'>";
         $list.="<span class='span3'>&nbsp;</span><span class='span3'><button type='button' class='btn btn-primary'  id='update_refund_pwd'>Update</button></span>";
         $list.="</div>";
-        
+
         $list.="</div>";
 
         return $list;
