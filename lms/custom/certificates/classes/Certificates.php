@@ -182,9 +182,17 @@ class Certificates extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Issue date</span><span class='span2'>$date</span>";
                 $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Expiration date</span><span class='span2'>$_exp_date</span>";
-                $list.="</div>";
+                $expired = $this->is_certificate_expired($certificate->courseid);
+                if ($expired > 0) {
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span2'>Expiration date</span><span class='span2'>$_exp_date</span>";
+                    $list.="</div>";
+                } // end if $expired
+                else {
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span2'>Expiration date</span><span class='span2'>N/A</span>";
+                    $list.="</div>";
+                }
 
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'><input class='cert' type='checkbox' id='$certificate->id' value='$certificate->id'></span><span class='span2'>Select</span>";
@@ -216,6 +224,15 @@ class Certificates extends Util {
             $list.=$this->get_send_certificate_page();
         } // end else
         return $list;
+    }
+
+    function is_certificate_expired($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $expired = $row['expired'];
+        }
+        return $expired;
     }
 
     function get_send_certificate_page() {
@@ -358,8 +375,10 @@ class Certificates extends Util {
         }
         $cert_issue_date = $this->get_certificate_issue_date($courseid, $userid);
         $issue_date = ($cert_issue_date == 0) ? time() : $cert_issue_date;
-        $day = date('d', $issue_date);
-        $month = date('M', $issue_date);
+        //$day = date('d', $issue_date);
+        //$month = date('M', $issue_date);
+        $day = date('dS', $issue_date);
+        $month = date('F', $issue_date);
         $year = date('Y', $issue_date);
         $renew_status = $this->get_course_renew_status($courseid);
         $title = $this->get_certificate_title($courseid);
@@ -380,6 +399,46 @@ class Certificates extends Util {
         $expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
         //echo "Expiration date: ".$expiration_date."<br>";
         switch ($courseid) {
+
+            case 41:
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div>";
+                $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
+                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Certification of Completion</span><br>";
+                $list.="<span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
+                $list.="<span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
+                $list.="<span style='align:center;font-size:16pt;'>has successfully completed the </span><br>";
+                $list.="<span style='align:center;font-size:26pt;'>Certified Nurse Assistant Program</span><br>";
+                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                } // end if $renew_status == true                                 
+                // President signature
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Terri McCord, RN<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Coodinator</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></p";
+                $list.="</div>";
+
+                $list.="</body>";
+                $list.="</html>";
+
+                $pdf = new mPDF('utf-8', 'A4-L');
+                $pdf->WriteHTML($list, 2);
+                $dir_path = $this->cert_path . "/$userid";
+                if (!is_dir($dir_path)) {
+                    if (!mkdir($dir_path)) {
+                        die('Could not write to disk');
+                    } // end if !mkdir($dir_path)
+                } // end if !is_dir($dir_path)
+                $path = $dir_path . "/certificate.pdf";
+                $pdf->Output($path, 'F');
+
+                break;
+
+
             case 44:
                 $list.="<!DOCTYPE HTML SYSTEM>";
                 $list.="<head>";
@@ -871,8 +930,8 @@ class Certificates extends Util {
         //$cert_arr = explode('-', $cert_no);
 
         $query = "SELECT * FROM `mdl_user` 
-            WHERE firstname = '".trim($fname)."'
-            AND lastname = '".trim($lname)."'";
+            WHERE firstname = '" . trim($fname) . "'
+            AND lastname = '" . trim($lname) . "'";
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -1285,8 +1344,8 @@ class Certificates extends Util {
         $this->create_label($cert->courseid, $userid);
         $firstname = strtoupper($userdetails->firstname);
         $lastname = strtoupper($userdetails->lastname);
-        $day = date('d', $issue);
-        $month = date('M', $issue);
+        $day = date('dS', $issue);
+        $month = date('F', $issue);
         $year = date('Y', $issue);
         $renew_status = $this->get_course_renew_status($cert->courseid);
         $title = $this->get_certificate_title($cert->courseid);
@@ -1303,6 +1362,46 @@ class Certificates extends Util {
           echo "Expiration date: " . $expiration_date . "<br>";
          */
         switch ($cert->courseid) {
+
+            case 41:
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div>";
+                $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
+                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Certification of Completion</span><br>";
+                $list.="<span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
+                $list.="<span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
+                $list.="<span style='align:center;font-size:16pt;'>has successfully completed the </span><br>";
+                $list.="<span style='align:center;font-size:26pt;'>Certified Nurse Assistant Program</span><br>";
+                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                } // end if $renew_status == true                                 
+                // President signature
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Terri McCord, RN<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Coodinator</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></p";
+                $list.="</div>";
+
+                $list.="</body>";
+                $list.="</html>";
+
+                $pdf = new mPDF('utf-8', 'A4-L');
+                $pdf->WriteHTML($list, 2);
+                $dir_path = $this->cert_path . "/$userid";
+                if (!is_dir($dir_path)) {
+                    if (!mkdir($dir_path)) {
+                        die('Could not write to disk');
+                    } // end if !mkdir($dir_path)
+                } // end if !is_dir($dir_path)
+                $path = $dir_path . "/certificate.pdf";
+                $pdf->Output($path, 'F');
+
+                break;
+
+
             case 44:
                 $list.="<!DOCTYPE HTML SYSTEM>";
                 $list.="<head>";
