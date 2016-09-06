@@ -419,13 +419,15 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Terri McCord, RN<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Coodinator</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></p";
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Terri McCord, RN<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Coodinator</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director, Agent # C-3110</span></td></tr></table></p";
                 $list.="</div>";
 
                 $list.="</body>";
                 $list.="</html>";
 
                 $pdf = new mPDF('utf-8', 'A4-L');
+                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+                $pdf->WriteHTML($stylesheet, 1);
                 $pdf->WriteHTML($list, 2);
                 $dir_path = $this->cert_path . "/$userid";
                 if (!is_dir($dir_path)) {
@@ -1382,13 +1384,16 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Terri McCord, RN<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Coodinator</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></p";
+                //$list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Terri McCord, RN<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Coodinator</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></p";
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Terri McCord, RN<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Coodinator</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director, Agent # C-3110</span></td></tr></table></p";
                 $list.="</div>";
 
                 $list.="</body>";
                 $list.="</html>";
 
                 $pdf = new mPDF('utf-8', 'A4-L');
+                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+                $pdf->WriteHTML($stylesheet, 1);
                 $pdf->WriteHTML($list, 2);
                 $dir_path = $this->cert_path . "/$userid";
                 if (!is_dir($dir_path)) {
