@@ -1,5 +1,6 @@
 <?php
 
+ini_set('memory_limit', '1024M'); // or you could use 1G
 require_once ('/home/cnausa/public_html/class.pdo.database.php');
 require_once ('/home/cnausa/public_html/functionality/php/classes/mailer/vendor/PHPMailerAutoload.php');
 
@@ -1723,6 +1724,35 @@ class Students {
             //$this->send_exam_passed_notification($passed_users);
             echo "<br>---------------------------------------------------------------<br>";
         } // end if count($phleb_users)>0
+    }
+    
+    /*************** Code related to typehead json data ******************/
+    
+    function create_typehead_data() {
+        $courses = array();
+        $firstname = array();
+        $lastname = array();
+        $emails = array();
+		$users=array();
+        
+        $query = "select * from mdl_course where visible=1";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courses[] = mb_convert_encoding($row['fullname'], 'UTF-8');
+        }
+
+        $query = "select * from mdl_user where deleted=0";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $lastname[] = mb_convert_encoding($row['lastname'], 'UTF-8');
+            $firstname[] = mb_convert_encoding($row['firstname'], 'UTF-8');
+            $users[]=mb_convert_encoding($row['lastname'], 'UTF-8')." ".mb_convert_encoding($row['firstname'], 'UTF-8');
+            $emails[] = mb_convert_encoding($row['email'],'UTF-8');
+        }
+
+        $data = array_merge($users, $emails, $courses);
+        file_put_contents('/home/cnausa/public_html/lms/custom/utils/data.json', json_encode($data));
+        echo "Data are created \n";
     }
 
 }
