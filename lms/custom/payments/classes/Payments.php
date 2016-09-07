@@ -769,13 +769,25 @@ class Payments extends Util {
             if ($amount == $db_amount) {
                 $query = "update mdl_card_payments set refunded=1 "
                         . "where id=$paymentid";
-            } else {
-                // It is not possible to refund more than was paid so rest amount is positive
+                $this->db->query($query);
+            } // end if $amount == $db_amount             
+            else {
+                // Update card payments amount
                 $rest_sum = $db_amount - $amount;
                 $query = "update mdl_card_payments set psum='$rest_sum' "
                         . "where id=$paymentid";
-            }
-            $this->db->query($query);
+                $this->db->query($query);
+                // Add data to partial refunds table
+                $query = "INSERT INTO mdl_partial_refund_payments "
+                        . "SELECT * FROM mdl_card_payments "
+                        . "where id=$paymentid";
+                $this->db->query($query);
+                // Update partial refund date 
+                $date=time();
+                $query="update mdl_partial_refund_payments "
+                        . "set pdate='$date' where id=$paymentid";
+            } // end else when it was partial refund
+
             return true;
         } // end if $status==true
         else {
