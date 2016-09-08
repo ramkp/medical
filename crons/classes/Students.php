@@ -1774,6 +1774,102 @@ class Students {
 
     /*     * ******* Code related to Certificates expiration messages ******** */
     
+    function get_certificate_reminder_message () {
+    	$list="";
+    	
+    	$list.="<p style='align:left;font-size:23px;font-weight:bold;'>Its Time To Renew your Certification!</p> 
+
+				<p style='align:center;font-size:25px;font-weight:bold;color:red;'>Medical2 Certification Agency</p>
+ 			
+    			<p style='font-size:15px;font-wieght:bold;'>Toll-Free: 1-877-741-1996 Fax: 407-233-1192 E-mail: <a href='mailto:help@medical2.com'>help@medical2.com</a></p> 
+
+			<p align='justify' style='font-size:15px;'>
+			You have received this notice because your Certification is about to expire. 
+    	    In order to remain certified, you must renew your certification. To qualify for 
+    	    recertification, you must login to your account and click on recertification tab 
+    		and follow the steps or send in your $50 renewal fee no later than 30 days past 
+    		your expiration date. If you do not meet this deadline, the fee will increase 
+    	    to $75. After 90 days, the fee will be $100. Additionally, if your certification 
+    	    is over 90 days expired, you must submit documentation verifying that you are 
+    	    current in the respective field. If you are not current in the field, then you 
+    	    will be required to retake the Workshop or the Online Exam. For any questions 
+    	    please contact us. 
+    		</p>	
+    		<hr>	
+			<p style='font-weight:bold;font-size:15px;'><span style='color:red;'>Make money orders out to</span> Medical2 Inc.</p> 
+			<hr>
+			<p style='align:left;font-weight:bold;font-size:15px;'>$100 Recertification Fee (Over 90 Days Expired)</p>
+
+		    <p style='align:left;font-size:15px;font-weight:bold;color:red;'>Mailing Address: Medical2 Inc.  1830A North Gloster St, Tupelo, MS 38804</p>"; 
+    	
+    		return $list;
+    }
+    
+    
+    function get_expired_certificates ($interval)  {
+    	$now=time();
+    	$i=0;
+    	$exp_date=time()+$interval;
+    	
+    	if ($interval=='m') {
+    		$start=time()+1209600; // 2 weeks later
+    		$end=time()+2592000; // one month later
+    	}
+    	
+    	if ($interval=='w') {
+    		$start=time(); // now
+    		$end=time()+604800;  // 7 days later
+    	}
+    	
+    	$query="select * from mdl_certificates 
+    	where expiration_date between $start and $end";
+    	$num = $this->db->numrows($query);
+    	if ($num > 0) {
+    		$result = $this->db->query($query);
+    		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    				$user_data=$this->get_user_data($row['userid']);
+    				$coursename=$this->get_course_name($row['courseid']);
+    				$this->send_certificate_expiration_data($user_data,$coursename);
+    				$i++;
+    		} // end while
+    	} // end if $num > 0 
+    	echo "Total users: ".$i."<br>";
+    }
+    
+    function send_certificate_expiration_data ($user_data,$coursename) {
+    	
+    	
+    	echo "$user_data->firstname $user_data->lastname $user_data->email <br>";
+    	echo "Coursename: $coursename";
+    	
+    	
+    	$mail = new PHPMailer;
+    	$mail->isSMTP();
+    	$mail->Host = $this->mail_smtp_host;
+    	$mail->SMTPAuth = true;
+    	$mail->Username = $this->mail_smtp_user;
+    	$mail->Password = $this->mail_smtp_pwd;
+    	$mail->SMTPSecure = 'tls';
+    	$mail->Port = $this->mail_smtp_port;
+    	$mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+    	$mail->addAddress($user_data->email);
+    	//$mail->addAddress('sirromas@gmail.com');
+    	$mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+    	$mail->isHTML(true);
+    	$mail->Subject = 'Renew certification';
+    	$mail->Body = $this->get_certificate_reminder_message();
+    	if (!$mail->send()) {
+    		echo "<br>Error sending email ($user_data->email) .... <br>\n";
+    		echo "<br>-------------------------------------------------------------------<br>";
+    	}
+    	else {
+    		echo "<br>Email was delivered ($user_data->email) <br>\n";
+    		echo "<br>-------------------------------------------------------------------<br>";
+    	}
+    	
+    	
+    }
+    
     
     /*     * ******* Code related to mysqldump backup ******** */
 
