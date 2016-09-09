@@ -579,12 +579,45 @@ class navClass extends Util {
         return $timecompleted;
     }
 
+    function get_certificate_renew_fee($courseid, $userid) {
+        $renew_fee = $this->get_renew_fee();
+        $query = "select * from mdl_certificates "
+                . "where courseid=$courseid and userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $expiration_date = $row['expiration_date']; // Unix timestap
+        }
+        $now = time();
+        if ($now > $expiration_date) {
+            $diff = $now - $expiration_date;
+            if (($diff) >= 34300800 && ($diff) <= 39398400) {
+                // 30 days after, but less then 90 days after expiration
+                $additional_fee = 25;
+            }
+            if ($diff > 39398400) {
+                // 90 days after expiration
+                $additional_fee = 50;
+            }
+        } // end if $now>$expiration_date
+        else {
+            $additional_fee = 0;
+        } // end else
+        $whole_renew_fee = $renew_fee + $additional_fee;
+        return $whole_renew_fee;
+    }
+
     function renew_certificate() {
 
-        /*         * *************************************************************
+        /* *************************************************************
          *  Certificate validation is one year. So whenever user clicks
          *  Renew Certificate it should be prolonged for one year from
          *  course completion moment, no other cases 
+         * 
+         *  Additional fee for expired certificates: 
+         *  $25 if renew attempt 30 days after expiration
+         *  $50 if renew attempt 90 days after expiration
+         *  if  renew attempt 95 days after expiration - new exam
+         * 
          * ************************************************************* */
 
         $courseid = $this->get_user_course($this->user->id);
@@ -617,7 +650,7 @@ class navClass extends Util {
         else {
             $list.="<div class='container-fluid'>";
             $userid = $this->user->id;
-            $renew_fee = $this->get_renew_fee();
+            $renew_fee = $this->get_certificate_renew_fee($courseid, $userid);
             $list.="<span class='span9'>Certificate renew is a paid service. Please click <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$renew_fee' target='_blank'>here</a> to pay by card.</span>";
             $list.="</div>";
             return $list;
