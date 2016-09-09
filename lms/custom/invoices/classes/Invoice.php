@@ -225,7 +225,7 @@ class Invoices extends Util {
 
     function create_open_invoices_page($invoices, $toolbar = true, $paid = false, $seacrh=false) {
         $list = "";
-        //print_r($invoices);
+        $permission = $this->check_module_permission('invoice');
         if ($toolbar == TRUE) {
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span2'>Search</span>";
@@ -285,17 +285,25 @@ class Invoices extends Util {
                 $list.="</div>";
 
                 if ($paid == false) {
+                    
+                    if ($permission==1) {
                     $list.="<div class='container-fluid'>";
                     $list.="<span class='span3'><a id='change_paid_$invoice->id' href='#' onClick='return false;'>Make it paid</a></span>";
                     $list.="</div>";
+                    } // end if $permission==1
+                    
                     $payment_types = $this->get_payment_methods($invoice->id);
                     $list.="<div id='change_payment_status_page_$invoice->id' style='display:none;'>";
                     $list.="<div class='container-fluid'>";
                     $list.=$payment_types;
                     $list.="</div>";
+                    
+                    
                     $list.="<div class='container-fluid'>";
                     $list.="<span class='span3'><button type='button' id='make_paid_$invoice->id' class='btn btn-primary'>Make it paid</button></span><span class='span5' id='invoice_status_$invoice->id'></span>";
                     $list.="</div>";
+                    
+                    
                     $list.="</div>";
                 } // end if $paid==false
 
@@ -431,7 +439,9 @@ class Invoices extends Util {
         $list.="<option value='0' selected>Payment type</option>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            if ($row['type']!='free') {
             $list.="<option value='" . $row['id'] . "'>" . $row['type'] . "</option>";
+            }
         }
         $list.="</select></span>";
         return $list;

@@ -110,7 +110,7 @@ class navClass extends Util {
                             <li class='dropdown'><a title='Programs' class='dropdown-toggle' href='#'>Courses<b class='caret'></b></a>                                
                             $price_items
                             </li>";
-        if ($permission == 1) {
+        //if ($permission == 1) {
             $list.="<li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Invoices<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Invoice' id='data_inv'>Invoice</a></li>
@@ -119,7 +119,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Send invoice' id='send_inv'>Send invoice</a></li>                                    
                                 </ul>
                             </li>";
-        }
+        //}
         $list.="<li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
