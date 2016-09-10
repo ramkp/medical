@@ -1281,16 +1281,6 @@ class Students {
             $in_list.="<td style='padding:15px;font-weight:bold;' colspan='2' align='center'>Invoice Payments</td>";
             $in_list.="</th>";
             foreach ($invoice_payments as $payment) {
-
-                /*
-                 * 
-                  echo "<br><pre>";
-                  print_r($payment);
-                  echo "</pre><br>";
-                 * 
-                 */
-
-
                 $coursename = $this->get_course_name($payment->courseid);
                 $date = date('m-d-Y h:i:s', ($payment->i_pdate - 86400));
                 $userdata = $this->get_user_data($payment->userid);
@@ -1319,12 +1309,19 @@ class Students {
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
                 $in_list.="</tr>";
+                
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
                 $in_list.="</tr>";
+                
                 $in_list.="<tr>";
-                $in_list.="<td style='padding:15px;'>Transaction date:</td><td style='padding:15px;'>$date</td>";
+                $in_list.="<td style='padding:15px;'>Invoice No:</td><td style='padding:15px;'>$payment->i_num</td>";
                 $in_list.="</tr>";
+                
+                $in_list.="<tr>";
+                $in_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
+                $in_list.="</tr>";
+                
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $in_list.="</tr>";
