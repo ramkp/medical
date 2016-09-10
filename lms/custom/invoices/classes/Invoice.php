@@ -66,6 +66,46 @@ class Invoices extends Util {
     function get_send_invoice_page() {
         $list = "";
         $program_types = $this->get_course_categories();
+        $invoice_program_types=$this->get_invoice_course_categories();
+        
+        // Send invoice to company or non-existing user
+        $list.="<div class='container-fluid'>";
+        $list.="<div class='container-fluid' style='font-weight:bold;'>";
+        $list.="<span class='span6'>Send invoice to company or new user</span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span9' id='any_invoice_status'></span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>$invoice_program_types</span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6' id='invoice_category_courses'></span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid' id='invoice_amount_row' style='display:none;'>";
+        $list.="<span class='span1' style=''>Amount* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_amount' style='width:265px;'></span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid' id='invoice_email_row' style='display:none;'>";
+        $list.="<span class='span1'>Email* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_email' style='width:265px;'></span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'><button type='button' id='send_any_invoice' class='btn btn-primary'>Send</button></span>";
+        $list.="</div>";
+        $list.="</div";
+       
+        $list.="<br><br><div class='container-fluid'>";
+        $list.="<span class='span6'><hr></span>";
+        $list.="</div><br><br>";
+        
+        // Send invoice to existing user
+        $list.="<div class='container-fluid'>";
+        $list.="<div class='container-fluid' style='font-weight:bold;'>";
+        $list.="<span class='span6'>Send invoice to existing user</span>";
+        $list.="</div>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span5' id='invoice_status'></span>";
         $list.="</div>";
@@ -81,6 +121,8 @@ class Invoices extends Util {
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'><button type='button' id='send_invoice' class='btn btn-primary'>Send</button></span>";
         $list.="</div>";
+        $list.="</div>";
+               
         return $list;
     }
 
@@ -621,6 +663,12 @@ class Invoices extends Util {
             $list.="</div>";
         } // end else 
         return $list;
+    }
+    
+    function send_any_invoice ( $courseid, $amount, $email ) {
+    	
+    	
+    	
     }
 
 }

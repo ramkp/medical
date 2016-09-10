@@ -430,6 +430,15 @@ $(document).ready(function () {
             $('#category_courses').html(data);
         });
     }
+    
+    function get_invoice_category_courses(id) {
+        var url = "/lms/custom/invoices/get_invoice_category_courses.php";
+        $.post(url, {id: id}).done(function (data) {
+            $('#invoice_category_courses').html(data);
+            $('#invoice_amount_row').show();
+            $('#invoice_email_row').show();
+        });
+    }
 
     function get_category_courses2(id) {
         var url = "/lms/custom/certificates/get_category_courses2.php";
@@ -1397,7 +1406,7 @@ $(document).ready(function () {
         if (event.target.id.indexOf("price_") >= 0) {
             update_item_price(event.target.id);
         }
-
+        
         if (event.target.id.indexOf("_faq") >= 0) {
             var oEditor = FCKeditorAPI.GetInstance('editor');
             var data = oEditor.GetHTML();
@@ -1440,6 +1449,26 @@ $(document).ready(function () {
         if (event.target.id == 'invoice_data') {
             update_invoice_data();
         }
+        
+        if (event.target.id == 'send_any_invoice') {
+            var courseid=$('#invoice_courses').val();
+            var amount=$('#invoice_amount').val();
+            var email=$('#invoice_email').val();
+            
+            if (courseid>0 && amount!='' && email!='') {
+            	$('#any_invoice_status').html('');
+            	if (confirm('Send invoice?')) {
+            	var url = "/lms/custom/invoices/send_any_invoice.php";
+                $.post(url, {courseid: courseid, amount:amount, email:email}).done(function (data) {
+                	$('#any_invoice_status').html(data);
+                });
+            	}
+            }
+            else {
+            	$('#any_invoice_status').html('Please select program and provide invoice amount with client email');
+            }
+        }
+        
 
         if (event.target.id == 'make_refund_button') {
             get_refund_modal_dialog();
@@ -2066,7 +2095,14 @@ $(document).ready(function () {
 
     });
     $('#region-main').on('change', 'select', function (event) {
-        console.log(event.target.id);
+        
+    	console.log(event.target.id);
+    	
+    	if (event.target.id == 'invoice_categories') {
+            var id = $('#invoice_categories').val();
+            console.log('Category id: ' + id);
+            get_invoice_category_courses(id);
+        }
 
         if (event.target.id == 'course_categories') {
             var id = $('#course_categories').val();

@@ -132,6 +132,59 @@ class Util {
         } // end if count($items)>0 
         return $list;
     }
+    
+    function get_invoice_course_categories () {
+    	$list = "";
+    	$items = array();
+    	$query = "select id, name from mdl_course_categories order by name";
+    	$result = $this->db->query($query);
+    	while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    		$item = new stdClass();
+    		foreach ($row as $key => $value) {
+    			$item->$key = $value;
+    		} // end foreach
+    		$items[] = $item;
+    	} // end while
+    	if (count($items) > 0) {
+    		$list.="<span class='span3'>Program type</span><span class='span4'>";
+    		$list.="<select id='invoice_categories' style='width:275px;'>";
+    		$list.="<option value='0' selected>Program type</option>";
+    		foreach ($items as $item) {
+    			$list.="<option value='$item->id'>$item->name</option>";
+    		} // end foreach
+    		$list.="</select></span>";
+    	} // end if count($items)>0
+    	return $list;
+    }
+    
+    function get_invoice_course_by_category($id) {
+    	$list = "";
+    	$items = array();
+    	$query = "select id, fullname from mdl_course where category=$id 
+    					 and cost>0 and visible=1";
+    	$num = $this->db->numrows($query);
+    	if ($num > 0) {
+    		$result = $this->db->query($query);
+    		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+    			$item = new stdClass();
+    			foreach ($row as $key => $value) {
+    				$item->$key = $value;
+    			} // end foreach
+    			$items[] = $item;
+    		} // end while
+    		$list.="<span class='span3'>Programs:</span><span class='span4'>
+    				<select id='invoice_courses' style='width:275px;'>";
+    		$list.="<option value='0' selected>Program</option>";
+    		foreach ($items as $item) {
+    			$list.="<option value='$item->id'>$item->fullname</option>";
+    		} // end foreach
+    		$list.="</select></span>";
+    	} // end if $num>0
+    	else {
+    		$list.="<span class='span3'>Programs:</span><span class='span4'>n/a</span>";
+    	}
+    	return $list;
+    }
 
     function get_course_by_category($id) {
         $list = "";
