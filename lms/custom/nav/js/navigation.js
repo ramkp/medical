@@ -88,7 +88,7 @@ $(document).ready(function () {
         } // end if state==0 || month==0 || year==0
 
         if (file_data != '' && file_data.length != 0 && state > 0 && month > 0 && year > 0) {
-//console.log('File data: ' + file_data);
+
             $('#gallery_err').html('');
             $('#comment').val('');
             var form_data = new FormData();
@@ -430,11 +430,12 @@ $(document).ready(function () {
             $('#category_courses').html(data);
         });
     }
-    
+
     function get_invoice_category_courses(id) {
         var url = "/lms/custom/invoices/get_invoice_category_courses.php";
         $.post(url, {id: id}).done(function (data) {
             $('#invoice_category_courses').html(data);
+            $('#invoice_client_row').show();
             $('#invoice_amount_row').show();
             $('#invoice_email_row').show();
         });
@@ -1406,7 +1407,7 @@ $(document).ready(function () {
         if (event.target.id.indexOf("price_") >= 0) {
             update_item_price(event.target.id);
         }
-        
+
         if (event.target.id.indexOf("_faq") >= 0) {
             var oEditor = FCKeditorAPI.GetInstance('editor');
             var data = oEditor.GetHTML();
@@ -1446,29 +1447,65 @@ $(document).ready(function () {
             make_invoice_paid(id);
         }
 
+        if (event.target.id.indexOf("make_any_paid_") >= 0) {
+            var id = event.target.id.replace("make_any_paid_", "");
+            var typeid = '#payment_type_' + id;
+            var errid = '#invoice_status_' + id;
+            var type = $(typeid).val();
+            if (type > 0) {
+                $(errid).html("");
+                if (dialog_loaded !== true) {
+                    console.log('Script is not yet loaded starting loading ...');
+                    dialog_loaded = true;
+                    var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                    $.getScript(js_url)
+                            .done(function () {
+                                console.log('Script bootstrap.min.js is loaded ...');
+                                var url = "/lms/custom/invoices/get_any_invoice_modal.php";
+                                var request = {id: id, type: type};
+                                $.post(url, request).done(function (data) {
+                                    $("body").append(data);
+                                    $("#myModal").modal('show');
+                                });
+                            })
+                            .fail(function () {
+                                console.log('Failed to load bootstrap.min.js');
+                            });
+                } // dialog_loaded!=true
+                else {
+                    console.log('Script already loaded');
+                    $("#myModal").modal('show');
+                } // end else
+            } // end if typeid
+            else {
+                $(errid).html("<span style='color:red;'>Please select payment type</span>");
+            }
+        }
+
+
         if (event.target.id == 'invoice_data') {
             update_invoice_data();
         }
-        
+
         if (event.target.id == 'send_any_invoice') {
-            var courseid=$('#invoice_courses').val();
-            var amount=$('#invoice_amount').val();
-            var email=$('#invoice_email').val();
-            
-            if (courseid>0 && amount!='' && email!='') {
-            	$('#any_invoice_status').html('');
-            	if (confirm('Send invoice?')) {
-            	var url = "/lms/custom/invoices/send_any_invoice.php";
-                $.post(url, {courseid: courseid, amount:amount, email:email}).done(function (data) {
-                	$('#any_invoice_status').html(data);
-                });
-            	}
-            }
-            else {
-            	$('#any_invoice_status').html('Please select program and provide invoice amount with client email');
+            var courseid = $('#invoice_courses').val();
+            var client = $('#invoice_client').val();
+            var amount = $('#invoice_amount').val();
+            var email = $('#invoice_email').val();
+
+            if (courseid > 0 && amount != '' && email != '' && client != '') {
+                $('#any_invoice_status').html('');
+                if (confirm('Send invoice?')) {
+                    var url = "/lms/custom/invoices/send_any_invoice.php";
+                    $.post(url, {courseid: courseid, amount: amount, email: email, client: client}).done(function (data) {
+                        $('#any_invoice_status').html(data);
+                    });
+                }
+            } else {
+                $('#any_invoice_status').html("<span style='color:red;'>Please select program and provide invoice amount with client email</span>");
             }
         }
-        
+
 
         if (event.target.id == 'make_refund_button') {
             get_refund_modal_dialog();
@@ -2095,10 +2132,10 @@ $(document).ready(function () {
 
     });
     $('#region-main').on('change', 'select', function (event) {
-        
-    	console.log(event.target.id);
-    	
-    	if (event.target.id == 'invoice_categories') {
+
+        //console.log(event.target.id);
+
+        if (event.target.id == 'invoice_categories') {
             var id = $('#invoice_categories').val();
             console.log('Category id: ' + id);
             get_invoice_category_courses(id);
@@ -2443,8 +2480,7 @@ $(document).ready(function () {
             $.post(url, {item: item}).done(function (data) {
                 $('#partial_container').html(data);
             });
-        }
-        else {
+        } else {
             console.log('Inside else ...');
             $('#partial_err').html('Please provide search criteria');
         }
@@ -2581,7 +2617,7 @@ $(document).ready(function () {
 
     $("body").click(function (event) {
 
-        console.log('Element clicked: ' + event.target.id);
+        //console.log('Element clicked: ' + event.target.id);
 
         if (event.target.id.indexOf("faq_edit_") >= 0) {
             var id = event.target.id.replace("faq_edit_", "");
@@ -2591,7 +2627,6 @@ $(document).ready(function () {
                 var url = "https://" + domain + "/lms/custom/faq/get_faq_edit_page.php";
                 var request = {id: id};
                 $.post(url, request).done(function (data) {
-                    //console.log('Server data ...' + data);
                     $("body").append(data);
                     $("#myModal").modal('show');
                 });
@@ -2706,8 +2741,7 @@ $(document).ready(function () {
             var status;
             if ($('#' + event.target.id).is(':checked')) {
                 status = 1;
-            }
-            else {
+            } else {
                 status = 0;
             }
             if (confirm('Change permissions for current module?')) {
@@ -2839,6 +2873,24 @@ $(document).ready(function () {
 
     $('body').on('change', 'select', function (event) {
 
+        if (event.target.id == 'any_invoice_categories') {
+            var id = $('#any_invoice_categories').val();
+            console.log('Category id: ' + id);
+            var url = "/lms/custom/invoices/get_any_invoice_course_by_category.php";
+            $.post(url, {id: id}).done(function (data) {
+                $('#invoice_category_courses').html(data);
+            }); // end if $.post
+        }
+
+        if (event.target.id == 'any_invoice_courses') {
+            var id = $('#any_invoice_courses').val();
+            console.log('Courseid id: ' + id);
+            var url = "/lms/custom/invoices/get_any_invoice_users.php";
+            $.post(url, {id: id}).done(function (data) {
+                $('#invoice_courses_users').html(data);
+            }); // end if $.post
+        }
+
         if (event.target.id == 'faq_categories') {
             var id = $('#faq_categories').val();
             if (id > 0) {
@@ -2873,10 +2925,40 @@ $(document).ready(function () {
             } // end if course_payment_id>0
         }
 
-    }); // end of body
+    }); // end of body change select even 
 
 
+    $('body').on('click', function (event) {
 
+        if (event.target.id == 'attach_invoice_payment') {
+
+            var invoice_id = $('#invoice_id').val();
+            var type = $('#invoice_payment_type').val();
+            var users_el = $('#users');
+            console.log('Users element: ' + users_el);
+            if (invoice_id != '' && type != '' && typeof (users_el) != 'undefined' && users_el != null) {
+                $('#any_invoice_users_err').html("");
+                var users = $('#users').val();
+                var users_list = users.join();
+                if (users_list != '' && users_list != 0) {
+                    $('#any_invoice_users_err').html("");
+                    var url = "/lms/custom/invoices/attach_any_invoice_payment.php";
+                    $.post(url, {invoice_id: invoice_id, type: type, users_list: users_list}).done(function (data) {
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        get_open_invoices_page();
+                    }); // end if $.post
+
+                } // end if users_list != '' && users_list != 0 
+                else {
+                    $('#any_invoice_users_err').html("<span style='color:red;'>Please select users</span>");
+                }
+            } // end if invoice_id != '' && type != '' && users.length > 0 
+            else {
+                $('#any_invoice_users_err').html("<span style='color:red;'>Please select users</span>");
+            }
+        }
+
+    }); // end of body click event
 
 
 

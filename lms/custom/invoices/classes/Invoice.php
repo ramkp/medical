@@ -14,7 +14,7 @@ class Invoices extends Util {
 
     public $limit = 3;
 
-    /* *******************************************************
+    /*     * ******************************************************
      * 
      *             Invoice credentials
      * 
@@ -54,10 +54,8 @@ class Invoices extends Util {
         $list = "Item successfully updated";
         return $list;
     }
-    
-    
 
-    /* *******************************************************
+    /*     * ******************************************************
      * 
      *             Send invoice
      * 
@@ -66,8 +64,8 @@ class Invoices extends Util {
     function get_send_invoice_page() {
         $list = "";
         $program_types = $this->get_course_categories();
-        $invoice_program_types=$this->get_invoice_course_categories();
-        
+        $invoice_program_types = $this->get_invoice_course_categories();
+
         // Send invoice to company or non-existing user
         $list.="<div class='container-fluid'>";
         $list.="<div class='container-fluid' style='font-weight:bold;'>";
@@ -79,28 +77,32 @@ class Invoices extends Util {
         $list.="<div class='container-fluid'>";
         $list.="<span class='span6'>$invoice_program_types</span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid'>";
         $list.="<span class='span6' id='invoice_category_courses'></span>";
         $list.="</div>";
-        
+
+        $list.="<div class='container-fluid' id='invoice_client_row' style='display:none;'>";
+        $list.="<span class='span1' style=''>Client* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_client' style='width:265px;'></span>";
+        $list.="</div>";
+
         $list.="<div class='container-fluid' id='invoice_amount_row' style='display:none;'>";
         $list.="<span class='span1' style=''>Amount* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_amount' style='width:265px;'></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' id='invoice_email_row' style='display:none;'>";
         $list.="<span class='span1'>Email* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_email' style='width:265px;'></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid'>";
         $list.="<span class='span2'><button type='button' id='send_any_invoice' class='btn btn-primary'>Send</button></span>";
         $list.="</div>";
         $list.="</div";
-       
+
         $list.="<br><br><div class='container-fluid'>";
         $list.="<span class='span6'><hr></span>";
         $list.="</div><br><br>";
-        
+
         // Send invoice to existing user
         $list.="<div class='container-fluid'>";
         $list.="<div class='container-fluid' style='font-weight:bold;'>";
@@ -122,7 +124,7 @@ class Invoices extends Util {
         $list.="<span class='span2'><button type='button' id='send_invoice' class='btn btn-primary'>Send</button></span>";
         $list.="</div>";
         $list.="</div>";
-               
+
         return $list;
     }
 
@@ -234,6 +236,15 @@ class Invoices extends Util {
         return $list;
     }
 
+    function get_any_invoice_sum($invoiceid) {
+        $query = "select * from mdl_invoice where id=$invoiceid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $sum = $row['i_sum'];
+        }
+        return $sum;
+    }
+
     function get_invoice_sum($courseid, $userid, $i_sum) {
         $late = new Late();
         $late_fee = $late->get_delay_fee($courseid);
@@ -265,7 +276,7 @@ class Invoices extends Util {
         return $sum;
     }
 
-    function create_open_invoices_page($invoices, $toolbar = true, $paid = false, $seacrh=false) {
+    function create_open_invoices_page($invoices, $toolbar = true, $paid = false, $seacrh = false) {
         $list = "";
         $permission = $this->check_module_permission('invoice');
         if ($toolbar == TRUE) {
@@ -292,7 +303,7 @@ class Invoices extends Util {
         if (count($invoices) > 0) {
             $list.="<div id='open_invoices_container'>";
             $total = count($invoices);
-            if ($total == $this->limit && $seacrh==false) {
+            if ($total == $this->limit && $seacrh == false) {
                 if ($paid == false) {
                     $total = $this->get_open_invoices_total();
                 } // end if $paid==false
@@ -303,49 +314,81 @@ class Invoices extends Util {
             $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
             $list.="<span class='span8'>Total invoices: $total</span>";
             $list.="</div>";
+
             foreach ($invoices as $invoice) {
-                $user = $this->get_user_details($invoice->userid);
-                $date = date('Y-m-d', time());
+
+                if ($invoice->userid > 0) {
+                    $user = $this->get_user_details($invoice->userid);
+                    $address_block = $this->get_user_address_block($invoice->userid);
+                }
+                
+                $date = date('Y-m-d', $invoice->i_date);
                 $coursename = $this->get_course_name($invoice->courseid);
                 $prefix = ($paid == false) ? "from " : "paid date ";
                 $link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $invoice->i_file));
-                $address_block=$this->get_user_address_block($invoice->userid);
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>User</span><span class='span6'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$invoice->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
-                $list.="</div>";
-                
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Address</span><span class='span6'>$address_block</span>";
-                $list.="</div>";
+
+                if ($invoice->userid > 0) {
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span2'>User</span><span class='span6'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$invoice->userid' target='_blank'>$user->firstname $user->lastname ($user->email)</a></span>";
+                    $list.="</div>";
+                } // end if $invoice->userid > 0 
+                else {
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span2'>Client</span><span class='span6'>$invoice->client</span>";
+                    $list.="</div>";
+                }
+
+                if ($invoice->userid > 0) {
+                    $list.="<div class='container-fluid'>";
+                    $list.="<span class='span2'>Address</span><span class='span6'>$address_block</span>";
+                    $list.="</div>";
+                }
 
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Program applied</span><span class='span6'>$coursename</span>";
                 $list.="</div>";
-                $sum = $this->get_invoice_sum($invoice->courseid, $invoice->userid, $invoice->i_sum);
+                if ($invoice->userid > 0) {
+                    $sum = $this->get_invoice_sum($invoice->courseid, $invoice->userid, $invoice->i_sum);
+                } // end if $invoice->userid > 0 
+                else {
+                    $sum = $this->get_any_invoice_sum($invoice->id);
+                }
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'>Invoice</span><span class='span6'>Invoice # $invoice->i_num for $$sum $prefix $date (<a href='$link' target='_blank'>link</a>)</span>";
                 $list.="</div>";
 
                 if ($paid == false) {
-                    
-                    if ($permission==1) {
-                    $list.="<div class='container-fluid'>";
-                    $list.="<span class='span3'><a id='change_paid_$invoice->id' href='#' onClick='return false;'>Make it paid</a></span>";
-                    $list.="</div>";
-                    } // end if $permission==1
-                    
+
+                    if ($this->user->id == 2) {
+                        // It is admin                		
+                        $list.="<div class='container-fluid'>";
+                        $list.="<span class='span3'><a id='change_paid_$invoice->id' href='#' onClick='return false;'>Make it paid</a></span>";
+                        $list.="</div>";
+                    } else {
+                        if ($permission == 1) {
+                            $list.="<div class='container-fluid'>";
+                            $list.="<span class='span3'><a id='change_paid_$invoice->id' href='#' onClick='return false;'>Make it paid</a></span>";
+                            $list.="</div>";
+                        } // end if $permission==1
+                    }
+
                     $payment_types = $this->get_payment_methods($invoice->id);
                     $list.="<div id='change_payment_status_page_$invoice->id' style='display:none;'>";
+
                     $list.="<div class='container-fluid'>";
                     $list.=$payment_types;
                     $list.="</div>";
-                    
-                    
-                    $list.="<div class='container-fluid'>";
-                    $list.="<span class='span3'><button type='button' id='make_paid_$invoice->id' class='btn btn-primary'>Make it paid</button></span><span class='span5' id='invoice_status_$invoice->id'></span>";
-                    $list.="</div>";
-                    
-                    
+
+                    if ($invoice->userid > 0) {
+                        $list.="<div class='container-fluid'>";
+                        $list.="<span class='span3'><button type='button' id='make_paid_$invoice->id' class='btn btn-primary'>Make it paid</button></span><span class='span5' id='invoice_status_$invoice->id'></span>";
+                        $list.="</div>";
+                    } else {
+                        $list.="<div class='container-fluid'>";
+                        $list.="<span class='span3'><button type='button' id='make_any_paid_$invoice->id' class='btn btn-primary'>Make it paid</button></span><span class='span5' id='invoice_status_$invoice->id'></span>";
+                        $list.="</div>";
+                    }
+
                     $list.="</div>";
                 } // end if $paid==false
 
@@ -481,8 +524,8 @@ class Invoices extends Util {
         $list.="<option value='0' selected>Payment type</option>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            if ($row['type']!='free') {
-            $list.="<option value='" . $row['id'] . "'>" . $row['type'] . "</option>";
+            if ($row['type'] != 'free') {
+                $list.="<option value='" . $row['id'] . "'>" . $row['type'] . "</option>";
             }
         }
         $list.="</select></span>";
@@ -499,6 +542,44 @@ class Invoices extends Util {
             } // end foreach 
         } // end while
         return $invoice;
+    }
+
+    function attach_any_invoice_payment($invoice_id, $type, $users_list) {
+        //$args = func_get_args();
+        //var_export($args);
+
+        $users_array = explode(',', $users_list);
+
+        if (count($users_array) > 0) {
+            // 1. Make invoice as paid
+            $date = time();
+            $query = "update mdl_invoice "
+                    . "set i_status=1, "
+                    . "i_ptype=$type, "
+                    . "i_pdate='$date' "
+                    . "where id=$invoice_id";
+            $this->db->query($query);
+
+            foreach ($users_array as $userid) {
+
+                // 2. Attach payment to users 
+                $query = "insert into mdl_any_invoice_user "
+                        . "(invoiceid, userid) "
+                        . "values($invoice_id, $userid)";
+                $this->db->query($query);
+                
+                //3. Confirm user's accounts
+                $query="update mdl_user set confirmed=1 where id=$userid";
+                $this->db->query($query);
+                
+            } // end foreach
+            $list = 1;
+        } // end if count($users_array)>0
+        else {
+            $list = 0;
+        }
+
+        return $list;
     }
 
     function make_invoice_paid($id, $payment_type) {
@@ -589,9 +670,9 @@ class Invoices extends Util {
 
     function search_invoice_users($item) {
         $users = array();
-        $data=explode(' ', $item);
-        $firstname=$data[1];
-        $lastname=$data[0];
+        $data = explode(' ', $item);
+        $firstname = $data[1];
+        $lastname = $data[0];
         $query = "select id from mdl_user "
                 . "where (firstname='$firstname' and lastname='$lastname') "
                 . "or email like '%$item%' and deleted=0";
@@ -664,11 +745,188 @@ class Invoices extends Util {
         } // end else 
         return $list;
     }
-    
-    function send_any_invoice ( $courseid, $amount, $email ) {
-    	
-    	
-    	
+
+    function send_any_invoice($courseid, $amount, $email, $client) {
+        $file_invoice = new Invoice();
+        $mailer = new Mailer();
+        $invoice_data = $file_invoice->create_any_invoice($courseid, $amount, $client);
+        $invoice_file_name = $invoice_data['file'];
+        $invoice_num = $invoice_data['num'];
+        // userid is 0 because user does not exist in the system for now
+        $date = time();
+        $query = "insert into mdl_invoice (i_num, 
+    			              userid, 
+    			              client,
+    			              courseid,
+    			              renew,
+    			              i_sum, 
+    			              i_status, 
+    			              i_file, 
+    			              i_ptype, 
+    			              i_date) 
+    			values('$invoice_num', 
+    	               0, 
+    	               '$client',
+    	               $courseid, 
+    	               0,
+    	               '$amount',
+    	               0,
+    	               '$invoice_file_name',
+    	               0,
+    	               '$date')";
+        //echo "Query: ".$query."<br>";
+        $this->db->query($query);
+        $mailer->send_any_invoice($client, $email, $invoice_file_name);
+        $list = "Invoice has been sent.";
+        return $list;
+    }
+
+    function get_any_invoice_course_categories() {
+        $list = "";
+        $items = array();
+        $query = "select id, name from mdl_course_categories order by name";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $item = new stdClass();
+            foreach ($row as $key => $value) {
+                $item->$key = $value;
+            } // end foreach
+            $items[] = $item;
+        } // end while
+        if (count($items) > 0) {
+            $list.="<span class='span4'>";
+            $list.="<select id='any_invoice_categories' style='width:275px;'>";
+            $list.="<option value='0' selected>Program type</option>";
+            foreach ($items as $item) {
+                $list.="<option value='$item->id'>$item->name</option>";
+            } // end foreach
+            $list.="</select>";
+            $list.="</span>";
+        } // end if count($items)>0
+        return $list;
+    }
+
+    function get_any_invoice_courses_by_category($id) {
+        $list = "";
+        $items = array();
+        $query = "select id, fullname from mdl_course where category=$id 
+    					 and cost>0 and visible=1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $item = new stdClass();
+                foreach ($row as $key => $value) {
+                    $item->$key = $value;
+                } // end foreach
+                $items[] = $item;
+            } // end while
+            $list.="<span class='span4'>";
+            $list.="<select id='any_invoice_courses' style='width:275px;'>";
+            $list.="<option value='0' selected>Program</option>";
+            foreach ($items as $item) {
+                $list.="<option value='$item->id'>$item->fullname</option>";
+            } // end foreach
+            $list.="</select>";
+            $list.="</span>";
+        } // end if $num>0
+        else {
+            $list.="<span class='span4'>n/a</span>";
+        }
+        return $list;
+    }
+
+    function get_any_invoice_users($id) {
+        $list = "";
+        $users = array();
+        //1. Get course context
+        $instanceid = $this->get_course_context($id);
+
+        //2. Get course users
+        $query = "select id, roleid, contextid, userid "
+                . "from mdl_role_assignments "
+                . "where roleid=$this->student_role and contextid=$instanceid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $status = $this->is_user_deleted($row['userid']);
+                if ($status == 0) {
+                    $user = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $user->$key = $value;
+                    } // end foreach
+                    $user_detailes = $this->get_user_details($user->userid);
+
+                    if ($user_detailes->lastname != '') {
+                        $users[strtolower(trim($user_detailes->lastname)) . "." . strtolower(trim($user_detailes->firstname))] = $user;
+                    } // end if $user_details->firstname != '' && $user_details->lastname != ''
+                    //$users[] = $user;
+                } // end if $status==0
+            } // end while
+        } // end if $num > 0
+        ksort($users);
+        if (count($users) > 0) {
+            $list.="<span class='span4'>";
+            $list.="<select id='users' multiple style='width:275px;'>";
+            $list.="<option value='0' selected>Select user</option>";
+            foreach ($users as $user) {
+                $user_details = $this->get_user_details($user->userid);
+                $list.="<option value='$user->userid'>" . ucfirst(strtolower(trim($user_details->lastname))) . " &nbsp;" . ucfirst(strtolower(trim($user_details->firstname))) . "</option>";
+            } // end foreach            
+            $list.="</select></span>";
+        } // end if count($users)>0
+        else {
+            $list.="<span class='span3'>Enrolled users:</span><span class='span4'>n/a</span>";
+        }
+        return $list;
+    }
+
+    function get_any_invoice_dilog($id, $type) {
+        //$args = func_get_args();
+        //var_export($args);
+        $programs = $this->get_any_invoice_course_categories();
+        $list = "";
+
+        $list.="<div id='myModal' class='modal fade'>
+        <input type='hidden' id='invoice_id' value='$id'>
+        <input type='hidden' id='invoice_payment_type' value='$type'>   
+            
+        <div class='modal-dialog modal-lg'>
+        <div class='modal-content'>
+            <div class='modal-header'>                
+                <h4 class='modal-title'>Attach payment</h4>
+                </div> 
+                
+                <div class='modal-body'>     
+                
+                <div class='container-fluid' style='text-align:center;'>
+                $programs  
+                </div>
+                          
+                <div class='container-fluid' style='text-align:center;'>
+                <span id='invoice_category_courses'></span>    
+                </div>
+                
+                <div class='container-fluid' style='text-align:center;'>
+                <span id='invoice_courses_users'></span>    
+                </div>
+                
+                <div class='container-fluid' style='text-align:center;'>
+                <span id='any_invoice_users_err'></span>    
+                </div>
+                
+                </div>
+                
+                <div class='modal-footer'>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                <span align='center'><button type='button' class='btn btn-primary' id='attach_invoice_payment'>Go</button></span>
+                </div>
+        
+        </div>
+        </div>";
+
+        return $list;
     }
 
 }

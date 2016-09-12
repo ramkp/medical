@@ -1283,11 +1283,17 @@ class Students {
             foreach ($invoice_payments as $payment) {
                 $coursename = $this->get_course_name($payment->courseid);
                 $date = date('m-d-Y h:i:s', ($payment->i_pdate - 86400));
-                $userdata = $this->get_user_data($payment->userid);
-                $firstname = $userdata->firstname;
-                $lastname = $userdata->lastname;
+                if ($payment->userid > 0) {
+                    $userdata = $this->get_user_data($payment->userid);
+                    $firstname = $userdata->firstname;
+                    $lastname = $userdata->lastname;
+                }
+
                 $amount = $payment->i_sum;
-                $workshop_data = $this->get_student_workshops_data($payment->userid);
+
+                if ($payment->userid > 0) {
+                    $workshop_data = $this->get_student_workshops_data($payment->userid);
+                }
 
                 $in_list.="<tr>";
                 if ($amount != $renew_fee) {
@@ -1298,30 +1304,37 @@ class Students {
                 } // end else
                 $in_list.="</tr>";
 
-                $in_list.="<tr>";
-                $in_list.="<td style='padding:15px;'>Workshop location</td><td style='padding:15px;'>" . $workshop_data['location'] . "</td>";
-                $in_list.="</tr>";
+                if ($payment->userid > 0) {
+                    $in_list.="<tr>";
+                    $in_list.="<td style='padding:15px;'>Workshop location</td><td style='padding:15px;'>" . $workshop_data['location'] . "</td>";
+                    $in_list.="</tr>";
 
-                $in_list.="<tr>";
-                $in_list.="<td style='padding:15px;'>Workshop date</td><td style='padding:15px;'>" . $workshop_data['date'] . "</td>";
-                $in_list.="</tr>";
+                    $in_list.="<tr>";
+                    $in_list.="<td style='padding:15px;'>Workshop date</td><td style='padding:15px;'>" . $workshop_data['date'] . "</td>";
+                    $in_list.="</tr>";
 
-                $in_list.="<tr>";
-                $in_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
-                $in_list.="</tr>";
-                
+                    $in_list.="<tr>";
+                    $in_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
+                    $in_list.="</tr>";
+                } // end if $payment->userid > 0
+                else {
+                    $in_list.="<tr>";
+                    $in_list.="<td style='padding:15px;'>Client</td><td style='padding:15px;'>$payment->client</td>";
+                    $in_list.="</tr>";
+                }
+
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
                 $in_list.="</tr>";
-                
+
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;'>Invoice No:</td><td style='padding:15px;'>$payment->i_num</td>";
                 $in_list.="</tr>";
-                
+
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;'>Payment date:</td><td style='padding:15px;'>$date</td>";
                 $in_list.="</tr>";
-                
+
                 $in_list.="<tr>";
                 $in_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $in_list.="</tr>";
@@ -1332,7 +1345,7 @@ class Students {
             $in_list.="</tr>";
             $in_list.="</table>";
         } // end if count($invoice_payments)>0
-        // Partia/Cash payments
+        // Partial/Cash payments
         if (count($parial_payments) > 0) {
             $pp_list.="<table>";
             $pp_list.="<th>";
@@ -1770,11 +1783,11 @@ class Students {
     }
 
     /*     * ******* Code related to Certificates expiration messages ******** */
-    
-    function get_certificate_reminder_message () {
-    	$list="";
-    	
-    	$list.="<p style='align:left;font-size:23px;font-weight:bold;'>Its Time To Renew your Certification!</p> 
+
+    function get_certificate_reminder_message() {
+        $list = "";
+
+        $list.="<p style='align:left;font-size:23px;font-weight:bold;'>Its Time To Renew your Certification!</p> 
 
 				<p style='align:center;font-size:25px;font-weight:bold;color:red;'>Medical2 Certification Agency</p>
  			
@@ -1797,77 +1810,72 @@ class Students {
 			<hr>
 			<p style='align:left;font-weight:bold;font-size:15px;'>$100 Recertification Fee (Over 90 Days Expired)</p>
 
-		    <p style='align:left;font-size:15px;font-weight:bold;color:red;'>Mailing Address: Medical2 Inc.  1830A North Gloster St, Tupelo, MS 38804</p>"; 
-    	
-    		return $list;
+		    <p style='align:left;font-size:15px;font-weight:bold;color:red;'>Mailing Address: Medical2 Inc.  1830A North Gloster St, Tupelo, MS 38804</p>";
+
+        return $list;
     }
-    
-    
-    function get_expired_certificates ($interval)  {
-    	$now=time();
-    	$i=0;
-    	$exp_date=time()+$interval;
-    	
-    	if ($interval=='m') {
-    		$start=time()+1209600; // 2 weeks later
-    		$end=time()+2592000; // one month later
-    	}
-    	
-    	if ($interval=='w') {
-    		$start=time(); // now
-    		$end=time()+604800;  // 7 days later
-    	}
-    	
-    	$query="select * from mdl_certificates 
+
+    function get_expired_certificates($interval) {
+        $now = time();
+        $i = 0;
+        $exp_date = time() + $interval;
+
+        if ($interval == 'm') {
+            $start = time() + 1209600; // 2 weeks later
+            $end = time() + 2592000; // one month later
+        }
+
+        if ($interval == 'w') {
+            $start = time(); // now
+            $end = time() + 604800;  // 7 days later
+        }
+
+        $query = "select * from mdl_certificates 
     	where expiration_date between $start and $end";
-    	$num = $this->db->numrows($query);
-    	if ($num > 0) {
-    		$result = $this->db->query($query);
-    		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-    				$user_data=$this->get_user_data($row['userid']);
-    				$coursename=$this->get_course_name($row['courseid']);
-    				$this->send_certificate_expiration_data($user_data,$coursename);
-    				$i++;
-    		} // end while
-    	} // end if $num > 0 
-    	echo "Total users: ".$i."<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_data = $this->get_user_data($row['userid']);
+                $coursename = $this->get_course_name($row['courseid']);
+                $this->send_certificate_expiration_data($user_data, $coursename);
+                $i++;
+            } // end while
+        } // end if $num > 0 
+        echo "Total users: " . $i . "<br>";
     }
-    
-    function send_certificate_expiration_data ($user_data,$coursename) {
-    	
-    	
-    	echo "$user_data->firstname $user_data->lastname $user_data->email <br>";
-    	echo "Coursename: $coursename";
-    	
-    	
-    	$mail = new PHPMailer;
-    	$mail->isSMTP();
-    	$mail->Host = $this->mail_smtp_host;
-    	$mail->SMTPAuth = true;
-    	$mail->Username = $this->mail_smtp_user;
-    	$mail->Password = $this->mail_smtp_pwd;
-    	$mail->SMTPSecure = 'tls';
-    	$mail->Port = $this->mail_smtp_port;
-    	$mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
-    	$mail->addAddress($user_data->email);
-    	//$mail->addAddress('sirromas@gmail.com');
-    	$mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
-    	$mail->isHTML(true);
-    	$mail->Subject = 'Renew certification';
-    	$mail->Body = $this->get_certificate_reminder_message();
-    	if (!$mail->send()) {
-    		echo "<br>Error sending email ($user_data->email) .... <br>\n";
-    		echo "<br>-------------------------------------------------------------------<br>";
-    	}
-    	else {
-    		echo "<br>Email was delivered ($user_data->email) <br>\n";
-    		echo "<br>-------------------------------------------------------------------<br>";
-    	}
-    	
-    	
+
+    function send_certificate_expiration_data($user_data, $coursename) {
+
+
+        echo "$user_data->firstname $user_data->lastname $user_data->email <br>";
+        echo "Coursename: $coursename";
+
+
+        $mail = new PHPMailer;
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->addAddress($user_data->email);
+        //$mail->addAddress('sirromas@gmail.com');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->isHTML(true);
+        $mail->Subject = 'Renew certification';
+        $mail->Body = $this->get_certificate_reminder_message();
+        if (!$mail->send()) {
+            echo "<br>Error sending email ($user_data->email) .... <br>\n";
+            echo "<br>-------------------------------------------------------------------<br>";
+        } else {
+            echo "<br>Email was delivered ($user_data->email) <br>\n";
+            echo "<br>-------------------------------------------------------------------<br>";
+        }
     }
-    
-    
+
     /*     * ******* Code related to mysqldump backup ******** */
 
     function backup_tables($host, $user, $pass, $name, $tables = '*') {
@@ -1917,7 +1925,7 @@ class Students {
         }
 
         //save file
-        $date=date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d h:i:s', time());
         $handle = fopen('/home/cnausa/public_html/crons/DB/db-backup-' . $date . '-' . (md5(implode(',', $tables))) . '.sql', 'w+');
         fwrite($handle, $return);
         fclose($handle);

@@ -49,7 +49,32 @@ class Dashboard extends Util {
             $query = "select * from mdl_free where userid=$userid";
             $free_num = $this->db->numrows($query);
 
-            if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $free_num > 0) {
+            //5. Check among any invoice payments
+            $query = "select * from mdl_any_invoice_user where userid=$userid";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $invoiceid = $row['invoiceid'];
+                }
+
+                $query = "select * from mdl_invoice where id=$invoiceid";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $db_courseid = $row['courseid'];
+                }
+                if ($db_courseid == $courseid) {
+                    $any_invoice_num = 1;
+                } // end if $db_courseid==$courseid
+                else {
+                    $any_invoice_num = 0;
+                }
+            } // end if $num>0
+            else {
+                $any_invoice_num = 0;
+            }
+
+            if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $free_num > 0 || $any_invoice_num > 0) {
                 $status = 1;
             } // end if $card_payments_num>0 || $invoice_payments_num>0
         } // end if $installment_status==0
@@ -748,7 +773,7 @@ class Dashboard extends Util {
         } // end if count($invoice_payments)>0        
         //echo "Course cost: " . $coursecost . "<br>";
         //echo "Total paid: " . $total_paid . "<br>";    
-        
+
         $balance = $coursecost - $total_paid;
         if ($balance >= 0) {
             $clear_balance = $balance;
@@ -756,8 +781,8 @@ class Dashboard extends Util {
         else {
             $clear_balance = 0;
         } // end else
-        
-        $free_acces = $this->check_free_access($userid);       
+
+        $free_acces = $this->check_free_access($userid);
         if ($free_acces > 0) {
             $clear_balance = 0;
         }
@@ -777,7 +802,7 @@ class Dashboard extends Util {
         $list.="</tr>";
         $list.="<tr>";
         $list.="<td>$inv_list</td>";
-        $list.="</tr>";        
+        $list.="</tr>";
 
         $list.="<tr>";
         $list.="<td style='padding:15px;'>Your unpaid balance - $$clear_balance</td>";

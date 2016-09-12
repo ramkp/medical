@@ -519,5 +519,48 @@ class Mailer {
             //echo 'Message has been sent to ' . $user->email;
         }
     }
+    
+    function send_any_invoice($client, $email, $invoice_file_name) {
+    	$mail = new PHPMailer;
+    	$recipient=$email;
+    	//$recipient = 'sirromas@gmail.com'; // temp workaround
+    	
+    	$message="";
+    	$message.="<html>";
+    	$message.="<body>";
+    	$message.="<p align='center'>Dear $client!</p>";
+    	$message.="<p align='center'>Invoice is in attachment.</p>";
+    	$message.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or by phone 877-741-1996</p>";
+    	$message.="<p>Best regards,</p>";
+    	$message.="<p>Medical2 Career College team</p>";
+    	$message.="</body></html>";
+    	
+    	$mail->isSMTP();
+    	$mail->Host = $this->mail_smtp_host;
+    	$mail->SMTPAuth = true;
+    	$mail->Username = $this->mail_smtp_user;
+    	$mail->Password = $this->mail_smtp_pwd;
+    	$mail->SMTPSecure = 'tls';
+    	$mail->Port = $this->mail_smtp_port;
+    	
+    	$mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+    	$mail->addAddress($recipient);
+    	$mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+    	
+    	$mail->addAttachment($invoice_file_name, "invoice.pdf");
+   
+    	$mail->isHTML(true);
+    	
+    	$mail->Subject = 'Medical2 Career College - Invoice';
+    	$mail->Body = $message;
+    	
+    	if (!$mail->send()) {
+    		echo 'Message could not be sent.';
+    		echo 'Mailer Error: ' . $mail->ErrorInfo;
+    	} // end if !$mail->send()
+    	else {
+    		//echo 'Message has been sent to ' . $recipient;
+    	}
+    }
 
 }
