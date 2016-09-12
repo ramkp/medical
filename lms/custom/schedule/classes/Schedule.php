@@ -14,6 +14,7 @@ class Schedule extends Util {
 
     public $courseid;
     public $labels_path;
+    public $modid;
 
     function __construct() {
         global $COURSE;
@@ -165,14 +166,28 @@ class Schedule extends Util {
     }
 
     function get_scheduler_module_id($courseid) {
-        $query = "select * from mdl_course_modules "
-                . "where module=23 "
-                . "and course=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $id = $row['id'];
-        }
-        return $id;
+        //echo "Function course id: ".$courseid."<br>";
+        if ($courseid == 1) {
+            //echo "Inside if ....<br>";
+            //print_r($_SERVER);
+            
+            $qs = $_SERVER['HTTP_REFERER'];
+            //echo "Query string: ".$qs."<br>";
+            $modid = trim(str_replace("https://medical2.com/lms/mod/scheduler/view.php?id=", "", $qs));
+            //echo "Module id: ".$modid."<br>";
+        } // end if $courseid == 1
+        else {
+            //echo "Inside else ...<br>";
+            $query = "select * from mdl_course_modules "
+                    . "where module=23 "
+                    . "and course=$courseid";
+            //echo "Query: " . $query . "<br>";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $modid = $row['id'];
+            }
+        } // end else
+        return $modid;
     }
 
     function create_slots_page($slots, $tools = true) {
@@ -185,6 +200,8 @@ class Schedule extends Util {
         if ($modid == '') {
             $modid = $this->get_scheduler_module_id($courseid);
         }
+
+        $this->modid = $modid;
 
         $list = "";
         if ($tools == true) {
@@ -230,6 +247,8 @@ class Schedule extends Util {
             foreach ($slots as $slot) {
                 $slotid = $slot->id;
                 $has_students = $this->is_has_students($slotid);
+                $modid = $this->get_scheduler_module_id($this->course->id);
+                //echo "Module id: ".$modid."<br>";
                 $editactionurl = "https://medical2.com/lms/mod/scheduler/view.php?id=" . $modid . "&what=updateslot&subpage=myappointments&offset=-1&sesskey=" . sesskey() . "&slotid=" . $slotid . "";
                 $addr_array = explode("/", $slot->appointmentlocation);
                 $addr_block = $addr_array[1] . " , " . $addr_array[0];
@@ -248,12 +267,12 @@ class Schedule extends Util {
                 if (count($slot_students) > 0) {
                     $list.= "<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                     $list.="<span class='span1'></span>";
-                    $list.="<span class='span3'>Student</span>";
+                    $list.="<span class='span5'>Student</span>";
                     $list.="<span class='span4'>Course completion status</span>";
                     $list.="</div>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
                     $list.="<span class='span1'><input type='checkbox' name='studentid' id='slot_students_$slotid' value=''></span>";
-                    $list.="<span class='span3'>Select all</span>";
+                    $list.="<span class='span2'>Select all</span>";
                     $list.="</div>";
                     foreach ($slot_students as $student) {
                         $user_data = $this->get_user_details($student->studentid);
@@ -267,7 +286,7 @@ class Schedule extends Util {
                         } // end else                        
                         $list.= "<div class='container-fluid' style='text-align:left;'>";
                         $list.="<span class='span1'><input type='checkbox' class='students' name='studentid' value='$student->studentid'></span>";
-                        $list.="<span class='span3'><a href='https://medical2.com/lms/user/profile.php?id=$student->studentid'  target='_blank'>$user_data->firstname $user_data->lastname</a></span>";
+                        $list.="<span class='span5'><a href='https://medical2.com/lms/user/profile.php?id=$student->studentid'  target='_blank'>$user_data->firstname $user_data->lastname $user_data->email</a></span>";
                         $list.="<span class='span4'>$status</span>";
                         $list.="</div>";
                     } // end foreach                                    
@@ -717,9 +736,9 @@ class Schedule extends Util {
         echo "<br>Total existed ws: " . $exists . "<br>";
         echo "<br>Total non-exists: " . $non_exists . "<br>";
     }
-    
+
     function delete_workshop($id) {
-        $query="delete from mdl_scheduler_slots where id=$id";
+        $query = "delete from mdl_scheduler_slots where id=$id";
         //echo "Query: ".$query."<br>";
         $this->db->query($query);
         echo "ok";
