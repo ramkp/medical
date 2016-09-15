@@ -26,8 +26,8 @@ class ProcessPayment {
 
     function save_log($data) {
         $fp = fopen($this->log_file_path, 'a');
-        $date=date('m-d-Y h:i:s', time());
-        fwrite($fp, $date ."\n");
+        $date = date('m-d-Y h:i:s', time());
+        fwrite($fp, $date . "\n");
         fwrite($fp, print_r($data, TRUE));
         fclose($fp);
     }
@@ -36,6 +36,13 @@ class ProcessPayment {
         $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
         $merchantAuthentication->setName($this->LOGIN_ID);
         $merchantAuthentication->setTransactionKey($this->TRANSACTION_KEY);
+        return $merchantAuthentication;
+    }
+
+    function sandbox_authorize() {
+        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+        $merchantAuthentication->setName('6cUTfQ5238');
+        $merchantAuthentication->setTransactionKey('5bN8q5WT3qa257p9');
         return $merchantAuthentication;
     }
 
@@ -283,11 +290,12 @@ class ProcessPayment {
         $creditCard->setExpirationDate($date);
         $paymentOne = new AnetAPI\PaymentType();
         $paymentOne->setCreditCard($creditCard);
+
         //create a transaction
         $transactionRequest = new AnetAPI\TransactionRequestType();
         $transactionRequest->setTransactionType("refundTransaction");
         $transactionRequest->setAmount($amount);
-        //$transactionRequest->setCustomField("x_ref_trans_id", $trans_id);
+        $transactionRequest->setRefTransId($trans_id);
         $transactionRequest->setPayment($paymentOne);
 
         $request = new AnetAPI\CreateTransactionRequest();
@@ -303,6 +311,99 @@ class ProcessPayment {
             //echo "Response: <pre>";
             //print_r($tresponse);
             //echo "</pre>";
+
+            if (($tresponse != null) && ($tresponse->getResponseCode() == "1" )) {
+                //echo "it is ok ....";
+                return TRUE;
+            } // end if ($tresponse != null) && ($tresponse->getResponseCode() == \SampleCode\Constants::RESPONSE_OK)            
+            else {
+                $this->save_log($tresponse);
+                return FALSE;
+            }
+        } // end if $response != null 
+        else {
+            //echo "Null resposnse .. ...";
+            return FALSE;
+        }
+        return $response;
+    }
+
+    function getCustomerProfileIds() {
+        // Common setup for API credentials
+        $merchantAuthentication = $this->sandbox_authorize();
+        $refId = 'ref' . time();
+
+        // Get all existing customer profile ID's
+        $request = new AnetAPI\GetCustomerProfileIdsRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $controller = new AnetController\GetCustomerProfileIdsController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+            echo "GetCustomerProfileId's SUCCESS: " . "\n";
+            $profileIds[] = $response->getIds();
+
+            echo "<pre>";
+            print_r($profileIds);
+            echo "</pre>";
+            //echo "There are " . count($profileIds[0]) . " Customer Profile ID's for this Merchant Name and Transaction Key" . "\n";
+        } // end if ($response != null) && ($response->getMessages()->getResultCode() == "Ok") 
+        else {
+            echo "GetCustomerProfileId's ERROR :  Invalid response\n";
+            $errorMessages = $response->getMessages()->getMessage();
+            echo "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+        } // end else 
+        return $response;
+    }
+
+    function makeRefund2($amount, $card_last_four, $exp_date, $trans_id) {
+        $merchantAuthentication = $this->sandbox_authorize();
+        $refId = 'ref' . time();
+        $date = $this->prepareExpirationDate($exp_date);
+
+        /*
+         * 
+          $transaction = new AuthorizeNetTransaction;
+          $transaction->amount = $amount;
+          $transaction->customerProfileId = $customerProfileId;
+          $transaction->customerPaymentProfileId = $paymentProfileId;
+          $transaction->transId = $transid; // original transaction ID
+
+          $response = $request->createCustomerProfileTransaction("Refund", $transaction);
+          $transactionResponse = $response->getTransactionResponse();
+
+          $transactionId = $transactionResponse->transaction_id;
+         * 
+         */
+
+
+        // Create the payment data for a credit card
+        $creditCard = new AnetAPI\CreditCardType();
+        //$creditCard->setCardNumber(base64_decode($card_last_four));
+        $creditCard->setCardNumber($card_last_four);
+        $creditCard->setExpirationDate($date);
+        $paymentOne = new AnetAPI\PaymentType();
+        $paymentOne->setCreditCard($creditCard);
+
+        //create a transaction
+        $transactionRequest = new AnetAPI\TransactionRequestType();
+        $transactionRequest->setTransactionType("refundTransaction");
+        $transactionRequest->setAmount($amount);
+        $transactionRequest->setRefTransId($trans_id);
+        $transactionRequest->setPayment($paymentOne);
+
+        $request = new AnetAPI\CreateTransactionRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setTransactionRequest($transactionRequest);
+        $controller = new AnetController\CreateTransactionController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+        if ($response != null) {
+            $tresponse = $response->getTransactionResponse();
+
+            echo "Response: <pre>";
+            print_r($tresponse);
+            echo "</pre>";
 
             if (($tresponse != null) && ($tresponse->getResponseCode() == "1" )) {
                 //echo "it is ok ....";
