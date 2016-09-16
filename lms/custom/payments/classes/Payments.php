@@ -286,7 +286,9 @@ class Payments extends Util {
     }
 
     function get_refund_page() {
-        $payments = array();
+        $payments1 = array();
+        $payments2 = array();
+
         $query = "select * "
                 . "from mdl_card_payments where refunded=1 "
                 . "order by pdate desc limit 0, $this->limit";
@@ -298,9 +300,26 @@ class Payments extends Util {
                 foreach ($row as $key => $value) {
                     $payment->$key = $value;
                 } // end foreach      
-                $payments[] = $payment;
+                $payments1[$row['pdate']] = $payment;
             } // end while
         } // end if $num>0
+
+        $query = "select * "
+                . "from mdl_partial_refund_payments "
+                . "order by pdate desc limit 0, $this->limit";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach      
+                $payments2[$row['pdate']] = $payment;
+            } // end while
+        } // end if $num>0
+        $payments = array_merge($payments2, $payments1);
+        ksort($payments);
         $list = $this->create_refunded_payments_page($payments);
         return $list;
     }
@@ -765,10 +784,12 @@ class Payments extends Util {
         } // ebd while
         $pr = new ProcessPayment();
         $status = $pr->makeRefund($amount, $card_last_four, $exp_date, $trans_id);
+        //$status = true; // temp workarount for testing
         if ($status == true) {
             if ($amount == $db_amount) {
                 $query = "update mdl_card_payments set refunded=1 "
                         . "where id=$paymentid";
+                //echo "Query0: ".$query."<br>";
                 $this->db->query($query);
             } // end if $amount == $db_amount             
             else {
@@ -781,11 +802,13 @@ class Payments extends Util {
                 $query = "INSERT INTO mdl_partial_refund_payments "
                         . "SELECT * FROM mdl_card_payments "
                         . "where id=$paymentid";
+                //echo "Query1: ".$query."<br>";
                 $this->db->query($query);
                 // Update partial refund date 
-                $date=time();
-                $query="update mdl_partial_refund_payments "
+                $date = time();
+                $query = "update mdl_partial_refund_payments "
                         . "set pdate='$date' where id=$paymentid";
+                //echo "Query2: ".$query."<br>";
             } // end else when it was partial refund
 
             return true;
