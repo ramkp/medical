@@ -25,6 +25,8 @@ class Report extends Util {
     public $cheque_report_csv_file;
     public $refund_report_csv_file;
     public $invoice_report_csv_file;
+    public $full_refund_sum;
+    public $partial_refund_sum;
 
     function __construct() {
         parent::__construct();
@@ -284,7 +286,7 @@ class Report extends Util {
         } // end if $from==$to
         else {
             $unix_from = strtotime($from);
-            $unix_to = strtotime($to) + 86400;
+            $unix_to = strtotime($to) + 86400 * 2;
         } // end else
 
 
@@ -318,7 +320,7 @@ class Report extends Util {
                 } // end if $user_status==0
             } // end while
         } // end if $num > 0
-        // 2. Get refund payments
+        // 2.1 Get refund payments
         if ($courseid > 0) {
             $query = "select * from mdl_card_payments "
                     . "where courseid=$courseid and refunded=1 "
@@ -337,10 +339,36 @@ class Report extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_status = $this->is_user_deleted($row['userid']);
                 if ($user_status == 0) {
-                    $this->refund_sum = $this->refund_sum + $row['psum'];
+                    $this->full_refund_sum = $this->full_refund_sum + $row['psum'];
                 } // end if $user_status==0
             } // end while
         } // end if $num > 0
+        //2.2 Get partial refund payments
+        if ($courseid > 0) {
+            $query = "select * mdl_partial_refund_payments "
+                    . "where courseid=$courseid  "
+                    . "and pdate between $unix_from and $unix_to "
+                    . "order by pdate desc ";
+        } // end if $courseid>0
+        else {
+            $query = "select * from mdl_partial_refund_payments "
+                    . "where pdate between $unix_from and $unix_to "
+                    . "order by pdate desc ";
+        } // end else
+
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_status = $this->is_user_deleted($row['userid']);
+                if ($user_status == 0) {
+                    $this->partial_refund_sum = $this->partial_refund_sum + $row['psum'];
+                } // end if $user_status==0
+            } // end while
+        } // end if $num > 0
+
+        $this->refund_sum = $this->full_refund_sum + $this->partial_refund_sum;
+
         //3. Get partial cash payments
         if ($courseid > 0) {
             $query = "select * from mdl_partial_payments "
@@ -870,7 +898,7 @@ class Report extends Util {
         } // end if $from==$to
         else {
             $unix_from = strtotime($from);
-            $unix_to = strtotime($to) + 86400;
+            $unix_to = strtotime($to) + 86400 * 2;
         } // end else
         //1. Full refunded payments
         if ($courseid > 0) {
