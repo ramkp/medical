@@ -291,7 +291,7 @@ class Payments extends Util {
 
         $query = "select * "
                 . "from mdl_card_payments where refunded=1 "
-                . "order by pdate desc limit 0, $this->limit";
+                . "order by pdate desc ";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -306,7 +306,7 @@ class Payments extends Util {
 
         $query = "select * "
                 . "from mdl_partial_refund_payments "
-                . "order by pdate desc limit 0, $this->limit";
+                . "order by pdate desc ";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);

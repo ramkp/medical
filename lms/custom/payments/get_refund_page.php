@@ -8,6 +8,7 @@ echo $list;
 
 ?>
 
+<!--
 <script type="text/javascript">
 
     $(document).ready(function () {
@@ -31,3 +32,5 @@ echo $list;
     });
 
 </script>
+-->
+
