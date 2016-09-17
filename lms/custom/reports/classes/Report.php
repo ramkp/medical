@@ -273,7 +273,7 @@ class Report extends Util {
 
     function get_revenue_report_data($courseid, $from, $to, $status = true, $output = true) {
 
-        date_default_timezone_set('Pacific/Wallis');
+        //date_default_timezone_set('Pacific/Wallis');
         $this->courseid = $courseid;
         $this->from = $from;
         $this->to = $to;
@@ -287,6 +287,7 @@ class Report extends Util {
         else {
             $unix_from = strtotime($from);
             $unix_to = strtotime($to) + 86400 * 2;
+            //$unix_to = strtotime($to);
         } // end else
 
 

@@ -1070,6 +1070,7 @@ class Students {
 
     function get_refund_data($start, $end) {
         $payments = array();
+        //$adjusted_start=$start-50000;
         $partial_payments = array();
         $query = "select * from mdl_card_payments "
                 . "where refunded=1 and pdate between $start and $end";
@@ -1088,6 +1089,7 @@ class Students {
 
         $query = "select * from mdl_partial_refund_payments "
                 . "where pdate between $start and $end";
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -1101,6 +1103,7 @@ class Students {
         } // end if $num > 0
 
         $all_payments = array_merge($payments, $partial_payments);
+        //print_r($all_payments);
         return $all_payments;
     }
 

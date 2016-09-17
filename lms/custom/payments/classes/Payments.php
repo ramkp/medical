@@ -807,7 +807,7 @@ class Payments extends Util {
                 // Update partial refund date 
                 $date = time();
                 $query = "update mdl_partial_refund_payments "
-                        . "set pdate='$date' where id=$paymentid";
+                        . "set psum='$amount', pdate='$date' where id=$paymentid";
                 //echo "Query2: ".$query."<br>";
             } // end else when it was partial refund
 
