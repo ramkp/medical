@@ -89,34 +89,43 @@ class Price extends Util {
     }
 
     function get_items_from_category($id) {
-        $price_items = array();
-        $query = "select id, "
-                . "fullname, "
-                . "installment, "
-                . "num_payments, "
-                . "cost, "
-                . "discount_status, "
-                . "discount_size, "
-                . "taxes, expired "
-                . "from mdl_course "
-                . "where category=$id and visible=1";
-        $num = $this->db->numrows($query);
-        if ($num) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $course_item = new stdClass();
-                foreach ($row as $key => $value) {
-                    $course_item->$key = $value;
-                }
-                $group_item = $this->get_item_group_discount($row['id']);
-                $price_item = (object) array_merge((array) $course_item, (array) $group_item);
-                $price_items[] = $price_item;
-            } // end while
-        } // end if $num                
-        $category_name = $this->get_category_name($id);
-        $list = $this->create_item_block2($price_items, $category_name);
-        $course_price_item_block = json_encode(array('item_title' => $category_name, 'item_data' => $list));
-        return $course_price_item_block;
+
+        //echo "<pre>";
+        //print_r($this->session);
+        //echo "</pre><br>";
+        //die();
+
+        if ($this->session->justloggedin == 1) {
+
+            $price_items = array();
+            $query = "select id, "
+                    . "fullname, "
+                    . "installment, "
+                    . "num_payments, "
+                    . "cost, "
+                    . "discount_status, "
+                    . "discount_size, "
+                    . "taxes, expired "
+                    . "from mdl_course "
+                    . "where category=$id and visible=1";
+            $num = $this->db->numrows($query);
+            if ($num) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $course_item = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $course_item->$key = $value;
+                    }
+                    $group_item = $this->get_item_group_discount($row['id']);
+                    $price_item = (object) array_merge((array) $course_item, (array) $group_item);
+                    $price_items[] = $price_item;
+                } // end while
+            } // end if $num                
+            $category_name = $this->get_category_name($id);
+            $list = $this->create_item_block2($price_items, $category_name);
+            $course_price_item_block = json_encode(array('item_title' => $category_name, 'item_data' => $list));
+            return $course_price_item_block;
+        } // end if $this->session->justloggedin==1
     }
 
     function get_existing_course_discounts($scope, $id) {
@@ -222,9 +231,9 @@ class Price extends Util {
         } // end else
         return $list;
     }
-    
-    function get_expiration_status ($id, $expired) {
-    	$list = "";
+
+    function get_expiration_status($id, $expired) {
+        $list = "";
         if ($expired == 0) {
             $list = "<input type='checkbox' name='expire_$id' id='expire_$id' value='$expired'>";
         } // end if $taxes_status==0
@@ -247,7 +256,7 @@ class Price extends Util {
                 $installment_checkbox = $this->get_installment_checkbox($item->id, $item->installment);
                 $installment_payments = $this->get_installment_num_payments($item->id, $item->installment, $item->num_payments);
                 $taxes = $this->course_tax_status($item->id, $item->taxes);
-                $expire=$this->get_expiration_status($item->id,$item->expired);
+                $expire = $this->get_expiration_status($item->id, $item->expired);
                 $list.= "<div class='container-fluid'>";
                 $list.="<span class='span6' style='color:red;' id='price_err_$item->id'></span>";
                 $list.= "</div>";
@@ -270,13 +279,13 @@ class Price extends Util {
 
                 /*
                  * 
-                $list.= "<div class='container-fluid'>";
-                $list.="<span class='span3'>Installment payment</span><span class='span1'>$installment_checkbox</span>";
-                $list.= "</div>";
+                  $list.= "<div class='container-fluid'>";
+                  $list.="<span class='span3'>Installment payment</span><span class='span1'>$installment_checkbox</span>";
+                  $list.= "</div>";
 
-                $list.= "<div class='container-fluid'>";
-                $list.="<span class='span3'>Num of payments</span><span class='span1'>$installment_payments</span>";
-                $list.= "</div>";
+                  $list.= "<div class='container-fluid'>";
+                  $list.="<span class='span3'>Num of payments</span><span class='span1'>$installment_payments</span>";
+                  $list.= "</div>";
                  * 
                  */
 
@@ -287,7 +296,7 @@ class Price extends Util {
                 $list.= "<div class='container-fluid'>";
                 $list.="<span class='span3'>Apply state taxes</span><span class='span1'>$taxes</span>";
                 $list.= "</div>";
-                
+
                 $list.= "<div class='container-fluid'>";
                 $list.="<span class='span3'>Program expires</span><span class='span1'>$expire</span>";
                 $list.= "</div>";
@@ -352,9 +361,9 @@ class Price extends Util {
         } // end if count($states)>0
     }
 
-    function update_item_price($course_id, $course_cost, $course_discount, $course_group_discount, $installment, $num_payments, $states, $taxes,$expire) {
+    function update_item_price($course_id, $course_cost, $course_discount, $course_group_discount, $installment, $num_payments, $states, $taxes, $expire) {
         // Update mdl_course table        
-        $num_payments = ($num_payments=='') ? 0 : $num_payments;
+        $num_payments = ($num_payments == '') ? 0 : $num_payments;
         $query = "update mdl_course "
                 . "set cost=$course_cost ,"
                 . "discount_size=$course_discount , "
@@ -362,7 +371,7 @@ class Price extends Util {
                 . "num_payments=$num_payments, expired=$expire, "
                 . "taxes=$taxes "
                 . "where id=$course_id";
-                //echo $query;
+        //echo $query;
         $this->db->query($query);
 
         // Update mdl_group_discount table

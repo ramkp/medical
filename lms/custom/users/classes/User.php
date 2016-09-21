@@ -21,18 +21,24 @@ class User extends Util {
     public $total;
 
     function get_users_list() {
-        $users = array();
-        $query = "select * from mdl_user where deleted=0 order by email LIMIT 0, $this->limit";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $user = new stdClass();
-            foreach ($row as $key => $value) {
-                $user->$key = $value;
-            } // end foreach
-            $users[] = $user;
-        } // end while
-        $total = $this->get_users_total();
-        $list = $this->create_users_list($users, $total, true, null);
+        $list = "";
+        if ($this->session->justloggedin == 1) {
+            $users = array();
+            $query = "select * from mdl_user where deleted=0 order by email LIMIT 0, $this->limit";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user = new stdClass();
+                foreach ($row as $key => $value) {
+                    $user->$key = $value;
+                } // end foreach
+                $users[] = $user;
+            } // end while
+            $total = $this->get_users_total();
+            $list.= $this->create_users_list($users, $total, true, null);
+        } // end if
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else
         return $list;
     }
 
@@ -64,7 +70,7 @@ class User extends Util {
         $list.="<input type='hidden' value='$search_criteria' id='item'>";
         $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
         $total = count($users);
-        if ($total <= $this->limit && $search_criteria==null) {
+        if ($total <= $this->limit && $search_criteria == null) {
             $total = $this->get_users_total();
         }
         $list.="<span class='span8' style=''>Total users found: " . $total . "</span>";

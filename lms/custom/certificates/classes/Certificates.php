@@ -39,36 +39,32 @@ class Certificates extends Util {
     }
 
     function get_certificates_list() {
-        $certificates = array();
-        $query = "select * from mdl_certificates where userid<>3002 and userid<>3784 order by issue_date desc limit 0, $this->limit";
+        $list = "";
 
-        /*
-         * 
-          $query="SELECT id,
-          courseid,
-          userid,
-          cert_no,
-          issue_date,
-          FROM_UNIXTIME( `issue_date` , '%Y-%m-%d' ) AS date,
-          expiration_date
-          FROM mdl_certificates
-          WHERE FROM_UNIXTIME( `issue_date` , '%Y-%m-%d' ) != '1999-12-31'
-          order by issue_date desc limit 0, $this->limit";
-         * 
-         */
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $certificate = new stdClass();
-                foreach ($row as $key => $value) {
-                    $certificate->$key = $value;
-                } // end foreach
-                $certificates[] = $certificate;
-            } // end while
-        } // end if $num > 0
-        $list = $this->create_certificates_list($certificates);
-        $_SESSION['total'] = $this->get_total_certificates();
+        if ($this->session->justloggedin == 1) {
+            $certificates = array();
+            $query = "select * from mdl_certificates "
+                    . "where userid<>3002 and userid<>3784 "
+                    . "order by issue_date desc limit 0, $this->limit";
+
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $certificate = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $certificate->$key = $value;
+                    } // end foreach
+                    $certificates[] = $certificate;
+                } // end while
+            } // end if $num > 0
+            $list = $this->create_certificates_list($certificates);
+            $_SESSION['total'] = $this->get_total_certificates();
+        } // end if
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else
+
         return $list;
     }
 

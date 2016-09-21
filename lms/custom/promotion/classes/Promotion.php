@@ -5,7 +5,7 @@
  *
  * @author sirromas
  */
-include      '/home/cnausa/public_html/lms/editor/fckeditor.php';
+include '/home/cnausa/public_html/lms/editor/fckeditor.php';
 require_once '/home/cnausa/public_html/lms/custom/utils/classes/Util.php';
 require_once '/home/cnausa/public_html/lms/custom/invoices/classes/Invoice.php';
 require_once '/home/cnausa/public_html/functionality/php/classes/mailer/vendor/PHPMailerAutoload.php';
@@ -84,34 +84,41 @@ class Promotion extends Util {
 
     function get_promotion_page() {
         $list = "";
-        $new_campaign = $this->get_add_new_campaigner_block();
-        $campagin_list = $this->get_campaigns_list();
-        $list.="<div class='container-fluid'  style='text-align:center;'>";
-        $list.="<span class='span8'>";
-        $oFCKeditor = new FCKeditor('editor');
-        $oFCKeditor->BasePath = $this->editor_path;
-        $oFCKeditor->Value = '';
-        $oFCKeditor->Create(false);
-        $list.="</div>";
-        $list.="</div>";
 
-        $list.="<div class='container-fluid' id='new_campaign_container' style='text-align:center;'>";
-        $list.=$new_campaign;
-        $list.="</div>";
+        if ($this->session->justloggedin == 1) {
+            $new_campaign = $this->get_add_new_campaigner_block();
+            $campagin_list = $this->get_campaigns_list();
+            $list.="<div class='container-fluid'  style='text-align:center;'>";
+            $list.="<span class='span8'>";
+            $oFCKeditor = new FCKeditor('editor');
+            $oFCKeditor->BasePath = $this->editor_path;
+            $oFCKeditor->Value = '';
+            $oFCKeditor->Create(false);
+            $list.="</div>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid'  style='text-align:center;'>";
-        $list.="<span class='span12'><hr/></span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid' id='new_campaign_container' style='text-align:center;'>";
+            $list.=$new_campaign;
+            $list.="</div>";
 
-        $list.="<div class='container-fluid'  style='text-align:left;'>";
-        $list.="<span class='span6'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$campagin_list</span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid'  style='text-align:center;'>";
+            $list.="<span class='span12'><hr/></span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid' id='campaign_container' style='text-align:left;'>";
-        $list.="";
-        $list.="</div>";
+            $list.="<div class='container-fluid'  style='text-align:left;'>";
+            $list.="<span class='span6'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$campagin_list</span>";
+            $list.="</div>";
 
-        $list.="</div>";
+            $list.="<div class='container-fluid' id='campaign_container' style='text-align:left;'>";
+            $list.="";
+            $list.="</div>";
+
+            $list.="</div>";
+        } // end if
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        }
+
 
         return $list;
     }

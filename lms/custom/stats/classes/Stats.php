@@ -40,27 +40,33 @@ class Stats extends Util {
     }
 
     function get_users_source_page() {
-        $src_users = array();
-        $query = "select id, firstname, lastname, email, come_from "
-                . "from  mdl_user where deleted=0 and come_from <>''";
-        //echo "Query: ".$query."<br>";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $user = new stdClass();
-                $user->id = $row['id'];
-                $user->firstname = $row['firstname'];
-                $user->lastname = $row['lastname'];
-                $user->email = $row['email'];
-                $user->come_from = $row['come_from'];
-                if ($user->come_from == $this->sources[$row['come_from']]->src) {
-                    $this->sources[$row['come_from']]->counter++;
-                } // end if $user->come_from==$this->sources->src
-                $src_users[] = $user;
-            } // end while
-        } // end if $num > 0
-        $list = $this->create_users_course_page($src_users);
+        $list = "";
+        if ($this->session->justloggedin == 1) {
+            $src_users = array();
+            $query = "select id, firstname, lastname, email, come_from "
+                    . "from  mdl_user where deleted=0 and come_from <>''";
+            //echo "Query: ".$query."<br>";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $user = new stdClass();
+                    $user->id = $row['id'];
+                    $user->firstname = $row['firstname'];
+                    $user->lastname = $row['lastname'];
+                    $user->email = $row['email'];
+                    $user->come_from = $row['come_from'];
+                    if ($user->come_from == $this->sources[$row['come_from']]->src) {
+                        $this->sources[$row['come_from']]->counter++;
+                    } // end if $user->come_from==$this->sources->src
+                    $src_users[] = $user;
+                } // end while
+            } // end if $num > 0
+            $list.= $this->create_users_course_page($src_users);
+        } // end if
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else 
         return $list;
     }
 
@@ -162,7 +168,7 @@ class Stats extends Util {
         $whole_div.="</tr>";
         $whole_div.="<tr>";
         $whole_div.="<td colspan='2'><div class='container-fluid' style='text-align:center;'><span class='span12'><br/><hr/></span></div></td>";
-        $whole_div.="</tr>";        
+        $whole_div.="</tr>";
         $whole_div.="</table>";
         return $whole_div;
     }

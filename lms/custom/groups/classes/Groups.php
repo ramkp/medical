@@ -13,20 +13,28 @@ class Groups extends Util {
     public $limit = 3;
 
     function get_requests_list() {
-        $requests = array();
-        $query = "select * from mdl_private_groups order by request_date desc limit 0, $this->limit";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $request = new stdClass();
-                foreach ($row as $key => $value) {
-                    $request->$key = $value;
-                }
-                $requests[] = $request;
-            } // end while 
-        } // end if $num > 0
-        $list = $this->render_requests_list($requests);
+        $list = "";
+
+        if ($this->session->justloggedin == 1) {
+            $requests = array();
+            $query = "select * from mdl_private_groups order by request_date desc limit 0, $this->limit";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $request = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $request->$key = $value;
+                    }
+                    $requests[] = $request;
+                } // end while 
+            } // end if $num > 0
+            $list.= $this->render_requests_list($requests);
+        } // end if 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else
+
         return $list;
     }
 

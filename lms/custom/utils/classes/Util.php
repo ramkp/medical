@@ -18,13 +18,15 @@ class Util {
     public $student_role = 5;
     public $editor_path;
     public $json_path;
-
-    function __construct() {
-        global $USER, $COURSE;
+    public $session;
+    
+                function __construct() {
+        global $USER, $COURSE, $SESSION;
         $db = new pdo_db();
         $this->db = $db;
         $this->user = $USER;
         $this->course = $COURSE;
+        $this->session=$SESSION;
         $this->host = $_SERVER['SERVER_NAME'];
         $this->editor_path = 'https://' . $_SERVER['SERVER_NAME'] . "/lms/editor/";
         $this->json_path=$_SERVER['DOCUMENT_ROOT'].'/lms/custom/utils/data.json';

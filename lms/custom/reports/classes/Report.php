@@ -241,18 +241,23 @@ class Report extends Util {
 
     function get_revenue_report() {
         $list = "";
-        $courses = $this->get_courses_list();
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6' id='revenue_report_err'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span3'>$courses</span><span class='span1'>From</span><span class='span2'><input type='text' id='datepicker1' style='width:75px;'></span><span class='span1'>To</span><span class='span2'><input type='text' id='datepicker2' style='width:75px;'></span><span class='span1'><button type='button' id='rev_go' class='btn btn-primary'>Go</button></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
-        $list.="</div>";
-        $list.="<div id='revenue_report_container'>";
-        $list.="</div>";
+        if ($this->session->justloggedin == 1) {
+            $courses = $this->get_courses_list();
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span6' id='revenue_report_err'></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'>$courses</span><span class='span1'>From</span><span class='span2'><input type='text' id='datepicker1' style='width:75px;'></span><span class='span1'>To</span><span class='span2'><input type='text' id='datepicker2' style='width:75px;'></span><span class='span1'><button type='button' id='rev_go' class='btn btn-primary'>Go</button></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+            $list.="</div>";
+            $list.="<div id='revenue_report_container'>";
+            $list.="</div>";
+        } // end if 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        }
         return $list;
     }
 
@@ -457,6 +462,8 @@ class Report extends Util {
                         <li><a href='#option5' data-toggle='tab'>Invoice payments</a></li>
                         
                         <li><a href='#option4' data-toggle='tab'>Refund payments</a></li>
+                        
+                        <li><a href='#option6' data-toggle='tab'>Stat</a></li>
 
                     </ul>                    
 
@@ -485,7 +492,7 @@ class Report extends Util {
 
                         </div>
                         
-						<div class='tab-pane' id='option5'>
+			<div class='tab-pane' id='option5'>
 
                             <h3>Invoice payments - $$this->invoice_sum - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->invoice_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
                             <p>$invoice_data_details</p> 
@@ -493,14 +500,125 @@ class Report extends Util {
                         </div>
                         
                         
-						<div class='tab-pane' id='option4'>
+			  <div class='tab-pane' id='option4'>
 
                             <h3>Refund payments - $$this->refund_sum - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->refund_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
                             <p>$refund_payment_detailes</p> 
 
                         </div>
                         
-        		    </div>
+                        <div class='tab-pane' id='option6'>
+
+                            <h3>Statistics</h3>
+                           
+                            <div class='row'>
+                            <span class='span2' style='margin-left:35px;'>By Year</span>
+                            
+                            <span class='span2'>
+                            <select id='stat_year1'>
+                            <option val='0' selected>Year</option>
+                            <option val='2013'>2013</option>
+                            <option val='2014'>2014</option>
+                            <option val='2015'>2015</option>
+                            <option val='2016'>2016</option>
+                            </select>
+                            </span>
+                            
+                            <span class='span2'>
+                            <select id='stat_year2'>
+                            <option val='0' selected>Year</option>
+                            <option val='2013'>2013</option>
+                            <option val='2014'>2014</option>
+                            <option val='2015'>2015</option>
+                            <option val='2016'>2016</option>
+                            </select>
+                            </span>
+
+                            <span class='span3'><button type='button' id='month_stat' class='btn btn-primary'>Go</button></span>
+
+                            </div>
+                            
+                            <div class='row' id='report_month_data'>
+                            
+                            </div>
+                            
+                         
+                            
+                            <div class='row'>
+                            
+                            <span class='span2' style='margin-left:35px;'>By Month</span>
+                            
+                            <span class='span2'>
+                            <select id='stat_month_year'>
+                            <option val='0' selected>Year</option>
+                            <option val='2013'>2013</option>
+                            <option val='2014'>2014</option>
+                            <option val='2015'>2015</option>
+                            <option val='2016'>2016</option>
+                            </select>
+                            </span>
+
+                            <span class='span2'>
+                            <select id='stat_month1'>
+                            <option val='0' selected>Month</option>
+                            <option val='1'>Jan</option>
+                            <option val='2'>Feb</option>
+                            <option val='3'>Mar</option>
+                            <option val='4'>April</option>
+                            <option val='5'>May</option>
+                            <option val='6'>June</option>
+                            <option val='7'>July</option>
+                            <option val='8'>Aug</option>
+                            <option val='9'>Sep</option>
+                            <option val='10'>Oct</option>
+                            <option val='11'>Nov</option>
+                            <option val='12'>Dec</option>
+
+                            </select>
+                            </span>
+                            
+                            <span class='span2'>
+                            <select id='stat_month2'>
+                            <option val='0' selected>Month</option>
+                            <option val='1'>Jan</option>
+                            <option val='2'>Feb</option>
+                            <option val='3'>Mar</option>
+                            <option val='4'>April</option>
+                            <option val='5'>May</option>
+                            <option val='6'>June</option>
+                            <option val='7'>July</option>
+                            <option val='8'>Aug</option>
+                            <option val='9'>Sep</option>
+                            <option val='10'>Oct</option>
+                            <option val='11'>Nov</option>
+                            <option val='12'>Dec</option>
+                            </select>
+                            </span>
+
+                            <span class='span3'><button type='button' id='month_stat' class='btn btn-primary'>Go</button></span>
+
+                            </div>
+                            
+                            <div class='row' id='report_month_data'>
+                            
+                            </div>
+                            
+                            <div class='row'>
+                            
+                            <span class='span2' style='margin-left:35px;'>By week</span>
+                            <span class='span2'><input type='text' id='week1' class='hasDatepicker' style='width:75px;'></span>
+                            <span class='span2'><input type='text' id='week2' class='hasDatepicker' style='width:75px;'></span>
+                            
+                            <span class='span3'><button type='button' id='week_stat' class='btn btn-primary'>Go</button></span>
+                            
+                            </div>
+                            
+                            <div class='row' id='report_week_data'>
+                            
+                            </div>
+
+                        </div>
+                </div>
                 </div>
             </div>";
 
@@ -1171,51 +1289,58 @@ class Report extends Util {
 
     function get_pemissions_page() {
         $list = "";
-        $permissions = array();
-        $query = "select * from mdl_permissions order by module_name";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $permission = new stdClass();
-            foreach ($row as $key => $value) {
-                $permission->$key = $value;
+
+        if ($this->session->justloggedin == 1) {
+            $permissions = array();
+            $query = "select * from mdl_permissions order by module_name";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $permission = new stdClass();
+                foreach ($row as $key => $value) {
+                    $permission->$key = $value;
+                }
+                $permissions[] = $permission;
             }
-            $permissions[] = $permission;
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span12' style='font-weight:bold;'>Permissions based list of modules</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+            $list.="<span class='span3'>Module name</span>";
+            $list.="<span class='span3'>Permission status</span>";
+            $list.="</div>";
+
+            foreach ($permissions as $permission) {
+                switch ($permission->module_name) {
+                    case 'invoice':
+                        $moduleName = 'Invoices';
+                        break;
+                    case 'cash':
+                        $moduleName = 'Cash/Cheque payments';
+                        break;
+                } // end switch
+
+                if ($permission->enabled == 0) {
+                    $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id'>";
+                } // end if $permission->enabled==0
+                else {
+                    $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id' checked>";
+                } // end else 
+
+                $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.="<span class='span3'>$moduleName</span>";
+                $list.="<span class='span3'>$status</span>";
+                $list.="</div>";
+            } // end foreach
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span6' id='status'></span>";
+            $list.="</div>";
+        } // end if 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
         }
 
-        $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span12' style='font-weight:bold;'>Permissions based list of modules</span>";
-        $list.="</div>";
-
-        $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
-        $list.="<span class='span3'>Module name</span>";
-        $list.="<span class='span3'>Permission status</span>";
-        $list.="</div>";
-
-        foreach ($permissions as $permission) {
-            switch ($permission->module_name) {
-                case 'invoice':
-                    $moduleName = 'Invoices';
-                    break;
-                case 'cash':
-                    $moduleName = 'Cash/Cheque payments';
-                    break;
-            } // end switch
-
-            if ($permission->enabled == 0) {
-                $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id'>";
-            } // end if $permission->enabled==0
-            else {
-                $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id' checked>";
-            } // end else 
-
-            $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span3'>$moduleName</span>";
-            $list.="<span class='span3'>$status</span>";
-            $list.="</div>";
-        } // end foreach
-        $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span6' id='status'></span>";
-        $list.="</div>";
 
         return $list;
     }

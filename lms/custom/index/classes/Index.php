@@ -66,20 +66,28 @@ class Index extends Util {
     }
 
     function get_index_page() {
-        $slides = array();
-        $query = "select * from mdl_slides ";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $slide = new stdClass();
-                foreach ($row as $key => $value) {
-                    $slide->$key = $value;
-                } // end foreach
-                $slides[] = $slide;
-            } // end while
-        } // end if $num>0
-        $list = $this->create_index_page($slides);
+        $list = "";
+
+        if ($this->session->justloggedin == 1) {
+            $slides = array();
+            $query = "select * from mdl_slides ";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $slide = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $slide->$key = $value;
+                    } // end foreach
+                    $slides[] = $slide;
+                } // end while
+            } // end if $num>0
+            $list.= $this->create_index_page($slides);
+        } // end if
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else
+
         return $list;
     }
 

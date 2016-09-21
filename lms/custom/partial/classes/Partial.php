@@ -126,20 +126,27 @@ class Partial extends Util {
 
     function get_partial_payments_list() {
         $list = "";
-        $partials = array();
-        $cc_partials = $this->get_partial_cc_payments();
-        $of_partials = $this->get_partial_offline_payments();
-        $partials = array_merge($cc_partials, $of_partials);
 
-        /*
-          foreach ($partials_arr as $p) {
-          $slotid=$this->get_user_slot($p->courseid, $p->userid);
-          $wsdate=$this->get_workshop_date($slotid);
-          $partials[$wsdate]=$p;
-          }
-          ksort($partials);
-         */
-        $list.=$this->create_partial_payments_list($partials);
+        if ($this->session->justloggedin == 1) {
+            $partials = array();
+            $cc_partials = $this->get_partial_cc_payments();
+            $of_partials = $this->get_partial_offline_payments();
+            $partials = array_merge($cc_partials, $of_partials);
+
+            /*
+              foreach ($partials_arr as $p) {
+              $slotid=$this->get_user_slot($p->courseid, $p->userid);
+              $wsdate=$this->get_workshop_date($slotid);
+              $partials[$wsdate]=$p;
+              }
+              ksort($partials);
+             */
+            $list.=$this->create_partial_payments_list($partials);
+        } // end if 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else
+
         return $list;
     }
 
@@ -167,7 +174,7 @@ class Partial extends Util {
         $list = "";
         if ($toolbar == true) {
             $add_payment_block = $this->get_add_partial_payment_page();
-          
+
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span2'>Search</span>";
             $list.="<span class='span2'><input type='text' id='search_partial' class='typehead' style='width:125px;' /></span>";
@@ -182,7 +189,7 @@ class Partial extends Util {
             $list.="<br><div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span12' id='add_payment_container'>$add_payment_block</span>";
             $list.="</div>";
-            
+
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span12' id='partial_err'></span>";
             $list.="</div>";
@@ -195,9 +202,9 @@ class Partial extends Util {
         if (count($partials) > 0) {
             $list.="<div class='container-fluid' style='text-align:center;' id='partial_container'>";
             $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span12' style='font-weight:bold;'>Total items: ".count($partials)."</span>";
+            $list.="<span class='span12' style='font-weight:bold;'>Total items: " . count($partials) . "</span>";
             $list.="</div>";
-            
+
             foreach ($partials as $partial) {
                 $user_data = $this->get_user_details($partial->userid);
                 $coursename = $this->get_course_name($partial->courseid);

@@ -26,17 +26,25 @@ class Taxes extends Util {
     public $limit = 10;
 
     function get_state_taxes_list() {
-        $taxes = array();
-        $query = "select * from mdl_state_taxes order by state limit 0, $this->limit";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $item = new stdClass();
-            foreach ($row as $key => $value) {
-                $item->$key = $value;
-            } // end foreach
-            $taxes[] = $item;
-        } // end while
-        $list = $this->create_taxes_block($taxes);
+        $list = "";
+
+        if ($this->session->justloggedin == 1) {
+            $taxes = array();
+            $query = "select * from mdl_state_taxes order by state limit 0, $this->limit";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $item = new stdClass();
+                foreach ($row as $key => $value) {
+                    $item->$key = $value;
+                } // end foreach
+                $taxes[] = $item;
+            } // end while
+            $list = $this->create_taxes_block($taxes);
+        } // end if
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        }
+
         return $list;
     }
 

@@ -21,24 +21,30 @@ class Payments extends Util {
     }
 
     function get_invoice_payments($payment_type) {
-        $invoice_payments = array();
-        $query = "select * from mdl_invoice "
-                . "where i_status=1 and "
-                . "i_ptype=$payment_type order by i_pdate desc limit 0, $this->limit";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $payment = new stdClass();
-                foreach ($row as $key => $value) {
-                    $payment->$key = $value;
-                } // end foreach 
-                $invoice_payments[] = $payment;
-            } // end while
-        } // end if $num > 0
-        $this->typeid = $payment_type;
-        $this->type = $this->get_payments_type($payment_type);
-        $list = $this->get_invoice_payments_page($invoice_payments);
+        $list = "";
+        if ($this->session->justloggedin == 1) {
+            $invoice_payments = array();
+            $query = "select * from mdl_invoice "
+                    . "where i_status=1 and "
+                    . "i_ptype=$payment_type order by i_pdate desc limit 0, $this->limit";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $payment = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $payment->$key = $value;
+                    } // end foreach 
+                    $invoice_payments[] = $payment;
+                } // end while
+            } // end if $num > 0
+            $this->typeid = $payment_type;
+            $this->type = $this->get_payments_type($payment_type);
+            $list.= $this->get_invoice_payments_page($invoice_payments);
+        } // end if 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else
         return $list;
     }
 
@@ -167,21 +173,28 @@ class Payments extends Util {
     }
 
     function get_payment_log_page() {
-        $payments = array();
-        $query = "select * from mdl_payments_log "
-                . "order by date_added desc limit 0, $this->limit";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $payment = new stdClass();
-                foreach ($row as $key => $value) {
-                    $payment->$key = $value;
-                } // end foreach 
-                $payments[] = $payment;
-            } // end while
-        } // end if $num > 0
-        $list = $this->create_payment_log_page($payments);
+        $list = "";
+        if ($this->session->justloggedin == 1) {
+            $payments = array();
+            $query = "select * from mdl_payments_log "
+                    . "order by date_added desc limit 0, $this->limit";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $payment = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $payment->$key = $value;
+                    } // end foreach 
+                    $payments[] = $payment;
+                } // end while
+            } // end if $num > 0
+            $list.= $this->create_payment_log_page($payments);
+        } // end if
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        }
+
         return $list;
     }
 
@@ -266,61 +279,77 @@ class Payments extends Util {
     }
 
     function get_card_payments_page() {
-        $payments = array();
-        $query = "select * "
-                . "from mdl_card_payments where refunded=0 "
-                . "order by pdate desc limit 0, $this->limit";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $payment = new stdClass();
-                foreach ($row as $key => $value) {
-                    $payment->$key = $value;
-                } // end foreach      
-                $payments[] = $payment;
-            } // end while
-        } // end if $num>0
-        $list = $this->create_card_payments_page($payments);
+        $list = "";
+        if ($this->session->justloggedin == 1) {
+            $payments = array();
+            $query = "select * "
+                    . "from mdl_card_payments where refunded=0 "
+                    . "order by pdate desc limit 0, $this->limit";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $payment = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $payment->$key = $value;
+                    } // end foreach      
+                    $payments[] = $payment;
+                } // end while
+            } // end if $num>0
+            $list.= $this->create_card_payments_page($payments);
+        } // end if 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else
+
         return $list;
     }
 
     function get_refund_page() {
-        $payments1 = array();
-        $payments2 = array();
+        $list = "";
 
-        $query = "select * "
-                . "from mdl_card_payments where refunded=1 "
-                . "order by pdate desc ";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $payment = new stdClass();
-                foreach ($row as $key => $value) {
-                    $payment->$key = $value;
-                } // end foreach      
-                $payments1[$row['pdate']] = $payment;
-            } // end while
-        } // end if $num>0
+        if ($this->session->justloggedin == 1) {
+            $payments1 = array();
+            $payments2 = array();
 
-        $query = "select * "
-                . "from mdl_partial_refund_payments "
-                . "order by pdate desc ";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $payment = new stdClass();
-                foreach ($row as $key => $value) {
-                    $payment->$key = $value;
-                } // end foreach      
-                $payments2[$row['pdate']] = $payment;
-            } // end while
-        } // end if $num>0
-        $payments = array_merge($payments2, $payments1);
-        ksort($payments);
-        $list = $this->create_refunded_payments_page($payments);
+            $query = "select * "
+                    . "from mdl_card_payments where refunded=1 "
+                    . "order by pdate desc ";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $payment = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $payment->$key = $value;
+                    } // end foreach      
+                    $payments1[$row['pdate']] = $payment;
+                } // end while
+            } // end if $num>0
+
+            $query = "select * "
+                    . "from mdl_partial_refund_payments "
+                    . "order by pdate desc ";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $payment = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $payment->$key = $value;
+                    } // end foreach      
+                    $payments2[$row['pdate']] = $payment;
+                } // end while
+            } // end if $num>0
+            $payments = array_merge($payments2, $payments1);
+            ksort($payments);
+            $list.= $this->create_refunded_payments_page($payments);
+        } // end if 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        }
+
+
         return $list;
     }
 
@@ -527,17 +556,25 @@ class Payments extends Util {
 
     function get_renew_fee_page() {
         $list = "";
-        $query = "select * from mdl_renew_fee where id=1";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $fee = $row['fee_sum'];
+
+        if ($this->session->justloggedin == 1) {
+            $query = "select * from mdl_renew_fee where id=1";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $fee = $row['fee_sum'];
+            }
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'>Renew Fee Amount</span><span class='span3'><input type='text' id='renew_fee2' name='renew_fee2' value='$fee' style='width:45px;'></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'><button type='button' id='update_renew_fee' class='btn btn-primary'>Update</button></span><span class='span5' id='fee_err'></span>";
+            $list.="</div>";
+        } // end if 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
         }
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span3'>Renew Fee Amount</span><span class='span3'><input type='text' id='renew_fee2' name='renew_fee2' value='$fee' style='width:45px;'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span3'><button type='button' id='update_renew_fee' class='btn btn-primary'>Update</button></span><span class='span5' id='fee_err'></span>";
-        $list.="</div>";
+
+
         return $list;
     }
 
@@ -821,28 +858,33 @@ class Payments extends Util {
     function get_update_refund_pwd_page() {
         $list = "";
 
-        $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span3'>Old password*:</span><span class='span3'><input type='password' id='old_pwd' style=''></span>";
-        $list.="</div>";
+        if ($this->session->justloggedin == 1) {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'>Old password*:</span><span class='span3'><input type='password' id='old_pwd' style=''></span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span3'>New password*:</span><span class='span3'><input type='password' id='new_pwd1' style=''></span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'>New password*:</span><span class='span3'><input type='password' id='new_pwd1' style=''></span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span3'>New password again*:</span><span class='span3'><input type='password' id='new_pwd2' style=''></span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'>New password again*:</span><span class='span3'><input type='password' id='new_pwd2' style=''></span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span6' style='color:red;' id='pwd_err'></span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span6' style='color:red;' id='pwd_err'></span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span3'>&nbsp;</span><span class='span3'><button type='button' class='btn btn-primary'  id='update_refund_pwd'>Update</button></span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'>&nbsp;</span><span class='span3'><button type='button' class='btn btn-primary'  id='update_refund_pwd'>Update</button></span>";
+            $list.="</div>";
 
-        $list.="</div>";
+            $list.="</div>";
+        } // end if 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        }
 
         return $list;
     }

@@ -14,20 +14,27 @@ class Installment extends Util {
     public $period = 28; // installment period in days
 
     function get_installment_page() {
-        $users = array();
-        $query = "select * from mdl_installment_users order by id asc limit 0, $this->limit";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $user = new stdClass();
-                foreach ($row as $key => $value) {
-                    $user->$key = $value;
-                } // end foreach 
-                $users[] = $user;
-            } /// end while
-        } // end if $num > 0        
-        $list = $this->create_installment_page($users);
+        $list = "";
+        if ($this->session->justloggedin == 1) {
+            $users = array();
+            $query = "select * from mdl_installment_users order by id asc limit 0, $this->limit";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $user = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $user->$key = $value;
+                    } // end foreach 
+                    $users[] = $user;
+                } /// end while
+            } // end if $num > 0        
+            $list.= $this->create_installment_page($users);
+        } // end if
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else
+
         return $list;
     }
 
@@ -76,16 +83,16 @@ class Installment extends Util {
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span3'>Installment duration</span><span class='span2'>$this->period days</span>";
-                $list.="</div>";                
+                $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span3'>Installment payments num</span><span class='span2'>$user->num</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>Installment Interval</span><span class='span2'>".round($this->period/$user->num)." days</span>";
+                $list.="<span class='span3'>Installment Interval</span><span class='span2'>" . round($this->period / $user->num) . " days</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span3'>Installment sum</span><span class='span2'>$$user->sum</span>";
-                $list.="</div>";                
+                $list.="</div>";
 
                 if ($user->subscription_id != '') {
                     $list.="<div class='container-fluid'>";

@@ -15,9 +15,15 @@ $(document).ready(function () {
         var url = "/lms/custom/prices/list.php";
         $.post(url, {id: id}).done(function (data) {
             console.log(data);
-            var price_obj = $.parseJSON(data);
-            update_navigation_status__menu(price_obj.item_title);
-            $('#region-main').html(price_obj.item_data);
+            try {
+                var price_obj = $.parseJSON(data);
+                update_navigation_status__menu(price_obj.item_title);
+                $('#region-main').html(price_obj.item_data);
+            } catch (e) {
+                // not json
+                window.location = "https://medical2.com/login";
+            }
+
         });
     }
 
@@ -321,7 +327,12 @@ $(document).ready(function () {
     function get_invoice_spec_page() {
         var url = "/lms/custom/invoices/index.php";
         $.post(url, {id: 1}).done(function (data) {
-            $('#region-main').html(data);
+            if (data != 'non_auth') {
+                $('#region-main').html(data);
+            } // end if data != 'non_auth' 
+            else {
+                window.location = "https://medical2.com/login";
+            } // end else 
         });
     }
 
@@ -506,12 +517,10 @@ $(document).ready(function () {
         var url = "/lms/custom/invoices/open_invoices.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-
             $.get('/lms/custom/utils/data.json', function (data) {
                 $("#search_invoice_input").typeahead({source: data, items: 24});
             }, 'json');
-
-        });
+        }); // end of post
     }
 
     function get_paid_invoice_page() {
@@ -1403,6 +1412,14 @@ $(document).ready(function () {
 // Main region events processing function
     $('#region-main').on('click', 'button', function (event) {
         console.log("Item clicked: " + event.target.id);
+        
+        /*
+        if (event.target.id == 'relogin') {
+            console.log('Inside relogin ...');
+            document.location.reload();
+        }
+        */
+
         // Save price item
         if (event.target.id.indexOf("price_") >= 0) {
             update_item_price(event.target.id);

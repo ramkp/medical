@@ -86,28 +86,40 @@ class Gallery extends Util {
     }
 
     function get_index_page() {
+        global $SESSION;
         $list = "";
-        $thumbs_list = $this->get_galllery_thumbs(null, null, null);
-        $toolbar = $this->get_toolbar();
-        $states = $this->get_states_list();
-        $month = $this->get_month_list();
-        $year = $this->get_year_list();
-        // Toolbar
-        $list .= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;'>";
-        $list .=$toolbar;
-        $list.= "</div>";
-        // Comment box
-        $list .= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
-        $list.="<span class='span10' style='text-align:center;'>Comment: &nbsp; <input type='text' id='comment' style='width:375px;'></span>";
-        $list.= "</div>";
-        // Error div
-        $list .= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
-        $list.="<span class='span10' id='gallery_err' style='color:red;'></span>";
-        $list.= "</div>";
-        // Thumbnails div
-        $list = $list . "<div class='container-fluid' style='padding-left:10px;padding-right:10px;'>";
-        $list.="<span id='thumb_list' style='' class='span10'>$thumbs_list</span>";
-        $list.= "</div>";
+
+        //echo "<pre> Utils seesion object: <br>";
+        //print_r($SESSION);
+        //echo "<br>-----------------------<br>";
+        
+        if ($SESSION->justloggedin == 1) {
+            $thumbs_list = $this->get_galllery_thumbs(null, null, null);
+            $toolbar = $this->get_toolbar();
+            $states = $this->get_states_list();
+            $month = $this->get_month_list();
+            $year = $this->get_year_list();
+            // Toolbar
+            $list .= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;'>";
+            $list .=$toolbar;
+            $list.= "</div>";
+            // Comment box
+            $list .= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
+            $list.="<span class='span10' style='text-align:center;'>Comment: &nbsp; <input type='text' id='comment' style='width:375px;'></span>";
+            $list.= "</div>";
+            // Error div
+            $list .= "<div class='container-fluid' style='padding-left:10px;padding-right:10px;text-align:center;'>";
+            $list.="<span class='span10' id='gallery_err' style='color:red;'></span>";
+            $list.= "</div>";
+            // Thumbnails div
+            $list = $list . "<div class='container-fluid' style='padding-left:10px;padding-right:10px;'>";
+            $list.="<span id='thumb_list' style='' class='span10'>$thumbs_list</span>";
+            $list.= "</div>";
+        } // end if
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        }
+
         return $list;
     }
 

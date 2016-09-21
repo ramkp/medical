@@ -22,26 +22,31 @@ class Invoices extends Util {
 
     function get_invoice_crednetials() {
         $list = "";
-        $query = "select * from mdl_invoice_credentials";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $item = new stdClass();
-            foreach ($row as $key => $value) {
-                $item->$key = $value;
-            } // end foreach
-        } // end while
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span5' id='invoice_status'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span3' style='font-weight:bold;'>Phone</span><span class='span3' style='font-weight:bold;'>Fax</span><span class='span3' style='font-weight:bold;'>Email</span><span class='span3' style='font-weight:bold;'>Site</span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span3'><input type='text' id='phone' value='$item->phone' size='15'></span><span class='span3'><input type='text' id='fax' value='$item->fax' size='15'></span><span class='span3'><input type='text' id='email' value='$item->email' size='20'></span><span class='span3'><input type='text' id='site' value='$item->site' size='20'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span2'><button type='button' id='invoice_data' class='btn btn-primary'>Save</button></span>";
-        $list.="</div>";
+        if ($this->session->justloggedin == 1) {
+            $query = "select * from mdl_invoice_credentials";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $item = new stdClass();
+                foreach ($row as $key => $value) {
+                    $item->$key = $value;
+                } // end foreach
+            } // end while
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span5' id='invoice_status'></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3' style='font-weight:bold;'>Phone</span><span class='span3' style='font-weight:bold;'>Fax</span><span class='span3' style='font-weight:bold;'>Email</span><span class='span3' style='font-weight:bold;'>Site</span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'><input type='text' id='phone' value='$item->phone' size='15'></span><span class='span3'><input type='text' id='fax' value='$item->fax' size='15'></span><span class='span3'><input type='text' id='email' value='$item->email' size='20'></span><span class='span3'><input type='text' id='site' value='$item->site' size='20'></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span2'><button type='button' id='invoice_data' class='btn btn-primary'>Save</button></span>";
+            $list.="</div>";
+        } // end if $this->session->justloggedin == 1
+        else {
+            $list.='non_auth';
+        }
         return $list;
     }
 
@@ -63,67 +68,74 @@ class Invoices extends Util {
 
     function get_send_invoice_page() {
         $list = "";
-        $program_types = $this->get_course_categories();
-        $invoice_program_types = $this->get_invoice_course_categories();
 
-        // Send invoice to company or non-existing user
-        $list.="<div class='container-fluid'>";
-        $list.="<div class='container-fluid' style='font-weight:bold;'>";
-        $list.="<span class='span6'>Send invoice to company or new user</span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span9' id='any_invoice_status'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>$invoice_program_types</span>";
-        $list.="</div>";
 
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6' id='invoice_category_courses'></span>";
-        $list.="</div>";
+        if ($this->session->justloggedin == 1) {
+            $program_types = $this->get_course_categories();
+            $invoice_program_types = $this->get_invoice_course_categories();
 
-        $list.="<div class='container-fluid' id='invoice_client_row' style='display:none;'>";
-        $list.="<span class='span1' style=''>Client* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_client' style='width:265px;'></span>";
-        $list.="</div>";
+            // Send invoice to company or non-existing user
+            $list.="<div class='container-fluid'>";
+            $list.="<div class='container-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span6'>Send invoice to company or new user</span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9' id='any_invoice_status'></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span6'>$invoice_program_types</span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid' id='invoice_amount_row' style='display:none;'>";
-        $list.="<span class='span1' style=''>Amount* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_amount' style='width:265px;'></span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span6' id='invoice_category_courses'></span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid' id='invoice_email_row' style='display:none;'>";
-        $list.="<span class='span1'>Email* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_email' style='width:265px;'></span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid' id='invoice_client_row' style='display:none;'>";
+            $list.="<span class='span1' style=''>Client* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_client' style='width:265px;'></span>";
+            $list.="</div>";
 
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span2'><button type='button' id='send_any_invoice' class='btn btn-primary'>Send</button></span>";
-        $list.="</div>";
-        $list.="</div";
+            $list.="<div class='container-fluid' id='invoice_amount_row' style='display:none;'>";
+            $list.="<span class='span1' style=''>Amount* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_amount' style='width:265px;'></span>";
+            $list.="</div>";
 
-        $list.="<br><br><div class='container-fluid'>";
-        $list.="<span class='span6'><hr></span>";
-        $list.="</div><br><br>";
+            $list.="<div class='container-fluid' id='invoice_email_row' style='display:none;'>";
+            $list.="<span class='span1'>Email* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_email' style='width:265px;'></span>";
+            $list.="</div>";
 
-        // Send invoice to existing user
-        $list.="<div class='container-fluid'>";
-        $list.="<div class='container-fluid' style='font-weight:bold;'>";
-        $list.="<span class='span6'>Send invoice to existing user</span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span5' id='invoice_status'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>$program_types</span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6' id='category_courses'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6' id='enrolled_users'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span2'><button type='button' id='send_invoice' class='btn btn-primary'>Send</button></span>";
-        $list.="</div>";
-        $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span2'><button type='button' id='send_any_invoice' class='btn btn-primary'>Send</button></span>";
+            $list.="</div>";
+            $list.="</div";
+
+            $list.="<br><br><div class='container-fluid'>";
+            $list.="<span class='span6'><hr></span>";
+            $list.="</div><br><br>";
+
+            // Send invoice to existing user
+            $list.="<div class='container-fluid'>";
+            $list.="<div class='container-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span6'>Send invoice to existing user</span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span5' id='invoice_status'></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span6'>$program_types</span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span6' id='category_courses'></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span6' id='enrolled_users'></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span2'><button type='button' id='send_invoice' class='btn btn-primary'>Send</button></span>";
+            $list.="</div>";
+            $list.="</div>";
+        } // end if  $this->session->justloggedin == 1
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        }
 
         return $list;
     }
@@ -156,6 +168,7 @@ class Invoices extends Util {
     }
 
     function send_invoice($courseid, $userid) {
+        $list = "";
         $file_invoice = new Invoice();
         $mailer = new Mailer();
         $user = $this->get_user_details($userid);
@@ -205,7 +218,7 @@ class Invoices extends Util {
                 . "'" . time() . "')";
         $this->db->query($query);
         $mailer->send_invoice($user);
-        $list = "Invoice has been sent.";
+        $list.= "Invoice has been sent.";
         return $list;
     }
 
@@ -216,23 +229,29 @@ class Invoices extends Util {
      * ******************************************************* */
 
     function get_open_invoices() {
-        //echo "<br/>Current user: $this->user->id<br/>";        
-        $invoices = array();
-        $query = "select * from mdl_invoice "
-                . "where i_status=0 and i_ptype=0 order by i_date desc limit 0,$this->limit";
-        //echo $query."<br/>";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $invoice = new stdClass();
-                foreach ($row as $key => $value) {
-                    $invoice->$key = $value;
-                }
-                $invoices[] = $invoice;
-            } // end while
-        } // end if $num>0
-        $list = $this->create_open_invoices_page($invoices, true, false);
+        //echo "<br/>Current user: $this->user->id<br/>";    
+        $list = "";
+        if ($this->session->justloggedin == 1) {
+            $invoices = array();
+            $query = "select * from mdl_invoice "
+                    . "where i_status=0 and i_ptype=0 order by i_date desc limit 0,$this->limit";
+            //echo $query."<br/>";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $invoice = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $invoice->$key = $value;
+                    }
+                    $invoices[] = $invoice;
+                } // end while
+            } // end if $num>0
+            $list .= $this->create_open_invoices_page($invoices, true, false);
+        } // end if if ($this->session->justloggedin == 1) 
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        }
         return $list;
     }
 
@@ -321,7 +340,7 @@ class Invoices extends Util {
                     $user = $this->get_user_details($invoice->userid);
                     $address_block = $this->get_user_address_block($invoice->userid);
                 }
-                
+
                 $date = date('Y-m-d', $invoice->i_date);
                 $coursename = $this->get_course_name($invoice->courseid);
                 $prefix = ($paid == false) ? "from " : "paid date ";
@@ -458,21 +477,29 @@ class Invoices extends Util {
      * ******************************************************* */
 
     function get_paid_invoices() {
-        $invoices = array();
-        $query = "select * from mdl_invoice "
-                . "where i_status=1 order by i_date desc limit 0, $this->limit";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $invoice = new stdClass();
-                foreach ($row as $key => $value) {
-                    $invoice->$key = $value;
-                }
-                $invoices[] = $invoice;
-            } // end while
-        } // end if $num>0
-        $list = $this->create_open_invoices_page($invoices, true, true);
+        $list = "";
+
+        if ($this->session->justloggedin == 1) {
+            $invoices = array();
+            $query = "select * from mdl_invoice "
+                    . "where i_status=1 order by i_date desc limit 0, $this->limit";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $invoice = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $invoice->$key = $value;
+                    }
+                    $invoices[] = $invoice;
+                } // end while
+            } // end if $num>0
+            $list .= $this->create_open_invoices_page($invoices, true, true);
+        } // end if $this->session->justloggedin == 1
+        else {
+            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
+        } // end else 
+
         return $list;
     }
 
@@ -567,11 +594,10 @@ class Invoices extends Util {
                         . "(invoiceid, userid) "
                         . "values($invoice_id, $userid)";
                 $this->db->query($query);
-                
+
                 //3. Confirm user's accounts
-                $query="update mdl_user set confirmed=1 where id=$userid";
+                $query = "update mdl_user set confirmed=1 where id=$userid";
                 $this->db->query($query);
-                
             } // end foreach
             $list = 1;
         } // end if count($users_array)>0
