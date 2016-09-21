@@ -36,7 +36,7 @@ echo "<script type = 'text/javascript'>";
 echo "google.charts.load('current', {'packages': ['corechart']})";
 echo "</script>";
 
-echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
+//echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
 echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
 echo"<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
 echo "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.js'></script>";
@@ -56,6 +56,8 @@ echo "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs
 
     	$("#start").datepicker();
         $("#end").datepicker();
+        $("#week1").datepicker();
+        $("#week2").datepicker();
 
       
     }); // end of $(document).ready(function(){	
