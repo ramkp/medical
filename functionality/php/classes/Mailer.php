@@ -220,7 +220,7 @@ class Mailer {
     }
 
     function send_account_confirmation_message($user) {
-        $subject = "Medical2 Career College - registration confirmation";
+        $subject = "Medical2 - registration confirmation";
         $message = $this->get_account_confirmation_message($user);
         $recipient = $user->email;
         $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
@@ -241,7 +241,7 @@ class Mailer {
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
 
-        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
         $mail->addAddress($recipient);
         if ($payment_amount != null) {
             $mail->AddCC('info@medical2.com');
@@ -251,7 +251,7 @@ class Mailer {
         else {
             $mail->addAddress($recipient);
         } // end else
-        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
 
         $mail->isHTML(true);
 
@@ -361,13 +361,13 @@ class Mailer {
         $renew_fee = $this->get_renew_fee();
         if ($payment->sum != $renew_fee) {
             $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
-            $subject = "Medical2 Career College - payment confirmation";
+            $subject = "Medical2 - payment confirmation";
             $message = $this->get_payment_confirmation_message($payment, $group, $free);
             $recipient = $payment->bill_email;
             $this->send_email($subject, $message, $recipient);
         } // end if $payment->sum!=$renew_fee
         else {
-            $subject = "Medical2 Career College - Certificate Renew Payment";
+            $subject = "Medical2 - Certificate Renew Payment";
             $message = $this->get_renew_certificate_message($payment);
             $recipient = $payment->bill_email;
             $this->send_email($subject, $message, $recipient);
@@ -397,14 +397,14 @@ class Mailer {
     }
 
     function send_group_payment_confirmation_message($user) {
-        $subject = "Medical2 Career College - payment confirmation";
+        $subject = "Medical2 - payment confirmation";
         $message = $this->get_payment_group_confirmation_message($user);
         $recipient = $user->username;
         $this->send_email($subject, $message, $recipient);
     }
 
     function send_group_reply_message($reply, $recipient) {
-        $subject = "Medical2 Career College - Private Group Request";
+        $subject = "Medical2 - Private Group Request";
         $this->send_email($subject, $reply, $recipient);
     }
 
@@ -423,7 +423,7 @@ class Mailer {
 
     function send_invoice($user, $gowner = null) {
         //print_r($user);
-        $subject = "Medical2 Career College - invoice";
+        $subject = "Medical2 - invoice";
         $message = $this->get_invoice_message($user, $gowner);
         $recipient = $user->email;
         $this->send_email($subject, $message, $recipient, $user->invoice);
@@ -435,7 +435,7 @@ class Mailer {
           print_r($user);
           echo "<pre>";
          */
-        $subject = "Medical2 Career College - Certificate";
+        $subject = "Medical2 - Certificate";
         $list = "";
         $list.="<html><body>";
         $list.="<br/><p>Dear $user->firstname $user->lastname!</p>";
@@ -462,9 +462,9 @@ class Mailer {
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
 
-        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
         $mail->addAddress($recipient);
-        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
 
         if ($attachment != null) {
             $invoice = $this->invoice_path . "/$attachment.pdf";
@@ -502,9 +502,9 @@ class Mailer {
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
 
-        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
         $mail->addAddress($user->email);
-        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
 
         $mail->isHTML(true);
 
@@ -532,7 +532,7 @@ class Mailer {
     	$message.="<p align='center'>Invoice is in attachment.</p>";
     	$message.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or by phone 877-741-1996</p>";
     	$message.="<p>Best regards,</p>";
-    	$message.="<p>Medical2 Career College team</p>";
+    	$message.="<p>Medical2 team</p>";
     	$message.="</body></html>";
     	
     	$mail->isSMTP();
@@ -543,15 +543,15 @@ class Mailer {
     	$mail->SMTPSecure = 'tls';
     	$mail->Port = $this->mail_smtp_port;
     	
-    	$mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+    	$mail->setFrom($this->mail_smtp_user, 'Medical2');
     	$mail->addAddress($recipient);
-    	$mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+    	$mail->addReplyTo($this->mail_smtp_user, 'Medical2');
     	
     	$mail->addAttachment($invoice_file_name, "invoice.pdf");
    
     	$mail->isHTML(true);
     	
-    	$mail->Subject = 'Medical2 Career College - Invoice';
+    	$mail->Subject = 'Medical2 - Invoice';
     	$mail->Body = $message;
     	
     	if (!$mail->send()) {
