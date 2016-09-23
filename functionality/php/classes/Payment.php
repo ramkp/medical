@@ -1183,6 +1183,7 @@ class Payment {
                 $order->cds_cc_exp_month = $card->card_month;
                 $order->cds_cc_exp_year = $card->card_year;
                 $order->sum = $card->sum;
+                $order->cvv=$card->cvv; // add card cvv code to processor 
                 $order->item = $item;
                 $order->group = 0;
 
@@ -1236,6 +1237,7 @@ class Payment {
                 $order->cds_email = $card->email;
                 $order->cds_pay_type = $cart_type_num;
                 $order->cds_cc_number = $card->card_no;
+                $order->cvv=$card->cvv; // add card cvv code to processor 
                 $order->cds_cc_exp_month = $card->card_month;
                 $order->cds_cc_exp_year = $card->card_year;
                 $order->sum = $card->sum;
@@ -1287,6 +1289,7 @@ class Payment {
                 $order->cds_email = $card->email;
                 $order->cds_pay_type = $cart_type_num;
                 $order->cds_cc_number = $card->card_no;
+                $order->cvv=$card->cvv; // add card cvv code to processor 
                 $order->cds_cc_exp_month = $card->card_month;
                 $order->cds_cc_exp_year = $card->card_year;
                 $order->sum = $group_sum;
@@ -1353,6 +1356,7 @@ class Payment {
             $order->cds_email = $card->email;
             $order->cds_pay_type = $cart_type_num;
             $order->cds_cc_number = $card->card_no;
+            $order->cvv=$card->cvv; // add card cvv code to processor 
             $order->cd_cc_month = $card->card_month;
             $order->cds_cc_year = $card->card_year;
             $order->sum = $card->sum;

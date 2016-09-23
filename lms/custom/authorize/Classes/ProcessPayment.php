@@ -51,6 +51,7 @@ class ProcessPayment {
         //echo "<br/>Expiration date: " . $exp_date . "<br/>";
         $creditCard = new AnetAPI\CreditCardType();
         $creditCard->setCardNumber($order->cds_cc_number);
+        $creditCard->setCardCode($order->cvv); // added new param - cvv
         $creditCard->setExpirationDate($exp_date);
         $payment = new AnetAPI\PaymentType();
         $payment->setCreditCard($creditCard);
