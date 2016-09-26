@@ -124,11 +124,15 @@ class Mailer {
         $list.="<div class='datagrid'>            
         <table style='table-layout: fixed;' width='360'>
         <thead>";
-        if ($printed_data == NULL) {
-            $list.="<tr>";
-            $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/5.png' width='360' height='90'></th>";
-            $list.="</tr>";
-        } // end if $printed_data == NULL        
+
+        /*
+          if ($printed_data == NULL) {
+          $list.="<tr>";
+          $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/5.png' width='360' height='90'></th>";
+          4  $list.="</tr>";
+          } // end if $printed_data == NULL
+         */
+
         $list.="</thead>
         <tbody>
         <tr style='background-color:#F5F5F5;'>
@@ -169,29 +173,28 @@ class Mailer {
         </tr>";
 
         if (property_exists($user, 'payment_amount')) {
-        	date_default_timezone_set("America/New_York");
-        	$date=date('m-d-Y h:i:s', time());
-        	
-        	$list.="<tr style='background-color:#F5F5F5;'>
+            date_default_timezone_set("America/New_York");
+            $date = date('m-d-Y h:i:s', time());
+
+            $list.="<tr style='background-color:#F5F5F5;'>
             <td>Payment status: </td><td>Paid by card: $$user->payment_amount</td>
             </tr>";
-        
-        	$list.="<tr>";
-        	$list.="<td>Card Holder:</td><td>$user->card_holder</td>";
-        	$list.="</tr>";
-            
+
+            $list.="<tr>";
+            $list.="<td>Card Holder:</td><td>$user->card_holder</td>";
+            $list.="</tr>";
+
             $list.="<tr style='background-color:#F5F5F5;'>";
             $list.="<td>Credit Card:</td><td>XXXX XXXX XXXX XXXX</td>";
             $list.="</tr>";
-            
+
             $list.="<tr>";
             $list.="<td>Expiry date: </td><td>$user->card_month$user->card_year</td>";
             $list.="</tr>";
-            
+
             $list.="<tr style='background-color:#F5F5F5;'>";
             $list.="<td>Order Date:</td><td>$date</td>";
             $list.="</tr>";
-            
         } // end if $payment_amount != null
 
         $list.="<tr style='background-color:#F5F5F5;'>
@@ -229,10 +232,10 @@ class Mailer {
     }
 
     function send_signup_confirmation_email($subject, $message, $recipient, $payment_amount) {
+        
+        /* We send confirmation email only if payment is received */
+        
         $mail = new PHPMailer;
-        //$recipient = 'sirromas@gmail.com'; // temp workaround
-        //$mail->SMTPDebug = 3;                                
-
         $mail->isSMTP();
         $mail->Host = $this->mail_smtp_host;
         $mail->SMTPAuth = true;
@@ -242,29 +245,23 @@ class Mailer {
         $mail->Port = $this->mail_smtp_port;
 
         $mail->setFrom($this->mail_smtp_user, 'Medical2');
-        $mail->addAddress($recipient);
         if ($payment_amount != null) {
-            $mail->AddCC('info@medical2.com');
-            $mail->AddCC('sirromas@gmail.com');
-            $mail->AddBCC('help@medical2.com');
-        } // end if $payment_amount != null
-        else {
             $mail->addAddress($recipient);
-        } // end else
-        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
-
-        $mail->isHTML(true);
-
-        $mail->Subject = $subject;
-        $mail->Body = $message;
-
-        if (!$mail->send()) {
-            echo 'Message could not be sent.';
-            echo 'Mailer Error: ' . $mail->ErrorInfo;
-        } // end if !$mail->send()        
-        else {
-            //echo 'Message has been sent to ' . $recipient;
-        }
+            $mail->AddCC('info@medical2.com');
+            $mail->AddCC('admin@medical2.com'); // forfarded to sirromas@gmail.com
+            $mail->AddBCC('help@medical2.com');
+            $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $message;
+            if (!$mail->send()) {
+                echo 'Message could not be sent.';
+                echo 'Mailer Error: ' . $mail->ErrorInfo;
+            } // end if !$mail->send()        
+            else {
+                //echo 'Message has been sent to ' . $recipient;
+            }
+        } // end if $payment_amount != null
     }
 
     function get_payment_confirmation_message($payment, $group = null, $free = null) {
@@ -314,9 +311,9 @@ class Mailer {
         <table style='table-layout: fixed;' width='360'>
         <thead>";
 
-        $list.="<tr>";
-        $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/5.png' width='360' height='90'></th>";
-        $list.="</tr>";
+        //$list.="<tr>";
+        //$list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/5.png' width='360' height='90'></th>";
+        //$list.="</tr>";
 
         $list.="</thead>
         <tbody>
@@ -378,7 +375,7 @@ class Mailer {
 
             $recipient = 'sirromas@gmail.com';
             $this->send_email($subject, $message, $recipient);
-            
+
             $recipient = 'help@medical2.com';
             $this->send_email($subject, $message, $recipient);
         } // end else
@@ -519,48 +516,48 @@ class Mailer {
             //echo 'Message has been sent to ' . $user->email;
         }
     }
-    
+
     function send_any_invoice($client, $email, $invoice_file_name) {
-    	$mail = new PHPMailer;
-    	$recipient=$email;
-    	//$recipient = 'sirromas@gmail.com'; // temp workaround
-    	
-    	$message="";
-    	$message.="<html>";
-    	$message.="<body>";
-    	$message.="<p align='center'>Dear $client!</p>";
-    	$message.="<p align='center'>Invoice is in attachment.</p>";
-    	$message.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or by phone 877-741-1996</p>";
-    	$message.="<p>Best regards,</p>";
-    	$message.="<p>Medical2 team</p>";
-    	$message.="</body></html>";
-    	
-    	$mail->isSMTP();
-    	$mail->Host = $this->mail_smtp_host;
-    	$mail->SMTPAuth = true;
-    	$mail->Username = $this->mail_smtp_user;
-    	$mail->Password = $this->mail_smtp_pwd;
-    	$mail->SMTPSecure = 'tls';
-    	$mail->Port = $this->mail_smtp_port;
-    	
-    	$mail->setFrom($this->mail_smtp_user, 'Medical2');
-    	$mail->addAddress($recipient);
-    	$mail->addReplyTo($this->mail_smtp_user, 'Medical2');
-    	
-    	$mail->addAttachment($invoice_file_name, "invoice.pdf");
-   
-    	$mail->isHTML(true);
-    	
-    	$mail->Subject = 'Medical2 - Invoice';
-    	$mail->Body = $message;
-    	
-    	if (!$mail->send()) {
-    		echo 'Message could not be sent.';
-    		echo 'Mailer Error: ' . $mail->ErrorInfo;
-    	} // end if !$mail->send()
-    	else {
-    		//echo 'Message has been sent to ' . $recipient;
-    	}
+        $mail = new PHPMailer;
+        $recipient = $email;
+        //$recipient = 'sirromas@gmail.com'; // temp workaround
+
+        $message = "";
+        $message.="<html>";
+        $message.="<body>";
+        $message.="<p align='center'>Dear $client!</p>";
+        $message.="<p align='center'>Invoice is in attachment.</p>";
+        $message.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or by phone 877-741-1996</p>";
+        $message.="<p>Best regards,</p>";
+        $message.="<p>Medical2 team</p>";
+        $message.="</body></html>";
+
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addAddress($recipient);
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+
+        $mail->addAttachment($invoice_file_name, "invoice.pdf");
+
+        $mail->isHTML(true);
+
+        $mail->Subject = 'Medical2 - Invoice';
+        $mail->Body = $message;
+
+        if (!$mail->send()) {
+            echo 'Message could not be sent.';
+            echo 'Mailer Error: ' . $mail->ErrorInfo;
+        } // end if !$mail->send()
+        else {
+            //echo 'Message has been sent to ' . $recipient;
+        }
     }
 
 }
