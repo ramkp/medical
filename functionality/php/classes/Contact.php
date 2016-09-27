@@ -18,7 +18,7 @@ class Contact {
 			   '".$phone."',   
 			   '".$message."', '".time()."')";
 		$this->db->query($query);		
-		$list="Thank you for contacting us. We back to you within 24h.";
+		$list="Your message is sent. Thank you";
 		return $list; 
 	}
 

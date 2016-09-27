@@ -389,8 +389,7 @@ $(document).ready(function () {
                 $.post(course_url, request).done(function (data) {
                     if (data > 0) {
                         $('#group_common_errors').html('Group name already exists');
-                    }
-                    else {
+                    } else {
                         // Everything is fine - show participants section
                         get_users_upload_form();
                     }
@@ -503,12 +502,12 @@ $(document).ready(function () {
      * 
      **************************************************************************/
     function submit_verify_cert_from() {
-        var fname= $('#fname').val();
-        var lname= $('#lname').val();        
-        
-        if (fname!='' && lname!='' ) {
+        var fname = $('#fname').val();
+        var lname = $('#lname').val();
+
+        if (fname != '' && lname != '') {
             var url = "https://" + domain + "/lms/custom/certificates/verify_certificate.php";
-            var request = {fname:fname,lname:lname};
+            var request = {fname: fname, lname: lname};
             $.post(url, request).done(function (data) {
                 $("#cert_err").html("<span style='color:green;'>" + data + "</span>");
             });
@@ -672,8 +671,7 @@ $(document).ready(function () {
         if (tot_participants == 0) {
             $('#type_err').html('Please select number of group participants');
             group_selected = true;
-        }
-        else {
+        } else {
             var url = "https://" + domain + "/functionality/php/get_group_registration_form.php";
             var request = {tot_participants: tot_participants};
             $.post(url, request).done(function (data) {
@@ -838,8 +836,7 @@ $(document).ready(function () {
                 $.post(course_url, request).done(function (data) {
                     if (data > 0) {
                         $('#group_common_errors').html('Group name already exists');
-                    }
-                    else {
+                    } else {
                         // Everything is fine - show participants section
                         get_manual_group_registration_form(tot_participants, courseid);
                     }
@@ -1119,16 +1116,16 @@ $(document).ready(function () {
                     var url = "https://" + domain + "/functionality/php/send_contact_request.php";
                     var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message};
                     $.post(url, request).done(function (data) {
-                        $('#contact_result').html(data);
+                        $('#contact_result').html("<span style='color:red;'>" + data + "</span>");
                     });
                 } // end if data>0
                 else {
-                    $('#contact_result').html('Captcha is incorrect');
+                    $('#contact_result').html("<span style='color:red;'>Captcha is incorrect</span>");
                 }
             });
         } // end if firstname!='' && lastname!=''
         else {
-            $('#contact_result').html("<span style='colore:red;'>Please provide all fields and correct email address and captcha</span>");
+            $('#contact_result').html("<span style='color:red;'>Please provide all fields and correct email address and captcha</span>");
         }
     }
 
@@ -1638,8 +1635,7 @@ $(document).ready(function () {
             get_group_registration_block();
             $('#group_common_section').show();
             $('#participants_details').show();
-        }
-        else {
+        } else {
             get_individual_registration_block();
         }
 
@@ -1769,42 +1765,42 @@ $(document).ready(function () {
         if (event.target.id == 'next_slide') {
             console.log('Next is clicked ...');
         }
-        
+
         /*
-        if (event.target.id.indexOf("img_") >= 0) {
-            var img = event.target.id.replace('img_', '');
-            var image = 'http://medical2.com/lms/custom/gallery/files/' + img;
-            var width = $(window).width();
-            console.log('Screen width: ' + width);
-            console.log('Dialog loaded: ' + dialog_loaded);
-            if (dialog_loaded !== true) {
-                console.log('Script is not yet loaded starting loading ...');
-                dialog_loaded = true;
-                var js_url = "http://" + domain + "/assets/js/bootstrap.min.js";
-                $.getScript(js_url)
-                        .done(function () {
-                            console.log('Script bootstrap.min.js is loaded ...');
-                            var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
-                            var request = {image: image, width: width};
-                            $.post(url, request).done(function (data) {
-                                $("body").append(data);
-                                $("#myModal").modal('show');
-                            });
-                        })
-                        .fail(function () {
-                            console.log('Failed to load bootstrap.min.js');
-                        });
-            } // dialog_loaded!=true
-            else {
-                var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
-                var request = {image: image, width: width};
-                $.post(url, request).done(function (data) {
-                    $("body").append(data);
-                    $("#myModal").modal('show');
-                });
-            } // end else
-        }   // end if event.target.id.indexOf("img_") >= 0
-        */
+         if (event.target.id.indexOf("img_") >= 0) {
+         var img = event.target.id.replace('img_', '');
+         var image = 'http://medical2.com/lms/custom/gallery/files/' + img;
+         var width = $(window).width();
+         console.log('Screen width: ' + width);
+         console.log('Dialog loaded: ' + dialog_loaded);
+         if (dialog_loaded !== true) {
+         console.log('Script is not yet loaded starting loading ...');
+         dialog_loaded = true;
+         var js_url = "http://" + domain + "/assets/js/bootstrap.min.js";
+         $.getScript(js_url)
+         .done(function () {
+         console.log('Script bootstrap.min.js is loaded ...');
+         var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
+         var request = {image: image, width: width};
+         $.post(url, request).done(function (data) {
+         $("body").append(data);
+         $("#myModal").modal('show');
+         });
+         })
+         .fail(function () {
+         console.log('Failed to load bootstrap.min.js');
+         });
+         } // dialog_loaded!=true
+         else {
+         var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
+         var request = {image: image, width: width};
+         $.post(url, request).done(function (data) {
+         $("body").append(data);
+         $("#myModal").modal('show');
+         });
+         } // end else
+         }   // end if event.target.id.indexOf("img_") >= 0
+         */
 
 
     }); // end of $("body").click(function (event) {    
