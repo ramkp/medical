@@ -248,7 +248,7 @@ class Mailer {
         if ($payment_amount != null) {
             $mail->addAddress($recipient);
             $mail->AddCC('info@medical2.com');
-            $mail->AddCC('admin@medical2.com'); // forfarded to sirromas@gmail.com
+            $mail->AddCC('sirromas@gmail.com'); 
             $mail->AddBCC('help@medical2.com');
             $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
             $mail->isHTML(true);
