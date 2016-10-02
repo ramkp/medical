@@ -139,12 +139,12 @@ class Mailer {
         if ($printed_data == NULL) {
             if ($catid == 5) {
                 $list.="<tr>";
-                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='90'></th>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
                 $list.="</tr>";
             } // end if
             else {
                 $list.="<tr>";
-                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='90'></th>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
                 $list.="</tr>";
             } // end else
         } // end if $printed_data == NULL
@@ -327,9 +327,9 @@ class Mailer {
         $list.="<div class='datagrid'>            
         <table style='table-layout: fixed;' width='360'>
         <thead>";
-        
+
         $list.="<tr>";
-        $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='90'></th>";
+        $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
         $list.="</tr>";
 
         $list.="</thead>
