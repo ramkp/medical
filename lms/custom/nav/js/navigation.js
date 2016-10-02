@@ -1412,13 +1412,66 @@ $(document).ready(function () {
 // Main region events processing function
     $('#region-main').on('click', 'button', function (event) {
         console.log("Item clicked: " + event.target.id);
-        
+
         /*
-        if (event.target.id == 'relogin') {
-            console.log('Inside relogin ...');
-            document.location.reload();
+         if (event.target.id == 'relogin') {
+         console.log('Inside relogin ...');
+         document.location.reload();
+         }
+         */
+
+        if (event.target.id == 'year_stat') {
+            var year1 = $('#stat_year1').val();
+            var year2 = $('#stat_year2').val();
+            console.log('Year1: ' + year1);
+            console.log('Year2' + year2);
+            if (year1 == 0 || year2 == 0) {
+                $('#report_year_data').html("<span style='color:red;'>Please select years to be compared</span>");
+            } // end if 
+            else {
+                $('#report_year_data').html('');
+                $('#ajax_loader').show();
+                var url = "/lms/custom/reports/get_year_stat.php";
+                $.ajax({
+                    url: url,
+                    data: {year1: year1, year2: year2},
+                    type: 'POST',
+                    success: function (data) {
+                        $('#ajax_loader').hide();
+                        $('#report_year_data').html(data);
+                    }
+                });
+            } // end else
+
         }
-        */
+
+        if (event.target.id == 'month_stat') {
+            var year = $('#stat_month_year').val();
+            var month1 = $('#stat_month1').val();
+            var month2 = $('#stat_month2').val();
+
+            console.log('Year: ' + year);
+            console.log('Month1: ' + month1);
+            console.log('Month1: ' + month2);
+
+            if (year == 0 || month1 == 0 || month2 == 0) {
+                $('#report_month_data').html("<span style='color:red;'>Please select year and months to be compared</span>");
+            } // end if
+            else {
+                $('#report_month_data').html('');
+                $('#ajax_loader').show();
+                var url = "/lms/custom/reports/get_month_stat.php";
+                $.ajax({
+                    url: url,
+                    data: {year: year, month1: month1, month2: month2},
+                    type: 'POST',
+                    success: function (data) {
+                        $('#ajax_loader').hide();
+                        $('#report_month_data').html(data);
+                    }
+                });
+            } // end else
+        }
 
         // Save price item
         if (event.target.id.indexOf("price_") >= 0) {

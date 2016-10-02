@@ -160,9 +160,10 @@ class Enroll {
         if ($response !== false) {
             // 2. Enroll user into course
             $this->enroll_user_to_course($user);
+            return true;
         }  // end if $response !== false        
         else {
-            $list.="<div class='container-fluid'>";            
+            $list.="<div class='container-fluid'>";
             $list.="<span class='span9'>Signup error happened </span>";
             $list.="</div>";
             echo $list;

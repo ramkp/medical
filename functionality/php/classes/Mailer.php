@@ -113,11 +113,21 @@ class Mailer {
         return $grand_total;
     }
 
+    function get_course_category($user) {
+        $query = "select * from mdl_course where id=$user->courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $catid = $row['category'];
+        }
+        return $catid;
+    }
+
     function get_account_confirmation_message($user, $printed_data = null) {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
+        $catid = $this->get_course_category($user);
         $list.= "<!DOCTYPE HTML><html><head><title>Account Confirmation</title>";
         $list.="</head>";
         $list.="<body><br/><br/><br/><br/>";
@@ -125,13 +135,20 @@ class Mailer {
         <table style='table-layout: fixed;' width='360'>
         <thead>";
 
-        /*
-          if ($printed_data == NULL) {
-          $list.="<tr>";
-          $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/5.png' width='360' height='90'></th>";
-          4  $list.="</tr>";
-          } // end if $printed_data == NULL
-         */
+
+        if ($printed_data == NULL) {
+            if ($catid == 5) {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='90'></th>";
+                $list.="</tr>";
+            } // end if
+            else {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='90'></th>";
+                $list.="</tr>";
+            } // end else
+        } // end if $printed_data == NULL
+
 
         $list.="</thead>
         <tbody>
@@ -248,7 +265,7 @@ class Mailer {
         if ($payment_amount != null) {
             $mail->addAddress($recipient);
             $mail->AddCC('info@medical2.com');
-            $mail->AddCC('sirromas@gmail.com'); 
+            $mail->AddCC('sirromas@gmail.com');
             $mail->AddBCC('help@medical2.com');
             $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
             $mail->isHTML(true);
@@ -310,10 +327,10 @@ class Mailer {
         $list.="<div class='datagrid'>            
         <table style='table-layout: fixed;' width='360'>
         <thead>";
-
-        //$list.="<tr>";
-        //$list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/5.png' width='360' height='90'></th>";
-        //$list.="</tr>";
+        
+        $list.="<tr>";
+        $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='90'></th>";
+        $list.="</tr>";
 
         $list.="</thead>
         <tbody>

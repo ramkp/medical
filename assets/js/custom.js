@@ -1653,9 +1653,34 @@ $(document).ready(function () {
             get_category_course(category_id);
         }
 
-        // if (event.target.id == 'register_state') {
-        // get_category_items_in_state();
-        // }
+        if (event.target.id == 'register_cities') {
+            var courseid = $('#register_courses').val();
+            var slotid = $('#register_cities').val();
+            var url = "/functionality/php/get_course_fee.php";
+            var request = {courseid: courseid, slotid: slotid};
+            $.post(url, request).done(function (data) {
+                var course = jQuery.parseJSON(data);
+                $('#dyn_course_name').html(course.name);
+                $('#dyn_course_fee').html(course.cost);
+
+                $('#payment_sum').remove();
+                $("#dyn_course_fee").append("<input type='hidden' id='payment_sum' value='" + course.raw_cost + "'>");
+
+                $('#selected_course').remove();
+                $("#dyn_course_fee").append("<input type='hidden' id='selected_course' value='" + courseid + "'>");
+
+                $('#selected_slot').remove();
+                $("#dyn_course_fee").append("<input type='hidden' id='selected_slot' value='" + slotid + "'>");
+
+                var amount = $('#payment_sum').val();
+                var selected_course = $('#selected_course').val();
+                var selected_slot = $('#selected_slot').val();
+                console.log('Selected course: ' + selected_course);
+                console.log('Selected slot: ' + selected_slot);
+                console.log('Program fee: ' + amount);
+                $('#course_fee').show();
+            });
+        }
 
         if (event.target.id == 'participants') {
             $('#type_err').html('');
@@ -1686,6 +1711,35 @@ $(document).ready(function () {
 
         if (event.target.id == 'register_courses') {
             get_register_course_states();
+            $('#personal_err').html('');
+            var courseid = $('#register_courses').val();
+            var slotid = $('#register_cities').val();
+            var request = {courseid: courseid, slotid: slotid};
+            var url = '/functionality/php/get_course_data.php';
+            $.post(url, request).done(function (data) {
+                var course = jQuery.parseJSON(data);
+                $('#dyn_course_name').html(course.name);
+                $('#dyn_course_fee').html(course.cost);
+
+                $('#payment_sum').remove();
+                $("#dyn_course_fee").append("<input type='hidden' id='payment_sum' value='" + course.raw_cost + "'>");
+
+                $('#selected_course').remove();
+                $("#dyn_course_fee").append("<input type='hidden' id='selected_course' value='" + courseid + "'>");
+
+                $('#selected_slot').remove();
+                $("#dyn_course_fee").append("<input type='hidden' id='selected_slot' value='" + slotid + "'>");
+
+                var amount = $('#payment_sum').val();
+                var selected_course = $('#selected_course').val();
+                var selected_slot = $('#selected_slot').val();
+                console.log('Selected course: ' + selected_course);
+                console.log('Selected slot: ' + selected_slot);
+                console.log('Program fee: ' + amount);
+                $('#course_fee').show();
+
+            });
+
         } // end if event.target.id == 'policy'
 
         if (event.target.id == 'register_state') {
@@ -1766,41 +1820,163 @@ $(document).ready(function () {
             console.log('Next is clicked ...');
         }
 
-        /*
-         if (event.target.id.indexOf("img_") >= 0) {
-         var img = event.target.id.replace('img_', '');
-         var image = 'http://medical2.com/lms/custom/gallery/files/' + img;
-         var width = $(window).width();
-         console.log('Screen width: ' + width);
-         console.log('Dialog loaded: ' + dialog_loaded);
-         if (dialog_loaded !== true) {
-         console.log('Script is not yet loaded starting loading ...');
-         dialog_loaded = true;
-         var js_url = "http://" + domain + "/assets/js/bootstrap.min.js";
-         $.getScript(js_url)
-         .done(function () {
-         console.log('Script bootstrap.min.js is loaded ...');
-         var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
-         var request = {image: image, width: width};
-         $.post(url, request).done(function (data) {
-         $("body").append(data);
-         $("#myModal").modal('show');
-         });
-         })
-         .fail(function () {
-         console.log('Failed to load bootstrap.min.js');
-         });
-         } // dialog_loaded!=true
-         else {
-         var url = "http://" + domain + "/functionality/php/get_gallery_item.php";
-         var request = {image: image, width: width};
-         $.post(url, request).done(function (data) {
-         $("body").append(data);
-         $("#myModal").modal('show');
-         });
-         } // end else
-         }   // end if event.target.id.indexOf("img_") >= 0
-         */
+        if (event.target.id == 'da') {
+            if ($('#da').is(':checked')) {
+                $('#diff_address').show();
+            } // end if
+            else {
+                $('#diff_address').hide();
+            } // end else
+        }
+
+        if (event.target.id == 'make_payment_personal2') {
+
+            var courseid = $('#selected_course').val();
+            var slotid = $('#selected_slot').val();
+            var amount = $('#payment_sum').val();
+
+            if (typeof (courseid) === "undefined") {
+                $('#personal_err').html('Please select program');
+            } // end if
+            else {
+                $('#personal_err').html('');
+                console.log('Course id: ' + courseid);
+                console.log('Slot id: ' + slotid);
+                console.log('Program fee: ' + amount);
+
+                var firstname = $('#first_name').val();
+                var lastname = $('#last_name').val();
+                var addr = $('#addr').val();
+                var city = $('#city').val();
+                var state = $('#state').val();
+                var country = $('#country').val();
+                var zip = $('#zip').val();
+                var inst = $('#inst').val();
+                var phone = $('#phone').val();
+                var email = $('#email').val();
+                var cardnumber = $('#card_no').val();
+                var cvv = $('#bill_cvv').val();
+                var exp_month = $('#card_month').val();
+                var exp_year = $('#card_year').val();
+                var from = $('#come_from').val();
+
+                if ($('#da').is(':checked')) {
+                    addr = $('#bill_addr').val();
+                    state = $('#bill_state').val();
+                    city = $('#bill_city').val();
+                    zip = $('#bill_zip').val();
+                } // end if 
+
+                if (firstname == '') {
+                    $('#personal_err').html('Please provide firstname');
+                    return;
+                }
+
+                if (lastname == '') {
+                    $('#personal_err').html('Please provide lastname');
+                    return;
+                }
+
+                if (addr == '') {
+                    $('#personal_err').html('Please provide street address');
+                    return;
+                }
+
+                if (city == '') {
+                    $('#personal_err').html('Please provide city');
+                    return;
+                }
+
+                if (state == 0) {
+                    $('#personal_err').html('Please select state');
+                    return;
+                }
+
+                if (country == '') {
+                    $('#personal_err').html('Please provide country');
+                    return;
+                }
+
+                if (zip == '') {
+                    $('#personal_err').html('Please provide zip');
+                    return;
+                }
+
+                if (phone == '') {
+                    $('#personal_err').html('Please provide phone');
+                    return;
+                }
+
+                if (email == '') {
+                    $('#personal_err').html('Please provide email');
+                    return;
+                }
+
+                if (cardnumber == '') {
+                    $('#personal_err').html('Please provide card number');
+                    return;
+                }
+
+                if (cvv == '') {
+                    $('#personal_err').html('Please provide card code number');
+                    return;
+                }
+
+                if (exp_month == 0 || exp_year == 0) {
+                    $('#personal_err').html('Please put expiration date');
+                    return;
+                }
+
+                if (!$('#policy').is(':checked')) {
+                    $('#personal_err').html('Please agree with terms and conditions');
+                    return;
+                }
+
+                $('#personal_err').html('');
+
+                var url = "/functionality/php/is_email_exists.php";
+                var request = {email: email};
+                $.post(url, request).done(function (data) {
+                    console.log('Server response: ' + data);
+                    if (data > 0) {
+                        $('#personal_err').html('Email already in use');
+                    } // end if data>0
+                    else {
+                        var user = {
+                            first_name: firstname,
+                            last_name: lastname,
+                            addr: addr,
+                            city: city,
+                            state: state,
+                            country: country,
+                            zip: zip,
+                            inst: inst,
+                            phone: phone,
+                            email: email,
+                            cardnumber: cardnumber,
+                            cvv: cvv,
+                            exp_month: exp_month,
+                            exp_year: exp_year,
+                            come_from: from,
+                            courseid: courseid,
+                            slotid: slotid,
+                            amount: amount
+                        };
+                        $('#ajax_loading_payment').show();
+                        personal_registration_obj = JSON.stringify(user);
+                        var signup_url = "/functionality/php/single_signup2.php";
+                        var signup_request = {user: JSON.stringify(user)};
+                        $.post(signup_url, signup_request).done(function (data) {
+                            $('#ajax_loading_payment').hide();
+                            $('#personal_err').html(data);
+                        });
+                    }
+                });
+            } // end else
+        }
+
+
+
 
 
     }); // end of $("body").click(function (event) {    
@@ -1809,18 +1985,6 @@ $(document).ready(function () {
         console.log('Item1 has changed class ... ' + event);
 
     });
-
-    /*
-     $("body").attrchange({
-     trackValues: true,
-     callback: function (event) {
-     //console.log("Element ID: " + event.target.id);
-     //console.log("Attribute name: " + event.attributeName);
-     //console.log("Attribute old value: " + event.oldValue);
-     //console.log("Attribute new value: " + event.newValue);            
-     }
-     });
-     */
 
 
 

@@ -315,7 +315,7 @@ class Report extends Util {
                     . "and refunded=0 "
                     . "order by pdate desc ";
         } // end else
-
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -338,7 +338,7 @@ class Report extends Util {
                     . "where pdate between $unix_from and $unix_to "
                     . "and refunded=1  order by pdate desc ";
         } // end else
-
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -351,7 +351,7 @@ class Report extends Util {
         } // end if $num > 0
         //2.2 Get partial refund payments
         if ($courseid > 0) {
-            $query = "select * mdl_partial_refund_payments "
+            $query = "select * from mdl_partial_refund_payments "
                     . "where courseid=$courseid  "
                     . "and pdate between $unix_from and $unix_to "
                     . "order by pdate desc ";
@@ -361,7 +361,7 @@ class Report extends Util {
                     . "where pdate between $unix_from and $unix_to "
                     . "order by pdate desc ";
         } // end else
-
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -387,6 +387,7 @@ class Report extends Util {
                     . "where ptype=1 "
                     . " and pdate between $unix_from and $unix_to";
         } // end else
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -409,6 +410,7 @@ class Report extends Util {
                     . "where ptype=2 "
                     . " and pdate between $unix_from and $unix_to";
         }
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -431,6 +433,7 @@ class Report extends Util {
                     . "where i_status=1 "
                     . " and i_date between $unix_from and $unix_to";
         }
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -516,29 +519,29 @@ class Report extends Util {
                             
                             <span class='span2'>
                             <select id='stat_year1'>
-                            <option val='0' selected>Year</option>
-                            <option val='2013'>2013</option>
-                            <option val='2014'>2014</option>
-                            <option val='2015'>2015</option>
-                            <option val='2016'>2016</option>
+                            <option value='0' selected>Year</option>
+                            <option value='2013'>2013</option>
+                            <option value='2014'>2014</option>
+                            <option value='2015'>2015</option>
+                            <option value='2016'>2016</option>
                             </select>
                             </span>
                             
                             <span class='span2'>
                             <select id='stat_year2'>
-                            <option val='0' selected>Year</option>
-                            <option val='2013'>2013</option>
-                            <option val='2014'>2014</option>
-                            <option val='2015'>2015</option>
-                            <option val='2016'>2016</option>
+                            <option value='0' selected>Year</option>
+                            <option value='2013'>2013</option>
+                            <option value='2014'>2014</option>
+                            <option value='2015'>2015</option>
+                            <option value='2016'>2016</option>
                             </select>
                             </span>
 
-                            <span class='span3'><button type='button' id='month_stat' class='btn btn-primary'>Go</button></span>
+                            <span class='span3'><button type='button' id='year_stat' class='btn btn-primary'>Go</button></span>
 
                             </div>
                             
-                            <div class='row' id='report_month_data'>
+                            <div class='row' id='report_year_data' style='margin-left:35px;'>
                             
                             </div>
                             
@@ -550,48 +553,48 @@ class Report extends Util {
                             
                             <span class='span2'>
                             <select id='stat_month_year'>
-                            <option val='0' selected>Year</option>
-                            <option val='2013'>2013</option>
-                            <option val='2014'>2014</option>
-                            <option val='2015'>2015</option>
-                            <option val='2016'>2016</option>
+                            <option value='0' selected>Year</option>
+                            <option value='2013'>2013</option>
+                            <option value='2014'>2014</option>
+                            <option value='2015'>2015</option>
+                            <option value='2016'>2016</option>
                             </select>
                             </span>
 
                             <span class='span2'>
                             <select id='stat_month1'>
-                            <option val='0' selected>Month</option>
-                            <option val='1'>Jan</option>
-                            <option val='2'>Feb</option>
-                            <option val='3'>Mar</option>
-                            <option val='4'>April</option>
-                            <option val='5'>May</option>
-                            <option val='6'>June</option>
-                            <option val='7'>July</option>
-                            <option val='8'>Aug</option>
-                            <option val='9'>Sep</option>
-                            <option val='10'>Oct</option>
-                            <option val='11'>Nov</option>
-                            <option val='12'>Dec</option>
+                            <option value='0' selected>Month</option>
+                            <option value='1'>Jan</option>
+                            <option value='2'>Feb</option>
+                            <option value='3'>Mar</option>
+                            <option value='4'>April</option>
+                            <option value='5'>May</option>
+                            <option value='6'>June</option>
+                            <option value='7'>July</option>
+                            <option value='8'>Aug</option>
+                            <option value='9'>Sep</option>
+                            <option value='10'>Oct</option>
+                            <option value='11'>Nov</option>
+                            <option value='12'>Dec</option>
 
                             </select>
                             </span>
                             
                             <span class='span2'>
                             <select id='stat_month2'>
-                            <option val='0' selected>Month</option>
-                            <option val='1'>Jan</option>
-                            <option val='2'>Feb</option>
-                            <option val='3'>Mar</option>
-                            <option val='4'>April</option>
-                            <option val='5'>May</option>
-                            <option val='6'>June</option>
-                            <option val='7'>July</option>
-                            <option val='8'>Aug</option>
-                            <option val='9'>Sep</option>
-                            <option val='10'>Oct</option>
-                            <option val='11'>Nov</option>
-                            <option val='12'>Dec</option>
+                            <option value='0' selected>Month</option>
+                            <option value='1'>Jan</option>
+                            <option value='2'>Feb</option>
+                            <option value='3'>Mar</option>
+                            <option value='4'>April</option>
+                            <option value='5'>May</option>
+                            <option value='6'>June</option>
+                            <option value='7'>July</option>
+                            <option value='8'>Aug</option>
+                            <option value='9'>Sep</option>
+                            <option value='10'>Oct</option>
+                            <option value='11'>Nov</option>
+                            <option value='12'>Dec</option>
                             </select>
                             </span>
 
@@ -599,25 +602,14 @@ class Report extends Util {
 
                             </div>
                             
-                            <div class='row' id='report_month_data'>
+                            <div class='row' id='report_month_data' style='margin-left:35px;'>
                             
                             </div>
                             
-                            <div class='row'>
-                            
-                            <span class='span2' style='margin-left:35px;'>By week</span>
-                            <span class='span2'><input type='text' id='week1' class='hasDatepicker' style='width:75px;'></span>
-                            <span class='span2'><input type='text' id='week2' class='hasDatepicker' style='width:75px;'></span>
-                            
-                            <span class='span3'><button type='button' id='week_stat' class='btn btn-primary'>Go</button></span>
-                            
+                            <div class='row' id='ajax_loader' style='margin-left:35px;text-align:center;display:none;'>
+                                <img src='https://$this->host/assets/img/ajax.gif' />
                             </div>
                             
-                            <div class='row' id='report_week_data'>
-                            
-                            </div>
-
-                        </div>
                 </div>
                 </div>
             </div>";
@@ -657,7 +649,7 @@ class Report extends Util {
         $list.="<span class='span3'>$courses</span><span class='span1'>From</span><span class='span2'><input type='text' id='datepicker1' style='width:75px;'></span><span class='span1'>To</span><span class='span2'><input type='text' id='datepicker2' style='width:75px;'></span><span class='span1'><button type='button' id='program_go' class='btn btn-primary'>Go</button></span>";
         $list.="</div>";
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
         $list.="<div id='program_report_container'>";
         $list.="</div>";
@@ -1351,6 +1343,69 @@ class Report extends Util {
         $this->db->query($query);
         $list = "Module permissions updated";
         return $list;
+    }
+
+    function get_period_payments($from, $to) {
+        
+    }
+
+    function get_year_stat_payments($year1, $year2) {
+        $first_year_start = '01/01/' . $year1;
+        $first_year_end = '12/31/' . $year1;
+        $from1 = strtotime($first_year_start);
+        $to1 = strtotime($first_year_end);
+
+        $second_year_start = '01/01/' . $year2;
+        $second_year_end = '12/31/' . $year2;
+        $from2 = strtotime($second_year_start);
+        $to2 = strtotime($second_year_end);
+
+        /*
+         * 
+          echo "First year start: " . $first_year_start . "<br>";
+          echo "First year end: " . $first_year_end . "<br>";
+          echo "First year unixtime start: " . $from1 . "<br>";
+          echo "First year unixtime end: " . $to1 . "<br>";
+
+          echo "<br>------------------------------------------------------------<br>";
+
+          echo "<br>Second year start: $second_year_start<br>";
+          echo "Second year end: " . $second_year_end . "<br>";
+          echo "Second year unixtime start: $from2<br>";
+          echo "Second year unixtime end: $to2<br>";
+         * 
+         */
+    }
+
+    function get_month_stat_payments($year, $month1, $month2) {
+        $number1 = cal_days_in_month(CAL_GREGORIAN, $month1, $year);
+        $number2 = cal_days_in_month(CAL_GREGORIAN, $month2, $year);
+
+        $first_month_start = $month1 . "/01/" . $year;
+        $first_month_end = $month1 . "/$number1/" . $year;
+        $from1 = strtotime($first_month_start);
+        $to1 = strtotime($first_month_end);
+
+        $second_month_start = $month2 . "/01/" . $year;
+        $second_month_end = $month2 . "/$number2/" . $year;
+        $from2 = strtotime($second_month_start);
+        $to2 = strtotime($second_month_end);
+
+        /*
+         * 
+          echo "Month1 start date: " . $first_month_start . "<br>";
+          echo "Month1 end date: " . $first_month_end . "<br>";
+          echo "Month1 unixtime start: " . $from1 . "<br>";
+          echo "Month1 unixtime end: " . $to1 . "<br>";
+
+          echo "<br>------------------------------------------------------------<br>";
+
+          echo "<br>Month2 start date: " . $second_month_start . "<br>";
+          echo "Month2 end date: " . $second_month_end . "<br>";
+          echo "Month2 unixtime start: " . $from2 . "<br>";
+          echo "Month2 unixtime start: " . $to2 . "<br>";
+         * 
+         */
     }
 
 }

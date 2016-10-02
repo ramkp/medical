@@ -446,9 +446,8 @@ class Register {
                 You have 90 days from the registration date to finish the exam. You acknowledge that in the event that you fail the exam on your first attempt you are only eligible to attempt this exam 4 times in a 12 month period. The fee is the same each time. In the event of a technical problem you can retry 2 times in a 1 hour period from the same computer at the discretion of Medical2 Medical Certification Agency technical support staff. It is your responsibility to disable call waiting, answering machines, and any other devise that may cause interference of your online exam. This exam must be passed with an 75% or better in order to become certified. You may request a hand score of the exam for an additional fee of $25.'
                 </p>
             </div>
-            <div class='modal-footer'>
-                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
-                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='ok'>I Agree with Terms and Conditions</button></span>
+            <div class='modal-footer' style='text-align:center;'>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>OK</button></span>
             </div>
         </div>
     </div>

@@ -1033,7 +1033,7 @@ class Payment {
     function add_payment_to_db($card) {
         $card_last_four = substr($card->card_no, -4);
         // To make refund we need to store card last four digits - base64 encode
-    	//date_default_timezone_set("America/New_York");
+        //date_default_timezone_set("America/New_York");
         $exp_date = $card->card_month . $card->card_year;
         $query = "insert into mdl_card_payments "
                 . "(userid,"
@@ -1043,7 +1043,7 @@ class Payment {
                 . "auth_code, "
                 . "pdate) "
                 . "values('" . $card->userid . "',"
-                . "'" . $card->courseid . "', '".base64_encode($card_last_four)."', '$exp_date', "
+                . "'" . $card->courseid . "', '" . base64_encode($card_last_four) . "', '$exp_date', "
                 . "'" . $card->sum . "', "
                 . "'$card->transid', "
                 . "'$card->auth_code', "
@@ -1183,7 +1183,7 @@ class Payment {
                 $order->cds_cc_exp_month = $card->card_month;
                 $order->cds_cc_exp_year = $card->card_year;
                 $order->sum = $card->sum;
-                $order->cvv=$card->cvv; // add card cvv code to processor 
+                $order->cvv = $card->cvv; // add card cvv code to processor 
                 $order->item = $item;
                 $order->group = 0;
 
@@ -1237,7 +1237,7 @@ class Payment {
                 $order->cds_email = $card->email;
                 $order->cds_pay_type = $cart_type_num;
                 $order->cds_cc_number = $card->card_no;
-                $order->cvv=$card->cvv; // add card cvv code to processor 
+                $order->cvv = $card->cvv; // add card cvv code to processor 
                 $order->cds_cc_exp_month = $card->card_month;
                 $order->cds_cc_exp_year = $card->card_year;
                 $order->sum = $card->sum;
@@ -1289,7 +1289,7 @@ class Payment {
                 $order->cds_email = $card->email;
                 $order->cds_pay_type = $cart_type_num;
                 $order->cds_cc_number = $card->card_no;
-                $order->cvv=$card->cvv; // add card cvv code to processor 
+                $order->cvv = $card->cvv; // add card cvv code to processor 
                 $order->cds_cc_exp_month = $card->card_month;
                 $order->cds_cc_exp_year = $card->card_year;
                 $order->sum = $group_sum;
@@ -1356,7 +1356,7 @@ class Payment {
             $order->cds_email = $card->email;
             $order->cds_pay_type = $cart_type_num;
             $order->cds_cc_number = $card->card_no;
-            $order->cvv=$card->cvv; // add card cvv code to processor 
+            $order->cvv = $card->cvv; // add card cvv code to processor 
             $order->cd_cc_month = $card->card_month;
             $order->cds_cc_year = $card->card_year;
             $order->sum = $card->sum;
@@ -1400,6 +1400,177 @@ class Payment {
         } // end else
 
         return $list;
+    }
+
+    function get_course_data($courseid, $slotid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $name = $row['fullname'];
+            $cost = $row['cost'];
+            $categoryid = $row['category'];
+            $discount_size = $row['discount_size'];
+        }
+
+        if ($discount_size > 0) {
+            $initial_amount = $cost - (($cost * $discount_size) / 100);
+        } // end if $discount_size>0
+        else {
+            $initial_amount = $cost;
+        } // end else
+
+        if ($categoryid != 5) {
+            if ($slotid > 0) {
+                $week_secs = 604800;  // Registration should be one week ahead
+                $query = "select * from mdl_scheduler_slots where id=$slotid";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $starttime = $row['starttime'];
+                } // end while
+
+                $diff = $starttime - time();
+
+                if ($diff <= $week_secs) {
+                    $late_fee = 25;
+                } // end if $diff<$week_secs
+                else {
+                    $late_fee = 0;
+                } // end else
+            } // end if $slotid > 0
+            else {
+                $late_fee = 0;
+            } // end else
+        } // end if $categoryid!=5
+        else {
+            $late_fee = 0;
+        } // end else
+
+        if ($late_fee > 0) {
+            $full_amount = ($initial_amount + $late_fee) . " (late fee applied)";
+            $raw_full_amount = $initial_amount + $late_fee;
+        } // end if $late_fee>0
+        else {
+            $full_amount = $initial_amount;
+            $raw_full_amount = $initial_amount;
+        } // end else
+        $course = new stdClass();
+        $course->name = $name;
+        $course->cost = "$" . $full_amount;
+        $course->raw_cost = $raw_full_amount;
+
+        return json_encode($course);
+    }
+
+    function enroll_user2($user) {
+        $list = "";
+        /*
+         * 
+          var user = {
+          first_name: firstname,
+          last_name: lastname,
+          addr: addr,
+          city: city,
+          state: state,
+          country: country,
+          zip: zip,
+          inst: inst,
+          phone: phone,
+          email: email,
+          cardnumber: cardnumber,
+          cvv: cvv,
+          exp_month: exp_month,
+          exp_year: exp_year,
+          come_from: from,
+          courseid: courseid,
+          slotid: slotid,
+          amount: amount
+          };
+         * 
+         */
+
+        $signup_status = $this->enroll->single_signup($user);
+
+        if ($signup_status === true) {
+
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9'>Signup is successfull :) </span>";
+            $list.="</div>";
+            return $list;
+            die();
+
+            /*             * **************************************************************
+             * 
+             *          Below code is not executed until approval
+             * 
+             * ************************************************************** */
+
+            $userid = $this->get_user_id_by_email($user->email);
+            $user_payment_data = $this->get_user_payment_credentials($userid);
+            $item = $this->get_course_name($user->courseid);
+
+            $order = new stdClass();
+            $order->cds_name = "$user_payment_data->firstname/$user_payment_data->lastname";
+            $order->cds_address_1 = $user->addr;
+            $order->cds_city = $user->city;
+            $order->cds_state = "$user_payment_data->state_code";
+            $order->cds_zip = $user->zip;
+            $order->cds_email = $user->email;
+
+            $order->cds_cc_number = $user->cardnumber;
+            $order->cds_cc_exp_month = $user->exp_month;
+            $order->cds_cc_exp_year = $user->exp_year;
+            $order->sum = $user->amount;
+            $order->cvv = $user->cvv;
+            $order->item = $item;
+            $order->group = 0;
+
+            $pr = new ProcessPayment();
+            $status = $pr->make_transaction($order);
+            if ($status === false) {
+                $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
+                $list.="<div class='panel-body'>";
+                $list.= "<div class='container-fluid' style='text-align:left;'>";
+                $list.= "<span class='span8'>Transaction failed, please contact your bank for details.</span>";
+                $list.="</div>";
+                $list.="</div>";
+                $list.="</div>";
+            } // end if $status === false
+            else {
+                $mailer = new Mailer();
+                $renew_fee = $this->get_renew_fee();
+
+                // Create object compatible with existing code 
+                $card = new stdClass();
+
+
+                $card->transid = $status['trans_id'];
+                $card->auth_code = $status['auth_code'];
+                $this->confirm_user($card->email);
+                $this->add_payment_to_db($card); // adds payment result to DB
+                $mailer->send_payment_confirmation_message($card);
+                $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
+                $list.="<div class='panel-body'>";
+                $list.= "<div class='container-fluid' style='text-align:left;'>";
+                if ($card->sum != $renew_fee) {
+                    $list.= "<span class='span8'>Payment is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
+                } // end if $card->sum != $renew_fee                    
+                else {
+                    $list.= "<span class='span8'>Payment is successful. Thank you! Please use Renew Certificate option from <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/my' target='_blank'>your Dashboard</a></span>";
+                } // end else
+                $list.="</div>";
+                $list.="</div>";
+                $list.="</div>";
+                $this->enroll->add_user_to_course_schedule($card->userid, $card);
+            } // end else
+        } // end if $signup_status  === true
+        else {
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9'>Signup error happened </span>";
+            $list.="</div>";
+            return $list;
+        }
     }
 
 }
