@@ -2,9 +2,7 @@
 
 ini_set('display_errors', '1');
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Api/vendor/autoload.php');
-
-//require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
-//require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
 use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
@@ -24,12 +22,101 @@ class ProcessPayment {
         $this->log_file_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/failed_transactions.log';
     }
 
-    function save_log($data) {
+    function get_failed_transaction_report($respone_object, $order_object) {
+        $list = "";
+        $response_arr = (array) $respone_object;
+        $order_arr = (array) $order_object;
+
+        $list.="<html>";
+        $list.="<body>";
+        $list.="<br><br>";
+
+        $list.="<table align='center'>";
+        foreach ($order_arr as $key => $value) {
+            if ($key != 'cds_pay_type' && $key != 'group') {
+                $field = $this->get_order_report_fields($key);
+                $list.="<tr>";
+                $list.="<td style='padding:15px;'>$field</td><td style='padding:15px;'>$value</td>";
+                $list.="</tr>";
+            }
+        }
+        $list.="</table>";
+
+        $list.="<br>";
+
+        $list.="<table align='center'>";
+        foreach ($response_arr as $key => $value) {
+            if ($key == 'net\authorize\api\contract\v1\TransactionResponseType responseCode') {
+                $list.="<tr>";
+                $list.="<td style='padding:15px;'>Transaction Response Code</td><td style='padding:15px;'>$value</td>";
+                $list.="</tr>";
+            }
+        }
+        $list.="</table>";
+
+        $list.="</body>";
+        $list.="</html>";
+
+        return $list;
+    }
+
+    function get_order_report_fields($field) {
+
+        switch ($field) {
+            case 'cds_name':
+                $name = 'Client Firstname/Lastname';
+                break;
+            case 'cds_address_1':
+                $name = 'Client Address';
+                break;
+            case 'cds_city':
+                $name = 'Client City';
+                break;
+            case 'cds_state':
+                $name = 'Client State';
+                break;
+            case 'cds_zip':
+                $name = 'Client ZIP';
+                break;
+            case 'cds_email':
+                $name = 'Client email';
+                break;
+            case 'phone':
+                $name = 'Client Phone';
+                break;
+            case 'cds_cc_number':
+                $name = 'Client Card Number';
+                break;
+            case 'cds_cc_exp_month':
+                $name = 'Client Card Expiration Month';
+                break;
+            case 'cds_cc_exp_year':
+                $name = 'Client Card Expiration Year';
+                break;
+            case 'sum':
+                $name = 'Program Fee ($)';
+                break;
+            case 'cvv':
+                $name = 'Client Card CVV code';
+                break;
+            case 'item':
+                $name = 'Program Applied';
+                break;
+        }
+
+        return $name;
+    }
+
+    function save_log($data, $order) {
         $fp = fopen($this->log_file_path, 'a');
         $date = date('m-d-Y h:i:s', time());
         fwrite($fp, $date . "\n");
         fwrite($fp, print_r($data, TRUE));
         fclose($fp);
+        $report = $this->get_failed_transaction_report($data, $order);
+        $subject = 'Medical2 - Failed Transaction Report';
+        $mail = New Mailer();
+        $mail->send_common_message($subject, $report);
     }
 
     function authorize() {
@@ -48,7 +135,6 @@ class ProcessPayment {
 
     function prepare_order($order) {
         $exp_date = $order->cds_cc_exp_year . '-' . $order->cds_cc_exp_month;
-        //echo "<br/>Expiration date: " . $exp_date . "<br/>";
         $creditCard = new AnetAPI\CreditCardType();
         $creditCard->setCardNumber($order->cds_cc_number);
         $creditCard->setCardCode($order->cvv); // added new param - cvv
@@ -60,7 +146,7 @@ class ProcessPayment {
 
     function make_transaction($post_order) {
 
-        // Create the payment data for a credit card        
+        // Create the payment data for credit card        
         $payment = $this->prepare_order($post_order);
         $merchantAuthentication = $this->authorize();
         $refId = 'ref' . time();
@@ -96,19 +182,6 @@ class ProcessPayment {
         $customer->setEmail($post_order->cds_email);
 
         $names = explode("/", $post_order->cds_name);
-
-        /*
-         * 
-          echo "<br>--------------------<br>";
-          print_r($names);
-          echo "<br>--------------------<br>";
-          die ();
-         * 
-         */
-
-        //$firstname = ($names[0] == '') ? "Loyal" : $names[0];
-        //$lastname = ($names[1] == '') ? 'Client' : $names[1];
-
         $firstname = $names[0];
         $lastname = $names[1];
 
@@ -173,7 +246,7 @@ class ProcessPayment {
                 return $status;
             } // end if ($tresponse != null) && ($tresponse->getResponseCode() == "1")
             else {
-                $this->save_log($tresponse);
+                $this->save_log($tresponse, $post_order);
                 return false;
             }
         } // end if $response != null        
@@ -265,7 +338,7 @@ class ProcessPayment {
             //echo "Message: ".$msg."<br>";
         }  // end if ($response != null) && ($response->getMessages()->getResultCode() == "Ok")        
         else {
-            $this->save_log($response);
+            $this->save_log($response, $post_order);
             $errorMessages = $response->getMessages()->getMessage();
             $msg = $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText();
         } // end else
@@ -318,7 +391,12 @@ class ProcessPayment {
                 return TRUE;
             } // end if ($tresponse != null) && ($tresponse->getResponseCode() == \SampleCode\Constants::RESPONSE_OK)            
             else {
-                $this->save_log($tresponse);
+                $post_order = new stdClass();
+                $post_order->refund_amount = $amount;
+                $post_order->card_last_four_digits = $card_last_four;
+                $post_order->card_expiration_date = $exp_date;
+                $post_order->original_transaction_id = $trans_id;
+                $this->save_log($tresponse, $post_order);
                 return FALSE;
             }
         } // end if $response != null 
@@ -411,7 +489,7 @@ class ProcessPayment {
                 return TRUE;
             } // end if ($tresponse != null) && ($tresponse->getResponseCode() == \SampleCode\Constants::RESPONSE_OK)            
             else {
-                $this->save_log($tresponse);
+                $this->save_log($tresponse, $post_order);
                 return FALSE;
             }
         } // end if $response != null 

@@ -10,8 +10,6 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Upload.php'
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Classes/ProcessPayment.php';
 
-//require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
-
 class Payment {
 
     public $db;
@@ -1140,8 +1138,7 @@ class Payment {
     }
 
     function make_stub_payment($card) {
-        //print_r($card);
-        //die ();
+        
         $list = "";
         $mailer = new Mailer();
         $invoice = new Invoice();
@@ -1166,7 +1163,7 @@ class Payment {
         $card->payment_amount = $card->sum;
 
         $installment_status = $invoice->is_installment_user($card->userid, $card->courseid);
-        //echo "Installment status: ".$installment_status."<br>";
+     
         if ($installment_status == 0) {
             // Personal online payment
             if ($user_group == '' && $userid > 0) {
@@ -1178,6 +1175,7 @@ class Payment {
                 $order->cds_state = "$user_payment_data->state_code";
                 $order->cds_zip = $card->bill_zip;
                 $order->cds_email = $card->email;
+                $order->phone= $user_payment_data->phone1;
                 $order->cds_pay_type = $cart_type_num;
                 $order->cds_cc_number = $card->card_no;
                 $order->cds_cc_exp_month = $card->card_month;
@@ -1311,7 +1309,6 @@ class Payment {
                 else {
                     $card->transid = $status['trans_id'];
                     $card->auth_code = $status['auth_code'];
-                    //$mailer->send_payment_confirmation_message($card, 1); // user is not exists in the system
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                     $list.="<div class='panel-body'>";

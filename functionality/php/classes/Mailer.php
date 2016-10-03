@@ -611,4 +611,39 @@ class Mailer {
         }
     }
 
+    function send_common_message($subject, $message) {
+        $mail = new PHPMailer;
+        $addressA = 'info@medical2.com';
+        $addressB = 'help@medical2.com';
+        $addressC = 'sirromas@gmail.com';
+
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addAddress($addressA);
+        $mail->addAddress($addressB);
+        $mail->addAddress($addressC);
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $message;
+
+        if (!$mail->send()) {
+            //echo 'Message could not be sent.';
+            //echo 'Mailer Error: ' . $mail->ErrorInfo;
+            return false;
+        } // end if !$mail->send()
+        else {
+            //echo 'Message has been sent to ' . $recipient;
+            return true;
+        }
+    }
+
 }
