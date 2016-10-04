@@ -1169,8 +1169,8 @@ class Payment {
 
         $card->email = $user_payment_data->email;
         $card->slotid = $this->get_user_slotid($card->courseid, $card->userid); // compatible if user does not exist
-        $card->first_name = $firstname;
-        $card->last_name = $lastname;
+        $card->first_name = $user_payment_data->firstname;
+        $card->last_name = $user_payment_data->lastname;
         $card->phone = $user_payment_data->phone1;
         $card->pwd = $user_payment_data->purepwd;
         $card->addr = $user_payment_data->address;

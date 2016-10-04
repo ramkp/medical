@@ -128,13 +128,14 @@ class Mailer {
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
         $catid = $this->get_course_category($user);
+        $p=new Payment();
+        $state=$p->get_state_name_by_id($user->state);
         $list.= "<!DOCTYPE HTML><html><head><title>Account Confirmation</title>";
         $list.="</head>";
         $list.="<body><br/><br/><br/><br/>";
         $list.="<div class='datagrid'>            
         <table style='table-layout: fixed;' width='360'>
         <thead>";
-
 
         if ($printed_data == NULL) {
             if ($catid == 5) {
@@ -177,7 +178,7 @@ class Mailer {
         <td>City</td><td>$user->city</td>
         </tr>        
         <tr style='background-color:#F5F5F5;'>
-        <td>State</td><td>$user->state</td>
+        <td>State</td><td>$state</td>
         </tr>
         <tr >
         <td>Zip</td><td>$user->zip</td>
