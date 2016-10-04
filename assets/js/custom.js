@@ -656,7 +656,7 @@ $(document).ready(function () {
                 bill_addr: bill_addr,
                 bill_city: bill_city,
                 bill_zip: bill_zip,
-                state:state,
+                state: state,
                 user_group: user_group,
                 bill_email: bill_email};
             var url = "https://" + domain + "/functionality/php/make_stub_payment.php";
@@ -2005,7 +2005,12 @@ $(document).ready(function () {
         }
 
 
-
+        if (event.target.id == 'manual_group_registration') {
+            // console.log('Manual registration ...');
+            var tot_participants = $('#participants').val();
+            $('#upload_section').hide();
+            verify_group_common_section();
+        }
 
 
     }); // end of $("body").click(function (event) {    
