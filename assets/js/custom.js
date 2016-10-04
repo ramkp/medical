@@ -583,7 +583,7 @@ $(document).ready(function () {
             console.log('Billing firstname: ' + names_arr[0]);
             console.log('Billing lastname: ' + names_arr[1]);
             if (typeof (names_arr[1]) === "undefined") {
-                $('#personal_err').html('Please provide correct card holder name separated by space');
+                $('#personal_payment_err').html('Please provide correct card holder name separated by space');
                 return;
             }
         }
