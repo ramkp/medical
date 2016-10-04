@@ -1846,26 +1846,31 @@ $(document).ready(function () {
 
                 var firstname = $('#first_name').val();
                 var lastname = $('#last_name').val();
+                var billing_name = $('#billing_name').val();
                 var addr = $('#addr').val();
                 var city = $('#city').val();
                 var state = $('#state').val();
                 var country = $('#country').val();
                 var zip = $('#zip').val();
-                var inst = $('#inst').val();
                 var phone = $('#phone').val();
                 var email = $('#email').val();
                 var cardnumber = $('#card_no').val();
-                var cvv = $('#bill_cvv').val();
+                var cvv = $('#cvv').val();
                 var exp_month = $('#card_month').val();
                 var exp_year = $('#card_year').val();
                 var from = $('#come_from').val();
 
                 if ($('#da').is(':checked')) {
-                    addr = $('#bill_addr').val();
-                    state = $('#bill_state').val();
-                    city = $('#bill_city').val();
-                    zip = $('#bill_zip').val();
+                    addr = $('#addr2').val();
+                    state = $('#state2').val();
+                    city = $('#city2').val();
+                    country = $('#country2').val();
+                    zip = $('#zip2').val();
+                    email = $('#email2').val();
+                    phone = $('#phone2').val();
                 } // end if 
+                
+                console.log('Mailing address: '+addr);
 
                 if (firstname == '') {
                     $('#personal_err').html('Please provide firstname');
@@ -1878,7 +1883,7 @@ $(document).ready(function () {
                 }
 
                 if (addr == '') {
-                    $('#personal_err').html('Please provide street address');
+                    $('#personal_err').html('Please provide mailing address');
                     return;
                 }
 
@@ -1911,6 +1916,22 @@ $(document).ready(function () {
                     $('#personal_err').html('Please provide email');
                     return;
                 }
+                
+                if (billing_name == '') {
+                    $('#personal_err').html('Please provide card holder name');
+                    return;
+                }
+
+                if (billing_name != '') {
+                    var names_arr = billing_name.split(" ");
+                    console.log('Billing name: '+billing_name);
+                    console.log('Billing firstname: '+names_arr[0]);
+                    console.log('Billing lastname: '+names_arr[1]);
+                    if (typeof (names_arr[1]) === "undefined") {
+                        $('#personal_err').html('Please provide correct card holder name separated by space');
+                        return;
+                    }
+                }
 
                 if (cardnumber == '') {
                     $('#personal_err').html('Please provide card number');
@@ -1927,11 +1948,6 @@ $(document).ready(function () {
                     return;
                 }
 
-                if (!$('#policy').is(':checked')) {
-                    $('#personal_err').html('Please agree with terms and conditions');
-                    return;
-                }
-
                 $('#personal_err').html('');
 
                 var url = "/functionality/php/is_email_exists.php";
@@ -1939,18 +1955,19 @@ $(document).ready(function () {
                 $.post(url, request).done(function (data) {
                     console.log('Server response: ' + data);
                     if (data > 0) {
-                        $('#personal_err').html('Email already in use');
+                        $('#personal_err').html('Email is already in use');
                     } // end if data>0
                     else {
                         var user = {
                             first_name: firstname,
                             last_name: lastname,
+                            billing_name: billing_name,
                             addr: addr,
                             city: city,
                             state: state,
                             country: country,
                             zip: zip,
-                            inst: inst,
+                            inst: 'n/a',
                             phone: phone,
                             email: email,
                             cardnumber: cardnumber,
@@ -1968,10 +1985,10 @@ $(document).ready(function () {
                         var signup_request = {user: JSON.stringify(user)};
                         $.post(signup_url, signup_request).done(function (data) {
                             $('#ajax_loading_payment').hide();
-                            $('#personal_err').html(data);
+                            $('#personal_err').html("<span style='color:black'>" + data + "</span>");
                         });
-                    }
-                });
+                    } // end else
+                }); // end of post
             } // end else
         }
 

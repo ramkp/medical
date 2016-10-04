@@ -28,9 +28,14 @@ class register_model extends CI_Model {
         return $drop_down;
     }
 
-    function get_year_drop_box() {
+    function get_year_drop_box($alter = false) {
         $drop_down = "";
-        $drop_down.= "<select id='card_year' style='width: 75px;'>";
+        if ($alter === false) {
+            $drop_down.= "<select id='card_year' style='width: 75px;'>";
+        } // end if
+        else {
+            $drop_down.= "<select id='card_year2' style='width: 75px;'>";
+        } // end else
         $drop_down.="<option value='0' selected>Year</option>";
         $drop_down.="<option value='2016'>2016</option>";
         $drop_down.="<option value='2017'>2017</option>";
@@ -51,7 +56,7 @@ class register_model extends CI_Model {
         return $drop_down;
     }
 
-    function get_month_drop_box() {
+    function get_month_drop_box($alter = false) {
         $drop_down = "";
         $items = "<option value='01'>01</option>
                 <option value='0' selected>Month</option>
@@ -66,7 +71,12 @@ class register_model extends CI_Model {
                 <option value='10'>10</option>
                 <option value='11'>11</option>
                 <option value='12'>12</option>";
-        $drop_down.= "<select id='card_month' style='width: 65px;'>";
+        if ($alter === false) {
+            $drop_down.= "<select id='card_month' style='width: 65px;'>";
+        } // end if
+        else {
+            $drop_down.= "<select id='card_month2' style='width: 65px;'>";
+        } // end else
         $drop_down.=$items;
         $drop_down.="</select>";
         return $drop_down;
@@ -285,7 +295,7 @@ class register_model extends CI_Model {
             $drop_down.="<select id='state' style='width:120px;'>";
         } // end if $bill == FALSE 
         else {
-            $drop_down.="<select id='bill_state' style='width:120px;'>";
+            $drop_down.="<select id='state2' style='width:120px;'>";
         } // end else
         $drop_down.="<option value='0' selected>State</option>";
         $query = "select * from mdl_states";
@@ -348,12 +358,15 @@ class register_model extends CI_Model {
      * 
      */
 
-    public function get_countries_list() {
+    public function get_countries_list($alter = false) {
         $drop_down = "";
-        //$drop_down.="<div class='dropdown'>
-        //<a href='#' id='country' data-toggle='dropdown' class='dropdown-toggle' onClick='return false;'>United States <b class='caret'></b></a>
-        //<ul class='dropdown-menu'>";
-        $drop_down.="<select id='country' style='width:120px;'>";
+
+        if ($alter === false) {
+            $drop_down.="<select id='country' style='width:120px;'>";
+        } // end if
+        else {
+            $drop_down.="<select id='country2' style='width:120px;'>";
+        } // end else
         $query = "select * from mdl_countries";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
@@ -544,9 +557,12 @@ class register_model extends CI_Model {
         $states2 = $this->get_states_list(true);
         $register_state = $this->get_register_course_states_list();
         $countries = $this->get_countries_list();
+        $countries2 = $this->get_countries_list(true);
         $cities = $this->get_register_course_cities_list();
         $card_year = $this->get_year_drop_box();
         $card_month = $this->get_month_drop_box();
+        $card_year2 = $this->get_year_drop_box(true);
+        $card_month2 = $this->get_month_drop_box(true);
 
         // ****************** Program information **************************
 
@@ -594,16 +610,16 @@ class register_model extends CI_Model {
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2' >First name*</span>";
-            $list.="<span class='span2' ><input type='text' id='first_name' name='first_name' ></span>";
+            $list.="<span class='span2' ><input type='text' required id='first_name' name='first_name' ></span>";
             $list.="<span class='span2' >Last name*</span>";
-            $list.="<span class='span2' ><input type='text' id='last_name' name='last_name'  ></span>";
+            $list.="<span class='span2' ><input type='text' required id='last_name' name='last_name'  ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>St Address*</span>";
-            $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
+            $list.="<span class='span2'>Mailing Address*</span>";
+            $list.="<span class='span2'><input type='text' required id='addr' name='addr' ></span>";
             $list.="<span class='span2'>City*</span>";
-            $list.="<span class='span2'><input type='text' id='city' name='city' ></span>";
+            $list.="<span class='span2'><input type='text' required id='city' name='city' ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -615,32 +631,23 @@ class register_model extends CI_Model {
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>ZIP Code*</span>";
-            $list.="<span class='span2'><input type='text' id='zip' name='zip' ></span>";
-            $list.="<span class='span2'>Business Or Institution</span>";
-            $list.="<span class='span2'><input type='text' id='inst' name='inst' ></span>";
+            $list.="<span class='span2'><input type='text' required id='zip' name='zip' ></span>";
+            $list.="<span class='span2'>Email*</span>";
+            $list.="<span class='span2'><input type='text' required id='email' name='email' ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Phone*</span>";
-            $list.="<span class='span2'><input type='text' id='phone' name='phone'  ></span>";
-            $list.="<span class='span2'>Email*</span>";
-            $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
-            $list.="</div>";
-
-            $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Card number*</span>";
-            $list.="<span class='span2'><input type='text' id='card_no' name='card_no'  ></span>";
-            $list.="<span class='span2'>CVV*</span>";
-            $list.="<span class='span2'><input type='text' id='bill_cvv' name='bill_cvv'  ></span>";
-            $list.="</div>";
-
-            $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Expiration Date*</span>";
-            $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
+            $list.="<span class='span2'><input type='text' required id='phone' name='phone'></span>";
             $list.="<span class='span2'>How did you hear about us?</span>";
             $list.="<span class='span2'>$come_from</span>";
             $list.="</div>";
 
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><hr></span>";
+            $list.="</div>";
+
+            // ********************  Payment section ********************
             $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;display:none;' id='course_fee'>";
             $list.="<span class='span2'>Selected program</span>";
             $list.="<span class='span2' id='dyn_course_name'></span>";
@@ -648,31 +655,53 @@ class register_model extends CI_Model {
             $list.="<span class='span2' id='dyn_course_fee'></span>";
             $list.="</div>";
 
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Card Holder Name*</span>";
+            $list.="<span class='span2'><input type='text' required id='billing_name' name='billing_name' ></span>";
+            $list.="<span class='span2'>CVV*</span>";
+            $list.="<span class='span2'><input type='text' id='cvv' name='cvv'  ></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Card number*</span>";
+            $list.="<span class='span2'><input type='text' id='card_no' name='card_no'  ></span>";
+            $list.="<span class='span2'>Expiration Date*</span>";
+            $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
+            $list.="</div>";
+
             $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span8'><input type='checkbox' id='da'> &nbsp; I have different billing address</span>";
+            $list.="<span class='span8'><input type='checkbox' id='da'> &nbsp; The card address is differrent</span>";
             $list.="</div>";
 
             $list.="<div id='diff_address' style='display:none;'>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Address*</span>";
-            $list.="<span class='span2'><input type='text' id='bill_addr' name='bill_addr'  ></span>";
-            $list.="<span class='span2'>State*</span>";
-            $list.="<span class='span2'>$states2</span>";
+            $list.="<span class='span2'>Mailing Address*</span>";
+            $list.="<span class='span2'><input type='text' id='addr2' name='addr2'  ></span>";
+            $list.="<span class='span2'>City*</span>";
+            $list.="<span class='span2'><input type='text' id='city2' name='city2'  ></span>";
             $list.="</div>";
-
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>City*</span>";
-            $list.="<span class='span2'><input type='text' id='bill_city' name='bill_city'  ></span>";
+            $list.="<span class='span2'>State*</span>";
+            $list.="<span class='span2'>$states2</span>";
+            $list.="<span class='span2'>Country*</span>";
+            $list.="<span class='span2' id='register_cities_container'>$countries2</span>";
+
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Zip code*</span>";
-            $list.="<span class='span2'><input type='text' id='bill_zip' name='bill_zip'  ></span>";
+            $list.="<span class='span2'><input type='text' id='zip2' name='zip2'  ></span>";
+            $list.="<span class='span2'>Receipt email*</span>";
+            $list.="<span class='span2'><input type='text' id='email2' name='email2'></span>";
             $list.="</div>";
 
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Phone*</span>";
+            $list.="<span class='span2'><input type='text' id='phone2' name='phone2'></span>";
             $list.="</div>";
 
-            $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span8'><input type='checkbox' id='policy'> I have read and agree to Terms and Conditions</span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -683,9 +712,13 @@ class register_model extends CI_Model {
             $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
             $list.="</div>";
 
-            $list.= "<div class='container-fluid' style='text-align:left;'>";
-            $list.= "<span class='span2'><button class='btn btn-primary' id='make_payment_personal2'>Submit</button></span>";
-            $list.= "</div>";
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'>By clicking the 'I Agree, Submit' button, you confirm you have reviewed and agree to the Pay by Computer Terms & Conditions (<a href='#' onClick='return false;' id='policy'>click to view).</a></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><button class='btn btn-primary' id='make_payment_personal2'>I Agree, Submit</button></span>";
+            $list.="</div>";
 
             $list.="</div></div></div></div>";
         } // end if $courseid==null
@@ -707,10 +740,7 @@ class register_model extends CI_Model {
             $list.="<span class='span1'><input type='hidden' value='$courseObj->raw_cost' id='payment_sum'></span>";
             $list.="<span class='span3'>$program_schedule</span>";
             $list.="</div>"; // end of container-fluid
-            //$list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
-            //$list.="<span class='span9'>Registration is not available for now, please try again later or call 877 741 1996. </span>";
-            //$list.="</div>"; // end of container-fluid
-
+            
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default
             // ********************  Individual registration form **************************        
@@ -726,7 +756,7 @@ class register_model extends CI_Model {
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>St Address*</span>";
+            $list.="<span class='span2'>Mailing Address*</span>";
             $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
             $list.="<span class='span2'>City*</span>";
             $list.="<span class='span2'><input type='text' id='city' name='city' ></span>";
@@ -742,31 +772,22 @@ class register_model extends CI_Model {
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>ZIP Code*</span>";
             $list.="<span class='span2'><input type='text' id='zip' name='zip' ></span>";
-            $list.="<span class='span2'>Business Or Institution</span>";
-            $list.="<span class='span2'><input type='text' id='inst' name='inst' ></span>";
+            $list.="<span class='span2'>Email*</span>";
+            $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Phone*</span>";
             $list.="<span class='span2'><input type='text' id='phone' name='phone'  ></span>";
-            $list.="<span class='span2'>Email*</span>";
-            $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
-            $list.="</div>";
-            
-            $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Card number*</span>";
-            $list.="<span class='span2'><input type='text' id='card_no' name='card_no'  ></span>";
-            $list.="<span class='span2'>CVV*</span>";
-            $list.="<span class='span2'><input type='text' id='bill_cvv' name='bill_cvv'  ></span>";
-            $list.="</div>";
-
-            $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Expiration Date*</span>";
-            $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
             $list.="<span class='span2'>How did you hear about us?</span>";
             $list.="<span class='span2'>$come_from</span>";
             $list.="</div>";
 
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><hr></span>";
+            $list.="</div>";
+
+            /* ********************** Payment section ********************* */
             $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;' id='course_fee'>";
             $list.="<span class='span2'>Selected program</span>";
             $list.="<span class='span2' id='dyn_course_name'>$selected_program</span>";
@@ -774,30 +795,53 @@ class register_model extends CI_Model {
             $list.="<span class='span2' id='dyn_course_fee'>$courseObj->cost</span>";
             $list.="</div>";
 
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Card Holder Name*</span>";
+            $list.="<span class='span2'><input type='text' required id='billing_name' name='billing_name' ></span>";
+            $list.="<span class='span2'>CVV*</span>";
+            $list.="<span class='span2'><input type='text' id='cvv' name='cvv'  ></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Card number*</span>";
+            $list.="<span class='span2'><input type='text' id='card_no' name='card_no'  ></span>";
+            $list.="<span class='span2'>Expiration Date*</span>";
+            $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
+            $list.="</div>";
+
             $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span8'><input type='checkbox' id='da'> &nbsp; I have different billing address</span>";
+            $list.="<span class='span8'><input type='checkbox' id='da'> &nbsp; The card address is differrent</span>";
             $list.="</div>";
 
             $list.="<div id='diff_address' style='display:none;'>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Address*</span>";
-            $list.="<span class='span2'><input type='text' id='bill_addr' name='bill_addr'  ></span>";
-            $list.="<span class='span2'>State*</span>";
-            $list.="<span class='span2'>$states2</span>";
+            $list.="<span class='span2'>Mailing Address*</span>";
+            $list.="<span class='span2'><input type='text' id='addr2' name='addr2'  ></span>";
+            $list.="<span class='span2'>City*</span>";
+            $list.="<span class='span2'><input type='text' id='city2' name='city2'  ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>City*</span>";
-            $list.="<span class='span2'><input type='text' id='bill_city' name='bill_city'  ></span>";
+            $list.="<span class='span2'>State*</span>";
+            $list.="<span class='span2'>$states2</span>";
+            $list.="<span class='span2'>Country*</span>";
+            $list.="<span class='span2' id='register_cities_container'>$countries2</span>";
+
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Zip code*</span>";
-            $list.="<span class='span2'><input type='text' id='bill_zip' name='bill_zip'  ></span>";
+            $list.="<span class='span2'><input type='text' id='zip2' name='zip2'  ></span>";
+            $list.="<span class='span2'>Receipt email*</span>";
+            $list.="<span class='span2'><input type='text' id='email2' name='email2'></span>";
             $list.="</div>";
 
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Phone*</span>";
+            $list.="<span class='span2'><input type='text' id='phone2' name='phone2'></span>";
             $list.="</div>";
 
-            $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span8'><input type='checkbox' id='policy'> I have read and agree to Terms and Conditions</span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -808,17 +852,13 @@ class register_model extends CI_Model {
             $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
             $list.="</div>";
 
-            $list.= "<div class='container-fluid' style='text-align:left;'>";
-            $list.= "<span class='span2'><button class='btn btn-primary' id='make_payment_personal2'>Submit</button></span>";
-            $list.= "</div>";
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'>By clicking the 'I Agree, Submit' button, you confirm you have reviewed and agree to the Pay by Computer Terms & Conditions (<a href='#' onClick='return false;' id='policy'>click to view).</a></span>";
+            $list.="</div>";
 
-            // Payment options link
-            //$list.="<div class='container-fluid' style='text-align:center;'>";
-            //$list.="<span class='span8'><a href='#' id='p_options_p' onClick='return false;'>Next</a></span>&nbsp;<span style='color:red;' id=''></span>";
-            //$list.="</div>";
-            //$list.="<div class='container-fluid' style='text-align:left;'>";
-            //$list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_personal'><img src='https://$this->host/assets/img/ajax.gif' /></span";
-            //$list.="</div>";
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><button class='btn btn-primary' id='make_payment_personal2'>I Agree, Submit</button></span>";
+            $list.="</div>";
 
             $list.="</div>";
             $list.="</div></div>";

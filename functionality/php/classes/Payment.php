@@ -1462,29 +1462,35 @@ class Payment {
         $list = "";
         /*
          * 
-          var user = {
-          first_name: firstname,
-          last_name: lastname,
-          addr: addr,
-          city: city,
-          state: state,
-          country: country,
-          zip: zip,
-          inst: inst,
-          phone: phone,
-          email: email,
-          cardnumber: cardnumber,
-          cvv: cvv,
-          exp_month: exp_month,
-          exp_year: exp_year,
-          come_from: from,
-          courseid: courseid,
-          slotid: slotid,
-          amount: amount
-          };
+          stdClass Object
+        (
+            [first_name] => Test
+            [last_name] => User
+            [billing_name] => John Connair
+            [addr] => Some Address2
+            [city] => Some city2
+            [state] => 10
+            [country] => 234
+            [zip] => 6902
+            [inst] => n/a
+            [phone] => 3802
+            [email] => saalax2@ambro.com
+            [cardnumber] => 234123412341211
+            [cvv] => 2254
+            [exp_month] => 07
+            [exp_year] => 2021
+            [come_from] => 0
+            [courseid] => 45
+            [slotid] => 730
+            [amount] => 450
+        )
          * 
          */
-
+        
+        //echo "<pre>";
+        //print_r($user);
+        //echo "</pre>";
+        //die();
         $signup_status = $this->enroll->single_signup($user);
 
         if ($signup_status === true) {
@@ -1495,7 +1501,7 @@ class Payment {
             return $list;
             die();
 
-            /*             * **************************************************************
+            /* ***************************************************************
              * 
              *          Below code is not executed until approval
              * 
@@ -1563,6 +1569,7 @@ class Payment {
             } // end else
         } // end if $signup_status  === true
         else {
+            echo $signup_status. "<br>";
             $list.="<div class='container-fluid'>";
             $list.="<span class='span9'>Signup error happened </span>";
             $list.="</div>";
