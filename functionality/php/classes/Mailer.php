@@ -154,10 +154,10 @@ class Mailer {
         $list.="</thead>
         <tbody>
         <tr style='background-color:#F5F5F5;'>
-        <td>First name</td><td>$user->first_name</td>
+        <td>First name</td><td>$user->signup_first</td>
         </tr>
         <tr>
-        <td>Last name</td><td>$user->last_name</td>
+        <td>Last name</td><td>$user->signup_last</td>
         </tr>
         <tr style='background-color:#F5F5F5;'>
         <td>Email</td><td>$user->email</td>

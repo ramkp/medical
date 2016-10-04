@@ -944,10 +944,15 @@ class Payment {
     }
 
     function get_state_name_by_id($stateid) {
-        $query = "select * from mdl_states where id=$stateid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $state = $row['state'];
+        if ($stateid > 0) {
+            $query = "select * from mdl_states where id=$stateid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $state = $row['state'];
+            }
+        } // end if
+        else {
+            $state = 'N/A';
         }
         return $state;
     }
@@ -1169,8 +1174,11 @@ class Payment {
 
         $card->email = $user_payment_data->email;
         $card->slotid = $this->get_user_slotid($card->courseid, $card->userid); // compatible if user does not exist
-        $card->first_name = $user_payment_data->firstname;
-        $card->last_name = $user_payment_data->lastname;
+        $card->first_name = $firstname;
+        $card->signup_first = $user_payment_data->firstname;
+        $card->last_name = $lastname;
+        $card->signup_last = $user_payment_data->lastname;
+
         $card->phone = $user_payment_data->phone1;
         $card->pwd = $user_payment_data->purepwd;
         $card->addr = $user_payment_data->address;
@@ -1296,12 +1304,12 @@ class Payment {
                 $group_users = $this->get_group_users($user_group);
 
                 $group_sum = $card->sum;
-
+                $state_code = $this->get_state_code($card->state);
                 $order = new stdClass();
                 $order->cds_name = $card->card_holder;
                 $order->cds_address_1 = $card->bill_addr;
                 $order->cds_city = $card->bill_city;
-                $order->cds_state = "CA";
+                $order->cds_state = $state_code;
                 $order->cds_zip = $card->bill_zip;
                 $order->cds_email = $card->email;
                 $order->cds_pay_type = $cart_type_num;
@@ -1309,7 +1317,7 @@ class Payment {
                 $order->cvv = $card->cvv; // add card cvv code to processor 
                 $order->cds_cc_exp_month = $card->card_month;
                 $order->cds_cc_exp_year = $card->card_year;
-                $order->sum = $group_sum;
+                $order->sum = $card->sum;
                 $order->item = $item;
                 $order->group = 1;
 
@@ -1538,13 +1546,8 @@ class Payment {
             $pr = new ProcessPayment();
             $status = $pr->make_transaction2($order);
             if ($status === false) {
-                $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
-                $list.="<div class='panel-body'>";
-                $list.= "<div class='container-fluid' style='text-align:left;'>";
+                $list.= "<div class='container-fluid' style='text-align:center;'>";
                 $list.= "<span class='span8'>Transaction failed, please contact your bank for details.</span>";
-                $list.="</div>";
-                $list.="</div>";
                 $list.="</div>";
             } // end if $status === false
             else {
@@ -1569,6 +1572,8 @@ class Payment {
                 $user->card_holder = $user->billing_name;
                 $user->card_month = $user->exp_month;
                 $user->card_year = $user->exp_year;
+                $user->signup_first = $user->first_name;
+                $user->signup_last = $user->last_name;
                 $this->confirm_user($user->email);
                 $this->add_payment_to_db($user); // adds payment result to DB
                 $mailer->send_payment_confirmation_message($user);
