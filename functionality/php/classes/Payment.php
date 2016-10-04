@@ -952,6 +952,15 @@ class Payment {
         return $state;
     }
 
+    function get_state_code($stateid) {
+        $query = "select * from mdl_states where id=$stateid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $code = $row['code'];
+        }
+        return $code;
+    }
+
     function get_group_payment_section($group_common_section, $users, $tot_participants) {
         $groupid = $this->enroll->create_course_group($group_common_section->courseid, $group_common_section->group_name);
 
@@ -1166,7 +1175,7 @@ class Payment {
         $card->pwd = $user_payment_data->purepwd;
         $card->addr = $user_payment_data->address;
         $card->city = $user_payment_data->city;
-        $card->state = $user_payment_data->state;
+        //$card->state = $user_payment_data->state;
         $card->zip = $user_payment_data->zip;
         $card->country = "US";
         $card->payment_amount = $card->sum;
@@ -1176,12 +1185,13 @@ class Payment {
         if ($installment_status == 0) {
             // Personal online payment
             if ($user_group == '' && $userid > 0) {
+                $state_code = $this->get_state_code($card->state);
                 $user_payment_data = $this->get_user_payment_credentials($userid);
                 $order = new stdClass();
                 $order->cds_name = "$firstname/$lastname";
                 $order->cds_address_1 = $card->bill_addr;
                 $order->cds_city = $card->bill_city;
-                $order->cds_state = "$user_payment_data->state_code";
+                $order->cds_state = $state_code;
                 $order->cds_zip = $card->bill_zip;
                 $order->cds_email = $card->email;
                 $order->phone = $user_payment_data->phone1;

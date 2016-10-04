@@ -656,6 +656,7 @@ $(document).ready(function () {
                 bill_addr: bill_addr,
                 bill_city: bill_city,
                 bill_zip: bill_zip,
+                state:state,
                 user_group: user_group,
                 bill_email: bill_email};
             var url = "https://" + domain + "/functionality/php/make_stub_payment.php";
