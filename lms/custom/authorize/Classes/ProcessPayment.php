@@ -33,12 +33,8 @@ class ProcessPayment {
 
         $list.="<table align='center'>";
         foreach ($order_arr as $key => $value) {
-            if ($key != 'cds_pay_type' && $key != 'group') {
+            if ($key != 'cds_pay_type' && $key != 'group' && $key != 'cds_cc_number' && $key != 'cds_cc_exp_month' && $key != 'cds_cc_exp_year' && $key != 'cvv') {
                 $field = $this->get_order_report_fields($key);
-                if ($key == 'cds_cc_number') {
-                    $value = 'XXXX XXXX XXXX XXXX';
-                }
-
                 $list.="<tr>";
                 $list.="<td style='padding:15px;'>$field</td><td style='padding:15px;'>$value</td>";
                 $list.="</tr>";
@@ -265,7 +261,6 @@ class ProcessPayment {
         //echo "<pre>";
         //print_r($post_order);
         //echo "</pre><br>-------------------------------<br>";
-
         // Create the payment data for credit card        
         $payment = $this->prepare_order($post_order);
         //$merchantAuthentication = $this->sandbox_authorize();
@@ -346,10 +341,10 @@ class ProcessPayment {
         $controller = new AnetController\CreateTransactionController($request);
         //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
         $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
-            //echo "--------Card payment response1 <pre>";
-            //print_r($response);
-            //echo "</pre><br>";
-            
+        //echo "--------Card payment response1 <pre>";
+        //print_r($response);
+        //echo "</pre><br>";
+
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
 
