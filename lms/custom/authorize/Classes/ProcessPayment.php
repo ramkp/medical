@@ -35,6 +35,10 @@ class ProcessPayment {
         foreach ($order_arr as $key => $value) {
             if ($key != 'cds_pay_type' && $key != 'group') {
                 $field = $this->get_order_report_fields($key);
+                if ($key == 'cds_cc_number') {
+                    $value = 'XXXX XXXX XXXX XXXX';
+                }
+
                 $list.="<tr>";
                 $list.="<td style='padding:15px;'>$field</td><td style='padding:15px;'>$value</td>";
                 $list.="</tr>";
