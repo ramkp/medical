@@ -260,6 +260,125 @@ class ProcessPayment {
         }
     }
 
+    function make_transaction2($post_order) {
+
+        //echo "<pre>";
+        //print_r($post_order);
+        //echo "</pre><br>-------------------------------<br>";
+
+        // Create the payment data for credit card        
+        $payment = $this->prepare_order($post_order);
+        $merchantAuthentication = $this->sandbox_authorize();
+        $refId = 'ref' . time();
+
+        // Order info
+        $invoiceNo = time();
+        $order = new AnetAPI\OrderType();
+        $order->setInvoiceNumber($invoiceNo);
+        if ($order->group == 0) {
+            $order->setDescription($post_order->item);
+            $lineitem = new AnetAPI\LineItemType();
+            $lineitem->setItemId(time());
+            $lineitem->setName($post_order->item);
+            $lineitem->setDescription($post_order->item);
+            $lineitem->setQuantity("1");
+            $lineitem->setUnitPrice($post_order->sum);
+            $lineitem->setTaxable("N");
+        } // end if $order==0
+        else {
+            $order->setDescription($post_order->item);
+            $lineitem = new AnetAPI\LineItemType();
+            $lineitem->setItemId(time());
+            $lineitem->setName("$post_order->item");
+            $lineitem->setDescription($post_order->item);
+            $lineitem->setQuantity("1");
+            $lineitem->setUnitPrice($post_order->sum);
+            $lineitem->setTaxable("N");
+        } // end else
+        // Customer info 
+        $custID = round(time() / 3785);
+        $customer = new AnetAPI\CustomerDataType();
+        $customer->setId($custID);
+        $customer->setEmail($post_order->cds_email);
+
+        $names = explode("/", $post_order->cds_name);
+        $firstname = $names[0];
+        $lastname = $names[1];
+
+        //Ship To Info
+        $shipto = new AnetAPI\NameAndAddressType();
+        $shipto->setFirstName($firstname);
+        $shipto->setLastName($lastname);
+        $shipto->setCompany('Student');
+        $shipto->setAddress($post_order->cds_address_1);
+        $shipto->setCity($post_order->cds_city);
+        $shipto->setState($post_order->cds_state);
+        $shipto->setZip($post_order->cds_zip);
+        $shipto->setCountry("USA");
+
+        // Bill To
+        $billto = new AnetAPI\CustomerAddressType();
+        $billto->setFirstName($firstname);
+        $billto->setLastName($lastname);
+        $billto->setCompany("Student");
+        $billto->setAddress($post_order->cds_address_1);
+        $billto->setCity($post_order->cds_city);
+        $billto->setState($post_order->cds_state);
+        $billto->setZip($post_order->cds_zip);
+        $billto->setCountry("USA");
+
+        //create a transaction
+        $transactionRequestType = new AnetAPI\TransactionRequestType();
+        $transactionRequestType->setTransactionType("authCaptureTransaction");
+        $transactionRequestType->setAmount($post_order->sum);
+        $transactionRequestType->setPayment($payment);
+        $transactionRequestType->setOrder($order);
+        $transactionRequestType->addToLineItems($lineitem);
+        $transactionRequestType->setCustomer($customer);
+        $transactionRequestType->setBillTo($billto);
+        $transactionRequestType->setShipTo($shipto);
+
+        $request = new AnetAPI\CreateTransactionRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setTransactionRequest($transactionRequestType);
+        $controller = new AnetController\CreateTransactionController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+            //echo "--------Card payment response1 <pre>";
+            //print_r($response);
+            //echo "</pre><br>";
+            
+        if ($response != null) {
+            $tresponse = $response->getTransactionResponse();
+
+
+            //echo "--------Card payment response2 <pre>";
+            //print_r($tresponse);
+            //echo "</pre><br>";
+            //die();
+
+
+            if (($tresponse != null) && ($tresponse->getResponseCode() == "1")) {
+                //echo "Charge Credit Card AUTH CODE : " . $tresponse->getAuthCode() . "\n";
+                //echo "Charge Credit Card TRANS ID  : " . $tresponse->getTransId() . "\n";
+                $status = array('auth_code' => $tresponse->getAuthCode(),
+                    'trans_id' => $tresponse->getTransId(),
+                    'auth_code' => $tresponse->getResponseCode(),
+                    'sum' => $post_order->sum);
+                return $status;
+            } // end if ($tresponse != null) && ($tresponse->getResponseCode() == "1")
+            else {
+                $this->save_log($tresponse, $post_order);
+                return false;
+            }
+        } // end if $response != null        
+        else {
+            //echo "Charge Credit card Null response returned";
+            return false;
+        }
+    }
+
     function createSubscription($post_order) {
 
         // Common Set Up for API Credentials

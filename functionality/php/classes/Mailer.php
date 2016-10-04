@@ -272,8 +272,8 @@ class Mailer {
             $mail->Subject = $subject;
             $mail->Body = $message;
             if (!$mail->send()) {
-                echo 'Message could not be sent.';
-                echo 'Mailer Error: ' . $mail->ErrorInfo;
+                //echo 'Message could not be sent.';
+                //echo 'Mailer Error: ' . $mail->ErrorInfo;
             } // end if !$mail->send()        
             else {
                 //echo 'Message has been sent to ' . $recipient;
@@ -494,8 +494,8 @@ class Mailer {
         $mail->Body = $message;
 
         if (!$mail->send()) {
-            echo 'Message could not be sent.';
-            echo 'Mailer Error: ' . $mail->ErrorInfo;
+            //echo 'Message could not be sent.';
+            //echo 'Mailer Error: ' . $mail->ErrorInfo;
         } // end if !$mail->send()        
         else {
             //echo 'Message has been sent to ' . $recipient;

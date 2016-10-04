@@ -1016,7 +1016,7 @@ class Payment {
     }
 
     function get_user_detailes($userid) {
-        $query = "select id, username, firstname, lastname from mdl_user "
+        $query = "select * from mdl_user "
                 . "where id=$userid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -1030,8 +1030,12 @@ class Payment {
 
     function add_payment_to_db($card) {
         $card_last_four = substr($card->card_no, -4);
-        // To make refund we need to store card last four digits - base64 encode
-        //date_default_timezone_set("America/New_York");
+
+        //echo "<pre> add_payment_to_db";
+        //print_r($card);
+        //echo "</pre>--------------------<br>";
+
+
         $exp_date = $card->card_month . $card->card_year;
         $query = "insert into mdl_card_payments "
                 . "(userid,"
@@ -1046,6 +1050,7 @@ class Payment {
                 . "'$card->transid', "
                 . "'$card->auth_code', "
                 . "'" . time() . "')";
+        //echo "Query: ".$query."<br>";
         $this->db->query($query);
     }
 
@@ -1138,7 +1143,7 @@ class Payment {
     }
 
     function make_stub_payment($card) {
-        
+
         $list = "";
         $mailer = new Mailer();
         $invoice = new Invoice();
@@ -1149,10 +1154,14 @@ class Payment {
         $user_payment_data = $this->get_user_payment_credentials($card->userid); // compatible if user does not exist
         $renew_fee = $this->get_renew_fee();
         // Make card object compatible with confirmation email
+        $names = explode(" ", $card->card_holder);
+        $firstname = $names[0];
+        $lastname = $names[1];
+
         $card->email = $user_payment_data->email;
         $card->slotid = $this->get_user_slotid($card->courseid, $card->userid); // compatible if user does not exist
-        $card->first_name = $user_payment_data->firstname;
-        $card->last_name = $user_payment_data->lastname;
+        $card->first_name = $firstname;
+        $card->last_name = $lastname;
         $card->phone = $user_payment_data->phone1;
         $card->pwd = $user_payment_data->purepwd;
         $card->addr = $user_payment_data->address;
@@ -1163,19 +1172,19 @@ class Payment {
         $card->payment_amount = $card->sum;
 
         $installment_status = $invoice->is_installment_user($card->userid, $card->courseid);
-     
+
         if ($installment_status == 0) {
             // Personal online payment
             if ($user_group == '' && $userid > 0) {
                 $user_payment_data = $this->get_user_payment_credentials($userid);
                 $order = new stdClass();
-                $order->cds_name = "$user_payment_data->firstname/$user_payment_data->lastname";
+                $order->cds_name = "$firstname/$lastname";
                 $order->cds_address_1 = $card->bill_addr;
                 $order->cds_city = $card->bill_city;
                 $order->cds_state = "$user_payment_data->state_code";
                 $order->cds_zip = $card->bill_zip;
                 $order->cds_email = $card->email;
-                $order->phone= $user_payment_data->phone1;
+                $order->phone = $user_payment_data->phone1;
                 $order->cds_pay_type = $cart_type_num;
                 $order->cds_cc_number = $card->card_no;
                 $order->cds_cc_exp_month = $card->card_month;
@@ -1345,7 +1354,7 @@ class Payment {
             $user_payment_data = $this->get_user_payment_credentials($card->userid);
             $installmentobj = $invoice->get_user_installment_payments($card->userid, $card->courseid);
             $order = new stdClass();
-            $order->cds_name = "$user_payment_data->firstname/$user_payment_data->lastname";
+            $order->cds_name = "$firstname/$lastname";
             $order->cds_address_1 = $card->bill_addr;
             $order->cds_city = $card->bill_city;
             $order->cds_state = "$user_payment_data->state_code";
@@ -1463,30 +1472,30 @@ class Payment {
         /*
          * 
           stdClass Object
-        (
-            [first_name] => Test
-            [last_name] => User
-            [billing_name] => John Connair
-            [addr] => Some Address2
-            [city] => Some city2
-            [state] => 10
-            [country] => 234
-            [zip] => 6902
-            [inst] => n/a
-            [phone] => 3802
-            [email] => saalax2@ambro.com
-            [cardnumber] => 234123412341211
-            [cvv] => 2254
-            [exp_month] => 07
-            [exp_year] => 2021
-            [come_from] => 0
-            [courseid] => 45
-            [slotid] => 730
-            [amount] => 450
-        )
+          (
+          [first_name] => Test
+          [last_name] => User
+          [billing_name] => John Connair
+          [addr] => Some Address2
+          [city] => Some city2
+          [state] => 10
+          [country] => 234
+          [zip] => 6902
+          [inst] => n/a
+          [phone] => 3802
+          [email] => saalax2@ambro.com
+          [cardnumber] => 234123412341211
+          [cvv] => 2254
+          [exp_month] => 07
+          [exp_year] => 2021
+          [come_from] => 0
+          [courseid] => 45
+          [slotid] => 730
+          [amount] => 450
+          )
          * 
          */
-        
+
         //echo "<pre>";
         //print_r($user);
         //echo "</pre>";
@@ -1495,27 +1504,16 @@ class Payment {
 
         if ($signup_status === true) {
 
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Signup is successfull :) </span>";
-            $list.="</div>";
-            return $list;
-            die();
-
-            /* ***************************************************************
-             * 
-             *          Below code is not executed until approval
-             * 
-             * ************************************************************** */
-
-            $userid = $this->get_user_id_by_email($user->email);
-            $user_payment_data = $this->get_user_payment_credentials($userid);
-            $item = $this->get_course_name($user->courseid);
+            $names = explode(" ", $user->billing_name);
+            $fisrtname = $names[0];
+            $lastname = $names[1];
+            $item = substr($this->get_course_name($user->courseid), 0, 30);
 
             $order = new stdClass();
-            $order->cds_name = "$user_payment_data->firstname/$user_payment_data->lastname";
+            $order->cds_name = "$fisrtname/$lastname";
             $order->cds_address_1 = $user->addr;
             $order->cds_city = $user->city;
-            $order->cds_state = "$user_payment_data->state_code";
+            $order->cds_state = $user->state;
             $order->cds_zip = $user->zip;
             $order->cds_email = $user->email;
 
@@ -1528,7 +1526,7 @@ class Payment {
             $order->group = 0;
 
             $pr = new ProcessPayment();
-            $status = $pr->make_transaction($order);
+            $status = $pr->make_transaction2($order);
             if ($status === false) {
                 $list.="<div class='panel panel-default' id='personal_payment_details'>";
                 $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
@@ -1542,39 +1540,45 @@ class Payment {
             else {
                 $mailer = new Mailer();
                 $renew_fee = $this->get_renew_fee();
+                // Create compatible object fields
+                $userid = $this->get_user_id_by_email($user->email);
+                //echo "User id: ".$userid."<br>";
+                $user_detailes = $this->get_user_detailes($userid);
 
-                // Create object compatible with existing code 
-                $card = new stdClass();
+                //echo "<br>----------------------<br>";
+                //print_r($user_detailes);
+                //echo "<br>----------------------<br>";
 
-
-                $card->transid = $status['trans_id'];
-                $card->auth_code = $status['auth_code'];
-                $this->confirm_user($card->email);
-                $this->add_payment_to_db($card); // adds payment result to DB
-                $mailer->send_payment_confirmation_message($card);
-                $list.="<div class='panel panel-default' id='personal_payment_details'>";
-                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
-                $list.="<div class='panel-body'>";
-                $list.= "<div class='container-fluid' style='text-align:left;'>";
-                if ($card->sum != $renew_fee) {
-                    $list.= "<span class='span8'>Payment is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
+                $user->userid = $userid;
+                $user->card_no = $user->cardnumber;
+                $user->sum = $user->amount;
+                $user->transid = $status['trans_id'];
+                $user->auth_code = $status['auth_code'];
+                $user->pwd = $user_detailes->purepwd;
+                $user->payment_amount = $user->amount;
+                $user->card_holder = $user->billing_name;
+                $user->card_month = $user->exp_month;
+                $user->card_year = $user->exp_year;
+                $this->confirm_user($user->email);
+                $this->add_payment_to_db($user); // adds payment result to DB
+                $mailer->send_payment_confirmation_message($user);
+                $list.= "<div class='container-fluid' style='text-align:center;'>";
+                if ($user->sum != $renew_fee) {
+                    $list.= "<span class='span8'>Payment is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user->email.pdf' target='_blank'>here.</a></span>";
                 } // end if $card->sum != $renew_fee                    
                 else {
                     $list.= "<span class='span8'>Payment is successful. Thank you! Please use Renew Certificate option from <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/my' target='_blank'>your Dashboard</a></span>";
                 } // end else
                 $list.="</div>";
-                $list.="</div>";
-                $list.="</div>";
-                $this->enroll->add_user_to_course_schedule($card->userid, $card);
+                $this->enroll->add_user_to_course_schedule($user->userid, $user);
             } // end else
         } // end if $signup_status  === true
         else {
-            echo $signup_status. "<br>";
             $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Signup error happened </span>";
+            $list.="<span class='span8'>Signup error happened </span>";
             $list.="</div>";
-            return $list;
         }
+        return $list;
     }
 
 }

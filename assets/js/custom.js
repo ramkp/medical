@@ -577,6 +577,17 @@ $(document).ready(function () {
             return false;
         }
 
+        if (card_holder != '') {
+            var names_arr = card_holder.split(" ");
+            console.log('Billing name: ' + card_holder);
+            console.log('Billing firstname: ' + names_arr[0]);
+            console.log('Billing lastname: ' + names_arr[1]);
+            if (typeof (names_arr[1]) === "undefined") {
+                $('#personal_err').html('Please provide correct card holder name separated by space');
+                return;
+            }
+        }
+
         if (card_year == '--') {
             $('#personal_payment_err').html('Please select card expiration year');
             return false;
@@ -1869,8 +1880,8 @@ $(document).ready(function () {
                     email = $('#email2').val();
                     phone = $('#phone2').val();
                 } // end if 
-                
-                console.log('Mailing address: '+addr);
+
+                console.log('Mailing address: ' + addr);
 
                 if (firstname == '') {
                     $('#personal_err').html('Please provide firstname');
@@ -1916,7 +1927,7 @@ $(document).ready(function () {
                     $('#personal_err').html('Please provide email');
                     return;
                 }
-                
+
                 if (billing_name == '') {
                     $('#personal_err').html('Please provide card holder name');
                     return;
@@ -1924,9 +1935,9 @@ $(document).ready(function () {
 
                 if (billing_name != '') {
                     var names_arr = billing_name.split(" ");
-                    console.log('Billing name: '+billing_name);
-                    console.log('Billing firstname: '+names_arr[0]);
-                    console.log('Billing lastname: '+names_arr[1]);
+                    console.log('Billing name: ' + billing_name);
+                    console.log('Billing firstname: ' + names_arr[0]);
+                    console.log('Billing lastname: ' + names_arr[1]);
                     if (typeof (names_arr[1]) === "undefined") {
                         $('#personal_err').html('Please provide correct card holder name separated by space');
                         return;
