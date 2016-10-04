@@ -268,7 +268,8 @@ class ProcessPayment {
 
         // Create the payment data for credit card        
         $payment = $this->prepare_order($post_order);
-        $merchantAuthentication = $this->sandbox_authorize();
+        //$merchantAuthentication = $this->sandbox_authorize();
+        $merchantAuthentication = $this->authorize();
         $refId = 'ref' . time();
 
         // Order info
@@ -343,8 +344,8 @@ class ProcessPayment {
         $request->setRefId($refId);
         $request->setTransactionRequest($transactionRequestType);
         $controller = new AnetController\CreateTransactionController($request);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
-        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
             //echo "--------Card payment response1 <pre>";
             //print_r($response);
             //echo "</pre><br>";
