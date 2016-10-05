@@ -1866,6 +1866,7 @@ $(document).ready(function () {
                 var zip = $('#zip').val();
                 var phone = $('#phone').val();
                 var email = $('#email').val();
+                var receipt_email = 'n/a';
                 var cardnumber = $('#card_no').val();
                 var cvv = $('#cvv').val();
                 var exp_month = $('#card_month').val();
@@ -1878,8 +1879,14 @@ $(document).ready(function () {
                     city = $('#city2').val();
                     country = $('#country2').val();
                     zip = $('#zip2').val();
-                    email = $('#email2').val();
+                    receipt_email = $('#email2').val();
                     phone = $('#phone2').val();
+
+                    if (receipt_email == '') {
+                        $('#personal_err').html('Please provide receipt email');
+                        return;
+                    }
+
                 } // end if 
 
                 console.log('Mailing address: ' + addr);
@@ -1928,6 +1935,7 @@ $(document).ready(function () {
                     $('#personal_err').html('Please provide email');
                     return;
                 }
+
 
                 if (billing_name == '') {
                     $('#personal_err').html('Please provide card holder name');
@@ -1982,6 +1990,7 @@ $(document).ready(function () {
                             inst: 'n/a',
                             phone: phone,
                             email: email,
+                            receipt_email: receipt_email,
                             cardnumber: cardnumber,
                             cvv: cvv,
                             exp_month: exp_month,

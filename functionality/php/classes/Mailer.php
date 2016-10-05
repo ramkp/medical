@@ -128,8 +128,8 @@ class Mailer {
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
         $catid = $this->get_course_category($user);
-        $p=new Payment();
-        $state=$p->get_state_name_by_id($user->state);
+        $p = new Payment();
+        $state = $p->get_state_name_by_id($user->state);
         $list.= "<!DOCTYPE HTML><html><head><title>Account Confirmation</title>";
         $list.="</head>";
         $list.="<body><br/><br/><br/><br/>";
@@ -197,21 +197,21 @@ class Mailer {
             $list.="<tr style='background-color:#F5F5F5;'>
             <td>Payment status: </td><td>Paid by card: $$user->payment_amount</td>
             </tr>";
-            
+
             /*
-            $list.="<tr>";
-            $list.="<td>Card Holder:</td><td>$user->card_holder</td>";
-            $list.="</tr>";
+              $list.="<tr>";
+              $list.="<td>Card Holder:</td><td>$user->card_holder</td>";
+              $list.="</tr>";
 
-            $list.="<tr style='background-color:#F5F5F5;'>";
-            $list.="<td>Credit Card:</td><td>XXXX XXXX XXXX XXXX</td>";
-            $list.="</tr>";
+              $list.="<tr style='background-color:#F5F5F5;'>";
+              $list.="<td>Credit Card:</td><td>XXXX XXXX XXXX XXXX</td>";
+              $list.="</tr>";
 
-            $list.="<tr>";
-            $list.="<td>Expiry date: </td><td>$user->card_month$user->card_year</td>";
-            $list.="</tr>";
-            */
-            
+              $list.="<tr>";
+              $list.="<td>Expiry date: </td><td>$user->card_month$user->card_year</td>";
+              $list.="</tr>";
+             */
+
             $list.="<tr style='background-color:#F5F5F5;'>";
             $list.="<td>Order Date:</td><td>$date</td>";
             $list.="</tr>";
@@ -245,8 +245,8 @@ class Mailer {
     function send_account_confirmation_message($user) {
         $subject = "Medical2 - registration confirmation";
         $message = $this->get_account_confirmation_message($user);
-        $recipient = $user->email;
         $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
+        $recipient = ($user->receipt_email != 'n/a') ? $user->receipt_email : $user->email;
         $this->send_signup_confirmation_email($subject, $message, $recipient, $payment_amount);
         $this->create_registration_data_details($user);
     }

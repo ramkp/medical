@@ -944,7 +944,8 @@ class Payment {
     }
 
     function get_state_name_by_id($stateid) {
-        if ($stateid > 0) {
+        //echo "State ID: ".$stateid."<br>";
+        if (is_numeric($stateid)) {
             $query = "select * from mdl_states where id=$stateid";
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -952,7 +953,7 @@ class Payment {
             }
         } // end if
         else {
-            $state = 'N/A';
+            $state = $stateid;
         }
         return $state;
     }
