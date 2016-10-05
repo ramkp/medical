@@ -1925,7 +1925,7 @@ $(document).ready(function () {
                 }
 
                 if (zip != '') {
-                    if (!$.isNumeric(zip) || zip.length < 5) {
+                    if (!$.isNumeric(zip) || zip.length < 4) {
                         $('#personal_err').html('Please provide valid zip');
                         return;
                     } // end if
@@ -1937,7 +1937,7 @@ $(document).ready(function () {
                 }
 
                 if (phone != '') {
-                    if (!$.isNumeric(phone) || phone.length < 10) {
+                    if (!$.isNumeric(phone) || phone.length < 9) {
                         $('#personal_err').html('Please provide valid phone');
                         return;
                     } // end if
@@ -1950,8 +1950,14 @@ $(document).ready(function () {
 
                 if (email != '') {
                     if (!validateEmail(email)) {
+                        console.log('Email vetification failure ..');
                         $('#personal_err').html('Please provide valid email');
+                        return;
+                    } // end if 
+                    else {
+                        console.log('Email verification passed ...');
                     }
+                    
                 }
 
 
