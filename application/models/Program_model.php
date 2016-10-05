@@ -181,7 +181,7 @@ class program_model extends CI_Model {
         $list.="</div>";
 
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
-        $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register/index/$cat_id'><button id='program_$cat_id' class='btn btn-primary'>Register</button></a></span>";
+        $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/$cat_id'><button id='program_$cat_id' class='btn btn-primary'>Register</button></a></span>";
         $list.="</div>";
 
 
@@ -257,7 +257,7 @@ class program_model extends CI_Model {
                     $register_button = "<a href='http://" . $_SERVER['SERVER_NAME'] . "/programs/schedule/$coursename'><button class='btn btn-primary'>Schedule/Register</button></a>";
                 } // end if $has_schedule>0
                 else {
-                    $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
+                    $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
                 } // end else    
                 if ($cat_name == 'Hands-On Certification Workshops') {
                     if ($item->id == 45) {
@@ -364,7 +364,7 @@ class program_model extends CI_Model {
                 $list.="</div>";
 
                 $list.="<br/><div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
+                $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
                 $list.="</div>";
 
                 $list.="</div>"; // end of panel-body
@@ -461,7 +461,7 @@ class program_model extends CI_Model {
             $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/programs/schedule/$coursename'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
         } // end if $has_schedule>0
         else {
-            $list.="<a href='http://" . $_SERVER['SERVER_NAME'] . "/register/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
+            $list.="<a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
         } // end else         
         $list.="</div>";
 
@@ -564,7 +564,7 @@ class program_model extends CI_Model {
                 $list.="</div>";
 
                 $list.="<br/><div class='container-fluid' style='text-align:left;'>";
-                $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
+                $list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
                 $list.="</div>";
 
                 $list.="</div>"; // end of panel-body
@@ -657,10 +657,10 @@ class program_model extends CI_Model {
                     $list.= "<span class='span1'>9am -  5pm</span>";
                     //echo "Scheduler id: ".$row->schedulerid."<br>";
                     if ($row->schedulerid == 6) {
-                        $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register/index/44/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
+                        $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/44/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
                     }
                     if ($row->schedulerid == 5) {
-                        $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register/index/45/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
+                        $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/45/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
                     }
                     $list.="</div>";
 
@@ -740,7 +740,7 @@ class program_model extends CI_Model {
                     $list.= "<span class='span2'>$location</span>";
                     $list.= "<span class='span3'>$row->notes</span>";
                     $list.= "<span class='span1'>9am -  5pm</span>";
-                    $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
+                    $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
                     $list.="</div>";
 
                     $list.="<div class='container-fluid' style='text-align:left;'>";

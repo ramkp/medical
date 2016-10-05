@@ -168,10 +168,8 @@ $host = $_SERVER['HTTP_HOST'];
         <!--<script type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>-->        
         <script type="text/javascript" src="https://<?php echo $host ?>/assets/js/custom.js"></script>        
         <script type="text/javascript" src="https://<?php echo $host ?>/assets/js/selectbox/jquery.selectBox.js"></script>        
-        <!--
-        <script type="text/javascript" src='http://medical2.com/assets/js/attrchange.js'></script>
-        <script type="text/javascript" src='http://medical2.com/assets/js/attrchange_ext.js'></script>
-        -->
+        <script type="text/javascript" src='http://medical2.com/assets/js/typehead.js'></script>
+        
         <script type="text/javascript">
             //<![CDATA[
             document.body.className += ' jsenabled';
@@ -216,7 +214,7 @@ $host = $_SERVER['HTTP_HOST'];
                                             <li><a href="http://<?php echo $host ?>/programs/program/certification-exams/" id="college" title="">Online Certification Exams</a></li>                     
                                         </ul>
                                     </li>                                    
-                                    <li><a href="https://<?php echo $host ?>/register2"  id="register_item" title="Register">Register</a></li>
+                                    <li><a href="https://<?php echo $host ?>/register"  id="register_item" title="Register">Register</a></li>
                                     <li><a href="http://<?php echo $host ?>/clients"  id="testimonial" title="Clients">Clients</a></li>
                                     <li><a href="http://<?php echo $host ?>/faq"  id="faq_item" title="FAQ’s">FAQ’s</a></li>
 
