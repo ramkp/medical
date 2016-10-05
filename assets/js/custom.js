@@ -1889,8 +1889,6 @@ $(document).ready(function () {
 
                 } // end if 
 
-                console.log('Mailing address: ' + addr);
-
                 if (firstname == '') {
                     $('#personal_err').html('Please provide firstname');
                     return;
@@ -1926,14 +1924,34 @@ $(document).ready(function () {
                     return;
                 }
 
+                if (zip != '') {
+                    if (!$.isNumeric(zip) || zip.length < 5) {
+                        $('#personal_err').html('Please provide valid zip');
+                        return;
+                    } // end if
+                } // end if
+
                 if (phone == '') {
                     $('#personal_err').html('Please provide phone');
                     return;
                 }
 
+                if (phone != '') {
+                    if (!$.isNumeric(phone) || phone.length < 10) {
+                        $('#personal_err').html('Please provide valid phone');
+                        return;
+                    } // end if
+                } // end if
+
                 if (email == '') {
                     $('#personal_err').html('Please provide email');
                     return;
+                }
+
+                if (email != '') {
+                    if (!validateEmail(email)) {
+                        $('#personal_err').html('Please provide valid email');
+                    }
                 }
 
 
@@ -2011,7 +2029,7 @@ $(document).ready(function () {
                     } // end else
                 }); // end of post
             } // end else
-        }
+        } // end if
 
 
         if (event.target.id == 'manual_group_registration') {

@@ -1548,7 +1548,7 @@ class Payment {
             $status = $pr->make_transaction2($order);
             if ($status === false) {
                 $list.= "<div class='container-fluid' style='text-align:center;'>";
-                $list.= "<span class='span8'>Transaction failed, please contact your bank for details.</span>";
+                $list.= "<span class='span8' style='color:red;font-weight:bold;'>Transaction failed. Credit card declined.</span>";
                 $list.="</div>";
             } // end if $status === false
             else {
