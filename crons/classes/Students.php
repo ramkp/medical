@@ -270,7 +270,7 @@ class Students {
 
                 if ($total_students > 0) {
                     // Get workshop date and participants
-                    date_default_timezone_set('Pacific/Wallis');
+                   
                     //echo "Workshop name: $ws_detailes->notes<br>";
                     //echo "Workshop location: $ws_detailes->appointmentlocation <br>";
                     //echo "Workshop date: " . date('m-d-Y', $ws_detailes->starttime) . "<br>";
@@ -394,7 +394,7 @@ class Students {
     function prepare_intructor_report($courseid, $slotid) {
         $list = "";
         $owe_sum = 0;
-        date_default_timezone_set('Pacific/Wallis');
+        
         $query = "select * from mdl_scheduler_appointment "
                 . "where slotid=$slotid";
         $result = $this->db->query($query);
@@ -536,7 +536,7 @@ class Students {
             if (count($participants) > 0) {
 
                 $owe_sum = 0;
-                date_default_timezone_set('Pacific/Wallis');
+                
                 $courseid = $this->get_workshop_course($ws);
                 $coursename = $this->get_course_name($courseid);
                 $cost = $this->get_course_cost($courseid);
@@ -724,7 +724,7 @@ class Students {
 
     function process_receivers($partials) {
         $list = "";
-        date_default_timezone_set('Pacific/Wallis');
+        
         $now = time();
         $diff = 43200; // 24h in secs 
         $i = 0;
@@ -795,7 +795,7 @@ class Students {
 
     function prepare_message($partial) {
         $list = "";
-        date_default_timezone_set('Pacific/Wallis');
+        
         $diff = $partial->cost - $partial->payment;
         $user_data = $this->get_user_data($partial->userid);
         $coursename = $this->get_course_name($partial->courseid);
@@ -1166,7 +1166,7 @@ class Students {
         $in_subtotal = 0;
         $pp_list = "";
         $cash_subtotal = 0;
-        date_default_timezone_set('Pacific/Wallis');
+        
         switch ($type) {
             case 1:
                 $stamp = time() - 86400;
@@ -1442,7 +1442,7 @@ class Students {
     }
 
     function get_student_workshops_data($userid) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $query = "select * from mdl_scheduler_appointment where studentid=$userid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -1466,7 +1466,7 @@ class Students {
 
     function get_report_payments($type) {
         $list = "";
-        //date_default_timezone_set('Pacific/Wallis');
+        
         switch ($type) {
             case 1:
                 // Daily report

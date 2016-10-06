@@ -334,8 +334,8 @@ class Register {
     }
 
     function is_email_exists($email) {
-        $query = "select username, deleted from mdl_user "
-                . "where username='$email' and deleted=0";
+        $query = "select * from mdl_user "
+                . "where username='$email' and deleted=0 and confirmed=1";
         return $this->db->numrows($query);
     }
 
@@ -506,7 +506,7 @@ class Register {
     }
 
     function get_register_course_states($courseid) {
-        date_default_timezone_set('Pacific/Wallis');
+       
         $register_states = array();
         $drop_down = "";
         $drop_down.="<select id='register_state' style='width:120px;'>";
@@ -540,7 +540,7 @@ class Register {
     }
 
     function get_register_course_cities($courseid, $slotid, $future = true) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $drop_down = "";
         $drop_down.="<select id='register_cities' style='width:120px;'>";
         $drop_down.="<option value='0' selected>City</option>";

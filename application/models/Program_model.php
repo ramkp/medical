@@ -625,7 +625,7 @@ class program_model extends CI_Model {
 
             $result = $this->db->query($query);
             $num = $result->num_rows();
-            date_default_timezone_set('Pacific/Wallis');
+            
             if ($num > 0) {
                 foreach ($result->result() as $row) {
                     $human_date = date('m-d-Y', $row->starttime);
@@ -719,7 +719,7 @@ class program_model extends CI_Model {
 
             $result = $this->db->query($query);
             $num = $result->num_rows();
-            date_default_timezone_set('Pacific/Wallis');
+            
             if ($num > 0) {
                 foreach ($result->result() as $row) {
                     $human_date = date('m-d-Y', $row->starttime);

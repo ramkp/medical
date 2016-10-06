@@ -567,6 +567,137 @@ $(document).ready(function () {
             return false;
         }
 
+        console.log('Card no: ' + card_no);
+
+        if (card_no == '') {
+            $('#personal_payment_err').html('Please provide card number');
+            return false;
+        }
+
+        if (card_holder == '') {
+            $('#personal_payment_err').html('Please provide card holder name');
+            return false;
+        }
+
+        if (card_holder != '') {
+            var names_arr = card_holder.split(" ");
+            console.log('Billing name: ' + card_holder);
+            console.log('Billing firstname: ' + names_arr[0]);
+            console.log('Billing lastname: ' + names_arr[1]);
+            if (typeof (names_arr[1]) === "undefined") {
+                $('#personal_payment_err').html('Please provide correct card holder name separated by space');
+                return;
+            }
+        }
+
+        if (card_year == '--') {
+            $('#personal_payment_err').html('Please select card expiration year');
+            return false;
+        }
+
+        if (card_month == '--') {
+            $('#personal_payment_err').html('Please select card expiration month');
+            return false;
+        }
+
+        if (bill_addr == '') {
+            $('#personal_payment_err').html('Please provide billing address');
+            return false;
+        }
+
+        if (bill_city == '') {
+            $('#personal_payment_err').html('Please provide billing city');
+            return false;
+        }
+
+        if (bill_zip == '') {
+            $('#personal_payment_err').html('Please provide billing zip code');
+            return false;
+        }
+
+        if (bill_email == '') {
+            $('#personal_payment_err').html('Please provide contact email');
+            return false;
+        }
+
+        if (validateEmail(bill_email) != true) {
+            $('#personal_payment_err').html('Please provide correct contact email');
+            return false;
+        }
+
+        if (cvv == '') {
+            $('#personal_payment_err').html('Please provide card cvv code');
+            return false;
+        }
+
+        if (state == 0) {
+            $('#personal_payment_err').html('Please select state');
+            return false;
+        }
+
+        if (!$('#policy_checkbox').prop('checked')) {
+            $('#personal_payment_err').html('Please Agree with Terms and Conditions');
+            return false;
+        }
+
+        var user_group = $('#user_group').val();
+        if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_email != '' && validateEmail(bill_email) == true) {
+            $('#personal_payment_err').html('');
+            var card = {sum: sum,
+                dashboard: dashboard,
+                email: email,
+                userid: userid,
+                courseid: courseid,
+                cvv: cvv,
+                participants: participants,
+                card_type: card_type,
+                card_no: card_no,
+                card_holder: card_holder,
+                card_year: card_year,
+                card_month: card_month,
+                bill_addr: bill_addr,
+                bill_city: bill_city,
+                bill_zip: bill_zip,
+                state: state,
+                user_group: user_group,
+                bill_email: bill_email};
+            var url = "https://" + domain + "/functionality/php/make_stub_payment.php";
+            var request = {card: JSON.stringify(card)};
+            $('#ajax_loading_payment').show();
+            $.post(url, request).done(function (data) {
+                $('#ajax_loading_payment').hide();
+                //console.log('Server response: '+data);
+                $('.form_div').html(data);
+            }); // end of post
+        } // end if card_type != 'Card type' && card_no!='' ...
+    }
+
+    function verify_group_payment_section() {
+        var dashboard = $('#dashboard').val();
+        var card = $('#card_type').text();
+        var card_type = card.trim();
+        var sum = $('#payment_sum').val();
+        var email = $('#email').val();
+        var card_no = $('#card_no').val();
+        var card_holder = $('#card_holder').val();
+        var card_year = $('#card_year').val();
+        var card_month = $('#card_month').val();
+        var bill_addr = $('#bill_addr').val();
+        var bill_city = $('#bill_city').val();
+        var bill_zip = $('#bill_zip').val();
+        var bill_email = $('#bill_email').val();
+        var userid = $('#userid').val();
+        var courseid = $('#courseid').val();
+        var participants = $('#participants').val();
+        var cvv = $('#bill_cvv').val();
+        var state = $('#bill_state').val();
+        if (card_type == 'Card type') {
+            $('#personal_payment_err').html('Please select card type');
+            return false;
+        }
+
+        console.log('Card no: ' + card_no);
+
         if (card_no == '') {
             $('#personal_payment_err').html('Please provide card number');
             return false;
@@ -1867,10 +1998,10 @@ $(document).ready(function () {
                 var phone = $('#phone').val();
                 var email = $('#email').val();
                 var receipt_email = 'n/a';
-                var cardnumber = $('#card_no').val();
-                var cvv = $('#cvv').val();
-                var exp_month = $('#card_month').val();
-                var exp_year = $('#card_year').val();
+                var cardnumber = $('#card_no2').val();
+                var cvv = $('#cvv2').val();
+                var exp_month = $('#card_month2').val();
+                var exp_year = $('#card_year2').val();
                 var from = $('#come_from').val();
 
                 if ($('#da').is(':checked')) {
@@ -1938,7 +2069,7 @@ $(document).ready(function () {
 
                 if (phone != '') {
                     if (!$.isNumeric(phone) || phone.length < 9) {
-                        $('#personal_err').html('Please provide valid phone');
+                        $('#personal_err').html('Please enter the valid phone number without any symbols and spaces.');
                         return;
                     } // end if
                 } // end if
@@ -1957,7 +2088,7 @@ $(document).ready(function () {
                     else {
                         console.log('Email verification passed ...');
                     }
-                    
+
                 }
 
 

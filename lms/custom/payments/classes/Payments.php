@@ -736,7 +736,7 @@ class Payments extends Util {
     function get_course_payments($courseid = null) {
         $list = "";
         $users = array();
-        date_default_timezone_set('Pacific/Wallis');
+        
         $list.="<select id='course_payments' style='width:375px;'>";
         $list.="<option value='0' selected>Payments</option>";
         if ($courseid != null) {

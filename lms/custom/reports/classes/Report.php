@@ -264,7 +264,7 @@ class Report extends Util {
     function create_csv_file($filename, $payments) {
         // Write CSV data
         $path = $this->files_path . '/' . $filename;
-        date_default_timezone_set('Pacific/Wallis');
+        
         $output = fopen($path, 'w');
         fputcsv($output, array('User', 'Program applied', 'Payment', 'Date'));
         foreach ($payments as $payment) {
@@ -278,7 +278,7 @@ class Report extends Util {
 
     function get_revenue_report_data($courseid, $from, $to, $status = true, $output = true) {
 
-        //date_default_timezone_set('Pacific/Wallis');
+        
         $this->courseid = $courseid;
         $this->from = $from;
         $this->to = $to;
@@ -739,7 +739,7 @@ class Report extends Util {
     }
 
     function is_user_has_card_payments($from, $to, $userid) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $query = "select * from mdl_card_payments "
                 . "where userid=$userid "
                 . "and pdate>=$from and pdate<=$to";
@@ -748,7 +748,7 @@ class Report extends Util {
     }
 
     function is_user_has_invoice_payments($from, $to, $userid) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $query = "select * from mdl_invoice where "
                 . "userid=$userid "
                 . "and i_status=1 "
@@ -920,7 +920,7 @@ class Report extends Util {
     }
 
     function get_card_payments_detailes($courseid, $from, $to) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $payments = array();
         $this->courseid = $courseid;
         $this->from = $from;
@@ -994,7 +994,7 @@ class Report extends Util {
     }
 
     function get_refund_payments_detailes($courseid, $from, $to) {
-        date_default_timezone_set('Pacific/Wallis');
+       
         $payments = array();
         $partial_payments = array();
         $this->courseid = $courseid;
@@ -1120,7 +1120,7 @@ class Report extends Util {
     }
 
     function get_invoice_payments_detailes($courseid, $from, $to) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $payments = array();
         $this->courseid = $courseid;
         $this->from = $from;
@@ -1203,7 +1203,7 @@ class Report extends Util {
     }
 
     function get_other_payment_report_data($courseid, $from, $to, $type) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $payments = array();
         $this->courseid = $courseid;
         $this->from = $from;

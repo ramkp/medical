@@ -37,7 +37,7 @@ class Schedule extends Util {
     }
 
     function get_course_slots($toolbar, $schedulerid, $search = null, $start = null, $end = null) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $slots = array();
         $now = time() - 86400;
         if ($search == null) {
@@ -430,7 +430,7 @@ class Schedule extends Util {
 
     function get_students_course_slots($schedulerid) {
         $list = "";
-        date_default_timezone_set('Pacific/Wallis');
+        
         $query = "select * from mdl_scheduler_slots "
                 . "where schedulerid=$schedulerid order by starttime";
         $num = $this->db->numrows($query);

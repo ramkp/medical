@@ -326,7 +326,7 @@ class navClass extends Util {
                     <div class='nav-divider-right'></div>
                     <ul class='nav pull-left'>
                         <li></li>                        
-                        <li class='dropdown'><a href='#cm_submenu_2' class='dropdown-toggle' title='Cerrtificate'>Certtificate<b class='caret'></b></a>                        
+                        <li class='dropdown'><a href='#cm_submenu_2' class='dropdown-toggle' title='Certificate'>Certificate<b class='caret'></b></a>                        
                         <ul class='dropdown-menu' style='display: none;'>";
         if (count($courses) > 0) {
             foreach ($courses as $courseid) {

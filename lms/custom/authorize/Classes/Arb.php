@@ -1,7 +1,7 @@
 <?php
 
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/classes/ProcessPayment.php');
-date_default_timezone_set('Pacific/Wallis');
+
 
 class subscription extends ProcessPayment {
 

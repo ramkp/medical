@@ -512,7 +512,7 @@ class Dashboard extends Util {
 
     function get_course_schedule_data($userid, $userslots, $courseid) {
         $list = "";
-        date_default_timezone_set('Pacific/Wallis');
+        
         $user_payments = $this->get_user_payments($userid, $courseid);
         if (count($userslots) > 0) {
             foreach ($userslots as $slotid) {
@@ -674,7 +674,7 @@ class Dashboard extends Util {
         $invoice_payments = array();
         $course_category = $this->get_course_category($courseid);
 
-        date_default_timezone_set('Pacific/Wallis');
+        
 
 
 // 1. Get data from mdl_card_payments // payments made by card

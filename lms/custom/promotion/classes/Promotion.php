@@ -24,7 +24,7 @@ class Promotion extends Util {
     }
 
     function get_campaigns_list() {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $list = "";
         $list.="<select id='camapaign'>";
         $list.="<option value='0' selected>Campaign</option>";

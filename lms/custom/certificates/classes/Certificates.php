@@ -1335,7 +1335,7 @@ class Certificates extends Util {
     }
 
     function create_new_certificate($cert, $issue, $expire) {
-        //date_default_timezone_set('Pacific/Wallis');
+        
         $coursename = $this->get_course_name($cert->courseid); // string
         $userdetails = $this->get_user_details($cert->userid); // object
         $userid = $cert->userid;

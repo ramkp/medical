@@ -261,7 +261,7 @@ class Schedule extends Programs {
 
     function get_course_schedule($courseid, $state = null) {
         //echo "Course id: ".$courseid."<br>";
-        date_default_timezone_set('Pacific/Wallis');
+        
         $list = "";
         //if ($courseid == 44 || $courseid == 45) {
           //  $list.=$this->get_shared_schedule($courseid, $state);

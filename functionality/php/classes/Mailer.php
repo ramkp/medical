@@ -40,7 +40,7 @@ class Mailer {
 
     function get_classs_info($user) {
         $list = "";
-        date_default_timezone_set('Pacific/Wallis');
+        
         if ($user->slotid > 0) {
             $query = "select * from mdl_scheduler_slots where id=$user->slotid";
             $result = $this->db->query($query);

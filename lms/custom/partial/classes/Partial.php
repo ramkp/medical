@@ -170,7 +170,7 @@ class Partial extends Util {
     }
 
     function create_partial_payments_list($partials, $toolbar = true) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $list = "";
         if ($toolbar == true) {
             $add_payment_block = $this->get_add_partial_payment_page();

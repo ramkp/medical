@@ -15,7 +15,7 @@ class Course extends Util {
 
     function get_course_certificates() {
         $certificates = array();
-        date_default_timezone_set('Pacific/Wallis');
+        
         $query = "select * from mdl_certificates order by issue_date ";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {

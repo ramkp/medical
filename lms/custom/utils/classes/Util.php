@@ -480,7 +480,7 @@ class Util {
 
     function get_course_workshops($id) {
         $slots = array();
-        date_default_timezone_set('Pacific/Wallis');
+        
         $schedulerid = $this->get_course_scheduler($id);
         $list = "";
         $list.="<span class='span3'>Workshops:</span><span class='span4'>";

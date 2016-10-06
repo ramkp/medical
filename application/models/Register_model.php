@@ -382,7 +382,7 @@ class register_model extends CI_Model {
     }
 
     public function get_program_schedule($slotid) {
-        date_default_timezone_set('Pacific/Wallis');
+        
         $list = "";
         $query = "select * from mdl_scheduler_slots where id=$slotid";
         $result = $this->db->query($query);
@@ -659,14 +659,14 @@ class register_model extends CI_Model {
             $list.="<span class='span2'>Card Holder Name*</span>";
             $list.="<span class='span2'><input type='text' required id='billing_name' name='billing_name' ></span>";
             $list.="<span class='span2'>CVV*</span>";
-            $list.="<span class='span2'><input type='text' id='cvv' name='cvv'  ></span>";
+            $list.="<span class='span2'><input type='text' id='cvv2' name='cvv2'  ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Card number*</span>";
-            $list.="<span class='span2'><input type='text' id='card_no' name='card_no'  ></span>";
+            $list.="<span class='span2'><input type='text' id='card_no2' name='card_no2'  ></span>";
             $list.="<span class='span2'>Expiration Date*</span>";
-            $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
+            $list.="<span class='span2'>" . $card_month2 . "&nbsp;&nbsp;&nbsp;" . $card_year2 . "</span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -799,14 +799,14 @@ class register_model extends CI_Model {
             $list.="<span class='span2'>Card Holder Name*</span>";
             $list.="<span class='span2'><input type='text' required id='billing_name' name='billing_name' ></span>";
             $list.="<span class='span2'>CVV*</span>";
-            $list.="<span class='span2'><input type='text' id='cvv' name='cvv'  ></span>";
+            $list.="<span class='span2'><input type='text' id='cvv' name='cvv2'  ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Card number*</span>";
-            $list.="<span class='span2'><input type='text' id='card_no' name='card_no'  ></span>";
+            $list.="<span class='span2'><input type='text' id='card_no2' name='card_no2'  ></span>";
             $list.="<span class='span2'>Expiration Date*</span>";
-            $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
+            $list.="<span class='span2'>" . $card_month2 . "&nbsp;&nbsp;&nbsp;" . $card_year2 . "</span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
