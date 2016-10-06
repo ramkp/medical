@@ -954,7 +954,7 @@ class Students {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $content = $row['content'];
         }
-        return $content;
+        return base64_decode($content);
     }
 
     function update_campaign_status($camid) {

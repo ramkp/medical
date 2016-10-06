@@ -24,7 +24,7 @@ class Promotion extends Util {
     }
 
     function get_campaigns_list() {
-        
+
         $list = "";
         $list.="<select id='camapaign'>";
         $list.="<option value='0' selected>Campaign</option>";
@@ -134,7 +134,7 @@ class Promotion extends Util {
 
         //print_r($users);
         //die();
-
+        $pure_data = base64_encode($data);
         $total = count($users);
         $query = "insert into mdl_campaign "
                 . "(content,"
@@ -143,7 +143,7 @@ class Promotion extends Util {
                 . "status,"
                 . "type,"
                 . "dated) "
-                . "values('$data',"
+                . "values('$pure_data',"
                 . "'$total',"
                 . "'0',"
                 . "'pending',"
