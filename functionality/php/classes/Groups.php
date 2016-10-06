@@ -6,15 +6,25 @@
  * @author sirromas
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
-class Groups {
+class Groups  {
 
     public $db;
 
     function __construct() {
-        $this->db = new pdo_db();
+        $this->db=new pdo_db();
     }
-
+    
+     function get_course_name($courseid) {
+        $query = "select fullname from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $name = $row['fullname'];
+        }
+        return $name;
+    }
+    
     function get_courses_list() {
         $drop_down = "";
         $drop_down.="<div class='dropdown'>
@@ -87,6 +97,21 @@ class Groups {
         }
         return $id;
     }
+    
+    function get_state_name_by_id($stateid) {
+        //echo "State ID: ".$stateid."<br>";
+        if (is_numeric($stateid)) {
+            $query = "select * from mdl_states where id=$stateid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $state = $row['state'];
+            }
+        } // end if
+        else {
+            $state = $stateid;
+        }
+        return $state;
+    }
 
     function submit_private_group_request($request) {
         $list = "";
@@ -118,8 +143,66 @@ class Groups {
                 . "'$request->state',"
                 . "'')";
         //echo "Query: ".$query."<br>";
-        $this->db->query($query);
+        //$this->db->query($query);
+        
+        
+        $coursename=$this->get_course_name($request->courses);
+        $statename=$this->get_state_name_by_id($request->state);
+        $subject="Medical2 - Private Group Request";
+        $message = "";
 
+        $message.="<html>";
+        $message.="<body>";
+        $message.="<table align='center'>";
+
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
+        $message.="</tr>";
+        
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>Contact Person</td><td style='padding:15px;'>$request->group_fio</td>";
+        $message.="</tr>";
+
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>City</td><td style='padding:15px;'>$request->group_city</td>";
+        $message.="</tr>";
+        
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>State</td><td style='padding:15px;'>$statename</td>";
+        $message.="</tr>";
+        
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>Company</td><td style='padding:15px;'>$request->group_company</td>";
+        $message.="</tr>";
+        
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>Budget</td><td style='padding:15px;'>$$request->group_budget</td>";
+        $message.="</tr>";
+        
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>People qty</td><td style='padding:15px;'>$request->people_num</td>";
+        $message.="</tr>";
+
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>Email</td><td style='padding:15px;'>$request->group_email</td>";
+        $message.="</tr>";
+
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>Phone</td><td style='padding:15px;'>$request->group_phone</td>";
+        $message.="</tr>";
+
+        $message.="<tr>";
+        $message.="<td style='padding:15px;' colspan='2'>$request->group_request</td>";
+        $message.="</tr>";
+
+
+        $message.="</table>";
+        $message.="</html>";
+        $message.="</body>";
+        $mail=new Mailer();
+        $mail->send_common_message($subject, $message);
+        
+        
         $list.="<br/><div  class='form_div'>";
         $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
         $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Private Groups</h5></div>";

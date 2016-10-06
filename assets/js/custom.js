@@ -478,7 +478,7 @@ $(document).ready(function () {
             return false;
         }
 
-        var url = "https://" + domain + "/functionality/php/submit_private_group_request.php";
+        var url = "/functionality/php/submit_private_group_request.php";
         var group_request = {group_fio: group_fio,
             group_city: group_city,
             group_phone: group_phone,
