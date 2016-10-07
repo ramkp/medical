@@ -335,7 +335,7 @@ class Register {
 
     function is_email_exists($email) {
         $query = "select * from mdl_user "
-                . "where username='$email' and deleted=0 and confirmed=1";
+                . "where username='$email' and deleted=0";
         return $this->db->numrows($query);
     }
 

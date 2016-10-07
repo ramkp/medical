@@ -13,11 +13,12 @@ class Groups  {
     public $db;
 
     function __construct() {
-        $this->db=new pdo_db();
+        $this->db = new pdo_db();
     }
     
      function get_course_name($courseid) {
         $query = "select fullname from mdl_course where id=$courseid";
+        //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $name = $row['fullname'];

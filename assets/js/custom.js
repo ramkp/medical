@@ -2128,7 +2128,9 @@ $(document).ready(function () {
                 var url = "/functionality/php/is_email_exists.php";
                 var request = {email: email};
                 $.post(url, request).done(function (data) {
-                    console.log('Server response: ' + data);
+                    console.log('Server email exists response: ' + data);
+                    
+                    
                     if (data > 0) {
                         $('#personal_err').html('Email is already in use');
                     } // end if data>0
