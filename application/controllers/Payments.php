@@ -23,7 +23,12 @@ class Payments extends CI_Controller {
             if (is_numeric($userid)) {
                 $user_exists = $this->payment_model->is_user_exissts($userid);
                 if ($user_exists > 0) {
-                    $form = $this->payment_model->get_payment_section($userid, $courseid, $slotid, $sum, $renew);
+                    if (isset($renew)) {
+                        $form = $this->payment_model->get_payment_section($userid, $courseid, $slotid, $sum, $renew);
+                    } // end if
+                    else {
+                        $form = $this->payment_model->get_payment_section($userid, $courseid, $slotid, $sum);
+                    } // end else
                 } // end if $user_exists>0
                 else {
                     $form.="<br><div class='container-fluid' style='text-align:center;'>";

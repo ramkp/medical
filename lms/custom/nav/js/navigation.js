@@ -1219,6 +1219,19 @@ $(document).ready(function () {
         var sum = $('#sum').val();
         var slotid = $('#register_cities').val();
         var ptype = $('input[name=payment_type]:checked').val();
+        var period = 0;
+
+        if ($('#renew').prop('checked')) {
+            period = $('#renew_period').val();
+            if (period == 0) {
+                $('#partial_err').html('Please select renew period');
+                return;
+            } // end if 
+            else {
+                console.log('Renew period: ' + period);
+            } // end else
+        } // end if 
+
         console.log('Course ID: ' + courseid);
         console.log('User ID: ' + userid);
         console.log('slot ID: ' + slotid);
@@ -1227,7 +1240,12 @@ $(document).ready(function () {
         if (courseid > 0 && userid > 0 && $.isNumeric(sum) && sum > 0) {
             $('#partial_err').html('');
             if (ptype == 'cc') {
-                var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum;
+                if (period == 0) {
+                    var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum;
+                } // end if
+                else {
+                    var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum + "/" + period;
+                }
                 window.open(url, '_blank');
             } // end if ptype=='cc'
             else {

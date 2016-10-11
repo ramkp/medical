@@ -53,6 +53,7 @@ class Certificates2 {
             $cert = new stdClass();
             $cert->id = $row['id'];
             $cert->issue_date = $row['issue_date'];
+            $cert->expire_date = $row['expiration_date'];
             $cert->code = $row['cert_no'];
         }
         return $cert;
@@ -105,9 +106,9 @@ class Certificates2 {
         $year = date('Y', $cert_data->issue_date);
         $title = $this->get_certificate_title($courseid);
 
-        $expiration_date_sec = $cert_data->issue_date + 31536000 * $expire_year;
+        $expiration_date_sec = $cert_data->expire_date + 31536000 * $expire_year;
         $expiration_date = date('m-d-Y', $expiration_date_sec);
-     
+
         switch ($courseid) {
 
             case 41:

@@ -170,7 +170,7 @@ class Partial extends Util {
     }
 
     function create_partial_payments_list($partials, $toolbar = true) {
-        
+
         $list = "";
         if ($toolbar == true) {
             $add_payment_block = $this->get_add_partial_payment_page();
@@ -253,6 +253,17 @@ class Partial extends Util {
         return $list;
     }
 
+    function get_renew_period_dropbox() {
+        $list = "";
+        $list.="<select id='renew_period'>";
+        $list.="<option value='0' selected>Renew period</option>";
+        $list.="<option value='1'>One Year</option>";
+        $list.="<option value='2'>Two Years</option>";
+        $list.="<option value='3'>Three Years</option>";
+        $list.="</select>";
+        return $list;
+    }
+
     function get_add_partial_payment_page() {
         $list = "";
         $ds = new Dashboard();
@@ -274,16 +285,10 @@ class Partial extends Util {
         $list.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='span8' id='enrolled_users'></span>";
         $list.="</div>";
 
-        /*
-          $list.="<div class='container-fluid' style='text-align:center;'>";
-          $list.="<span class='span2'>Paid sum</span>";
-          $list.="<span class='span2'><input type='text' id='sum' style='width:45px;' /></span>";
-          $list.="</div>";
-         */
-
         $list.="<div class='container-fluid' style='text-align:left;display:none;' id='payment_options'>";
+        
         $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cc' checked>Card payment</span>";
-
+        $period=$this->get_renew_period_dropbox();
         $enabled = $this->check_module_permission('cash');
 
         if ($this->user->id == 2) {
@@ -298,11 +303,21 @@ class Partial extends Util {
             } // end if $enabled == 1
         } // end else
 
-
-
         $list.="<span class='span3'><input type='text' id='sum' style='width:120px;' /></span>";
+        $list.="<span class='span6'><input type='checkbox' id='renew'> &nbsp; This is certificate renew payment</span>";
+        $list.="<span class='span3'>$period</span>";
+        $list.="<span class='span3'><button class='btn btn-primary' id='get_partial_payment_section'>Add</button></span>";
+        
+        $list.="</div>";
+        
+        /*
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span6'><input type='checkbox' id='renew'> &nbsp; This is certificate renew payment</span>";
+        $list.="<span class='span3'>$period</span>";
         $list.="<span class='span3'><button class='btn btn-primary' id='get_partial_payment_section'>Add</button></span>";
         $list.="</div>";
+        */
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span12' id='payment_section'></span>";
         $list.="</div>";
