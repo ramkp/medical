@@ -15,14 +15,15 @@ class Payments extends CI_Controller {
     public function index() {
         $form = "";
         $userid = $this->uri->segment(3);
-        $courseid=$this->uri->segment(4);        
-        $slotid=$this->uri->segment(5);        
-        $sum=$this->uri->segment(6);        
+        $courseid = $this->uri->segment(4);
+        $slotid = $this->uri->segment(5);
+        $sum = $this->uri->segment(6);
+        $renew = $this->uri->segment(7);
         if ($userid != null) {
             if (is_numeric($userid)) {
-                $user_exists = $this->payment_model->is_user_exissts($userid);                
+                $user_exists = $this->payment_model->is_user_exissts($userid);
                 if ($user_exists > 0) {
-                    $form = $this->payment_model->get_payment_section($userid,$courseid,$slotid,$sum);
+                    $form = $this->payment_model->get_payment_section($userid, $courseid, $slotid, $sum, $renew);
                 } // end if $user_exists>0
                 else {
                     $form.="<br><div class='container-fluid' style='text-align:center;'>";

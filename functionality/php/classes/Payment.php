@@ -5,10 +5,12 @@
  *
  * @author sirromas
  */
+ini_set('memory_limit', '-1');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Late.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Upload.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Classes/ProcessPayment.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates2.php';
 
 class Payment {
 
@@ -640,7 +642,7 @@ class Payment {
         return $fee;
     }
 
-    function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null, $sum = false) {
+    function get_payment_section($group_data, $users, $participants, $installment = null, $from_email = null, $sum = false, $renew = null) {
 
         /*
           echo "<br/>Users-------------<br/>";
@@ -666,6 +668,7 @@ class Payment {
 
         $dashboard = ($from_email == null) ? 0 : 1;
         $list.="<input type='hidden' id='dashboard' value='$dashboard'>";
+        $list.="<input type='hidden' id='renew' value='$renew'>";
         if ($from_email != null) {
             $list.="<br/><div  class='form_div'>";
         }
@@ -1167,7 +1170,7 @@ class Payment {
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
         $user_payment_data = $this->get_user_payment_credentials($card->userid); // compatible if user does not exist
-        $renew_fee = $this->get_renew_fee();
+        //$renew_fee = $this->get_renew_fee();
         // Make card object compatible with confirmation email
         $names = explode(" ", $card->card_holder);
         $firstname = $names[0];
@@ -1234,12 +1237,14 @@ class Payment {
                     $list.="<div class='panel panel-default' id='personal_payment_details'>";
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                     $list.="<div class='panel-body'>";
-                    $list.= "<div class='container-fluid' style='text-align:left;'>";
-                    if ($card->sum != $renew_fee) {
+                    $list.= "<div class='container-fluid' style='text-align:center;'>";
+                    if ($card->renew == null) {
                         $list.= "<span class='span8'>Payment is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
                     } // end if $card->sum != $renew_fee                    
                     else {
-                        $list.= "<span class='span8'>Payment is successful. Thank you! Please use Renew Certificate option from <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/my' target='_blank'>your Dashboard</a></span>";
+                        $cert=new Certificates2();
+                        $cert->renew_certificate($card->courseid, $card->userid, $card->renew);
+                        $list.= "<span class='span8'>Payment is successful. Thank you! Your certificate has been renewed.</span>";
                     } // end else
                     $list.="</div>";
                     $list.="</div>";

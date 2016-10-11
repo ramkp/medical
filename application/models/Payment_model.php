@@ -110,7 +110,7 @@ class Payment_model extends CI_Model {
         return $slotid;
     }
 
-    public function get_payment_section($userid, $courseid, $slotid, $sum) {
+    public function get_payment_section($userid, $courseid, $slotid, $sum, $renew=null) {
         $list = "";                
         //echo "Sum inside model: ".$sum."<br>";
         if ($userid != NULL) {
@@ -125,7 +125,7 @@ class Payment_model extends CI_Model {
                     // Personal signup
                     $group_data = '';
                     $participants = 1;
-                    $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, 1,$sum);
+                    $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, 1,$sum, $renew);
                 } // end if $group_status==0
                 else {
                     // Group member signup
@@ -134,7 +134,7 @@ class Payment_model extends CI_Model {
                     $group_data->group_name = $group_name;
                     $group_data->courseid = $courseid;
                     $participants = 1;
-                    $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, 1, $sum);
+                    $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, 1, $sum, $renew);
                 } // end else 
             } // end if $installment_status==0
             else {

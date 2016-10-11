@@ -149,6 +149,7 @@ class ProcessPayment {
         // Create the payment data for credit card        
         $payment = $this->prepare_order($post_order);
         $merchantAuthentication = $this->authorize();
+        //$merchantAuthentication = $this->sandbox_authorize();
         $refId = 'ref' . time();
 
         // Order info

@@ -561,6 +561,7 @@ $(document).ready(function () {
         var courseid = $('#courseid').val();
         var participants = $('#participants').val();
         var cvv = $('#bill_cvv').val();
+        var renew=$('#renew').val();
         var state = $('#bill_state').val();
         if (card_type == 'Card type') {
             $('#personal_payment_err').html('Please select card type');
@@ -659,6 +660,7 @@ $(document).ready(function () {
                 bill_city: bill_city,
                 bill_zip: bill_zip,
                 state: state,
+                renew:renew,
                 user_group: user_group,
                 bill_email: bill_email};
             var url = "https://" + domain + "/functionality/php/make_stub_payment.php";

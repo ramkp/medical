@@ -40,7 +40,7 @@ class Mailer {
 
     function get_classs_info($user) {
         $list = "";
-        
+
         if ($user->slotid > 0) {
             $query = "select * from mdl_scheduler_slots where id=$user->slotid";
             $result = $this->db->query($query);
@@ -359,7 +359,7 @@ class Mailer {
         </tr> 
         
         <tr>
-        <td>Amount paid</td><td>$$renew_fee</td>
+        <td>Amount paid</td><td>$$user->sum</td>
         </tr> 
         
         <tr>
@@ -376,7 +376,7 @@ class Mailer {
 
     function send_payment_confirmation_message($payment, $group = null, $free = null) {
         $renew_fee = $this->get_renew_fee();
-        if ($payment->sum != $renew_fee) {
+        if ($payment->renew == null) {
             $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
             $subject = "Medical2 - payment confirmation";
             $message = $this->get_payment_confirmation_message($payment, $group, $free);

@@ -384,7 +384,7 @@ class Certificates extends Util {
         if ($renew_status == 1) {
             if ($renew == true) {
                 //  renew existing certificate
-                $expiration_date_sec = $date + 31536000;
+                $expiration_date_sec = $issue_date + 31536000;
                 $this->update_certificate_data2($courseid, $userid, $expiration_date_sec);
             } // end if $renew==true
             else {
@@ -1145,6 +1145,7 @@ class Certificates extends Util {
     function update_certificate_data($id, $exp_date) {
         $query = "update mdl_certificates "
                 . "set expiration_date='$exp_date' where id=$id";
+        //echo "Query:".$query."<br>";
         $this->db->query($query);
     }
 
@@ -1155,10 +1156,10 @@ class Certificates extends Util {
             foreach ($certs_array as $id) {
                 $certificate = $this->get_certificate_detailes($id);
                 $this->get_certificate_template($certificate->courseid, $certificate->userid, $certificate->date, $certificate->code, true);
-                $this->update_certificate_data($id, $certificate->date);
+                //$this->update_certificate_data($id, $certificate->date);
             } // end foreach
         } // end if count($certs_array)>0
-        $list.="Selected Certificate(s) were renewed";
+       // $list.="Selected Certificate(s) were renewed";
         return $list;
     }
 
