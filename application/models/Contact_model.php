@@ -23,12 +23,25 @@ class Contact_model extends CI_Model {
         return $list;
     }
 
-    public function get_contact_form() {   
+    public function get_programs_list() {
+        $list = "";
+        $list.="<select id='program' name='program' style='width: 155px;'>";
+        $list.="<option value='0' selected>Program</option>";
+        $query = "select * from mdl_course where cost>0 and visible=1";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $list.="<option value='$row->fullname'>$row->fullname</option>";
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    public function get_contact_form() {
         $antispam = new Antispam();
         $configs = array(
             'img_path' => './captcha/',
-            'img_url' => 'http://'.$_SERVER['SERVER_NAME'] . '/captcha/',            
-            'font_path' => $_SERVER['DOCUMENT_ROOT'].'/application/fonts/',
+            'img_url' => 'http://' . $_SERVER['SERVER_NAME'] . '/captcha/',
+            'font_path' => $_SERVER['DOCUMENT_ROOT'] . '/application/fonts/',
             'img_height' => '50',
             'font_size' => 16
         );
@@ -42,6 +55,7 @@ class Contact_model extends CI_Model {
 
         $query = $this->db->insert_string('mdl_captcha', $data);
         $this->db->query($query);
+        $programs_list = $this->get_programs_list();
 
         $list = "";
         $list.="<br/><div  class='form_div'>";
@@ -76,6 +90,8 @@ class Contact_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'>Program*</span>";
+        $list.="<span class='span2'>$programs_list</span>";
         $list.="<span class='span2'>Message*</span>";
         $list.="<span  class='span2'><textarea id='message' name='message' rows='4' ></textarea></span>";
         $list.="</div>";

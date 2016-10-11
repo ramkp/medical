@@ -1243,7 +1243,8 @@ $(document).ready(function () {
         var phone = $('#phone').val();
         var message = $('#message').val();
         var captcha = $('#captcha').val();
-        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && message != '' && captcha != '') {
+        var program=$('#program').val();
+        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && message != '' && captcha != '' && program!=0) {
             var url = "https://" + domain + "/functionality/php/verify_captcha.php";
             var request = {captcha: captcha};
             $.post(url, request).done(function (data) {
@@ -1257,7 +1258,7 @@ $(document).ready(function () {
                     $('#message').val('');
                     $('#captcha').val('');
                     var url = "https://" + domain + "/functionality/php/send_contact_request.php";
-                    var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message};
+                    var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message, program:program};
                     $.post(url, request).done(function (data) {
                         $('#contact_result').html("<span style='color:red;'>" + data + "</span>");
                     });

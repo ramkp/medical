@@ -11,7 +11,7 @@ class Contact {
         $this->db = new pdo_db();
     }
 
-    function post_contact_form($firstname, $lastname, $email, $phone, $user_message) {
+    function post_contact_form($firstname, $lastname, $email, $phone, $user_message, $program) {
 
         /*
           $query="insert into mdl_contact (fname,lname,email,phone,message,added)
@@ -44,6 +44,10 @@ class Contact {
         $message.="<tr>";
         $message.="<td style='padding:15px;'>Phone</td><td style='padding:15px;'>$phone</td>";
         $message.="</tr>";
+        
+        $message.="<tr>";
+        $message.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$program</td>";
+        $message.="</tr>";
 
         $message.="<tr>";
         $message.="<td style='padding:15px;' colspan='2'>$user_message</td>";
@@ -57,7 +61,7 @@ class Contact {
         $mailer = new Mailer();
         $mailer->send_contact_request($message);
 
-        $list = "Your message is sent. Thank you";
+        $list = "<span style='color:black;'>Your message is sent. Thank you</span>";
         return $list;
     }
 
