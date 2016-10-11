@@ -1238,13 +1238,13 @@ class Payment {
                     $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
                     $list.="<div class='panel-body'>";
                     $list.= "<div class='container-fluid' style='text-align:center;'>";
-                    if ($card->renew == null) {
-                        $list.= "<span class='span8'>Payment is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
-                    } // end if $card->sum != $renew_fee                    
-                    else {
-                        $cert=new Certificates2();
+                    if ($card->renew > 0) {
+                        $cert = new Certificates2();
                         $cert->renew_certificate($card->courseid, $card->userid, $card->renew);
                         $list.= "<span class='span8'>Payment is successful. Thank you! Your certificate has been renewed.</span>";
+                    } // end if $card->sum != $renew_fee                    
+                    else {
+                        $list.= "<span class='span8'>Payment is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
                     } // end else
                     $list.="</div>";
                     $list.="</div>";
