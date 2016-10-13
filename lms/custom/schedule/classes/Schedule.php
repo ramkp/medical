@@ -39,10 +39,10 @@ class Schedule extends Util {
     function get_course_slots($toolbar, $schedulerid, $search = null, $start = null, $end = null) {
 
         $username = $this->user->username;
-        $userid=$this->user->id;
+        $userid = $this->user->id;
         $slots = array();
         $now = time() - 86400;
-        if ($username == 'admin' && $username == 'manager') {
+        if ($username == 'admin' || $username == 'manager') {
             if ($search == null) {
                 if ($start == null && $end == null) {
                     $query = "select * from mdl_scheduler_slots "
@@ -243,8 +243,11 @@ class Schedule extends Util {
     }
 
     function create_slots_page($slots, $tools = true) {
-        global $COURSE;
+        global $COURSE, $USER;
         $courseid = $COURSE->id;
+        $userid = $USER->id;
+        $contextid = $this->get_course_context($courseid);
+        $roleid = $this->get_user_role($userid, $contextid);
         //echo "Course id: " . $courseid . "<br>";
         $qs = $_SERVER['QUERY_STRING'];
         $modid = trim(str_replace("id=", "", $qs));
@@ -304,14 +307,26 @@ class Schedule extends Util {
                 $editactionurl = "https://medical2.com/lms/mod/scheduler/view.php?id=" . $modid . "&what=updateslot&subpage=myappointments&offset=-1&sesskey=" . sesskey() . "&slotid=" . $slotid . "";
                 $addr_array = explode("/", $slot->appointmentlocation);
                 $addr_block = $addr_array[1] . " , " . $addr_array[0];
+
                 $list.="<div class='panel panel-default'>";
 
-                if ($has_students > 0) {
-                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a><br> $slot->notes</h5></div>";
-                } // end if $has_students>0
+                if ($roleid <= 3) {
+                    $balance_block = $this->get_workshop_balance($slotid);
+                    if ($has_students > 0) {
+                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;" . $balance_block . "<br> $slot->notes</h5></div>";
+                    } // end if $has_students>0
+                    else {
+                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;<a href='#' onClick='return false;'><img id='del_slot_$slotid' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete'></a>&nbsp;" . $balance_block . "<br> $slot->notes</h5></div>";
+                    } // end else 
+                } // end if $roleid <= 3
                 else {
-                    $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;<a href='#' onClick='return false;'><img id='del_slot_$slotid' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete'></a><br> $slot->notes</h5></div>";
-                } // end else 
+                    if ($has_students > 0) {
+                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a><br> $slot->notes</h5></div>";
+                    } // end if $has_students>0
+                    else {
+                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;<a href='#' onClick='return false;'><img id='del_slot_$slotid' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete'></a><br> $slot->notes</h5></div>";
+                    } // end else 
+                } // end else
 
                 $list.="<div class='panel-body' id='$slotid'>";
                 $slot_students = $this->get_slot_students($slot->id);
@@ -794,6 +809,92 @@ class Schedule extends Util {
         //echo "Query: ".$query."<br>";
         $this->db->query($query);
         echo "ok";
+    }
+
+    function get_workshop_balance($slotid) {
+        $list = "";
+        $paid_amount = 0;
+        $unpaid_amount = 0;
+        $courseid = $this->get_course_id($slotid);
+        $course_cost = $this->get_course_cost($courseid);
+
+        $query = "select * from mdl_scheduler_appointment where slotid=$slotid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $student_payment = $this->get_student_payment($courseid, $row['studentid']);
+                $paid_amount = $paid_amount + $student_payment;
+                $diff = $student_payment - $course_cost;
+                if ($diff < 0) {
+                    $unpaid_amount = $unpaid_amount + abs($diff);
+                } // end if
+            } // end while
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Total paid:</span>";
+            $list.="<span class='span1'>$$paid_amount</span>";
+            $list.="<span class='span2'>Total unpaid: </span>";
+            $list.="<span class='span1'>$$unpaid_amount</span>";
+            $list.="</div>";
+        } // end if $num>0
+        else {
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Total paid:</span>";
+            $list.="<span class='span1'>$0</span>";
+            $list.="<span class='span2'>Total unpaid: </span>";
+            $list.="<span class='span1'>$0</span>";
+            $list.="</div>";
+        } // end else
+
+        return $list;
+    }
+
+    function get_course_cost($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cost = $row['cost'];
+        }
+        return $cost;
+    }
+
+    function get_student_payment($courseid, $userid) {
+        $paid = 0;
+        // 1. Get payment from credit cards
+        $query = "select * from mdl_card_payments "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $paid = $paid + $row['psum'];
+            }
+        }
+
+        // 2. Get payment from cash or partial payments
+        $query = "select * from mdl_partial_payments "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $paid = $paid + $row['psum'];
+            }
+        }
+
+        // 3.Get payment from invoice table
+        $query = "select * from mdl_invoice "
+                . "where courseid=$courseid "
+                . "and userid=$userid and i_status=1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $paid = $paid + $row['i_sum'];
+            }
+        }
+
+        return $paid;
     }
 
 }
