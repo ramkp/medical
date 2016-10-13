@@ -2069,13 +2069,15 @@ $(document).ready(function () {
                     $('#personal_err').html('Please provide phone');
                     return;
                 }
-
+                
+                /*
                 if (phone != '') {
                     if (!$.isNumeric(phone) || phone.length < 9) {
                         $('#personal_err').html('Please enter the valid phone number without any symbols and spaces.');
                         return;
                     } // end if
                 } // end if
+                */
 
                 if (email == '') {
                     $('#personal_err').html('Please provide email');

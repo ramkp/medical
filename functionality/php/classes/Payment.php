@@ -1240,8 +1240,13 @@ class Payment {
                     $list.= "<div class='container-fluid' style='text-align:center;'>";
                     if ($card->renew > 0) {
                         $cert = new Certificates2();
-                        $cert->renew_certificate($card->courseid, $card->userid, $card->renew);
-                        $list.= "<span class='span8'>Payment is successful. Thank you! Your certificate has been renewed.</span>";
+                        $res = $cert->renew_certificate($card->courseid, $card->userid, $card->renew);
+                        if ($res != '') {
+                            $list.= "<span class='span8'>Payment is successful. Thank you! Your certificate has been renewed.</span>";
+                        } // end if
+                        else {
+                            $list.= "<span class='span8'>Payment is successful, please contact us to get your updated certificate.</span>";
+                        } // end else
                     } // end if $card->sum != $renew_fee                    
                     else {
                         $list.= "<span class='span8'>Payment is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user_payment_data->email.pdf' target='_blank'>here.</a></span>";
