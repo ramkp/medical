@@ -19,17 +19,17 @@ class Util {
     public $editor_path;
     public $json_path;
     public $session;
-    
-                function __construct() {
+
+    function __construct() {
         global $USER, $COURSE, $SESSION;
         $db = new pdo_db();
         $this->db = $db;
         $this->user = $USER;
         $this->course = $COURSE;
-        $this->session=$SESSION;
+        $this->session = $SESSION;
         $this->host = $_SERVER['SERVER_NAME'];
         $this->editor_path = 'https://' . $_SERVER['SERVER_NAME'] . "/lms/editor/";
-        $this->json_path=$_SERVER['DOCUMENT_ROOT'].'/lms/custom/utils/data.json';
+        $this->json_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/data.json';
         //$this->create_typehead_data();
     }
 
@@ -38,8 +38,8 @@ class Util {
         $firstname = array();
         $lastname = array();
         $emails = array();
-		$users=array();
-        
+        $users = array();
+
         $query = "select * from mdl_course where visible=1";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -51,8 +51,8 @@ class Util {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $lastname[] = mb_convert_encoding($row['lastname'], 'UTF-8');
             $firstname[] = mb_convert_encoding($row['firstname'], 'UTF-8');
-            $users[]=mb_convert_encoding($row['lastname'], 'UTF-8')." ".mb_convert_encoding($row['firstname'], 'UTF-8');
-            $emails[] = mb_convert_encoding($row['email'],'UTF-8');
+            $users[] = mb_convert_encoding($row['lastname'], 'UTF-8') . " " . mb_convert_encoding($row['firstname'], 'UTF-8');
+            $emails[] = mb_convert_encoding($row['email'], 'UTF-8');
         }
 
         $data = array_merge($users, $emails, $courses);
@@ -85,9 +85,15 @@ class Util {
         return $contextid;
     }
 
-    function get_user_role($userid) {
-        $query = "select * from mdl_role_assignments"
-                . "   where userid=$userid";
+    function get_user_role($userid, $contextid = null) {
+        if ($contextid == null) {
+            $query = "select * from mdl_role_assignments"
+                    . "   where userid=$userid";
+        } // end if
+        else {
+            $query = "select * from mdl_role_assignments"
+                    . "   where userid=$userid and contextid=$contextid";
+        } // end else
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -134,58 +140,58 @@ class Util {
         } // end if count($items)>0 
         return $list;
     }
-    
-    function get_invoice_course_categories () {
-    	$list = "";
-    	$items = array();
-    	$query = "select id, name from mdl_course_categories order by name";
-    	$result = $this->db->query($query);
-    	while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-    		$item = new stdClass();
-    		foreach ($row as $key => $value) {
-    			$item->$key = $value;
-    		} // end foreach
-    		$items[] = $item;
-    	} // end while
-    	if (count($items) > 0) {
-    		$list.="<span class='span3'>Program type</span><span class='span4'>";
-    		$list.="<select id='invoice_categories' style='width:275px;'>";
-    		$list.="<option value='0' selected>Program type</option>";
-    		foreach ($items as $item) {
-    			$list.="<option value='$item->id'>$item->name</option>";
-    		} // end foreach
-    		$list.="</select></span>";
-    	} // end if count($items)>0
-    	return $list;
+
+    function get_invoice_course_categories() {
+        $list = "";
+        $items = array();
+        $query = "select id, name from mdl_course_categories order by name";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $item = new stdClass();
+            foreach ($row as $key => $value) {
+                $item->$key = $value;
+            } // end foreach
+            $items[] = $item;
+        } // end while
+        if (count($items) > 0) {
+            $list.="<span class='span3'>Program type</span><span class='span4'>";
+            $list.="<select id='invoice_categories' style='width:275px;'>";
+            $list.="<option value='0' selected>Program type</option>";
+            foreach ($items as $item) {
+                $list.="<option value='$item->id'>$item->name</option>";
+            } // end foreach
+            $list.="</select></span>";
+        } // end if count($items)>0
+        return $list;
     }
-    
+
     function get_invoice_course_by_category($id) {
-    	$list = "";
-    	$items = array();
-    	$query = "select id, fullname from mdl_course where category=$id 
+        $list = "";
+        $items = array();
+        $query = "select id, fullname from mdl_course where category=$id 
     					 and cost>0 and visible=1";
-    	$num = $this->db->numrows($query);
-    	if ($num > 0) {
-    		$result = $this->db->query($query);
-    		while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-    			$item = new stdClass();
-    			foreach ($row as $key => $value) {
-    				$item->$key = $value;
-    			} // end foreach
-    			$items[] = $item;
-    		} // end while
-    		$list.="<span class='span3'>Programs:</span><span class='span4'>
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $item = new stdClass();
+                foreach ($row as $key => $value) {
+                    $item->$key = $value;
+                } // end foreach
+                $items[] = $item;
+            } // end while
+            $list.="<span class='span3'>Programs:</span><span class='span4'>
     				<select id='invoice_courses' style='width:275px;'>";
-    		$list.="<option value='0' selected>Program</option>";
-    		foreach ($items as $item) {
-    			$list.="<option value='$item->id'>$item->fullname</option>";
-    		} // end foreach
-    		$list.="</select></span>";
-    	} // end if $num>0
-    	else {
-    		$list.="<span class='span3'>Programs:</span><span class='span4'>n/a</span>";
-    	}
-    	return $list;
+            $list.="<option value='0' selected>Program</option>";
+            foreach ($items as $item) {
+                $list.="<option value='$item->id'>$item->fullname</option>";
+            } // end foreach
+            $list.="</select></span>";
+        } // end if $num>0
+        else {
+            $list.="<span class='span3'>Programs:</span><span class='span4'>n/a</span>";
+        }
+        return $list;
     }
 
     function get_course_by_category($id) {
@@ -453,15 +459,15 @@ class Util {
         return $name;
     }
 
-    function get_user_address_block($userid, $invoice_id=null) {
+    function get_user_address_block($userid, $invoice_id = null) {
         $list = "";
         $user_detailes = $this->get_user_details($userid);
-		$list.="$user_detailes->firstname $user_detailes->lastname<br>";
-		$list.="Phone: $user_detailes->phone1<br>";
-		$list.="Email: $user_detailes->email<br>";
-		$list.="$user_detailes->address<br>";
-		$list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
-        
+        $list.="$user_detailes->firstname $user_detailes->lastname<br>";
+        $list.="Phone: $user_detailes->phone1<br>";
+        $list.="Email: $user_detailes->email<br>";
+        $list.="$user_detailes->address<br>";
+        $list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
+
         return $list;
     }
 
@@ -480,7 +486,7 @@ class Util {
 
     function get_course_workshops($id) {
         $slots = array();
-        
+
         $schedulerid = $this->get_course_scheduler($id);
         $list = "";
         $list.="<span class='span3'>Workshops:</span><span class='span4'>";

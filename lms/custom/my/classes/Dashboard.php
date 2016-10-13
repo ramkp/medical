@@ -27,102 +27,111 @@ class Dashboard extends Util {
         $status = 0;
         $courseid = $this->course->id;
         $userid = $this->user->id;
-        $invoice = new Invoice();
-        $installment_status = $invoice->is_installment_user($userid, $courseid);
-        if ($installment_status == 0) {
-            // 1. Check among card payments
-            $query = "select * from mdl_card_payments "
-                    . "where userid=$userid and courseid=$courseid and refunded=0 ";
-            $card_payments_num = $this->db->numrows($query);
 
-            // 2. Check among invoice payments
-            $query = "select * from mdl_invoice "
-                    . "where userid=$userid and courseid=$courseid and i_status=1";
-            $invoice_payments_num = $this->db->numrows($query);
+        $contextid = $this->get_course_context($courseid);
+        $roleid = $this->get_user_role($userid, $contextid);
 
-            // 3. Check among partial payments
-            $query = "select * from mdl_partial_payments "
-                    . "where userid=$userid and courseid=$courseid";
-            $partial_num = $this->db->numrows($query);
+        if ($roleid <= 3) {
+            return 1;
+        } // end if
+        else {
+            $invoice = new Invoice();
+            $installment_status = $invoice->is_installment_user($userid, $courseid);
+            if ($installment_status == 0) {
+                // 1. Check among card payments
+                $query = "select * from mdl_card_payments "
+                        . "where userid=$userid and courseid=$courseid and refunded=0 ";
+                $card_payments_num = $this->db->numrows($query);
 
-            //4. Check among free access 
-            $query = "select * from mdl_free where userid=$userid";
-            $free_num = $this->db->numrows($query);
+                // 2. Check among invoice payments
+                $query = "select * from mdl_invoice "
+                        . "where userid=$userid and courseid=$courseid and i_status=1";
+                $invoice_payments_num = $this->db->numrows($query);
 
-            //5. Check among any invoice payments
-            $query = "select * from mdl_any_invoice_user where userid=$userid";
-            $num = $this->db->numrows($query);
-            if ($num > 0) {
-                $result = $this->db->query($query);
-                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $invoiceid = $row['invoiceid'];
-                }
+                // 3. Check among partial payments
+                $query = "select * from mdl_partial_payments "
+                        . "where userid=$userid and courseid=$courseid";
+                $partial_num = $this->db->numrows($query);
 
-                $query = "select * from mdl_invoice where id=$invoiceid";
-                $result = $this->db->query($query);
-                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $db_courseid = $row['courseid'];
-                }
-                if ($db_courseid == $courseid) {
-                    $any_invoice_num = 1;
-                } // end if $db_courseid==$courseid
+                //4. Check among free access 
+                $query = "select * from mdl_free where userid=$userid";
+                $free_num = $this->db->numrows($query);
+
+                //5. Check among any invoice payments
+                $query = "select * from mdl_any_invoice_user where userid=$userid";
+                $num = $this->db->numrows($query);
+                if ($num > 0) {
+                    $result = $this->db->query($query);
+                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        $invoiceid = $row['invoiceid'];
+                    }
+
+                    $query = "select * from mdl_invoice where id=$invoiceid";
+                    $result = $this->db->query($query);
+                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        $db_courseid = $row['courseid'];
+                    }
+                    if ($db_courseid == $courseid) {
+                        $any_invoice_num = 1;
+                    } // end if $db_courseid==$courseid
+                    else {
+                        $any_invoice_num = 0;
+                    }
+                } // end if $num>0
                 else {
                     $any_invoice_num = 0;
                 }
-            } // end if $num>0
-            else {
-                $any_invoice_num = 0;
-            }
 
-            if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $free_num > 0 || $any_invoice_num > 0) {
-                $status = 1;
-            } // end if $card_payments_num>0 || $invoice_payments_num>0
-        } // end if $installment_status==0
-        else {
-            $interval = 604800; // 7 days in sec
-            $query = "select * from mdl_installment_users "
-                    . "where userid=$userid "
-                    . "and courseid=$courseid";
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $subscription_id = $row['subscription_id'];
-                $subscription_start = $row['subscription_start'];
-            }
-            if (is_numeric($subscription_id)) {
-                $user_interval = time() - $subscription_start;
-                if ($user_interval <= $interval) {
+                if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $free_num > 0 || $any_invoice_num > 0) {
                     $status = 1;
-                } // end if $user_interval<=$interval
-                else {
-                    $query = "select * from mdl_card_payments "
-                            . "where userid=$userid and "
-                            . "courseid=$courseid "
-                            . "and refunded=0 "
-                            . " and pdate>$subscription_start";
-                    $status = $this->db->numrows($query);
-                } // end else
-            } // end if is_numeric($subscription_id)
+                } // end if $card_payments_num>0 || $invoice_payments_num>0
+            } // end if $installment_status==0
             else {
-                $status = 0;
-            }
-        } // end else when it is installment user
+                $interval = 604800; // 7 days in sec
+                $query = "select * from mdl_installment_users "
+                        . "where userid=$userid "
+                        . "and courseid=$courseid";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $subscription_id = $row['subscription_id'];
+                    $subscription_start = $row['subscription_start'];
+                }
+                if (is_numeric($subscription_id)) {
+                    $user_interval = time() - $subscription_start;
+                    if ($user_interval <= $interval) {
+                        $status = 1;
+                    } // end if $user_interval<=$interval
+                    else {
+                        $query = "select * from mdl_card_payments "
+                                . "where userid=$userid and "
+                                . "courseid=$courseid "
+                                . "and refunded=0 "
+                                . " and pdate>$subscription_start";
+                        $status = $this->db->numrows($query);
+                    } // end else
+                } // end if is_numeric($subscription_id)
+                else {
+                    $status = 0;
+                }
+            } // end else when it is installment user
+        } // end else 
         return $status;
     }
 
     function get_user_status() {
-//print_r($this->user);
-//echo "Username: " . $this->user->username . "<br>";
+
         $username = $this->user->username;
-//echo "Username: " . $username . "<br>";
         if ($username != 'manager') {
-            $roleid = $this->get_user_role($this->user->id);
+            $contextid = $this->get_course_context($this->course->id);
+            $roleid = $this->get_user_role($this->user->id, $contextid);
+            //echo "Role ID: ".$roleid."<br>";
             if ($roleid == 5) {
                 $status = $this->is_user_paid();
             } // end if $roleid == 5
-            else {
-// It is Manager 
+            elseif ($roleid <= 3) {
+                // It is teacher, manager or higher 
                 $status = 1;
-            }
+            } // end if 
         } // end if $username != 'manager'
         else {
             $status = 1;
@@ -512,7 +521,7 @@ class Dashboard extends Util {
 
     function get_course_schedule_data($userid, $userslots, $courseid) {
         $list = "";
-        
+
         $user_payments = $this->get_user_payments($userid, $courseid);
         if (count($userslots) > 0) {
             foreach ($userslots as $slotid) {
@@ -674,7 +683,7 @@ class Dashboard extends Util {
         $invoice_payments = array();
         $course_category = $this->get_course_category($courseid);
 
-        
+
 
 
 // 1. Get data from mdl_card_payments // payments made by card

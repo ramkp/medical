@@ -37,49 +37,101 @@ class Schedule extends Util {
     }
 
     function get_course_slots($toolbar, $schedulerid, $search = null, $start = null, $end = null) {
-        
+
+        $username = $this->user->username;
+        $userid=$this->user->id;
         $slots = array();
         $now = time() - 86400;
-        if ($search == null) {
-            if ($start == null && $end == null) {
-                $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid "
-                        . "and starttime>$now order by starttime";
-            } // end if $start == null && $end == null
-            if ($start != null && $end == null) {
-                $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid "
-                        . "and starttime>" . strtotime($start) . " order by starttime";
-            } // end if $start!=null && $end==null
-            if ($start != null && $end != null) {
-                $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid "
-                        . "and starttime>" . strtotime($start) . " "
-                        . "and starttime<" . strtotime($end) . " order by starttime";
-            } // end if $start != null && $end != null
-        } // end if ($search == null) {
+        if ($username == 'admin' && $username == 'manager') {
+            if ($search == null) {
+                if ($start == null && $end == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and starttime>$now order by starttime";
+                } // end if $start == null && $end == null
+                if ($start != null && $end == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and starttime>" . strtotime($start) . " order by starttime";
+                } // end if $start!=null && $end==null
+                if ($start != null && $end != null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and starttime>" . strtotime($start) . " "
+                            . "and starttime<" . strtotime($end) . " order by starttime";
+                } // end if $start != null && $end != null
+            } // end if ($search == null) {
+            else {
+                if ($start == null && $end == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and 	(appointmentlocation like '%$search%' "
+                            . "or notes like '%$search%') and starttime>$now";
+                } // end if $start == null && $end == null
+                if ($start != null && $end == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and 	(appointmentlocation like '%$search%' "
+                            . "or notes like '%$search%') "
+                            . "and starttime>" . strtotime($start) . " order by starttime";
+                } // end if $start!=null && $end==null
+                if ($start != null && $end != null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and starttime>" . strtotime($start) . " "
+                            . "and 	(appointmentlocation like '%$search%' "
+                            . "or notes like '%$search%') "
+                            . "and starttime<" . strtotime($end) . " order by starttime";
+                } // end if $start != null && $end != null
+            } // end else
+        } // end if $username=='admin' && $username=='manager'
         else {
-            if ($start == null && $end == null) {
-                $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid "
-                        . "and 	(appointmentlocation like '%$search%' "
-                        . "or notes like '%$search%') and starttime>$now";
-            } // end if $start == null && $end == null
-            if ($start != null && $end == null) {
-                $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid "
-                        . "and 	(appointmentlocation like '%$search%' "
-                        . "or notes like '%$search%') "
-                        . "and starttime>" . strtotime($start) . " order by starttime";
-            } // end if $start!=null && $end==null
-            if ($start != null && $end != null) {
-                $query = "select * from mdl_scheduler_slots "
-                        . "where schedulerid=$schedulerid "
-                        . "and starttime>" . strtotime($start) . " "
-                        . "and 	(appointmentlocation like '%$search%' "
-                        . "or notes like '%$search%') "
-                        . "and starttime<" . strtotime($end) . " order by starttime";
-            } // end if $start != null && $end != null
+            if ($search == null) {
+                if ($start == null && $end == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and starttime>$now and teacherid=$userid order by starttime";
+                } // end if $start == null && $end == null
+                if ($start != null && $end == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and starttime>" . strtotime($start) . " "
+                            . "and teacherid=$userid order by starttime";
+                } // end if $start!=null && $end==null
+                if ($start != null && $end != null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and starttime>" . strtotime($start) . " "
+                            . "and starttime<" . strtotime($end) . " "
+                            . "and teacherid=$userid order by starttime";
+                } // end if $start != null && $end != null
+            } // end if ($search == null) {
+            else {
+                if ($start == null && $end == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and 	(appointmentlocation like '%$search%' "
+                            . "or notes like '%$search%') and starttime>$now "
+                            . "and teacherid=$userid";
+                } // end if $start == null && $end == null
+                if ($start != null && $end == null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and 	(appointmentlocation like '%$search%' "
+                            . "or notes like '%$search%') "
+                            . "and starttime>" . strtotime($start) . " "
+                            . "and teacherid=$userid order by starttime";
+                } // end if $start!=null && $end==null
+                if ($start != null && $end != null) {
+                    $query = "select * from mdl_scheduler_slots "
+                            . "where schedulerid=$schedulerid "
+                            . "and starttime>" . strtotime($start) . " "
+                            . "and 	(appointmentlocation like '%$search%' "
+                            . "or notes like '%$search%') "
+                            . "and starttime<" . strtotime($end) . " "
+                            . "and teacherid=$userid order by starttime";
+                } // end if $start != null && $end != null
+            } // end else
         } // end else
         //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
@@ -170,7 +222,7 @@ class Schedule extends Util {
         if ($courseid == 1) {
             //echo "Inside if ....<br>";
             //print_r($_SERVER);
-            
+
             $qs = $_SERVER['HTTP_REFERER'];
             //echo "Query string: ".$qs."<br>";
             $modid = trim(str_replace("https://medical2.com/lms/mod/scheduler/view.php?id=", "", $qs));
@@ -430,7 +482,7 @@ class Schedule extends Util {
 
     function get_students_course_slots($schedulerid) {
         $list = "";
-        
+
         $query = "select * from mdl_scheduler_slots "
                 . "where schedulerid=$schedulerid order by starttime";
         $num = $this->db->numrows($query);
