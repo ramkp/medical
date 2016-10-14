@@ -4,6 +4,7 @@ require_once ('/home/cnausa/public_html/lms/class.pdo.database.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/my/classes/Dashboard.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/classes/Invoice.php');
 
 class Partial extends Util {
@@ -286,9 +287,9 @@ class Partial extends Util {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;display:none;' id='payment_options'>";
-        
+
         $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cc' checked>Card payment</span>";
-        $period=$this->get_renew_period_dropbox();
+        $period = $this->get_renew_period_dropbox();
         $enabled = $this->check_module_permission('cash');
 
         if ($this->user->id == 2) {
@@ -307,16 +308,16 @@ class Partial extends Util {
         $list.="<span class='span6'><input type='checkbox' id='renew'> &nbsp; This is certificate renew payment</span>";
         $list.="<span class='span3'>$period</span>";
         $list.="<span class='span3'><button class='btn btn-primary' id='get_partial_payment_section'>Add</button></span>";
-        
+
         $list.="</div>";
-        
+
         /*
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span6'><input type='checkbox' id='renew'> &nbsp; This is certificate renew payment</span>";
-        $list.="<span class='span3'>$period</span>";
-        $list.="<span class='span3'><button class='btn btn-primary' id='get_partial_payment_section'>Add</button></span>";
-        $list.="</div>";
-        */
+          $list.="<div class='container-fluid' style='text-align:left;'>";
+          $list.="<span class='span6'><input type='checkbox' id='renew'> &nbsp; This is certificate renew payment</span>";
+          $list.="<span class='span3'>$period</span>";
+          $list.="<span class='span3'><button class='btn btn-primary' id='get_partial_payment_section'>Add</button></span>";
+          $list.="</div>";
+         */
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span12' id='payment_section'></span>";
@@ -438,6 +439,15 @@ class Partial extends Util {
             $this->update_slots_table($courseid, $userid, $slotid);
             $this->add_user_to_course_schedule($slotid, $userid);
         } // end if $source == 'add_cash' || $source == 'add_cheque'
+
+        $userObj = $this->get_user_details($userid);
+        $userObj->courseid = $courseid;
+        $userObj->userid = $userid;
+        $userObj->slotid = $slotid;
+        $userObj->payment_amount = $sum;
+        $mailer = new Mailer();
+        $mailer->send_partial_payment_confirmation($userObj);
+
         $list = "Partial payment successfully added. Please reload the page";
         return $list;
     }
