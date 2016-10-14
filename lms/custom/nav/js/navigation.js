@@ -2335,14 +2335,18 @@ $(document).ready(function () {
     }
 
     function get_user_credentials_page() {
+
         var url = "/lms/custom/users/get_users_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+
+            $.get('/lms/custom/utils/data.json', function (data) {
+                $('#search_user_input').typeahead({source: data, items: 24});
+            }, 'json');
+
         });
 
-        $.get('/lms/custom/utils/data.json', function (data) {
-            $('#search_user_input').typeahead({source: data, items: 24});
-        }, 'json');
+
     }
 
     function search_user_by_email() {
