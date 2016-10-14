@@ -354,7 +354,7 @@ class Schedule extends Util {
                         $student_balance = $this->get_student_balance($courseid, $student->studentid);
                         $list.= "<div class='container-fluid' style='text-align:left;'>";
                         $list.="<span class='span1'><input type='checkbox' class='students' name='studentid' value='$student->studentid'></span>";
-                        $list.="<span class='span5'><a href='https://medical2.com/lms/user/profile.php?id=$student->studentid'  target='_blank'>$user_data->firstname $user_data->lastname &nbsp; $user_data->email</a>&nbsp; $student_balance</span>";
+                        $list.="<span class='span5'><a href='https://medical2.com/lms/user/profile.php?id=$student->studentid'  target='_blank'>$user_data->firstname $user_data->lastname $user_data->phone1&nbsp; $user_data->email</a>&nbsp; $student_balance</span>";
                         $list.="<span class='span4'>$status</span>";
                         $list.="</div>";
                     } // end foreach                                    
