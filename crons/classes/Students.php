@@ -1770,7 +1770,8 @@ class Students {
         $lastname = array();
         $emails = array();
         $users = array();
-
+        $phones=array();
+        
         $query = "select * from mdl_course where visible=1";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -1784,9 +1785,10 @@ class Students {
             $firstname[] = mb_convert_encoding($row['firstname'], 'UTF-8');
             $users[] = mb_convert_encoding($row['lastname'], 'UTF-8') . " " . mb_convert_encoding($row['firstname'], 'UTF-8');
             $emails[] = mb_convert_encoding($row['email'], 'UTF-8');
+            $phones[]=mb_convert_encoding($row['phone1'], 'UTF-8');
         }
 
-        $data = array_merge($users, $emails, $courses);
+        $data = array_merge($users, $emails, $courses, $phones);
         file_put_contents('/home/cnausa/public_html/lms/custom/utils/data.json', json_encode($data));
         echo "Data are created \n";
     }

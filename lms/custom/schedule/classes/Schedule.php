@@ -832,6 +832,8 @@ class Schedule extends Util {
                 } // end if
             } // end while
             $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Total students:</span>";
+            $list.="<span class='span1'>$num</span>";
             $list.="<span class='span2'>Total paid:</span>";
             $list.="<span class='span1'>$$paid_amount</span>";
             $list.="<span class='span2'>Total unpaid: </span>";
@@ -840,6 +842,8 @@ class Schedule extends Util {
         } // end if $num>0
         else {
             $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Total students:</span>";
+            $list.="<span class='span1'>0</span>";
             $list.="<span class='span2'>Total paid:</span>";
             $list.="<span class='span1'>$0</span>";
             $list.="<span class='span2'>Total unpaid: </span>";

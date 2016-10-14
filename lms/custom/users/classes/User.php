@@ -47,7 +47,7 @@ class User extends Util {
         if ($toolbar == true) {
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span2'>Search</span>";
-            $list.="<span class='span2'><input type='text' id='search_user_input' class='typeahead' autocomplete='off' spellcheck='false' style='width:125px;' ></span>";
+            $list.="<span class='span2'><input type='text' id='search_user_input' class='typeahead' style='width:125px;' autocomplete='off' spellcheck='false'></span>";
             $list.="<span class='span3'><button class='btn btn-primary' id='search_user'>Search</button></span>";
             $list.="<span class='span2'><button class='btn btn-primary' id='clear_user'>Clear filter</button></span>";
             $list.="</div>";
@@ -57,11 +57,12 @@ class User extends Util {
             $list.="<div class='container-fluid' style='font-weight:bold;'>";
             $list.="<span class='span2'>Firstname</span>";
             $list.="<span class='span2'>Lastname</span>";
+            $list.="<span class='span2'>Phone</span>";
             $list.="<span class='span4'>Username</span>";
             $list.="<span class='span2'>Passsword</span>";
             $list.="</div>";
             $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
-            $list.="<span class='span10'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
+            $list.="<span class='span12'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
             $list.="</div>";
         } // end if $toolbar==true
         $list.="<div id='users_container'>";
@@ -79,11 +80,12 @@ class User extends Util {
             $list.="<div class='container-fluid'>";
             $list.="<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'><span class='span2'>$user->firstname</a></span>";
             $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'>$user->lastname</a></span>";
+            $list.="<span class='span2'>$user->phone1</span>";
             $list.="<span class='span4'>$user->email</span>";
             $list.="<span class='span2'>$user->purepwd</span>";
             $list.="</div>";
             $list.="<div class='container-fluid'>";
-            $list.="<span class='span10'><hr/></span>";
+            $list.="<span class='span12'><hr/></span>";
             $list.="</div>";
         } // end foreach
         $list.="</div>";
@@ -154,12 +156,15 @@ class User extends Util {
     function search_user_by_email($email) {
         $list = "";
         $users = array();
+        $data = explode(' ', $email);
+        $firstname = $data[1];
+        $lastname = $data[0];
         $query = "select * from mdl_user "
-                . "where deleted=0"
-                . " and email like '%" . trim($email) . "%' "
-                . "or firstname like '%" . trim($email) . "%' "
-                . "or lastname like '%" . trim($email) . "%'"
-                . " order by email ";
+                . "where deleted=0 "
+                . " and ( email like '%" . trim($email) . "%' "
+                . "or (firstname='$firstname' and lastname='$lastname') "
+                . "or phone1 like '%$email%') "
+                . " order by lastname ";
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
