@@ -130,25 +130,28 @@ class Mailer {
         $catid = $this->get_course_category($user);
         $p = new Payment();
         $state = $p->get_state_name_by_id($user->state);
-        $list.= "<!DOCTYPE HTML><html><head><title>Payment Confirmation</title>";
-        $list.="</head>";
-        $list.="<body><br/><br/><br/><br/>";
-        $list.="<div class='datagrid'>            
+
+        if ($user->period == 0) {
+
+            $list.= "<!DOCTYPE HTML><html><head><title>Payment Confirmation</title>";
+            $list.="</head>";
+            $list.="<body><br/><br/><br/><br/>";
+            $list.="<div class='datagrid'>            
         <table style='table-layout: fixed;' width='360'>
         <thead>";
 
-        if ($catid == 5) {
-            $list.="<tr>";
-            $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
-            $list.="</tr>";
-        } // end if
-        else {
-            $list.="<tr>";
-            $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
-            $list.="</tr>";
-        } // end else
+            if ($catid == 5) {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
+                $list.="</tr>";
+            } // end if
+            else {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+                $list.="</tr>";
+            } // end else
 
-        $list.="</thead>
+            $list.="</thead>
         <tbody>
         <tr style='background-color:#F5F5F5;'>
         <td>First name</td><td>$user->firstname</td>
@@ -187,29 +190,79 @@ class Mailer {
         <td>Program fee</td><td>$$course_cost</td>
         </tr>";
 
-        if (property_exists($user, 'payment_amount')) {
-            date_default_timezone_set("America/New_York");
-            $date = date('m-d-Y h:i:s', time());
+            if (property_exists($user, 'payment_amount')) {
+                date_default_timezone_set("America/New_York");
+                $date = date('m-d-Y h:i:s', time());
 
-            $list.="<tr style='background-color:#F5F5F5;'>
+                $list.="<tr style='background-color:#F5F5F5;'>
             <td>Payment status: </td><td>Paid by cash/cheque: $$user->payment_amount</td>
             </tr>";
 
-            $list.="<tr style='background-color:#F5F5F5;'>";
-            $list.="<td>Order Date:</td><td>$date</td>";
-            $list.="</tr>";
-        } // end if $payment_amount != null
+                $list.="<tr style='background-color:#F5F5F5;'>";
+                $list.="<td>Order Date:</td><td>$date</td>";
+                $list.="</tr>";
+            } // end if $payment_amount != null
 
-        $list.="<tr style='background-color:#F5F5F5;'>
+            $list.="<tr style='background-color:#F5F5F5;'>
         <td>Class info</td><td>$class_info</td>
         </tr>
         </tbody>
         </table>
         </div>";
-        $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
-        $list.="</body></html>";
+            $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
+            $list.="</body></html>";
+            $subject = 'Medical2 - Payment Confirmation';
+        }// end if $user->period==0
+        else {
+            $list.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
+            $list.="</head>";
+            $list.="<body><br/><br/><br/><br/>";
+            $list.="<div class='datagrid'>            
+        <table style='table-layout: fixed;' width='360'>
+        <thead>";
 
-        $subject = 'Medical2 - payment confirmation';
+            $list.="<tr>";
+            $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+            $list.="</tr>";
+
+            $list.="</thead>
+        <tbody>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>First name</td><td>$user->firstname</td>
+        </tr>
+        
+        <tr>
+        <td>Last name</td><td>$user->lastname</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Email</td><td>$user->email</td>
+        </tr>
+        
+        <tr>
+        <td>Phone</td><td>$user->phone1</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Applied Progarm</td><td>$course_name</td>
+        </tr> 
+        
+        <tr>
+        <td>Amount paid</td><td>$$user->payment_amount</td>
+        </tr> 
+        
+        <tr>
+        <td colspan='2' align='left'>&nbsp;</td>
+        </tr> 
+        
+        <tr>
+        <td colspan='2' align='left'>This certification has been renewed</td>
+        </tr> 
+        
+        </table></body></html>";
+            $subject = 'Medical2 - Certificate Renew Payment';
+        } // end else
 
         $this->send_common_message($subject, $list, $user->email);
     }

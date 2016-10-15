@@ -415,7 +415,7 @@ class Partial extends Util {
         $this->db->query($query);
     }
 
-    function add_partial_payment($courseid, $userid, $sum, $source, $slotid) {
+    function add_partial_payment($courseid, $userid, $sum, $source, $slotid, $period) {
         $date = time();
         $payment_type = 0; // cc                
         if ($source == 'cheque' || $source == 'cash') {
@@ -445,6 +445,7 @@ class Partial extends Util {
         $userObj->userid = $userid;
         $userObj->slotid = $slotid;
         $userObj->payment_amount = $sum;
+        $userObj->period = $period;
         $mailer = new Mailer();
         $mailer->send_partial_payment_confirmation($userObj);
 

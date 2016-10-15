@@ -1251,7 +1251,7 @@ $(document).ready(function () {
             else {
                 if (confirm('Add partial payment for current user?')) {
                     var url = "/lms/custom/partial/add_partial_payment.php";
-                    $.post(url, {courseid: courseid, userid: userid, sum: sum, source: ptype, slotid: slotid}).done(function (data) {
+                    $.post(url, {courseid: courseid, userid: userid, sum: sum, source: ptype, slotid: slotid, period: period}).done(function (data) {
                         $('#partial_err').html("<span style='color:black;'>" + data + "</span>");
                     });
                 } // end if confirm
