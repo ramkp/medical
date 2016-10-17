@@ -471,6 +471,11 @@ $(document).ready(function () {
         var url = "/lms/custom/certificates/get_course_users.php";
         $.post(url, {id: id}).done(function (data) {
             $('#enrolled_users').html(data);
+            var json_path = id + ".json";
+            $.get('/lms/custom/utils/' + json_path, function (data) {
+                $("#users").typeahead({source: data, items: 27});
+            }, 'json');
+
         });
     }
 
@@ -479,6 +484,10 @@ $(document).ready(function () {
         var url = "/lms/custom/certificates/get_course_users2.php";
         $.post(url, {id: id}).done(function (data) {
             $('#send_enrolled_users').html(data);
+            var json_path = id + ".json";
+            $.get('/lms/custom/utils/' + json_path, function (data) {
+                $("#send_users").typeahead({source: data, items: 27});
+            }, 'json');
         });
     }
 
@@ -498,19 +507,32 @@ $(document).ready(function () {
 
     function send_invoice() {
         var courseid = $('#courses').val();
-        var userid = $('#users').val();
-        if (userid > 0 && courseid > 0) {
-            if (confirm('Send invoice to user?')) {
-                $('#invoice_status').html('');
-                var url = "/lms/custom/invoices/send_invoice_send.php";
-                $.post(url, {userid: userid, courseid: courseid}).done(function (data) {
-                    $('#invoice_status').html(data);
-                });
-            } // end if confirm('Send invoice to user?')
-        } // end if userid > 0 && courseid > 0
+        var username = $('#users').val();
+
+        if (username == '') {
+            $('#invoice_status').html('Please provide username');
+            return;
+        } // end if
         else {
-            $('#invoice_status').html("<span style='color:red;'>Please select program and user</span>");
+            var url = "/lms/custom/utils/get_userid_by_fio.php";
+            $.post(url, {username: username}).done(function (userid) {
+                if (userid > 0 && courseid > 0) {
+                    if (confirm('Send invoice to user?')) {
+                        $('#invoice_status').html('');
+                        var url = "/lms/custom/invoices/send_invoice_send.php";
+                        $.post(url, {userid: userid, courseid: courseid}).done(function (data) {
+                            $('#invoice_status').html(data);
+                        });
+                    } // end if confirm('Send invoice to user?')
+                } // end if userid > 0 && courseid > 0
+                else {
+                    $('#invoice_status').html("<span style='color:red;'>Please select program and user</span>");
+                } // end else
+            });
         } // end else
+
+
+
     }
 
     function get_open_invoices_page() {
@@ -597,6 +619,11 @@ $(document).ready(function () {
         var url = "/lms/custom/payments/get_free_payments.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+
+            $.get('/lms/custom/utils/data.json', function (data) {
+                $("#search_payment").typeahead({source: data, items: 24});
+            }, 'json');
+
         });
     }
 
@@ -671,53 +698,74 @@ $(document).ready(function () {
     }
 
     function add_installment_user() {
-        var userid = $('#users').val();
-        console.log('User id: ' + userid);
-        var courseid = $('#courses').val();
-        console.log('Course id: ' + courseid);
-        var num = $('#inst_num').val();
-        console.log('Payments num:' + num);
-        if (userid > 0 && courseid > 0 && num > 0) {
-            if (confirm('Add installment user?')) {
-                $('#add_inst_user_status').html('');
-                var url = "/lms/custom/installment/add_installment_user.php";
-                $.post(url, {userid: userid, num: num, courseid: courseid}).done(function (data) {
-                    $('#add_inst_user_status').html(data);
-                });
-            } // end if confirm
-        } // end if userid>0 && num>0 && sum>0
+        var username = $('#users').val();
+
+        if (username == '') {
+            $('#add_inst_user_status').html("<span style='color:red;'>Please provide user</span>");
+            return;
+        } // end if username==''
         else {
-            $('#add_inst_user_status').html("<span style='color:red;'>Please select user and provide installment params</span>");
-        } // end else 
+            var url = "/lms/custom/utils/get_userid_by_fio.php";
+            $.post(url, {username: username}).done(function (userid) {
+                console.log('User id: ' + userid);
+                var courseid = $('#courses').val();
+                console.log('Course id: ' + courseid);
+                var num = $('#inst_num').val();
+                console.log('Payments num:' + num);
+                if (userid > 0 && courseid > 0 && num > 0) {
+                    if (confirm('Add installment user?')) {
+                        $('#add_inst_user_status').html('');
+                        var url = "/lms/custom/installment/add_installment_user.php";
+                        $.post(url, {userid: userid, num: num, courseid: courseid}).done(function (data) {
+                            $('#add_inst_user_status').html(data);
+                        });
+                    } // end if confirm
+                } // end if userid>0 && num>0 && sum>0
+                else {
+                    $('#add_inst_user_status').html("<span style='color:red;'>Please select user and provide installment params</span>");
+                } // end else
+            });
+        } // end else
     }
 
     function send_certicicate_to_user() {
         var courseid = $('#send_courses').val();
-        var userid = $('#send_users').val();
-        if (userid > 0 && courseid > 0) {
-            var url = "/lms/custom/certificates/get_course_completion.php";
-            $.post(url, {userid: userid, courseid: courseid}).done(function (completion_date) {
-                if (completion_date == 0) {
-                    if (confirm('User did not complete the course, send certificate anyway?')) {
-                        var url2 = "/lms/custom/certificates/send_certificate.php";
-                        $.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
-                            $('#send_cert_err').html(data);
-                        });
-                    } // end if confirm
-                } // end if data==0 
-                else {
-                    if (confirm('Send certificate to user?')) {
-                        $('#send_cert_err').html('');
-                        $.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
-                            $('#send_cert_err').html(data);
-                        });
-                    } // end if conform
-                } // end else
-            }); // end of $.post get_course_completion.php
-        } // end if userid>0 && courseid>0
+        var username = $('#send_users').val();
+        console.log('User name: '+username);
+        if (username == '') {
+            $('#send_cert_err').html("<span style='color:red;'>Please provide user</span>");
+            return;
+        } // end if username == ''
         else {
-            console.log('Incorrect data!');
-            $('#send_cert_err').html("<span style='color:red;'>Please select program and user</span>");
+            var url = "/lms/custom/utils/get_userid_by_fio.php";
+            $.post(url, {username: username}).done(function (userid) {
+                console.log('Course ID: '+courseid);
+                console.log('User ID: '+userid);
+                if (userid > 0 && courseid > 0) {
+                    var url = "/lms/custom/certificates/get_course_completion.php";
+                    $.post(url, {userid: userid, courseid: courseid}).done(function (completion_date) {
+                        if (completion_date == 0) {
+                            if (confirm('User did not complete the course, send certificate anyway?')) {
+                                var url2 = "/lms/custom/certificates/send_certificate.php";
+                                $.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
+                                    $('#send_cert_err').html(data);
+                                });
+                            } // end if confirm
+                        } // end if data==0 
+                        else {
+                            if (confirm('Send certificate to user?')) {
+                                $('#send_cert_err').html('');
+                                $.post(url2, {courseid: courseid, userid: userid, completion_date: completion_date}).done(function (data) {
+                                    $('#send_cert_err').html(data);
+                                });
+                            } // end if conform
+                        } // end else
+                    }); // end of $.post get_course_completion.php
+                } // end if userid>0 && courseid>0
+                else {
+                    $('#send_cert_err').html("<span style='color:red;'>Please select program and user</span>");
+                } // end else
+            });
         } // end else
     }
 
@@ -1215,51 +1263,61 @@ $(document).ready(function () {
 
     function get_partial_payments_section() {
         var courseid = $('#register_courses').val();
-        var userid = $('#users').val();
-        var sum = $('#sum').val();
-        var slotid = $('#register_cities').val();
-        var ptype = $('input[name=payment_type]:checked').val();
-        var period = 0;
+        var username = $('#users').val();
 
-        if ($('#renew').prop('checked')) {
-            period = $('#renew_period').val();
-            if (period == 0) {
-                $('#partial_err').html('Please select renew period');
-                return;
-            } // end if 
-            else {
-                console.log('Renew period: ' + period);
-            } // end else
-        } // end if 
-
-        console.log('Course ID: ' + courseid);
-        console.log('User ID: ' + userid);
-        console.log('slot ID: ' + slotid);
-        console.log('Sum : ' + sum);
-        console.log('Ptype: ' + ptype);
-        if (courseid > 0 && userid > 0 && $.isNumeric(sum) && sum > 0) {
-            $('#partial_err').html('');
-            if (ptype == 'cc') {
-                if (period == 0) {
-                    var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum;
-                } // end if
-                else {
-                    var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum + "/" + period;
-                }
-                window.open(url, '_blank');
-            } // end if ptype=='cc'
-            else {
-                if (confirm('Add partial payment for current user?')) {
-                    var url = "/lms/custom/partial/add_partial_payment.php";
-                    $.post(url, {courseid: courseid, userid: userid, sum: sum, source: ptype, slotid: slotid, period: period}).done(function (data) {
-                        $('#partial_err').html("<span style='color:black;'>" + data + "</span>");
-                    });
-                } // end if confirm
-            } // end else when it is not cc payment
-        } // end if courseid > 0 && userid > 0 && sum > 0
+        if (username == '') {
+            $('#partial_err').html('Please provide user');
+            return;
+        } // end if username==''
         else {
-            $('#partial_err').html('Please select program and user and provide paid amount');
-        } // end else    
+            var url = "/lms/custom/utils/get_userid_by_fio.php";
+            $.post(url, {username: username}).done(function (userid) {
+                var sum = $('#sum').val();
+                var slotid = $('#register_cities').val();
+                var ptype = $('input[name=payment_type]:checked').val();
+                var period = 0;
+
+                if ($('#renew').prop('checked')) {
+                    period = $('#renew_period').val();
+                    if (period == 0) {
+                        $('#partial_err').html('Please select renew period');
+                        return;
+                    } // end if 
+                    else {
+                        console.log('Renew period: ' + period);
+                    } // end else
+                } // end if 
+
+                console.log('Course ID: ' + courseid);
+                console.log('User ID: ' + userid);
+                console.log('slot ID: ' + slotid);
+                console.log('Sum : ' + sum);
+                console.log('Ptype: ' + ptype);
+                if (courseid > 0 && userid > 0 && $.isNumeric(sum) && sum > 0) {
+                    $('#partial_err').html('');
+                    if (ptype == 'cc') {
+                        if (period == 0) {
+                            var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum;
+                        } // end if
+                        else {
+                            var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum + "/" + period;
+                        }
+                        window.open(url, '_blank');
+                    } // end if ptype=='cc'
+                    else {
+                        if (confirm('Add partial payment for current user?')) {
+                            var url = "/lms/custom/partial/add_partial_payment.php";
+                            $.post(url, {courseid: courseid, userid: userid, sum: sum, source: ptype, slotid: slotid, period: period}).done(function (data) {
+                                $('#partial_err').html("<span style='color:black;'>" + data + "</span>");
+                            });
+                        } // end if confirm
+                    } // end else when it is not cc payment
+                } // end if courseid > 0 && userid > 0 && sum > 0
+                else {
+                    $('#partial_err').html('Please select program and user and provide paid amount');
+                } // end else
+            });
+        } // end else
     }
 
     function search_slots_by_date() {
@@ -1690,31 +1748,44 @@ $(document).ready(function () {
 
         if (event.target.id == 'create_cert_button') {
             var courseid = $('#courses').val();
-            var userid = $('#users').val();
-            var s_m = $('#s_m').val();
-            var s_d = $('#s_d').val();
-            var s_y = $('#s_y').val();
-            var e_m = $('#e_m').val();
-            var e_d = $('#e_d').val();
-            var e_y = $('#e_y').val();
-            if (s_m > 0 && s_d > 0 && s_y > 0 && e_m > 0 && e_d > 0 && e_y > 0 && courseid > 0 && userid > 0) {
-                $('#print_err').html('');
-                var start = s_y + '-' + s_m + '-' + s_d;
-                var end = e_y + '-' + e_m + '-' + e_d;
-                $('#print_err').html('');
-                $('#ajax_loader').show();
-                console.log('Issue date: ' + start);
-                console.log('Expire date: ' + end);
-                var url = "/lms/custom/certificates/create_certificate.php";
-                $.post(url, {courseid: courseid, userid: userid, start: start, end: end}).done(function (data) {
-                    $('#ajax_loader').hide();
-                    get_certificates_page();
-                });
-            } // end if
-            else {
-                $('#print_err').html('Please select program, user and certificate dates');
-            }
+            var username = $('#users').val();
 
+            if (username == '') {
+                $('#print_err').html('Please select user');
+            } // end if username == '' 
+            else {
+                var url = "/lms/custom/utils/get_userid_by_fio.php";
+                $.post(url, {username: username}).done(function (userid) {
+
+                    var s_m = $('#s_m').val();
+                    var s_d = $('#s_d').val();
+                    var s_y = $('#s_y').val();
+                    var e_m = $('#e_m').val();
+                    var e_d = $('#e_d').val();
+                    var e_y = $('#e_y').val();
+                    console.log('Course ID: ' + courseid);
+                    console.log('User ID: ' + userid);
+                    if (s_m > 0 && s_d > 0 && s_y > 0 && e_m > 0 && e_d > 0 && e_y > 0 && courseid > 0 && userid > 0) {
+                        $('#print_err').html('');
+                        var start = s_y + '-' + s_m + '-' + s_d;
+                        var end = e_y + '-' + e_m + '-' + e_d;
+                        $('#print_err').html('');
+                        $('#ajax_loader').show();
+
+                        console.log('Issue date: ' + start);
+                        console.log('Expire date: ' + end);
+                        var url = "/lms/custom/certificates/create_certificate.php";
+                        $.post(url, {courseid: courseid, userid: userid, start: start, end: end}).done(function (data) {
+                            $('#ajax_loader').hide();
+                            get_certificates_page();
+                        });
+                    } // end if
+                    else {
+                        $('#print_err').html('Please select program, user and certificate dates');
+                    }
+
+                });
+            } // end else
         }
 
         if (event.target.id == 'send_cert') {

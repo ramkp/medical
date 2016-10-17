@@ -286,7 +286,7 @@ class Partial extends Util {
         $list.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='span8' id='enrolled_users'></span>";
         $list.="</div>";
 
-        $list.="<div class='container-fluid' style='text-align:left;display:none;' id='payment_options'>";
+        $list.="<div class='container-fluid' style='text-align:left;display:block;' id='payment_options'>";
 
         $list.="<span class='span3'><input type='radio' name='payment_type' class='ptype' value='cc' checked>Card payment</span>";
         $period = $this->get_renew_period_dropbox();

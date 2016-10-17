@@ -166,7 +166,7 @@ class Installment extends Util {
         $list.="<span class='span6' id='enrolled_users'></span>";
         $list.="</div>";
 
-        $list.="<div id='installment_params' style='display:none;'>";
+        $list.="<div id='installment_params' style='display:block;'>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span6'><span class='span3'>Payments num</span><span class='span4'><input type='text' id='inst_num' ></span></span>";
         $list.="</div></div>";

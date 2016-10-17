@@ -262,7 +262,7 @@ class Util {
     }
 
     function is_user_deleted($id) {
-        $query = "select deleted from mdl_user where id=$id";
+        $query = "select * from mdl_user where id=$id";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $status = $row['deleted'];
@@ -270,9 +270,64 @@ class Util {
         return $status;
     }
 
+    function get_userid_by_fio($data) {
+        //echo "Data: " . $data . "<br>";
+        $names_arr = explode(' ', $data);
+        //echo "Array <pre>";
+        //print_r($names_arr);
+        //echo "</pre><br>";
+        $firstname = $names_arr[1];
+        $lastname = $names_arr[0];
+
+        $query = "select * from mdl_user "
+                . "where firstname='$firstname' "
+                . "and lastname='$lastname'";
+        //echo "Query: " . $query . "<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
+    }
+
+    function create_course_users($id) {
+        $users = array();
+        //1. Get course context
+        //echo "Course id: " . $id . "<br>";
+        $instanceid = $this->get_course_context($id);
+
+        //2. Get course users
+        $query = "select id, roleid, contextid, userid "
+                . "from mdl_role_assignments "
+                . "where roleid=$this->student_role and contextid=$instanceid";
+        //echo "Query: ".$query."<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $userid = $row['userid'];
+                //echo "User id: " . $userid . "<br>";
+                $status = $this->is_user_deleted($userid);
+                //echo "Status: " . $status . "<br>";
+                if ($status == 0) {
+                    $user_detailes = $this->get_user_details($row['userid']);
+                    if ($user_detailes->lastname != '') {
+                        $users[] = mb_convert_encoding($user_detailes->lastname, 'UTF-8') . " " . mb_convert_encoding($user_detailes->firstname, 'UTF-8');
+                        //$users[] = "<span data-userid='" . $row['userid'] . "'>" . mb_convert_encoding($user_detailes->lastname, 'UTF-8') . " " . mb_convert_encoding($user_detailes->firstname, 'UTF-8') . "</span>";
+                    } // end if
+                } // end if $status==0
+            } // end while
+            //echo "<pre>";
+            //print_r($users);
+            //echo "</pre><br>";
+            file_put_contents("/home/cnausa/public_html/lms/custom/utils/$id.json", json_encode($users));
+        } // end if $num > 0
+    }
+
     function get_course_users($id, $output = true, $mutliple = false) {
         //echo "Course id: ".$id."<br>";
         //$mutliple=true; // temp workaround
+        $this->create_course_users($id);
         $list = "";
         $users = array();
         //1. Get course context
@@ -318,25 +373,26 @@ class Util {
         //echo "</pre><br>";
 
 
-        if (count($users) > 0) {
-            $list.="<span class='span3'>Enrolled users:</span><span class='span4'>";
-            if ($mutliple == true) {
-                $list.="<select id='users' multiple style='width:275px;'>";
-            } // end if $mutliple==true
-            else {
-                $list.="<select id='users' style='width:275px;'>";
-            }
 
+        $list.="<span class='span3'>Users:</span><span class='span4'>";
+        if ($mutliple == true) {
+            $list.="<select id='users' multiple style='width:275px;'>";
             $list.="<option value='0' selected>Select user</option>";
-            foreach ($users as $user) {
-                $user_details = $this->get_user_details($user->userid);
-                $list.="<option value='$user->userid'>" . ucfirst(strtolower(trim($user_details->lastname))) . " &nbsp;" . ucfirst(strtolower(trim($user_details->firstname))) . "</option>";
-            } // end foreach            
-            $list.="</select></span>";
-        } // end if count($users)>0
+            if (count($users) > 0) {
+                foreach ($users as $user) {
+                    $user_details = $this->get_user_details($user->userid);
+                    $list.="<option value='$user->userid'>" . ucfirst(strtolower(trim($user_details->lastname))) . " &nbsp;" . ucfirst(strtolower(trim($user_details->firstname))) . "</option>";
+                } // end foreach            
+                $list.="</select></span>";
+            } // end if count($users)>0
+            else {
+                $list.="<span class='span3'>Enrolled users:</span><span class='span4'>n/a</span>";
+            } // end else
+        } // end if $mutliple == true 
         else {
-            $list.="<span class='span3'>Enrolled users:</span><span class='span4'>n/a</span>";
+            $list.="<input type='text' id='users' class='typeahead’ autocomplete='off' spellcheck='false' style='width:265px;'>";
         }
+
         if ($output == true) {
             return $list;
         } // end if $output == true
@@ -347,6 +403,7 @@ class Util {
 
     function get_course_users2($id, $output = true, $mutliple = false) {
         $list = "";
+        $this->create_course_users($id);
         $users = array();
         //1. Get course context
         $instanceid = $this->get_course_context($id);
@@ -379,13 +436,7 @@ class Util {
 
         if (count($users) > 0) {
             $list.="<span class='span3'>Enrolled users:</span><span class='span4'>";
-            $list.="<select id='send_users' style='width:275px;'>";
-            $list.="<option value='0' selected>Select user</option>";
-            foreach ($users as $user) {
-                $user_details = $this->get_user_details($user->userid);
-                $list.="<option value='$user->userid'>" . ucfirst(strtolower(trim($user_details->lastname))) . " &nbsp;" . ucfirst(strtolower(trim($user_details->firstname))) . "</option>";
-            } // end foreach            
-            $list.="</select></span>";
+            $list.="<input type='text' id='send_users' class='typeahead’ autocomplete='off' spellcheck='false' style='width:265px;'>";
         } // end if count($users)>0
         else {
             $list.="<span class='span3'>Enrolled users:</span><span class='span4'>n/a</span>";
