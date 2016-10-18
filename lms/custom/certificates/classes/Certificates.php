@@ -446,7 +446,7 @@ class Certificates extends Util {
                 $list.="<body>";
                 $list.="<div class='cert'>";
                 $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy Certification the $day of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy Workshop Certification the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of hands-on clinical exam and written certification exam.
                         Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture, 
@@ -1413,7 +1413,7 @@ class Certificates extends Util {
                 $list.="<body>";
                 $list.="<div class='cert'>";
                 $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy Certification the $day of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy Workshop Certification the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of hands-on clinical exam and written certification exam.
                         Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture, 
