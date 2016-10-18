@@ -8,16 +8,23 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
+
+use Dompdf\Dompdf;
 
 class Dashboard extends Util {
 
     public $resolution_path;
     public $resolution_path2;
+    public $assignment_module;
+    public $assesment_path;
 
     function __construct() {
         parent::__construct();
         $this->resolution_path = 'https://' . $_SERVER['SERVER_NAME'] . '/lms/custom/my/get_screen_resolution.php';
         $this->resolution_path2 = $_SERVER['SERVER_NAME'];
+        $this->assignment_module = 1;
+        $this->assesment_path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/my";
     }
 
     function is_user_paid() {
@@ -839,6 +846,53 @@ class Dashboard extends Util {
 
 
         return $list;
+    }
+
+    function is_assignment_page() {
+        $querystring = $_SERVER['REQUEST_URI'];
+        $needle = "mod/assign/view.php";
+        $status = strpos($querystring, $needle);
+        if ($status !== FALSE) {
+            return 1;
+        }
+    }
+
+    function get_module_id() {
+        $querystring = $_SERVER['REQUEST_URI'];
+        parse_str($querystring, $output);
+        $id = $output['/lms/mod/assign/view_php?id'];
+        return $id;
+    }
+
+    function create_assignment_pdf($moduleid) {
+        $query = "select * from mdl_course_modules where id=$moduleid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $instanceid = $row['instance'];
+        }
+
+        $query = "select * from mdl_assign where id=$instanceid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $html = $row['intro'];
+        }
+
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+        $output = $dompdf->output();
+
+        $file_path = $this->assesment_path . "/assesment_$instanceid.pdf";
+        file_put_contents($file_path, $output);
+
+        $path = "https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/my/assesment_$instanceid.pdf";
+
+        return $path;
     }
 
 }

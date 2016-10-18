@@ -4,8 +4,6 @@ $(document).ready(function () {
     var domain = 'medical2.com';
     var dialog_loaded;
     console.log("ready!");
-
-
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
         $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='https://" + domain + "/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
@@ -20,7 +18,7 @@ $(document).ready(function () {
                 update_navigation_status__menu(price_obj.item_title);
                 $('#region-main').html(price_obj.item_data);
             } catch (e) {
-                // not json
+// not json
                 window.location = "https://medical2.com/login";
             }
 
@@ -308,12 +306,9 @@ $(document).ready(function () {
         var url = "/lms/custom/certificates/list.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-
             $.get('/lms/custom/utils/data.json', function (data) {
                 $("#search_certificate").typeahead({source: data, items: 24});
             }, 'json');
-
-
         });
     }
 
@@ -475,7 +470,6 @@ $(document).ready(function () {
             $.get('/lms/custom/utils/' + json_path, function (data) {
                 $("#users").typeahead({source: data, items: 27});
             }, 'json');
-
         });
     }
 
@@ -508,7 +502,6 @@ $(document).ready(function () {
     function send_invoice() {
         var courseid = $('#courses').val();
         var username = $('#users').val();
-
         if (username == '') {
             $('#invoice_status').html('Please provide username');
             return;
@@ -549,11 +542,9 @@ $(document).ready(function () {
         var url = "/lms/custom/invoices/paid_invoices.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-
             $.get('/lms/custom/utils/data.json', function (data) {
                 $("#search_invoice_input").typeahead({source: data, items: 24});
             }, 'json');
-
         });
     }
 
@@ -576,22 +567,18 @@ $(document).ready(function () {
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
-
         $.get('/lms/custom/utils/data.json', function (data) {
             $("#search_payment").typeahead({source: data, items: 24});
         }, 'json');
-
     }
 
     function get_check_payments_page() {
         var url = "/lms/custom/payments/get_cheque_payments.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-
             $.get('/lms/custom/utils/data.json', function (data) {
                 $("#search_payment").typeahead({source: data, items: 24});
             }, 'json');
-
         });
     }
 
@@ -607,11 +594,9 @@ $(document).ready(function () {
         var url = "/lms/custom/payments/get_card_payments.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-
             $.get('/lms/custom/utils/data.json', function (data) {
                 $("#search_payment").typeahead({source: data, items: 24});
             }, 'json');
-
         });
     }
 
@@ -619,11 +604,9 @@ $(document).ready(function () {
         var url = "/lms/custom/payments/get_free_payments.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-
             $.get('/lms/custom/utils/data.json', function (data) {
                 $("#search_payment").typeahead({source: data, items: 24});
             }, 'json');
-
         });
     }
 
@@ -699,7 +682,6 @@ $(document).ready(function () {
 
     function add_installment_user() {
         var username = $('#users').val();
-
         if (username == '') {
             $('#add_inst_user_status').html("<span style='color:red;'>Please provide user</span>");
             return;
@@ -731,7 +713,7 @@ $(document).ready(function () {
     function send_certicicate_to_user() {
         var courseid = $('#send_courses').val();
         var username = $('#send_users').val();
-        console.log('User name: '+username);
+        console.log('User name: ' + username);
         if (username == '') {
             $('#send_cert_err').html("<span style='color:red;'>Please provide user</span>");
             return;
@@ -739,8 +721,8 @@ $(document).ready(function () {
         else {
             var url = "/lms/custom/utils/get_userid_by_fio.php";
             $.post(url, {username: username}).done(function (userid) {
-                console.log('Course ID: '+courseid);
-                console.log('User ID: '+userid);
+                console.log('Course ID: ' + courseid);
+                console.log('User ID: ' + userid);
                 if (userid > 0 && courseid > 0) {
                     var url = "/lms/custom/certificates/get_course_completion.php";
                     $.post(url, {userid: userid, courseid: courseid}).done(function (completion_date) {
@@ -1264,7 +1246,6 @@ $(document).ready(function () {
     function get_partial_payments_section() {
         var courseid = $('#register_courses').val();
         var username = $('#users').val();
-
         if (username == '') {
             $('#partial_err').html('Please provide user');
             return;
@@ -1276,7 +1257,6 @@ $(document).ready(function () {
                 var slotid = $('#register_cities').val();
                 var ptype = $('input[name=payment_type]:checked').val();
                 var period = 0;
-
                 if ($('#renew').prop('checked')) {
                     period = $('#renew_period').val();
                     if (period == 0) {
@@ -1489,12 +1469,15 @@ $(document).ready(function () {
     $('#region-main').on('click', 'button', function (event) {
         console.log("Item clicked: " + event.target.id);
 
-        /*
-         if (event.target.id == 'relogin') {
-         console.log('Inside relogin ...');
-         document.location.reload();
-         }
-         */
+
+        if (event.target.id == 'print_assignment') {
+            var moduleid = $('#print_assignment').data('moduleid');
+            var url = "/lms/custom/my/get_assignment_pdf.php";
+            $.post(url, {moduleid: moduleid}).done(function (url) {
+                var oWindow = window.open(url, "print");
+            });
+        }
+
 
         if (event.target.id == 'year_stat') {
             var year1 = $('#stat_year1').val();
@@ -1525,11 +1508,9 @@ $(document).ready(function () {
             var year = $('#stat_month_year').val();
             var month1 = $('#stat_month1').val();
             var month2 = $('#stat_month2').val();
-
             console.log('Year: ' + year);
             console.log('Month1: ' + month1);
             console.log('Month1: ' + month2);
-
             if (year == 0 || month1 == 0 || month2 == 0) {
                 $('#report_month_data').html("<span style='color:red;'>Please select year and months to be compared</span>");
             } // end if
@@ -1549,7 +1530,7 @@ $(document).ready(function () {
             } // end else
         }
 
-        // Save price item
+// Save price item
         if (event.target.id.indexOf("price_") >= 0) {
             update_item_price(event.target.id);
         }
@@ -1638,7 +1619,6 @@ $(document).ready(function () {
             var client = $('#invoice_client').val();
             var amount = $('#invoice_amount').val();
             var email = $('#invoice_email').val();
-
             if (courseid > 0 && amount != '' && email != '' && client != '') {
                 $('#any_invoice_status').html('');
                 if (confirm('Send invoice?')) {
@@ -1680,7 +1660,6 @@ $(document).ready(function () {
             var oEditor = FCKeditorAPI.GetInstance('editor');
             var data = oEditor.GetHTML();
             console.log('Editor data: ' + data);
-
             if (data == '') {
                 $('#prom_err').html('Please provide message text');
             } else {
@@ -1749,7 +1728,6 @@ $(document).ready(function () {
         if (event.target.id == 'create_cert_button') {
             var courseid = $('#courses').val();
             var username = $('#users').val();
-
             if (username == '') {
                 $('#print_err').html('Please select user');
             } // end if username == '' 
@@ -1771,7 +1749,6 @@ $(document).ready(function () {
                         var end = e_y + '-' + e_m + '-' + e_d;
                         $('#print_err').html('');
                         $('#ajax_loader').show();
-
                         console.log('Issue date: ' + start);
                         console.log('Expire date: ' + end);
                         var url = "/lms/custom/certificates/create_certificate.php";
@@ -1962,7 +1939,6 @@ $(document).ready(function () {
     $('#region-main').on('click', 'checkbox', function (event) {
         console.log('Event: ' + event);
     });
-
     function get_refund_modal_dialog() {
         //console.log('Refund modal dialog ...');
         if (dialog_loaded !== true) {
@@ -2062,7 +2038,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'labels') {
-            //console.log('Print labels from Workshop Schedule page ...');
+//console.log('Print labels from Workshop Schedule page ...');
             var selected = new Array();
             $("input:checked").each(function () {
                 if ($(this).val() != '') {
@@ -2257,7 +2233,7 @@ $(document).ready(function () {
     }); // end of $('#region-main').on('click', 'a'
 
     $(document).on('change', '[type=checkbox]', function (event) {
-        //console.log('Event id: ' + event.target.id);
+//console.log('Event id: ' + event.target.id);
         var courseid = event.target.id.replace('installment_', '');
         var installment_el = '#installment_' + courseid;
         //console.log('Installment: ' + installment_el);
@@ -2292,7 +2268,7 @@ $(document).ready(function () {
     });
     $('#region-main').on('change', 'select', function (event) {
 
-        //console.log(event.target.id);
+//console.log(event.target.id);
 
         if (event.target.id == 'invoice_categories') {
             var id = $('#invoice_categories').val();
@@ -2323,7 +2299,6 @@ $(document).ready(function () {
         if (event.target.id == 'send_courses') {
             var id = $('#send_courses').val();
             get_course_users2(id);
-
         }
 
         if (event.target.id == 'workshops') {
@@ -2410,14 +2385,10 @@ $(document).ready(function () {
         var url = "/lms/custom/users/get_users_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-
             $.get('/lms/custom/utils/data.json', function (data) {
                 $('#search_user_input').typeahead({source: data, items: 24});
             }, 'json');
-
         });
-
-
     }
 
     function search_user_by_email() {
@@ -2451,7 +2422,6 @@ $(document).ready(function () {
         $.post(url, {id: 1}).done(function (data) {
 //console.log(data);
             $('#region-main').html(data);
-
             $.get('/lms/custom/utils/data.json', function (data) {
                 $("#search_partial").typeahead({source: data, items: 24});
             }, 'json');
@@ -2466,7 +2436,7 @@ $(document).ready(function () {
     }
 
     function get_refund_page() {
-        //console.log('It is refund page ...');
+//console.log('It is refund page ...');
         var url = "/lms/custom/payments/get_refund_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
@@ -2483,7 +2453,6 @@ $(document).ready(function () {
     $("#prices").click(function (event) {
         get_price_items_from_category(event.target.id);
     });
-
     $("#index").click(function (event) {
         update_navigation_status__menu('Index page');
         get_index_page();
@@ -2508,7 +2477,6 @@ $(document).ready(function () {
         update_navigation_status__menu('Promotions');
         get_promotion_page();
     });
-
     $("#Testimonial").click(function (event) {
         update_navigation_status__menu('Testimonial');
         get_testimonial_page();
@@ -2576,12 +2544,10 @@ $(document).ready(function () {
         update_navigation_status__menu('Free');
         get_free_payments();
     });
-
     $("#program_reports").click(function (event) {
         update_navigation_status__menu('Program reports');
         get_program_report();
     });
-
     $("#revenue_reports").click(function (event) {
         update_navigation_status__menu('Revenue reports');
         get_revenue_report();
@@ -2618,7 +2584,6 @@ $(document).ready(function () {
         update_navigation_status__menu('Partial payments');
         get_partial_payments_page();
     });
-
     $("#cash_report").click(function () {
         update_navigation_status__menu('Cash report');
         var url = "/lms/custom/reports/get_cash_report.php";
@@ -2626,7 +2591,6 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     });
-
     $("#cheque_report").click(function () {
         update_navigation_status__menu('Cheque report');
         var url = "/lms/custom/reports/get_cheque_report.php";
@@ -2634,7 +2598,6 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     });
-
     $("#search_partial_button").click(function () {
         var item = $('#search_partial').val();
         if (item != '') {
@@ -2648,7 +2611,6 @@ $(document).ready(function () {
             $('#partial_err').html('Please provide search criteria');
         }
     });
-
     $("#permissions").click(function () {
         update_navigation_status__menu('Permissions');
         var url = "/lms/custom/reports/get_permissions_page.php";
@@ -2656,7 +2618,6 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     });
-
     $("#faq").click(function () {
         console.log('FAQ function ...');
         update_navigation_status__menu('FAQ');
@@ -2667,7 +2628,6 @@ $(document).ready(function () {
             $('#region-main').html(data);
         });
     });
-
     /************************************************************************
      * 
      *      Code related to courses selection by logged students
@@ -2761,7 +2721,6 @@ $(document).ready(function () {
             assign_user_to_course();
         }
     });
-
     $('#make_college_strudent_partial_payment').on('click', function () {
         var courseid = $('#courseid').val();
         var userid = $('#userid').val();
@@ -2777,7 +2736,6 @@ $(document).ready(function () {
         }
 
     });
-
     $("body").click(function (event) {
 
         //console.log('Element clicked: ' + event.target.id);
@@ -2796,7 +2754,6 @@ $(document).ready(function () {
             }).fail(function () {
                 console.log('Failed to load bootstrap.min.js');
             });
-
         }
 
 
@@ -2820,7 +2777,6 @@ $(document).ready(function () {
             }).fail(function () {
                 console.log('Failed to load bootstrap.min.js');
             });
-
         }
 
         if (event.target.id == 'add_faq') {
@@ -2869,7 +2825,6 @@ $(document).ready(function () {
                     $('#region-main').html(data);
                 });
             });
-
         }
 
         if (event.target.id.indexOf("del_slot_") >= 0) {
@@ -3003,10 +2958,8 @@ $(document).ready(function () {
                 var old_pwd = $('#old_pwd').val();
                 var new_pwd1 = $('#new_pwd1').val();
                 var new_pwd2 = $('#new_pwd2').val();
-
                 console.log('New pwd1: ' + new_pwd1);
                 console.log('New pwd2:' + new_pwd2);
-
                 if (old_pwd == '' || new_pwd1 == '' || new_pwd2 == '') {
                     $('#pwd_err').html('All fields are required');
                 } // end if old_pwd == '' || new_pwd1 == '' || new_pwd2 == ''
