@@ -272,16 +272,24 @@ class Util {
 
     function get_userid_by_fio($data) {
         //echo "Data: " . $data . "<br>";
-        $names_arr = explode(' ', $data);
+        $names_arr = explode(' ', trim($data));
         //echo "Array <pre>";
         //print_r($names_arr);
         //echo "</pre><br>";
         $firstname = $names_arr[1];
+        if ($firstname == '') {
+            $firstname = $names_arr[2];
+        }
         $lastname = $names_arr[0];
-
         $query = "select * from mdl_user "
                 . "where firstname='$firstname' "
                 . "and lastname='$lastname'";
+        $num = $this->db->numrows($query);
+        if ($num == 0) {
+            $query = "select * from mdl_user "
+                    . "where firstname like '%$firstname%' "
+                    . "and lastname like '%$lastname%'";
+        } // end if
         //echo "Query: " . $query . "<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
