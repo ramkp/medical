@@ -126,25 +126,28 @@ class navClass extends Util {
                                     <li><a href='#' id='refund' title='Refund'>Refund payments</a></li>                                                                      
                                 </ul>
                             </li>                            
-                            <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
+                            <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                   
-                                    <li><a href='#' title='About' id='about'>About page</a></li>
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
-                                    <li><a href='#' title='FAQ' id='faq'>FAQ</a></li>
-                                    <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>View User</a></li>
                                     <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
-                                    
-                                    <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>                                    
-                                    <li><a href='#' title='Google Map' id='contact_page'>Contact Page</a></li>
                                     <li><a href='#' title='Google Map' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
-                                    <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
-                                    <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>                                     
                                 </ul>
                             </li>
+                            <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Manage Site Pages<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' title='About' id='about'>About page</a></li>
+                                     <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
+                                    <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
+                                    <li><a href='#' title='FAQ' id='faq'>FAQ</a></li>
+                                    <li><a href='#' title='Index page' id='index'>Index page</a></li>
+                                    <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>
+                                    <li><a href='#' title='Terms' id='terms'>Terms & Conditions</a></li> 
+                                </ul>
+                            </li> 
                             <li class='dropdown'><a title='Account' class='dropdown-toggle' href='#cm_submenu_2'>Account<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                
                                     <li><a href='/lms/user/profile.php?id=$userid' title='Profile'>Profile</a></li>                                    
@@ -218,27 +221,30 @@ class navClass extends Util {
                                     
                                 </ul>
                             </li>                            
-                            <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>More<b class='caret'></b></a>
+                            <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
-                                    <li><a href='#' title='Index page' id='index'>Index page</a></li>
-                                    <li><a href='#' title='About' id='about'>About page</a></li>
                                     <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
-                                    <li><a href='#' title='Users Feedback' id='feedback'>Users Feedback</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>View User</a></li>
                                     <li><a href='#' title='Renew fee' id='renew_fee'>Renew Fee</a></li>
                                     <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
-                                    <li><a href='#' title='FAQ' id='faq'>FAQ</a></li>
-                                    <li><a href='#' title='Groups' id='Groups'>Private Groups</a></li>
-                                    <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
-                                    <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
-                                    <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>                                     
                                 </ul>
                             </li>
+                            <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Manage Site Pages<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' title='About' id='about'>About page</a></li>
+                                     <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
+                                    <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
+                                    <li><a href='#' title='FAQ' id='faq'>FAQ</a></li>
+                                    <li><a href='#' title='Index page' id='index'>Index page</a></li>
+                                    <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>
+                                    <li><a href='#' title='Terms' id='terms'>Terms & Conditions</a></li> 
+                                </ul>
+                            </li>    
                             <li class='dropdown'><a title='Account' class='dropdown-toggle' href='#cm_submenu_2'>Account<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                
                                     <li><a href='/lms/user/profile.php?id=$userid' title='Profile'>Profile</a></li>                                    

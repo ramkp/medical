@@ -60,6 +60,20 @@ $(document).ready(function () {
         });
     }
 
+    function update_terms_page(data) {
+        var url = "/lms/custom/terms/update_terms.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully saved. </p>");
+        });
+    }
+
+    function get_terms_page() {
+        var url = "/lms/custom/terms/get_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     function update_testimonial_page(data) {
         var url = "/lms/custom/testimonial/edit.php";
         $.post(url, {data: data}).done(function () {
@@ -1562,6 +1576,12 @@ $(document).ready(function () {
             update_about_page(data);
         }
 
+        if (event.target.id.indexOf("_terms") >= 0) {
+            var oEditor = FCKeditorAPI.GetInstance('editor');
+            var data = oEditor.GetHTML();
+            update_terms_page(data);
+        }
+
         if (event.target.id.indexOf("_test") >= 0) {
             var oEditor = FCKeditorAPI.GetInstance('editor');
             var data = oEditor.GetHTML();
@@ -2496,6 +2516,12 @@ $(document).ready(function () {
         update_navigation_status__menu('Testimonial');
         get_testimonial_page();
     });
+
+    $("#terms").click(function (event) {
+        update_navigation_status__menu('Terms and Conditions');
+        get_terms_page();
+    });
+
     $("#Photo_Gallery").click(function (event) {
         update_navigation_status__menu('Photo Gallery');
         get_gallery_index_page();
