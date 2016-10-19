@@ -474,8 +474,7 @@ $(document).ready(function () {
         }
 
         if (group_request == '') {
-            $('#private_err').html('Please provide request ');
-            return false;
+            group_request = 'n/a';
         }
 
         var url = "/functionality/php/submit_private_group_request.php";
@@ -561,7 +560,7 @@ $(document).ready(function () {
         var courseid = $('#courseid').val();
         var participants = $('#participants').val();
         var cvv = $('#bill_cvv').val();
-        var renew=$('#renew').val();
+        var renew = $('#renew').val();
         var state = $('#bill_state').val();
         if (card_type == 'Card type') {
             $('#personal_payment_err').html('Please select card type');
@@ -660,7 +659,7 @@ $(document).ready(function () {
                 bill_city: bill_city,
                 bill_zip: bill_zip,
                 state: state,
-                renew:renew,
+                renew: renew,
                 user_group: user_group,
                 bill_email: bill_email};
             var url = "https://" + domain + "/functionality/php/make_stub_payment.php";
@@ -1245,8 +1244,8 @@ $(document).ready(function () {
         var phone = $('#phone').val();
         var message = $('#message').val();
         var captcha = $('#captcha').val();
-        var program=$('#program').val();
-        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && message != '' && captcha != '' && program!=0) {
+        var program = $('#program').val();
+        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && message != '' && captcha != '' && program != 0) {
             var url = "https://" + domain + "/functionality/php/verify_captcha.php";
             var request = {captcha: captcha};
             $.post(url, request).done(function (data) {
@@ -1260,7 +1259,7 @@ $(document).ready(function () {
                     $('#message').val('');
                     $('#captcha').val('');
                     var url = "https://" + domain + "/functionality/php/send_contact_request.php";
-                    var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message, program:program};
+                    var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message, program: program};
                     $.post(url, request).done(function (data) {
                         $('#contact_result').html("<span style='color:red;'>" + data + "</span>");
                     });
@@ -2069,15 +2068,15 @@ $(document).ready(function () {
                     $('#personal_err').html('Please provide phone');
                     return;
                 }
-                
+
                 /*
-                if (phone != '') {
-                    if (!$.isNumeric(phone) || phone.length < 9) {
-                        $('#personal_err').html('Please enter the valid phone number without any symbols and spaces.');
-                        return;
-                    } // end if
-                } // end if
-                */
+                 if (phone != '') {
+                 if (!$.isNumeric(phone) || phone.length < 9) {
+                 $('#personal_err').html('Please enter the valid phone number without any symbols and spaces.');
+                 return;
+                 } // end if
+                 } // end if
+                 */
 
                 if (email == '') {
                     $('#personal_err').html('Please provide email');
@@ -2134,8 +2133,8 @@ $(document).ready(function () {
                 var request = {email: email};
                 $.post(url, request).done(function (data) {
                     console.log('Server email exists response: ' + data);
-                    
-                    
+
+
                     if (data > 0) {
                         $('#personal_err').html('Email is already in use');
                     } // end if data>0

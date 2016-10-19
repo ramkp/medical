@@ -95,7 +95,7 @@ class Groups_model extends CI_Model {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Program*</span>";
         $list.="<span class='span2'>$courses</span>";
-        $list.="<span class='span2' >Special Request*</span>";
+        $list.="<span class='span2' >Special Request</span>";
         $list.="<span class='span2'><textarea rows='5' name='text' id='group_request' name='group_request'></textarea></span>";
         $list.="</div>"; // end of container-fluid
 
