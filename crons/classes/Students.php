@@ -1781,8 +1781,8 @@ class Students {
         $query = "select * from mdl_user where deleted=0";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $lastname[] = mb_convert_encoding($row['lastname'], 'UTF-8');
-            $firstname[] = mb_convert_encoding($row['firstname'], 'UTF-8');
+            $lastname[] = mb_convert_encoding(trim($row['lastname']), 'UTF-8');
+            $firstname[] = mb_convert_encoding(trim($row['firstname']), 'UTF-8');
             $users[] = mb_convert_encoding($row['lastname'], 'UTF-8') . " " . mb_convert_encoding($row['firstname'], 'UTF-8');
             $emails[] = mb_convert_encoding($row['email'], 'UTF-8');
             $phones[]=mb_convert_encoding($row['phone1'], 'UTF-8');
