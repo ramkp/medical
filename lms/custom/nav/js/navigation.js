@@ -119,20 +119,30 @@ $(document).ready(function () {
     }
 
     function add_user_to_slot() {
-        var userid = $('#users').val();
         var slotid = $('#slots').val();
-        console.log('User ID: ' + userid);
-        console.log('Slot ID:' + slotid);
-        if (userid > 0 && slotid > 0) {
-            var url = "/lms/custom/schedule/add_user_to_slot.php";
-            $.post(url, {slotid: slotid, userid: userid}).done(function (data) {
-                console.log('Server response: ' + data);
-                document.location.reload();
-            });
-        } // end if userid>0 && slotid>0
+        var username = $('#users').val();
+
+        if (username == '') {
+            alert('Please slelect student and workshop!');
+            return;
+        } // end if
         else {
-            alert('Please sleect student and workshop!');
-        }
+            var url = "/lms/custom/utils/get_userid_by_fio.php";
+            $.post(url, {username: username}).done(function (userid) {
+                console.log('User ID: ' + userid);
+                console.log('Slot ID:' + slotid);
+                if (userid > 0 && slotid > 0) {
+                    var url = "/lms/custom/schedule/add_user_to_slot.php";
+                    $.post(url, {slotid: slotid, userid: userid}).done(function (data) {
+                        console.log('Server response: ' + data);
+                        document.location.reload();
+                    });
+                } // end if userid>0 && slotid>0
+                else {
+                    alert('Please slelect student and workshop!');
+                }
+            });
+        } // end else
     }
 
     function refresh_gallery_thumbs() {
@@ -651,6 +661,11 @@ $(document).ready(function () {
                         $.post(url, request).done(function (data) {
                             $("body").append(data);
                             $("#myModal").modal('show');
+
+                            $.get('/lms/custom/utils/data.json', function (data) {
+                                $('#users').typeahead({source: data, items: 24});
+                            }, 'json');
+
                         });
                     })
                     .fail(function () {
