@@ -2990,6 +2990,15 @@ $(document).ready(function () {
                 $('#region-main').html(data);
             });
         }
+        
+        if (event.target.id == 'register_user') {
+            update_navigation_status__menu('Register User');
+            var url = "/lms/custom/register/get_register_form.php";
+            var request = {id: 1};
+            $.post(url, request).done(function (data) {
+                $('#region-main').html(data);
+            });
+        }
 
         if (event.target.id == 'update_refund_pwd') {
             var url = "/lms/custom/payments/get_old_refund_pwd.php";
@@ -3223,7 +3232,7 @@ $(document).ready(function () {
             }); // end of post
         }
 
-
+        
 
 
     }); // end of body click event
