@@ -576,6 +576,18 @@ $(document).ready(function () {
         var url = "/lms/custom/installment/get_installment_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+
+            $.get('/lms/custom/utils/courses.json', function (data) {
+                $("#installment_program").typeahead({source: data, items: 24});
+            }, 'json');
+
+            $.get('/lms/custom/utils/data.json', function (data) {
+                $("#installment_user ").typeahead({source: data, items: 24});
+            }, 'json');
+
+            $('#subs_start').datepicker();
+            $('#subs_exp').datepicker();
+
         });
     }
 
@@ -2990,7 +3002,7 @@ $(document).ready(function () {
                 $('#region-main').html(data);
             });
         }
-        
+
         if (event.target.id == 'register_user') {
             update_navigation_status__menu('Register User');
             var url = "/lms/custom/register/get_register_form.php";
@@ -3232,8 +3244,132 @@ $(document).ready(function () {
             }); // end of post
         }
 
-        
 
+        if (event.target.id == 'add_subs_button') {
+            var coursename = $('#installment_program').val();
+            var user = $('#installment_user').val();
+            var amount = $('#amount').val();
+            var start = $('#subs_start').val();
+            var end = $('#subs_exp').val();
+            var holder = $('#card_holder').val();
+            var card_no = $('#card_no').val();
+            var cvv = $('#cvv').val();
+            var card_year = $('#card_year').val();
+            var card_month = $('#card_month').val();
+            var addr = $('#subs_addr').val();
+            var city = $('#subs_city').val();
+            var state = $('#subs_state').val();
+            var zip = $('#subs_zip').val();
+            var email = $('#subs_email').val();
+            var phone = $('#subs_phone').val();
+
+            console.log('Address :' + addr);
+
+            if (coursename == '') {
+                $('#subs_err').html('Please select program');
+                return;
+            }
+
+            if (user == '') {
+                $('#subs_err').html('Please select user');
+                return;
+            }
+
+            if (amount == '') {
+                $('#subs_err').html('Please provide program fee');
+                return;
+            }
+
+            if (start == '') {
+                $('#subs_err').html('Please select subscription start');
+                return;
+            }
+
+            if (end == '') {
+                $('#subs_err').html('Please select subscription expiration');
+                return;
+            }
+
+            if (addr == '') {
+                $('#subs_err').html('Please provide your address');
+                return;
+            }
+
+            if (city == '') {
+                $('#subs_err').html('Please provide your city');
+                return;
+            }
+
+            if (state == 0) {
+                $('#subs_err').html('Please select state');
+                return;
+            }
+
+            if (zip == '') {
+                $('#subs_err').html('Please provide zip');
+                return;
+            }
+
+            if (email == '') {
+                $('#subs_err').html('Please provide email');
+                return;
+            }
+
+            if (phone == '') {
+                $('#subs_err').html('Please provide phone');
+                return;
+            }
+
+            if (holder == '') {
+                $('#subs_err').html('Please provide cardholder name');
+                return;
+            }
+
+            if (card_no == '') {
+                $('#subs_err').html('Please provide card number');
+                return;
+            }
+
+            if (cvv == '') {
+                $('#subs_err').html('Please provide cvv code');
+                return;
+            }
+
+            if (card_year == '--' || card_month == '--') {
+                $('#subs_err').html('Please put expiration');
+                return;
+            }
+
+            $('#subs_err').html('');
+
+            var subs = {
+                coursename: coursename,
+                user: user,
+                amount: amount,
+                start: start,
+                end: end,
+                addr: addr,
+                city: city,
+                state: state,
+                zip: zip,
+                email: email,
+                phone: phone,
+                holder: holder,
+                card_no: card_no,
+                cvv: cvv,
+                card_year: card_year,
+                card_month: card_month
+            };
+
+            $('#ajax_loader').show();
+            var url = "/lms/custom/installment/create_subs.php";
+            var request = {subs: JSON.stringify(subs)};
+            $.post(url, request).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#subs_err').html("<span style='color:black'>" + data + "</span>");
+            });
+
+        }
 
     }); // end of body click event
 
