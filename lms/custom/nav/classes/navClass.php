@@ -143,7 +143,6 @@ class navClass extends Util {
                                      <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
                                     <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
                                     <li><a href='#' title='FAQ' id='faq'>FAQ</a></li>
-                                    <li><a href='#' title='Index page' id='index'>Index page</a></li>
                                     <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>
                                     <li><a href='#' title='Terms' id='terms'>Terms & Conditions</a></li> 
                                 </ul>

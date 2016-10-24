@@ -699,9 +699,18 @@ class Invoices extends Util {
         $data = explode(' ', $item);
         $firstname = $data[1];
         $lastname = $data[0];
+        if ($firstname == '') {
+            $firstname = $data[2];
+        }
         $query = "select id from mdl_user "
                 . "where (firstname='$firstname' and lastname='$lastname') "
                 . "or email like '%$item%' and deleted=0";
+        $num = $this->db->numrows($query);
+        if ($num == 0) {
+            $query = "select id from mdl_user "
+                    . "where (firstname like '%$firstname%') "
+                    . "or email like '%$item%' and deleted=0";
+        }
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);

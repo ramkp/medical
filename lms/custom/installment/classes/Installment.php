@@ -5,177 +5,45 @@
  *
  * @author sirromas
  */
-//require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 require_once ('/home/cnausa/public_html/lms/custom/utils/classes/Util.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/register/classes/Register.php';
 
 class Installment extends Util {
 
     public $limit = 3;
     public $period = 28; // installment period in days
 
+    function __construct() {
+        parent::__construct();
+    }
+
     function get_installment_page() {
         $list = "";
-        if ($this->session->justloggedin == 1) {
-            $users = array();
-            $query = "select * from mdl_installment_users order by id asc limit 0, $this->limit";
-            $num = $this->db->numrows($query);
-            if ($num > 0) {
-                $result = $this->db->query($query);
-                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $user = new stdClass();
-                    foreach ($row as $key => $value) {
-                        $user->$key = $value;
-                    } // end foreach 
-                    $users[] = $user;
-                } /// end while
-            } // end if $num > 0        
-            $list.= $this->create_installment_page($users);
-        } // end if
-        else {
-            $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
-        } // end else
+        $r = new Register();
+        $form = $r->get_register_form();
 
-        return $list;
-    }
+        $list.="<ul class='nav nav-tabs'>
+          <li class='active'><a data-toggle='tab' href='#home'><h5>Installment users</h5></a></li>
+          <li><a data-toggle='tab' href='#menu1'><h5>Register user</h5></a></li>
+          <li><a data-toggle='tab' href='#menu2'><h5>Add subscription</h5></a></li>
+        </ul>
 
-    function get_course_name($courseid) {
-        $query = "select fullname from mdl_course where id=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $name = $row['fullname'];
-        }
-        return $name;
-    }
+        <div class='tab-content'>
+          
+         <div id='home' class='tab-pane fade in active'>
+            <p>Installment users</p>
+          </div>
+        
+          <div id='menu1' class='tab-pane fade'>
+            <p>$form</p>
+          </div>
+        
+          <div id='menu2' class='tab-pane fade'>
+            <p>Add subscription</p>
+          </div>
 
-    function create_installment_page($users, $toolbar = true) {
-        $list = "";
-        //print_r($users);
-        //echo "<br>";
-        //echo "Toolbar: ".$toolbar;
-        if (count($users) > 0) {
-            $list.="<div id='installment_users_container'>";
-            foreach ($users as $user) {
-                $userdata = $this->get_user_details($user->userid);
-                $coursename = $this->get_course_name($user->courseid);
-                if ($user->modifierid == 0) {
-                    $modifier = new stdClass();
-                    $modifier->firstname = 'Super';
-                    $modifier->lastname = 'Admin';
-                } // end if $user->modifierid==0
-                else {
-                    $modifier = $this->get_user_details($user->modifierid);
-                } // end else 
-                $date_created = date('Y-m-d', $user->created);
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span4' id='inst_status_$user->id'></span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>User firstname</span><span class='span2'>$userdata->firstname</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>User lastname</span><span class='span2'>$userdata->lastname</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>User email</span><span class='span2'>$userdata->email</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>User program</span><span class='span4'>$coursename</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>Installment duration</span><span class='span2'>$this->period days</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>Installment payments num</span><span class='span2'>$user->num</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>Installment Interval</span><span class='span2'>" . round($this->period / $user->num) . " days</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>Installment sum</span><span class='span2'>$$user->sum</span>";
-                $list.="</div>";
+        </div>";
 
-                if ($user->subscription_id != '') {
-                    $list.="<div class='container-fluid'>";
-                    $list.="<span class='span3'>Subscription ID</span><span class='span2'>$user->subscription_id</span>";
-                    $list.="</div>";
-                    $list.="<div class='container-fluid'>";
-                    $list.="<span class='span3'>Subscription start date</span><span class='span2'>" . date('Y-m-d', $user->subscription_start) . "</span>";
-                    $list.="</div>";
-                } // end if $user->subscription_id!=''
-
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>Created by</span><span class='span2'>$modifier->firstname &nbsp;$modifier->lastname</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span3'>Creation date</span><span class='span2'>$date_created</span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span7'><hr/></span>";
-                $list.="</div>";
-            } // end foreach 
-            $list.="</div>";
-            if ($toolbar == true) {
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span9'  id='pagination'></span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span6'><a href='#' onClick='return false;' id='add_installment_user'>Add Installment User</a></span>";
-                $list.="</div>";
-                $list.=$this->get_add_installment_user_page();
-            }
-        } // end if count($users)>0
-        else {
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span4'>No installment users found</span>";
-            $list.="</div>";
-            if ($toolbar == true) {
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span9'  id='pagination'></span>";
-                $list.="</div>";
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span6'><a href='#' onClick='return false;' id='add_installment_user'>Add Installment User</a></span>";
-                $list.="</div>";
-                $list.=$this->get_add_installment_user_page();
-            }
-            $list.=$this->get_add_installment_user_page();
-        }
-        return $list;
-    }
-
-    function get_total_installment_users() {
-        $query = "select * from mdl_installment_users ";
-        $num = $this->db->numrows($query);
-        return $num;
-    }
-
-    function get_add_installment_user_page() {
-        $list = "";
-        $program_types = $this->get_course_categories();
-        $list.="<div id='add_installment_user_container' style='display:none;'>";
-        $list.="<div class='container-fluid'>";
-
-        $list.="<span class='span6' id='add_inst_user_status'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>$program_types</span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6' id='category_courses'></span>";
-        $list.="</div>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6' id='enrolled_users'></span>";
-        $list.="</div>";
-
-        $list.="<div id='installment_params' style='display:block;'>";
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'><span class='span3'>Payments num</span><span class='span4'><input type='text' id='inst_num' ></span></span>";
-        $list.="</div></div>";
-
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'><button type='button' id='add_installment_user' class='btn btn-primary'>Add User</button></span>";
-        $list.="</div>";
-
-        $list.="</div>";
         return $list;
     }
 
@@ -234,56 +102,6 @@ class Installment extends Util {
         $this->db->query($query);
         $list = "User successfully added";
         return $list;
-    }
-
-    function get_course_cost($courseid) {
-        $query = "select * from mdl_course where id=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $cost = $row['cost'];
-        }
-        return $cost;
-    }
-
-    function get_user_card_payments($userid, $courseid) {
-        $sum = 0;
-        $query = "select * from mdl_card_payments "
-                . "where "
-                . "userid=$userid "
-                . "and courseid=$courseid";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $sum = $sum + $row['psum'];
-            } // end while 
-        } // end if $num > 0
-        return $sum;
-    }
-
-    function verify_installment_users() {
-        $query = "select * from mdl_installment_users";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $course_cost = $this->get_course_cost($row['courseid']);
-                $paid_sum = $this->get_user_card_payments($row['userid'], $row['courseid']);
-                if ($paid_sum == $course_cost) {
-                    $query = "delete from mdl_installment_users "
-                            . "where  userid=" . $row['userid'] . ""
-                            . " and courseid=" . $row['courseid'] . "";
-                    $this->db->numrows($query);
-                    echo "User with ID (" . $row['userid'] . ") hase been deleted from installment users \n";
-                } // end if $paid_sum == $course_cost
-                else {
-                    echo "User with ID (" . $row['userid'] . ") is not yet paid in full for course with ID (" . $row['courseid'] . ")";
-                } // end elese 
-            } // end while
-        } // end if $num>0
-        else {
-            echo "There are no installment users available ....\n";
-        }
     }
 
 }

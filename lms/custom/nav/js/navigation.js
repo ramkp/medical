@@ -153,7 +153,7 @@ $(document).ready(function () {
                     });
                 } // end if userid>0 && slotid>0
                 else {
-                    alert('Please slelect student and workshop!');
+                    alert('Please select student and workshop!');
                 }
             });
         } // end else
@@ -3114,6 +3114,117 @@ $(document).ready(function () {
                 $('#any_invoice_users_err').html("<span style='color:red;'>Please select users</span>");
             }
         }
+
+        if (event.target.id == 'internal_register_submit') {
+
+            var courseid = $('#register_courses').val();
+            var slotid = $('#register_cities').val();
+            var firstname = $('#first_name').val();
+            var lastname = $('#last_name').val();
+            var addr = $('#addr').val();
+            var city = $('#city').val();
+            var state = $('#state').val();
+            var country = $('#country').val();
+            var zip = $('#zip').val();
+            var phone = $('#phone').val();
+            var email = $('#email').val();
+
+            if (courseid == 0) {
+                $('#personal_err').html('Please select ptogram');
+                return;
+            }
+
+            if (firstname == '') {
+                $('#personal_err').html('Please provide firstname');
+                return;
+            }
+
+            if (lastname == '') {
+                $('#personal_err').html('Please provide lastname');
+                return;
+            }
+
+            if (addr == '') {
+                $('#personal_err').html('Please provide mailing address');
+                return;
+            }
+
+            if (city == '') {
+                $('#personal_err').html('Please provide city');
+                return;
+            }
+
+            if (state == 0) {
+                $('#personal_err').html('Please select state');
+                return;
+            }
+
+            if (country == '') {
+                $('#personal_err').html('Please provide country');
+                return;
+            }
+
+            if (zip == '') {
+                $('#personal_err').html('Please provide zip');
+                return;
+            }
+
+            if (zip != '') {
+                if (!$.isNumeric(zip) || zip.length < 4) {
+                    $('#personal_err').html('Please provide valid zip');
+                    return;
+                } // end if
+            } // end if
+
+            if (phone == '') {
+                $('#personal_err').html('Please provide phone');
+                return;
+            }
+
+
+            if (email == '') {
+                $('#personal_err').html('Please provide email');
+                return;
+            }
+
+            $('#personal_err').html('');
+
+            var url = "/functionality/php/is_email_exists.php";
+            var request = {email: email};
+            $.post(url, request).done(function (data) {
+                console.log('Server email exists response: ' + data);
+                if (data > 0) {
+                    $('#personal_err').html('Email is already in use');
+                } // end if data>0
+                else {
+                    var user = {
+                        first_name: firstname,
+                        last_name: lastname,
+                        addr: addr,
+                        city: city,
+                        state: state,
+                        country: country,
+                        zip: zip,
+                        inst: 'n/a',
+                        phone: phone,
+                        email: email,
+                        courseid: courseid,
+                        slotid: slotid,
+                    };
+                    $('#ajax_loading_payment').show();
+                    personal_registration_obj = JSON.stringify(user);
+                    var signup_url = "/functionality/php/internal_signup.php";
+                    var signup_request = {user: JSON.stringify(user)};
+                    $.post(signup_url, signup_request).done(function (data) {
+                        $('#ajax_loading_payment').hide();
+                        $('#personal_err').html("<span style='color:black'>" + data + "</span>");
+                    });
+                } // end else
+            }); // end of post
+        }
+
+
+
 
     }); // end of body click event
 

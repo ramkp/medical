@@ -276,20 +276,20 @@ class Util {
         //echo "Array <pre>";
         //print_r($names_arr);
         //echo "</pre><br>";
-        $firstname = $names_arr[1];
-        if ($firstname == '') {
-            $firstname = $names_arr[2];
+        if (count($names_arr) == 2) {
+            $firstname = $names_arr[1];
+            $lastname = $names_arr[0];
+            $query = "select * from mdl_user "
+                    . "where firstname='$firstname' "
+                    . "and lastname='$lastname'";
         }
-        $lastname = $names_arr[0];
-        $query = "select * from mdl_user "
-                . "where firstname='$firstname' "
-                . "and lastname='$lastname'";
-        $num = $this->db->numrows($query);
-        if ($num == 0) {
+        if (count($names_arr) == 3) {
+            $firstname = $names_arr[2];
+            $lastname = $names_arr[0];
             $query = "select * from mdl_user "
                     . "where firstname like '%$firstname%' "
-                    . "and lastname like '%$lastname%'";
-        } // end if
+                    . "and lastname like '%$lastname%' ";
+        }
         //echo "Query: " . $query . "<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {

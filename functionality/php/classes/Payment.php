@@ -1607,4 +1607,16 @@ class Payment {
         return $list;
     }
 
+    function internal_signup($user) {
+        $list = "";
+        $signup_status = $this->enroll->single_signup($user);
+        if ($signup_status === true) {
+            $list.="Registration is successfull";
+        } // end if
+        else {
+            $list.="Registration failed";
+        }
+        return $list;
+    }
+
 }
