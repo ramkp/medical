@@ -149,12 +149,12 @@ class Register extends Util {
         $list.="<span class='span2' >First name*</span>";
         $list.="<span class='span2' ><input type='text' id='first_name' name='first_name' ></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2' >Last name*</span>";
         $list.="<span class='span2' ><input type='text' id='last_name' name='last_name'  ></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Mailing Address*</span>";
         $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
@@ -169,7 +169,7 @@ class Register extends Util {
         $list.="<span class='span2'>State*</span>";
         $list.="<span class='span2'>$states</span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Country*</span>";
         $list.="<span class='span2'>$countries</span>";
@@ -189,25 +189,25 @@ class Register extends Util {
         $list.="<span class='span2'>Email*</span>";
         $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
         $list.="</div>";
-        
-        $list.="<div class='container-fluid' style='text-align:center;display:none;'>";
-        $list.="<span class='span4' id='ajax_loading_payment'><img src='https://medical2.com/assets/img/ajax.gif'></span>";
+
+        $list.="<div class='container-fluid' id='ajax_loading_payment' style='text-align:center;display:none;'>";
+        $list.="<span class='span4'><img src='https://medical2.com/assets/img/ajax.gif'></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span4' id='personal_err' style='color:red;'></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>&nbsp;</span>";
         $list.="<span class='span2'><button class='btn btn-primary' id='internal_register_submit'>Submit</button></span>";
         $list.="</div>";
-        
+
 
         $list.="</div>"; // end of panel-body
         $list.="</div>"; // end of panel panel-default
-       
-        
+
+
         return $list;
     }
 

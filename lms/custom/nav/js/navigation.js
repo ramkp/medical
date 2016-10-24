@@ -585,6 +585,10 @@ $(document).ready(function () {
                 $("#installment_user ").typeahead({source: data, items: 24});
             }, 'json');
 
+            $.get('/lms/custom/utils/installment_users.json', function (data) {
+                $("#installment_search").typeahead({source: data, items: 24});
+            }, 'json');
+
             $('#subs_start').datepicker();
             $('#subs_exp').datepicker();
 
@@ -3256,12 +3260,13 @@ $(document).ready(function () {
             var cvv = $('#cvv').val();
             var card_year = $('#card_year').val();
             var card_month = $('#card_month').val();
-            var addr = $('#subs_addr').val();
-            var city = $('#subs_city').val();
-            var state = $('#subs_state').val();
-            var zip = $('#subs_zip').val();
-            var email = $('#subs_email').val();
-            var phone = $('#subs_phone').val();
+            //var addr = $('#subs_addr').val();
+            //var city = $('#subs_city').val();
+            //var state = $('#subs_state').val();
+            //var zip = $('#subs_zip').val();
+            //var email = $('#subs_email').val();
+            //var phone = $('#subs_phone').val();
+            var payments_num = $('#payments_num').val();
 
             console.log('Address :' + addr);
 
@@ -3290,35 +3295,37 @@ $(document).ready(function () {
                 return;
             }
 
-            if (addr == '') {
-                $('#subs_err').html('Please provide your address');
-                return;
-            }
-
-            if (city == '') {
-                $('#subs_err').html('Please provide your city');
-                return;
-            }
-
-            if (state == 0) {
-                $('#subs_err').html('Please select state');
-                return;
-            }
-
-            if (zip == '') {
-                $('#subs_err').html('Please provide zip');
-                return;
-            }
-
-            if (email == '') {
-                $('#subs_err').html('Please provide email');
-                return;
-            }
-
-            if (phone == '') {
-                $('#subs_err').html('Please provide phone');
-                return;
-            }
+            /*
+             if (addr == '') {
+             $('#subs_err').html('Please provide your address');
+             return;
+             }
+             
+             if (city == '') {
+             $('#subs_err').html('Please provide your city');
+             return;
+             }
+             
+             if (state == 0) {
+             $('#subs_err').html('Please select state');
+             return;
+             }
+             
+             if (zip == '') {
+             $('#subs_err').html('Please provide zip');
+             return;
+             }
+             
+             if (email == '') {
+             $('#subs_err').html('Please provide email');
+             return;
+             }
+             
+             if (phone == '') {
+             $('#subs_err').html('Please provide phone');
+             return;
+             }
+             */
 
             if (holder == '') {
                 $('#subs_err').html('Please provide cardholder name');
@@ -3348,12 +3355,7 @@ $(document).ready(function () {
                 amount: amount,
                 start: start,
                 end: end,
-                addr: addr,
-                city: city,
-                state: state,
-                zip: zip,
-                email: email,
-                phone: phone,
+                payments_num: payments_num,
                 holder: holder,
                 card_no: card_no,
                 cvv: cvv,
@@ -3361,15 +3363,39 @@ $(document).ready(function () {
                 card_month: card_month
             };
 
-            $('#ajax_loader').show();
+            $('#ajax_loader2').show();
             var url = "/lms/custom/installment/create_subs.php";
             var request = {subs: JSON.stringify(subs)};
             $.post(url, request).done(function (data) {
-                $('#ajax_loader').hide();
+                $('#ajax_loader2').hide();
                 $('#subs_err').html("<span style='color:black'>" + data + "</span>");
             });
 
         }
+
+        if (event.target.id == 'installment_search_button') {
+            var item = $('#installment_search').val();
+            if (item == '') {
+                $('#installment_err').html('Please provide search criteria');
+            } // end if
+            else {
+                $('#installment_err').html('');
+                $('#ajax_loader').show();
+                var url = "/lms/custom/installment/search_subs.php";
+                var request = {item: item};
+                $.post(url, request).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#installment_container').html(data);
+                });
+            } // end else
+
+        }
+
+        if (event.target.id == 'installment_clear_button') {
+            get_installment_page();
+        }
+
+
 
     }); // end of body click event
 

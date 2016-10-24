@@ -376,93 +376,70 @@ class ProcessPayment {
         }
     }
 
-    function createSubscription($post_order) {
+    function createSubscription($subs) {
 
-        // Common Set Up for API Credentials
-        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
-        $merchantAuthentication->setName($this->LOGIN_ID);
-        $merchantAuthentication->setTransactionKey($this->TRANSACTION_KEY);
-        $intervalLength = round($this->period / $post_order->payments_num);
+        $merchantAuthentication = $this->sandbox_authorize();
+        //$merchantAuthentication=$this->authorize();
+
+        $amount = round($subs->amount / $subs->payments_num);
+        $names = explode(" ", $subs->holder); // card holder name
+        $firstname = $names[1];
+        $lastname = $names[0];
+        $exp_date = $subs->card_year . "-" . $subs->card_month;
+
+        $period_sec = strtotime($subs->end) - strtotime($subs->start);
+        //  Interval Length must be a value from 7 through 365 for day based subscriptions
+        $intervalLength = round($period_sec / $subs->payments_num / 86400);
+
         $refId = 'ref' . time();
-        $start_date_h = date('Y-m-d', time()); // first subscription payment today
-        $total_occurences = $post_order->payments_num;
-        $expiration = $post_order->cds_cc_year . "-" . $post_order->cd_cc_month;
-        $names = explode("/", $post_order->cds_name);
 
-        // Customer info 
-        $custID = round(time() / 3785);
-        $customer = new AnetAPI\CustomerDataType();
-        $customer->setId($custID);
-        $customer->setEmail($post_order->cds_email);
-
-        /*
-         * 
-          echo "<br>--------------------<br>";
-          print_r($names);
-          echo "<br>--------------------<br>";
-
-          echo "First name: ".$firstname."<br>";
-          echo "Last name: ".$lastname."<br>";
-         * 
-         */
-
-        $firstname = $names[0];
-        $lastname = $names[1];
-
-        //$firstname = ($names[0] == '') ? "Loyal" : $names[0];
-        //$lastname = ($names[2] == '') ? 'Client' : $names[2];
         // Subscription Type Info
         $subscription = new AnetAPI\ARBSubscriptionType();
-        $subscription->setName("Subscription for $post_order->item");
+        $subscription->setName($subs->coursename);
+
         $interval = new AnetAPI\PaymentScheduleType\IntervalAType();
         $interval->setLength($intervalLength);
         $interval->setUnit("days");
+
         $paymentSchedule = new AnetAPI\PaymentScheduleType();
         $paymentSchedule->setInterval($interval);
-        $paymentSchedule->setStartDate(new DateTime($start_date_h));
-        $paymentSchedule->setTotalOccurrences($total_occurences);
-        $paymentSchedule->setTrialOccurrences("1");
+        $paymentSchedule->setStartDate(new DateTime($subs->start));
+        $paymentSchedule->setTotalOccurrences($subs->payments_num);
+
         $subscription->setPaymentSchedule($paymentSchedule);
-        $subscription->setAmount($post_order->sum);
-        $subscription->setTrialAmount("0.00");
+        $subscription->setAmount($amount);
 
         $creditCard = new AnetAPI\CreditCardType();
-        $creditCard->setCardNumber($post_order->cds_cc_number);
-        $creditCard->setExpirationDate($expiration);
+        $creditCard->setCardNumber($subs->card_no);
+        $creditCard->setExpirationDate($exp_date);
+
         $payment = new AnetAPI\PaymentType();
         $payment->setCreditCard($creditCard);
+
         $subscription->setPayment($payment);
+
         $billTo = new AnetAPI\NameAndAddressType();
         $billTo->setFirstName($firstname);
         $billTo->setLastName($lastname);
+
         $subscription->setBillTo($billTo);
+
         $request = new AnetAPI\ARBCreateSubscriptionRequest();
         $request->setmerchantAuthentication($merchantAuthentication);
         $request->setRefId($refId);
         $request->setSubscription($subscription);
         $controller = new AnetController\ARBCreateSubscriptionController($request);
-        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
 
-        /*
-         * 
-          echo "--------Subscription response <pre>";
-          print_r($response);
-          echo "<br>-------------------------<br>";
-          die('Stopped ....');
-         * 
-         */
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
 
         if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
-            $msg = $response->getSubscriptionId();
-            //echo "Message: ".$msg."<br>";
-        }  // end if ($response != null) && ($response->getMessages()->getResultCode() == "Ok")        
+            return $response->getSubscriptionId();
+        } // end if  
         else {
-            $this->save_log($response, $post_order);
             $errorMessages = $response->getMessages()->getMessage();
-            $msg = $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText();
-        } // end else
-        return $msg;
+            echo "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+            return false;
+        }
     }
 
     function prepareExpirationDate($exp_date) {
