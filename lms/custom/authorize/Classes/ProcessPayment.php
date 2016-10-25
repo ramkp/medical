@@ -378,8 +378,8 @@ class ProcessPayment {
 
     function createSubscription($subs) {
 
-        $merchantAuthentication = $this->sandbox_authorize();
-        //$merchantAuthentication=$this->authorize();
+        //$merchantAuthentication = $this->sandbox_authorize();
+        $merchantAuthentication=$this->authorize();
 
         $amount = round($subs->amount / $subs->payments_num);
         $names = explode(" ", $subs->holder); // card holder name
@@ -430,7 +430,7 @@ class ProcessPayment {
         $request->setSubscription($subscription);
         $controller = new AnetController\ARBCreateSubscriptionController($request);
 
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
 
         if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
             return $response->getSubscriptionId();

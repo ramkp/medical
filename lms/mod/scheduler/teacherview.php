@@ -51,16 +51,25 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     //echo "Course ID: ".$courseid."<br>";
     if ($slotid) {
         $slot = scheduler_slot::load_by_id($slotid, $scheduler);
-    } else {
+        $slot->slotid = $slotid;
+    } // end if  
+    else {
         $slot = new scheduler_slot($scheduler);
     }
 
-    // Set data fields from input form.
+
+    //echo "<pre>";
+    //print_r($data);
+    //echo "</pre>";
+    //die();
+    
+    // Set new data from input form.
     $slot->starttime = $data->starttime;
     $slot->duration = $data->duration;
-    $slot->exclusivity = $data->exclusivityenable ? $data->exclusivity : 0;
     $slot->teacherid = $data->teacherid;
     $slot->notes = $data->notes['text'];
+    $slot->exclusivity = $data->exclusivity;
+    $slot->emaildate = $data->emaildate;
     $slot->notesformat = $data->notes['format'];
     $slot->appointmentlocation = $data->appointmentlocation;
     $slot->hideuntil = $data->hideuntil;
@@ -112,9 +121,8 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
         $slot->schedulerid = $schedulerid;
         $ds->save_additional_slot($slot);
         //die('Stopped');
-        
     } // end if $courseid == 44 || $courseid == 45
-
+    // Saves original slot
     $slot->save();
 }
 
@@ -242,20 +250,20 @@ if ($action == 'updateslot') {
     $slotid = required_param('slotid', PARAM_INT);
     $slot = $scheduler->get_slot($slotid);
     $data = scheduler_prepare_formdata($slot);
-      
-      /*
-       * 
+
+    /*
+     * 
       echo "Module object: <pre>";
       print_r($cm);
       echo "</pre>";
       echo "<br>Subpage: $subpage<br>";
-       * 
-       */
+     * 
+     */
 
     //echo "Module id: ".$cm->id."<br>";
     $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid, 'subpage' => $subpage, 'offset' => $offset));
     $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage, 'offset' => $offset));
-    
+
     //echo "<br><Action URL: $actionurl><br>";
     //echo "<br><Return URL: $returnurl><br>";
 

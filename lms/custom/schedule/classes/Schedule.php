@@ -5,10 +5,10 @@
  *
  * @author sirromas
  */
-//session_start();
-require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
 class Schedule extends Util {
 
@@ -680,21 +680,38 @@ class Schedule extends Util {
         return $num;
     }
 
+    function get_original_slot_data($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slot = new stdClass();
+            foreach ($row as $key => $value) {
+                $slot->$key = $value;
+            }
+        }
+        return $slot;
+    }
+
     function save_additional_slot($slot) {
+
         if ($_REQUEST['what'] == 'addslot') {
             $query = "insert into mdl_scheduler_slots "
                     . "(schedulerid,"
                     . "starttime,"
-                    . "duration,"
-                    . "teacherid,"
+                    . "duration, "
+                    . "exclusivity, "
+                    . "emaildate, "
+                    . "teacherid, "
                     . "appointmentlocation,"
                     . "timemodified,"
                     . "notes,"
                     . "hideuntil) "
                     . "values($slot->schedulerid,"
-                    . "'$slot->starttime',"
-                    . "'480',"
-                    . "'234',"
+                    . "'$slot->starttime', "
+                    . "'$slot->duration', "
+                    . "'$slot->exclusivity', "
+                    . "'$slot->emaildate', "
+                    . "$slot->teacherid, "
                     . "'$slot->appointmentlocation',"
                     . "'$slot->timemodified',"
                     . "'$slot->notes',"
@@ -702,6 +719,46 @@ class Schedule extends Util {
             //echo "Query: " . $query . "<br>";
             $this->db->query($query);
         } // end if $_REQUEST['what'] == 'addslot'
+
+        if ($_REQUEST['what'] == 'updateslot') {
+
+            // Find vice-versa workshop to be updated
+            $original_slot = $this->get_original_slot_data($slot->slotid);
+            $query = "select * from mdl_scheduler_slots "
+                    . "where "
+                    . "appointmentlocation='$original_slot->appointmentlocation' "
+                    . "and schedulerid=$slot->schedulerid "
+                    . "and starttime='$original_slot->starttime'";
+            //echo "Query: " . $query . "<br>";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['id']; // This is id of workshop to be updated
+            }
+
+            $query = "update mdl_scheduler_slots "
+                    . "set starttime='$slot->starttime', "
+                    . "duration='$slot->duration', "
+                    . "exclusivity='$slot->exclusivity', "
+                    . "emaildate='$slot->emaildate', "
+                    . "teacherid='$slot->teacherid', "
+                    . "hideuntil='$slot->hideuntil', "
+                    . "appointmentlocation='$slot->appointmentlocation', "
+                    . "timemodified='$slot->timemodified', "
+                    . "notes='$slot->notes' "
+                    . " where id=$slotid ";
+            //echo "Query: " . $query . "<br>";
+            //die();
+            $this->db->query($query);
+            $this->notify_students($slot->schedulerid);
+        } // end if $_REQUEST['what'] == 'updateslot') 
+    }
+
+    function notify_students($schedulerid) {
+        //1. Get students list
+        $query = "select * from mdl_scheduler_appointment where  ";
+
+        //2. Send notification about workshop 
+        $mailer = new Mailer();
     }
 
     function get_user_address_data($userid) {
