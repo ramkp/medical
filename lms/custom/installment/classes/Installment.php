@@ -334,7 +334,7 @@ class Installment extends Util {
                 $list.="</div>";
 
                 $list.="<div class='container-fluid' style='text-align:left;'>";
-                $list.="<span class='span4'>Payments q-ty</span>";
+                $list.="<span class='span4'>No of payments</span>";
                 $list.="<span class='span4'>$userObject->payments_num</span>";
                 $list.="</div>";
 

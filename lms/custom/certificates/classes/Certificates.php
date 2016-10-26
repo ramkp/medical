@@ -488,7 +488,7 @@ class Certificates extends Util {
                 $list.="<body>";
                 $list.="<div class='cert'>";
                 $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy with EKG certification the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy with EKG certification the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of hands-on clinical exam and written certification exam.<br>"
                         . "Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture,<br> "
@@ -530,7 +530,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
@@ -567,7 +567,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
@@ -604,7 +604,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:25pt;'>Obstetrics Technician Certificate</span>";
-                $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day th of $month $year To:</span>";
+                $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>for the successful completion of the Obstetrics Technician Written Exam. </span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
@@ -645,7 +645,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
@@ -682,7 +682,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:25pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Phlebotomy Technician Certificate<br><br><br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
                 $list.="<br><br><br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam. </span>";
                 $list.="<br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
@@ -719,7 +719,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
@@ -1455,7 +1455,7 @@ class Certificates extends Util {
                 $list.="<body>";
                 $list.="<div class='cert'>";
                 $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy with EKG certification the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy with EKG certification the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of hands-on clinical exam and written certification exam.<br>"
                         . "Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture,<br> "
@@ -1497,7 +1497,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
@@ -1534,7 +1534,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $cert->code<br>";
@@ -1569,7 +1569,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:25pt;'>Obstetrics Technician Certificate</span>";
-                $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day th of $month $year To:</span>";
+                $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>for the successful completion of the Obstetrics Technician Written Exam. </span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
@@ -1609,7 +1609,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $cert->code<br>";
@@ -1645,7 +1645,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:25pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Phlebotomy Technician Certificate<br><br><br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
                 $list.="<br><br><br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam. </span>";
                 $list.="<br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
@@ -1682,7 +1682,7 @@ class Certificates extends Util {
                 $list.="<div class='cert'>";
                 $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
+                $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $cert->code<br>";

@@ -749,16 +749,77 @@ class Schedule extends Util {
             //echo "Query: " . $query . "<br>";
             //die();
             $this->db->query($query);
-            $this->notify_students($slot->schedulerid);
+            $slots_array = array($slot->slotid, $slotid);
+            $this->notify_students($slots_array);
         } // end if $_REQUEST['what'] == 'updateslot') 
     }
 
-    function notify_students($schedulerid) {
-        //1. Get students list
-        $query = "select * from mdl_scheduler_appointment where  ";
+    function get_worskhop_update_message($slotid) {
+        $list = "";
 
-        //2. Send notification about workshop 
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $date = date('m-d-Y', $row['starttime']);
+            $location = $row['appointmentlocation'];
+            $notes = $row['notes'];
+        }
+
+        $list.="<html>";
+        $list.="<body>";
+        $list.="<p align='center'>Dear Student!</p>";
+        $list.="<p align='center'>The Workshop you registered was changed:</p>";
+
+        $list.="<table align='center'>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Workshop date</td><td style='padding:15px;'>$date</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Workshop location</td><td style='padding:15px;'>$location</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Additional info</td><td style='padding:15px;'>$notes</td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+
+        $list.="<p>Best regards, <br>Medical2 team</p>";
+        $list.="</body>";
+        $list.="</html>";
+
+        return $list;
+    }
+
+    function notify_students($slots_array) {
+
+        /*
+         * 
+          echo "<pre>";
+          print_r($slots_array);
+          echo "</pre>";
+          die();
+         * 
+         */
+
         $mailer = new Mailer();
+        $message = $this->get_worskhop_update_message($slots_array[0]);
+        if (count($slots_array) > 0) {
+            foreach ($slots_array as $slotid) {
+                if ($slotid > 0) {
+                    $query = "select * from mdl_scheduler_appointment "
+                            . "where slotid=$slotid";
+                    $result = $this->db->query($query);
+                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        $user = $this->get_user_details($row['studentid']);
+                        $students[] = $user->email;
+                    } // end while
+                } // end if $slotid>0
+            } // end foreach 
+            $mailer->send_workshop_notification($students, $message);
+        } // end if count >0
     }
 
     function get_user_address_data($userid) {

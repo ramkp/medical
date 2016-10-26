@@ -16,7 +16,8 @@ class Mailer {
 
     public $mail_smtp_host = 'mail.medical2.com';
     public $mail_smtp_port = 25;
-    public $mail_smtp_user = 'info@medical2.com';
+    //public $mail_smtp_user = 'info@medical2.com';
+    public $mail_smtp_user = 'medical2@medical2.com';
     public $mail_smtp_pwd = 'aK6SKymc';
     public $invoice_path;
     public $registration_path;
@@ -794,6 +795,56 @@ class Mailer {
         } // end if !$mail->send()
         else {
             //echo 'Message has been sent to ' . $recipient;
+            return true;
+        }
+    }
+
+    function send_workshop_notification($recipients, $message) {
+        $mail = new PHPMailer();
+
+        $address = 'sirromas@gmail.com';
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        /*
+         * 
+          echo "Norify message: <pre>";
+          print_r($recipients);
+          echo "</pre>";
+          die();
+         * 
+         */
+
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+
+
+        foreach ($recipients as $recipient) {
+            $mail->addAddress($recipient);
+        }
+
+
+        $mail->AddAddress($address); // copy to me to make sure email is sent
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+
+        $mail->isHTML(true);
+        $mail->Subject = 'Medical2 - Workshop Update';
+        $mail->Body = $message;
+
+        if (!$mail->send()) {
+            //echo 'Message could not be sent.';
+            //echo 'Mailer Error: ' . $mail->ErrorInfo;
+            //die();
+            return false;
+        } // end if !$mail->send()
+        else {
+            //echo 'Message has been sent to ' . $address;
+            //die();
             return true;
         }
     }

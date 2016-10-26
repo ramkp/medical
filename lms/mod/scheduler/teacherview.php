@@ -62,7 +62,6 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     //print_r($data);
     //echo "</pre>";
     //die();
-    
     // Set new data from input form.
     $slot->starttime = $data->starttime;
     $slot->duration = $data->duration;
@@ -124,6 +123,12 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     } // end if $courseid == 44 || $courseid == 45
     // Saves original slot
     $slot->save();
+
+    // Notify workshop users
+    if ($courseid != 44 && $courseid != 45) {
+        $slots_array = array($slot->slotid);
+        $ds->notify_students($slots_array);
+    }
 }
 
 function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, $groupid = 0) {
