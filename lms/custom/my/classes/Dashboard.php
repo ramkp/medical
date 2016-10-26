@@ -895,4 +895,10 @@ class Dashboard extends Util {
         return $path;
     }
 
+    function get_notes_status($userid) {
+        $query = "select * from mdl_post where module='notes' and userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
 }
