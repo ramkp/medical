@@ -15,20 +15,35 @@ class Late {
         $this->db = new pdo_db();
     }
 
+    function get_course_category($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $catid = $row['category'];
+        }
+        return $catid;
+    }
+
     function is_course_scheduled($courseid) {
         $status = 0;
-        $query = "select * from mdl_scheduler where course=$courseid";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $schedulerid = $row['id'];
-            } // end while
-
-            $query = "select * from mdl_scheduler_slots where schedulerid=$schedulerid";
+        $catid = $this->get_course_category($courseid);
+        if ($catid == 5) {
+            return $status; // =0 no schedule
+        } // end if $catid==5
+        else {
+            $query = "select * from mdl_scheduler where course=$courseid";
             $num = $this->db->numrows($query);
-            $status = $num;
-        } // end if $num > 0
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $schedulerid = $row['id'];
+                } // end while
+
+                $query = "select * from mdl_scheduler_slots where schedulerid=$schedulerid";
+                $num = $this->db->numrows($query);
+                $status = $num;
+            } // end if $num > 0
+        } // end else
         return $status;
     }
 
