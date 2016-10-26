@@ -1545,7 +1545,7 @@ class Payment {
             $order->cds_state = $user->state;
             $order->cds_zip = $user->zip;
             $order->cds_email = $user->email;
-
+            $order->phone = $user->phone;
             $order->cds_cc_number = $user->cardnumber;
             $order->cds_cc_exp_month = $user->exp_month;
             $order->cds_cc_exp_year = $user->exp_year;
