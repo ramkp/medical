@@ -873,6 +873,10 @@ $(document).ready(function () {
             $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
                 $('#ajax_loading').hide();
                 $('#revenue_report_container').html(data);
+
+                $('#stat_start').datepicker();
+                $('#stat_end').datepicker();
+
             });
         } // end if courseid>0 && from!='' && to!=''
         else {
@@ -3393,6 +3397,61 @@ $(document).ready(function () {
 
         if (event.target.id == 'installment_clear_button') {
             get_installment_page();
+        }
+
+        if (event.target.id == 'get_stat') {
+
+            var interval = null;
+
+            var courseid = $('#courses').val();
+
+            if ($('#byyear').prop("checked")) {
+                interval = 'year';
+            }
+
+            if ($('#bymonth').prop("checked")) {
+                interval = 'month';
+            }
+
+            if ($('#byweek').prop("checked")) {
+                interval = 'week';
+            }
+
+            if (interval == null) {
+                $('#stat_err').html('Please select interval');
+                return false;
+            }
+
+            var start = $('#stat_start').val();
+            var end = $('#stat_end').val();
+
+            if (start == '' || end == '') {
+                $('#stat_err').html('Please select period');
+                return false;
+            }
+
+            var stat = {
+                start: start,
+                end: end,
+                interval: interval,
+                courseid: courseid};
+
+            $('#stat_err').html('');
+            $('#stat_data').html('');
+            $('#stat_ajax_loader').show();
+            var url = "/lms/custom/reports/get_stat_data.php";
+            var request = {stat: JSON.stringify(stat)};
+            $.post(url, request).done(function (data) {
+                $('#stat_ajax_loader').hide();
+                $('#stat_data').html(data);
+            });
+
+
+
+
+
+
+
         }
 
 

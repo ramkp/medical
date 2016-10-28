@@ -5,6 +5,7 @@
  *
  * @author sirromas
  */
+ini_set('memory_limit', '1024M'); // or you could use 1G
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 
 class Report extends Util {
@@ -264,7 +265,7 @@ class Report extends Util {
     function create_csv_file($filename, $payments) {
         // Write CSV data
         $path = $this->files_path . '/' . $filename;
-        
+
         $output = fopen($path, 'w');
         fputcsv($output, array('User', 'Program applied', 'Payment', 'Date'));
         foreach ($payments as $payment) {
@@ -278,7 +279,7 @@ class Report extends Util {
 
     function get_revenue_report_data($courseid, $from, $to, $status = true, $output = true) {
 
-        
+
         $this->courseid = $courseid;
         $this->from = $from;
         $this->to = $to;
@@ -452,7 +453,7 @@ class Report extends Util {
         $invoice_data_details = $this->get_invoice_payments_detailes($courseid, $from, $to);
         $grand_total = $this->card_sum + $this->cash_sum + $this->cheque_sum + $this->invoice_sum;
         $list.="<div class='container-fluid'>";
-        $list.="<div class='span10'>
+        $list.="<div class='span12'>
 
                     <ul class='nav nav-tabs '>
 
@@ -514,99 +515,30 @@ class Report extends Util {
 
                             <h3>Statistics</h3>
                            
-                            <div class='row'>
-                            <span class='span2' style='margin-left:35px;'>By Year</span>
+                            <div class='row' style='padding-left:45px;'>
                             
-                            <span class='span2'>
-                            <select id='stat_year1'>
-                            <option value='0' selected>Year</option>
-                            <option value='2013'>2013</option>
-                            <option value='2014'>2014</option>
-                            <option value='2015'>2015</option>
-                            <option value='2016'>2016</option>
-                            </select>
-                            </span>
+                            <span class='span2'><input type='radio' name='interval' id='byyear'>By year</span>
+                            <span class='span2'><input type='radio' name='interval' id='bymonth'>By month</span>
+                            <span class='span2'><input type='radio' name='interval' id='byweek'>By week</span>
                             
-                            <span class='span2'>
-                            <select id='stat_year2'>
-                            <option value='0' selected>Year</option>
-                            <option value='2013'>2013</option>
-                            <option value='2014'>2014</option>
-                            <option value='2015'>2015</option>
-                            <option value='2016'>2016</option>
-                            </select>
-                            </span>
+                            <span class='span2'><input type='text' id='stat_start' style='width:95px;'></span>
+                            
+                            <span class='span2'><input type='text' id='stat_end' style='width:95px;'></span>
 
-                            <span class='span3'><button type='button' id='year_stat' class='btn btn-primary'>Go</button></span>
+                            <span class='span1'><button type='button' id='get_stat' class='btn btn-primary'>Go</button></span>
 
                             </div>
                             
-                            <div class='row' id='report_year_data' style='margin-left:35px;'>
+                            <div class='row' id='stat_data' style='margin-left:35px;'>
                             
                             </div>
                             
-                         
-                            
-                            <div class='row'>
-                            
-                            <span class='span2' style='margin-left:35px;'>By Month</span>
-                            
-                            <span class='span2'>
-                            <select id='stat_month_year'>
-                            <option value='0' selected>Year</option>
-                            <option value='2013'>2013</option>
-                            <option value='2014'>2014</option>
-                            <option value='2015'>2015</option>
-                            <option value='2016'>2016</option>
-                            </select>
-                            </span>
-
-                            <span class='span2'>
-                            <select id='stat_month1'>
-                            <option value='0' selected>Month</option>
-                            <option value='1'>Jan</option>
-                            <option value='2'>Feb</option>
-                            <option value='3'>Mar</option>
-                            <option value='4'>April</option>
-                            <option value='5'>May</option>
-                            <option value='6'>June</option>
-                            <option value='7'>July</option>
-                            <option value='8'>Aug</option>
-                            <option value='9'>Sep</option>
-                            <option value='10'>Oct</option>
-                            <option value='11'>Nov</option>
-                            <option value='12'>Dec</option>
-
-                            </select>
-                            </span>
-                            
-                            <span class='span2'>
-                            <select id='stat_month2'>
-                            <option value='0' selected>Month</option>
-                            <option value='1'>Jan</option>
-                            <option value='2'>Feb</option>
-                            <option value='3'>Mar</option>
-                            <option value='4'>April</option>
-                            <option value='5'>May</option>
-                            <option value='6'>June</option>
-                            <option value='7'>July</option>
-                            <option value='8'>Aug</option>
-                            <option value='9'>Sep</option>
-                            <option value='10'>Oct</option>
-                            <option value='11'>Nov</option>
-                            <option value='12'>Dec</option>
-                            </select>
-                            </span>
-
-                            <span class='span3'><button type='button' id='month_stat' class='btn btn-primary'>Go</button></span>
-
+                            <div class='row' id='stat_err' style='margin-left:35px;color:red;'>
+                                
                             </div>
                             
-                            <div class='row' id='report_month_data' style='margin-left:35px;'>
                             
-                            </div>
-                            
-                            <div class='row' id='ajax_loader' style='margin-left:35px;text-align:center;display:none;'>
+                            <div class='row' id='stat_ajax_loader' style='margin-left:35px;text-align:center;display:none;'>
                                 <img src='https://$this->host/assets/img/ajax.gif' />
                             </div>
                             
@@ -739,7 +671,7 @@ class Report extends Util {
     }
 
     function is_user_has_card_payments($from, $to, $userid) {
-        
+
         $query = "select * from mdl_card_payments "
                 . "where userid=$userid "
                 . "and pdate>=$from and pdate<=$to";
@@ -748,7 +680,7 @@ class Report extends Util {
     }
 
     function is_user_has_invoice_payments($from, $to, $userid) {
-        
+
         $query = "select * from mdl_invoice where "
                 . "userid=$userid "
                 . "and i_status=1 "
@@ -920,7 +852,7 @@ class Report extends Util {
     }
 
     function get_card_payments_detailes($courseid, $from, $to) {
-        
+
         $payments = array();
         $this->courseid = $courseid;
         $this->from = $from;
@@ -994,7 +926,7 @@ class Report extends Util {
     }
 
     function get_refund_payments_detailes($courseid, $from, $to) {
-       
+
         $payments = array();
         $partial_payments = array();
         $this->courseid = $courseid;
@@ -1120,7 +1052,7 @@ class Report extends Util {
     }
 
     function get_invoice_payments_detailes($courseid, $from, $to) {
-        
+
         $payments = array();
         $this->courseid = $courseid;
         $this->from = $from;
@@ -1203,7 +1135,7 @@ class Report extends Util {
     }
 
     function get_other_payment_report_data($courseid, $from, $to, $type) {
-        
+
         $payments = array();
         $this->courseid = $courseid;
         $this->from = $from;
@@ -1345,67 +1277,357 @@ class Report extends Util {
         return $list;
     }
 
-    function get_period_payments($from, $to) {
-        
+    function get_period_payments($courseid, $unix_start, $unix_end) {
+        $payments = new stdClass();
+
+        // Credit card payments
+        if ($courseid == 0) {
+            $query = "select sum(psum) as total from mdl_card_payments "
+                    . "where pdate between $unix_start "
+                    . "and $unix_end "
+                    . "and  refunded=0";
+        } // end if 
+        else {
+            $query = "select sum(psum) as total from mdl_card_payments "
+                    . "where courseid=$courseid and pdate between $unix_start "
+                    . "and $unix_end "
+                    . "and  refunded=0";
+        } // end else
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $card_amout = $row['total'];
+        }
+        $payments->card = $card_amout;
+
+        // Cash payments
+        if ($courseid == 0) {
+            $query = "select sum(psum) as total from mdl_partial_payments "
+                    . "where pdate between $unix_start "
+                    . "and $unix_end "
+                    . "and  ptype=1";
+        } // end if
+        else {
+            $query = "select sum(psum) as total from mdl_partial_payments "
+                    . "where courseid=$courseid and pdate between $unix_start "
+                    . "and $unix_end "
+                    . "and  ptype=1";
+        } // end else 
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cash_amout = $row['total'];
+        }
+        $payments->cash = $cash_amout;
+
+        // Cheque payments
+        if ($courseid == 0) {
+            $query = "select sum(psum) as total from mdl_partial_payments "
+                    . "where pdate between $unix_start "
+                    . "and $unix_end "
+                    . "and  ptype=2";
+        } // end if
+        else {
+            $query = "select sum(psum) as total from mdl_partial_payments "
+                    . "where courseid=$courseid and pdate between $unix_start "
+                    . "and $unix_end "
+                    . "and  ptype=2";
+        } // end else
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cheque_amout = $row['total'];
+        }
+        $payments->cheque = $cheque_amout;
+
+        // Invoice payments
+        if ($courseid == 0) {
+            $query = "select sum(i_sum) as total from mdl_invoice "
+                    . "where i_status=1 and i_pdate between $unix_start "
+                    . "and $unix_end ";
+        } // end if
+        else {
+            $query = "select sum(i_sum) as total from mdl_invoice "
+                    . "where courseid=$courseid and "
+                    . "i_status=1 and i_pdate between $unix_start "
+                    . "and $unix_end ";
+        }
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $invoice_amout = $row['total'];
+        }
+        $payments->invoice = $invoice_amout;
+
+        return $payments;
     }
 
-    function get_year_stat_payments($year1, $year2) {
-        $first_year_start = '01/01/' . $year1;
-        $first_year_end = '12/31/' . $year1;
-        $from1 = strtotime($first_year_start);
-        $to1 = strtotime($first_year_end);
+    function get_payments_between_dates($item) {
+        $list = "";
+        $total_card = 0;
+        $total_cash = 0;
+        $total_cheque = 0;
+        $total_invoice = 0;
 
-        $second_year_start = '01/01/' . $year2;
-        $second_year_end = '12/31/' . $year2;
-        $from2 = strtotime($second_year_start);
-        $to2 = strtotime($second_year_end);
+        $unix_start = strtotime($item->start);
+        $unix_end = strtotime($item->end);
+        $diff = $unix_end - $unix_start;
+        $courseid = $item->courseid;
 
-        /*
-         * 
-          echo "First year start: " . $first_year_start . "<br>";
-          echo "First year end: " . $first_year_end . "<br>";
-          echo "First year unixtime start: " . $from1 . "<br>";
-          echo "First year unixtime end: " . $to1 . "<br>";
+        $list.="<table>";
+        $list.="<tr>";
+        $list.="<th style='padding:15px;'>Period</th>";
+        $list.="<th style='padding:15px;'>Cards</th>";
+        $list.="<th style='padding:15px;'>Cash</th>";
+        $list.="<th style='padding:15px;'>Cheque</th>";
+        $list.="<th style='padding:15px;'>Invoices</th>";
+        $list.="</tr>";
 
-          echo "<br>------------------------------------------------------------<br>";
+        switch ($item->interval) {
+            case "year":
+                $year_start = date('Y', $unix_start);
+                $year_end = date('Y', $unix_end);
+                $yearnumber = $year_end - $year_start;
+                for ($i = 1; $i <= $yearnumber; $i++) {
+                    $y = date('Y', $unix_start);
+                    $year_days_number = date("z", mktime(0, 0, 0, 12, 31, $y)) + 1;
+                    $yearperiod = 86400 * $year_days_number;
+                    $added = $unix_start + $yearperiod;
+                    $payments = $this->get_period_payments($courseid, $unix_start, $added);
+                    if ($added <= $unix_end) {
+                        $total_card = $total_card + $payments->card;
+                        $total_cash = $total_cash + $payments->cash;
+                        $total_cheque = $total_cheque + $payments->cheque;
+                        $total_invoice = $total_invoice + $payments->invoice;
+                        $list.="<tr>";
+                        $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
+                        $list.="<td style='padding:15px;'>$$payments->card</td>";
+                        $list.="<td style='padding:15px;'>$$payments->cash</td>";
+                        $list.="<td style='padding:15px;'>$$payments->cheque</td>";
+                        $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                        $list.="</tr>";
+                        $unix_start = $added;
+                    } // end if
+                    else {
+                        $added = $unix_end;
+                        $total_card = $total_card + $payments->card;
+                        $total_cash = $total_cash + $payments->cash;
+                        $total_cheque = $total_cheque + $payments->cheque;
+                        $total_invoice = $total_invoice + $payments->invoice;
+                        $list.="<tr>";
+                        $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
+                        $list.="<td style='padding:15px;'>$$payments->card</td>";
+                        $list.="<td style='padding:15px;'>$$payments->cash</td>";
+                        $list.="<td style='padding:15px;'>$$payments->cheque</td>";
+                        $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                        $list.="</tr>";
+                    } /// end else
+                } // end for
+                $list.="<tr>";
+                $list.="<th style='padding:15px;'></th>";
+                $list.="<th style='padding:15px;'>$$total_card</th>";
+                $list.="<th style='padding:15px;'>$$total_cash</th>";
+                $list.="<th style='padding:15px;'>$$total_cheque</th>";
+                $list.="<th style='padding:15px;'>$$total_invoice</th>";
+                $list.="</tr>";
+                $list.="</table>";
+                break;
+            case "month":
+                $monthnumber = idate('m', $diff);
+                for ($i = 1; $i <= ($monthnumber - 1); $i++) {
+                    $m = date('m', $unix_start);
+                    $y = date('Y', $unix_start);
+                    $days_in_month = cal_days_in_month(CAL_GREGORIAN, $m, $y);
+                    $monthperiod = 86400 * $days_in_month;
+                    $added = $unix_start + $monthperiod;
+                    $payments = $this->get_period_payments($courseid, $unix_start, $added);
+                    if ($added <= $unix_end) {
+                        $total_card = $total_card + $payments->card;
+                        $total_cash = $total_cash + $payments->cash;
+                        $total_cheque = $total_cheque + $payments->cheque;
+                        $total_invoice = $total_invoice + $payments->invoice;
+                        $list.="<tr>";
+                        $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
+                        $list.="<td style='padding:15px;'>$$payments->card</td>";
+                        $list.="<td style='padding:15px;'>$$payments->cash</td>";
+                        $list.="<td style='padding:15px;'>$$payments->cheque</td>";
+                        $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                        $list.="</tr>";
+                        $unix_start = $added;
+                    } // end if
+                    else {
+                        $added = $unix_end;
+                        $total_card = $total_card + $payments->card;
+                        $total_cash = $total_cash + $payments->cash;
+                        $total_cheque = $total_cheque + $payments->cheque;
+                        $total_invoice = $total_invoice + $payments->invoice;
+                        $list.="<tr>";
+                        $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
+                        $list.="<td style='padding:15px;'>$$payments->card</td>";
+                        $list.="<td style='padding:15px;'>$$payments->cash</td>";
+                        $list.="<td style='padding:15px;'>$$payments->cheque</td>";
+                        $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                        $list.="</tr>";
+                    } /// end else
+                } // end for
+                $list.="<tr>";
+                $list.="<th style='padding:15px;'></th>";
+                $list.="<th style='padding:15px;'>$$total_card</th>";
+                $list.="<th style='padding:15px;'>$$total_cash</th>";
+                $list.="<th style='padding:15px;'>$$total_cheque</th>";
+                $list.="<th style='padding:15px;'>$$total_invoice</th>";
+                $list.="</tr>";
+                $list.="</table>";
+                break;
+            case "week":
+                $month_start = date('m', $unix_start);
+                $month_end = date('m', $unix_end);
+                $weeksnumber = idate('W', $diff);
+                $weekperiod = 86400 * 7;
+                if ($month_start == $month_end) {
+                    for ($i = 1; $i <= ($weeksnumber - 1); $i++) {
+                        $added = $unix_start + $weekperiod;
+                        $payments = $this->get_period_payments($courseid, $unix_start, $added);
+                        if ($added <= $unix_end) {
+                            $total_card = $total_card + $payments->card;
+                            $total_cash = $total_cash + $payments->cash;
+                            $total_cheque = $total_cheque + $payments->cheque;
+                            $total_invoice = $total_invoice + $payments->invoice;
+                            $list.="<tr>";
+                            $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
+                            $list.="<td style='padding:15px;'>$$payments->card</td>";
+                            $list.="<td style='padding:15px;'>$$payments->cash</td>";
+                            $list.="<td style='padding:15px;'>$$payments->cheque</td>";
+                            $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                            $list.="</tr>";
+                            $unix_start = $added;
+                        } // end if
+                        else {
+                            $added = $unix_end;
+                            if ($unix_start != $added) {
+                                $total_card = $total_card + $payments->card;
+                                $total_cash = $total_cash + $payments->cash;
+                                $total_cheque = $total_cheque + $payments->cheque;
+                                $total_invoice = $total_invoice + $payments->invoice;
+                                $list.="<tr>";
+                                $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
+                                $list.="<td style='padding:15px;'>$$payments->card</td>";
+                                $list.="<td style='padding:15px;'>$$payments->cash</td>";
+                                $list.="<td style='padding:15px;'>$$payments->cheque</td>";
+                                $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                                $list.="</tr>";
+                                //return;
+                            } // end if
+                            else {
+                                //return;
+                            } // end ekse
+                        } /// end else
+                    } // end for
+                    $list.="<tr>";
+                    $list.="<th style='padding:15px;'></th>";
+                    $list.="<th style='padding:15px;'>$$total_card</th>";
+                    $list.="<th style='padding:15px;'>$$total_cash</th>";
+                    $list.="<th style='padding:15px;'>$$total_cheque</th>";
+                    $list.="<th style='padding:15px;'>$$total_invoice</th>";
+                    $list.="</tr>";
+                    $list.="</table>";
+                } //  end if
+                else {
+                    for ($i = 1; $i <= ($weeksnumber); $i++) {
+                        $added = $unix_start + $weekperiod;
+                        $payments = $this->get_period_payments($courseid, $unix_start, $added);
+                        if ($added <= $unix_end) {
+                            $total_card = $total_card + $payments->card;
+                            $total_cash = $total_cash + $payments->cash;
+                            $total_cheque = $total_cheque + $payments->cheque;
+                            $total_invoice = $total_invoice + $payments->invoice;
+                            $list.="<tr>";
+                            $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
+                            $list.="<td style='padding:15px;'>$$payments->card</td>";
+                            $list.="<td style='padding:15px;'>$$payments->cash</td>";
+                            $list.="<td style='padding:15px;'>$$payments->cheque</td>";
+                            $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                            $list.="</tr>";
+                            $unix_start = $added;
+                        } // end if
+                        else {
+                            $added = $unix_end;
+                            if ($unix_start != $added) {
+                                $total_card = $total_card + $payments->card;
+                                $total_cash = $total_cash + $payments->cash;
+                                $total_cheque = $total_cheque + $payments->cheque;
+                                $total_invoice = $total_invoice + $payments->invoice;
+                                $list.="<tr>";
+                                $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
+                                $list.="<td style='padding:15px;'>$$payments->card</td>";
+                                $list.="<td style='padding:15px;'>$$payments->cash</td>";
+                                $list.="<td style='padding:15px;'>$$payments->cheque</td>";
+                                $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                                $list.="</tr>";
+                                //return;
+                            } // end if
+                            else {
+                                //return;
+                            } // end ekse
+                        } /// end else
+                    } // end for
+                    $list.="<tr>";
+                    $list.="<th style='padding:15px;'></th>";
+                    $list.="<th style='padding:15px;'>$$total_card</th>";
+                    $list.="<th style='padding:15px;'>$$total_cash</th>";
+                    $list.="<th style='padding:15px;'>$$total_cheque</th>";
+                    $list.="<th style='padding:15px;'>$$total_invoice</th>";
+                    $list.="</tr>";
+                    $list.="</table>";
+                } // end else
 
-          echo "<br>Second year start: $second_year_start<br>";
-          echo "Second year end: " . $second_year_end . "<br>";
-          echo "Second year unixtime start: $from2<br>";
-          echo "Second year unixtime end: $to2<br>";
-         * 
-         */
+                break;
+        }
+        return $list;
     }
 
-    function get_month_stat_payments($year, $month1, $month2) {
-        $number1 = cal_days_in_month(CAL_GREGORIAN, $month1, $year);
-        $number2 = cal_days_in_month(CAL_GREGORIAN, $month2, $year);
+    function get_stat_data($item) {
+        $list = "";
+        $unix_start = strtotime($item->start);
+        $unix_end = strtotime($item->end);
 
-        $first_month_start = $month1 . "/01/" . $year;
-        $first_month_end = $month1 . "/$number1/" . $year;
-        $from1 = strtotime($first_month_start);
-        $to1 = strtotime($first_month_end);
+        if ($unix_start > $unix_end) {
+            $list.="Period end date must be later then period begin date";
+            return;
+        } // end if 
 
-        $second_month_start = $month2 . "/01/" . $year;
-        $second_month_end = $month2 . "/$number2/" . $year;
-        $from2 = strtotime($second_month_start);
-        $to2 = strtotime($second_month_end);
+        $datetime1 = date_create($item->start);
+        $datetime2 = date_create($item->end);
+        $interval = date_diff($datetime1, $datetime2);
+        $posted_interval = $item->interval;
+        $days = $interval->format('%a');
 
-        /*
-         * 
-          echo "Month1 start date: " . $first_month_start . "<br>";
-          echo "Month1 end date: " . $first_month_end . "<br>";
-          echo "Month1 unixtime start: " . $from1 . "<br>";
-          echo "Month1 unixtime end: " . $to1 . "<br>";
-
-          echo "<br>------------------------------------------------------------<br>";
-
-          echo "<br>Month2 start date: " . $second_month_start . "<br>";
-          echo "Month2 end date: " . $second_month_end . "<br>";
-          echo "Month2 unixtime start: " . $from2 . "<br>";
-          echo "Month2 unixtime start: " . $to2 . "<br>";
-         * 
-         */
+        switch ($posted_interval) {
+            case 'year':
+                if ($days < 730) {
+                    $list.="Selected period should contain at least two years";
+                    return $list;
+                } // end if
+                else {
+                    $list.=$this->get_payments_between_dates($item);
+                } // end else
+                break;
+            case 'month':
+                if ($days < 60) {
+                    $list.="Selected period should contain at least two months";
+                    return $list;
+                } // end if
+                else {
+                    $list.=$this->get_payments_between_dates($item);
+                } // end else
+                break;
+            case 'week':
+                if ($days < 14) {
+                    $list.="Selected period should contain at least two weeks";
+                    return $list;
+                } // end if
+                else {
+                    $list.=$this->get_payments_between_dates($item);
+                } // end else
+                break;
+        } // end of switch
+        return $list;
     }
 
 }
