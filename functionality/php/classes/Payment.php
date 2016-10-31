@@ -1173,8 +1173,14 @@ class Payment {
         //$renew_fee = $this->get_renew_fee();
         // Make card object compatible with confirmation email
         $names = explode(" ", $card->card_holder);
-        $firstname = $names[0];
-        $lastname = $names[1];
+        if (count($names) == 2) {
+            $firstname = $names[0];
+            $lastname = $names[1];
+        } //end if 
+        if (count($names) == 3) {
+            $firstname = $names[0] . " " . $names[1];
+            $lastname = $names[2];
+        } // end else
 
         $card->email = $user_payment_data->email;
         $card->slotid = $this->get_user_slotid($card->courseid, $card->userid); // compatible if user does not exist
@@ -1534,8 +1540,16 @@ class Payment {
         if ($signup_status === true) {
 
             $names = explode(" ", $user->billing_name);
-            $fisrtname = $names[0];
-            $lastname = $names[1];
+            if (count($names) == 2) {
+                $fisrtname = $names[0];
+                $lastname = $names[1];
+            } // end if
+
+            if (count($names) == 3) {
+                $fisrtname = $names[0] . " " . $names[1];
+                $lastname = $names[2];
+            } // end if
+
             $item = substr($this->get_course_name($user->courseid), 0, 30);
 
             $order = new stdClass();
