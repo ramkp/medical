@@ -257,7 +257,9 @@ class Schedule extends Util {
         }
 
         $this->modid = $modid;
-
+        
+        //echo "Total workshops: ".count($slots)."<br>";
+        
         $list = "";
         if ($tools == true) {
             $list.="<div class='panel panel-default'>";
@@ -370,7 +372,7 @@ class Schedule extends Util {
             $list.="</div>";
         } // end if count($slots)>0        
         else {
-            $list.= "<div class='container-fluid' style='text-align:left;'>";
+            $list.= "<div class='container-fluid' style='text-align:left;' id='schedule_container'>";
             $list.="<span class='span8'>There are no scheduled workshops</span>";
             $list.="</div>";
         }

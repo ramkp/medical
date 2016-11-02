@@ -1358,6 +1358,7 @@ $(document).ready(function () {
         $('#ajax_loading').show();
         $.post(url, {start: start, end: end, scheduler: scheduler, sesskey: sesskey}).done(function (data) {
             $('#ajax_loading').hide();
+            //console.log(data);
             $('#schedule_container').html(data);
         });
     }
@@ -3445,13 +3446,6 @@ $(document).ready(function () {
                 $('#stat_ajax_loader').hide();
                 $('#stat_data').html(data);
             });
-
-
-
-
-
-
-
         }
 
 
