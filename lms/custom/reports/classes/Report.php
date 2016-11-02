@@ -1193,12 +1193,13 @@ class Report extends Util {
                     . "and  ptype=1";
         } // end if
         else {
-            $query = "select sum(psum) as total, p.userid, u.id, u.deleted "
-                    . "from mdl_partial_payments, mdl_user u "
+            $query = "select sum(p.psum) as total, p.userid, u.id, u.deleted "
+                    . "from mdl_partial_payments p, mdl_user u "
                     . "where p.userid=u.id and u.deleted=0 and courseid=$courseid "
                     . "and pdate between $unix_start and $unix_end "
                     . "and  ptype=1";
         } // end else 
+        //echo "Query:".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $cash_amout = $row['total'];
@@ -1370,22 +1371,32 @@ class Report extends Util {
             case "week":
                 $year_start = date('Y', $unix_start);
                 $year_end = date('Y', $unix_end);
-
                 if ($year_start != $year_end) {
                     $list.="<tr>";
                     $list.="<th style='padding:15px;text-align:center;' colspan='5' >Weeks comparison available within same year</th>";
                     $list.="</tr>";
                 } // end if 
                 else {
-                    $month_start = date('m', $unix_start);
-                    $month_end = date('m', $unix_end);
+                    //$month_start = date('m', $unix_start);
+                    //$month_end = date('m', $unix_end);
                     $weeksnumber = idate('W', $diff);
                     $weekperiod = 86400 * 7;
-                    if ($month_start == $month_end) {
-                        for ($i = 1; $i <= ($weeksnumber - 1); $i++) {
-                            $added = $unix_start + $weekperiod;
-                            $payments = $this->get_period_payments($courseid, $unix_start, $added);
-                            if ($added <= $unix_end) {
+                    for ($i = 1; $i <= ($weeksnumber - 1); $i++) {
+                        $added = $unix_start + $weekperiod;
+                        $payments = $this->get_period_payments($courseid, $unix_start, $added);
+                        if ($added <= $unix_end) {
+                            $list.="<tr>";
+                            $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
+                            $list.="<td style='padding:15px;'>$$payments->card</td>";
+                            $list.="<td style='padding:15px;'>$$payments->cash</td>";
+                            $list.="<td style='padding:15px;'>$$payments->cheque</td>";
+                            $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                            $list.="</tr>";
+                            $unix_start = $added;
+                        } // end if
+                        else {
+                            $added = $unix_end;
+                            if ($unix_start != $added) {
                                 $list.="<tr>";
                                 $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
                                 $list.="<td style='padding:15px;'>$$payments->card</td>";
@@ -1393,87 +1404,30 @@ class Report extends Util {
                                 $list.="<td style='padding:15px;'>$$payments->cheque</td>";
                                 $list.="<td style='padding:15px;'>$$payments->invoice</td>";
                                 $list.="</tr>";
-                                $unix_start = $added;
+                                //return;
                             } // end if
                             else {
-                                $added = $unix_end;
-                                if ($unix_start != $added) {
-                                    $list.="<tr>";
-                                    $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
-                                    $list.="<td style='padding:15px;'>$$payments->card</td>";
-                                    $list.="<td style='padding:15px;'>$$payments->cash</td>";
-                                    $list.="<td style='padding:15px;'>$$payments->cheque</td>";
-                                    $list.="<td style='padding:15px;'>$$payments->invoice</td>";
-                                    $list.="</tr>";
-                                    //return;
-                                } // end if
-                                else {
-                                    //return;
-                                } // end ekse
-                            } /// end else
-                        } // end for
-                        $total_payments = $this->get_period_payments($courseid, $original_unix_start, $original_unix_end);
+                                //return;
+                            } // end ekse
+                        } /// end else
+                    } // end for
+                    $total_payments = $this->get_period_payments($courseid, $original_unix_start, $original_unix_end);
 
-                        /*
-                          $list.="<tr>";
-                          $list.="<th style='padding:15px;'></th>";
-                          $list.="<th style='padding:15px;'>$$total_payments->card</th>";
-                          $list.="<th style='padding:15px;'>$$total_payments->cash</th>";
-                          $list.="<th style='padding:15px;'>$$total_payments->cheque</th>";
-                          $list.="<th style='padding:15px;'>$$total_payments->invoice</th>";
-                          $list.="</tr>";
-                         */
+                    /*
+                      $list.="<tr>";
+                      $list.="<th style='padding:15px;'></th>";
+                      $list.="<th style='padding:15px;'>$$total_payments->card</th>";
+                      $list.="<th style='padding:15px;'>$$total_payments->cash</th>";
+                      $list.="<th style='padding:15px;'>$$total_payments->cheque</th>";
+                      $list.="<th style='padding:15px;'>$$total_payments->invoice</th>";
+                      $list.="</tr>";
+                     */
 
-                        $list.="</table>";
-                    } //  end if
-                    else {
-                        for ($i = 1; $i <= ($weeksnumber); $i++) {
-                            $added = $unix_start + $weekperiod;
-                            $payments = $this->get_period_payments($courseid, $unix_start, $added);
-                            if ($added <= $unix_end) {
-                                $list.="<tr>";
-                                $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
-                                $list.="<td style='padding:15px;'>$$payments->card</td>";
-                                $list.="<td style='padding:15px;'>$$payments->cash</td>";
-                                $list.="<td style='padding:15px;'>$$payments->cheque</td>";
-                                $list.="<td style='padding:15px;'>$$payments->invoice</td>";
-                                $list.="</tr>";
-                                $unix_start = $added;
-                            } // end if
-                            else {
-                                $added = $unix_end;
-                                if ($unix_start != $added) {
-                                    $list.="<tr>";
-                                    $list.="<td style='padding:15px;'>" . date('m-d-Y', $unix_start) . " " . date('m-d-Y', $added) . "</td>";
-                                    $list.="<td style='padding:15px;'>$$payments->card</td>";
-                                    $list.="<td style='padding:15px;'>$$payments->cash</td>";
-                                    $list.="<td style='padding:15px;'>$$payments->cheque</td>";
-                                    $list.="<td style='padding:15px;'>$$payments->invoice</td>";
-                                    $list.="</tr>";
-                                    //return;
-                                } // end if
-                                else {
-                                    //return;
-                                } // end ekse
-                            } /// end else
-                        } // end for
-                        $total_payments = $this->get_period_payments($courseid, $original_unix_start, $original_unix_end);
+                    $list.="</table>";
 
-                        /*
-                          $list.="<tr>";
-                          $list.="<th style='padding:15px;'></th>";
-                          $list.="<th style='padding:15px;'>$$total_payments->card</th>";
-                          $list.="<th style='padding:15px;'>$$total_payments->cash</th>";
-                          $list.="<th style='padding:15px;'>$$total_payments->cheque</th>";
-                          $list.="<th style='padding:15px;'>$$total_payments->invoice</th>";
-                          $list.="</tr>";
-                         */
-                        $list.="</table>";
-                    } // end else
+                    break;
                 } // end else
-
-                break;
-        }
+        } // end switch
         return $list;
     }
 
