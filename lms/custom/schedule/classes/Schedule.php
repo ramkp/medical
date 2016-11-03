@@ -257,9 +257,9 @@ class Schedule extends Util {
         }
 
         $this->modid = $modid;
-        
+
         //echo "Total workshops: ".count($slots)."<br>";
-        
+
         $list = "";
         if ($tools == true) {
             $list.="<div class='panel panel-default'>";
@@ -456,9 +456,8 @@ class Schedule extends Util {
             $cert = new Certificates();
             foreach ($students_arr as $studentid) {
                 $cert->send_certificate($courseid, $studentid, $now, false);
-                $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.pdf";
-                //$jpg_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.jpg";
-                //exec("convert -density 300 $pdf_file $jpg_file");
+                //$pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.pdf";
+                $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/$courseid/certificate.pdf";
                 $certs[] = $pdf_file;
             }
             //print_r($certs);
