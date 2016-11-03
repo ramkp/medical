@@ -5,6 +5,8 @@
  *
  * @author sirromas
  */
+set_time_limit(0);
+error_reporting('all');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.php';
@@ -141,7 +143,8 @@ class Certificates extends Util {
                 $date = date('m-d-Y', $certificate->issue_date);
                 $exp_date = date('m-d-Y', $certificate->expiration_date);
                 $_exp_date = ($exp_date == '') ? "n/a" : $exp_date;
-                $cert_link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $certificate->path));
+                //$cert_link = trim(str_replace($_SERVER['DOCUMENT_ROOT'], '', $certificate->path));
+                $cert_link = "/lms/custom/certificates/$certificate->userid/$certificate->courseid/certificate.pdf";
                 $addr_link = "/lms/custom/certificates/$certificate->userid/label.pdf";
                 //$address_block=$this->get_user_address_block($user->id);                
                 //echo "Address block: ".$address_block."<br>";
@@ -421,19 +424,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
-
                 break;
 
 
@@ -464,19 +454,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
-
                 break;
 
             case 45:
@@ -505,19 +482,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
-
                 break;
 
             case 47:
@@ -542,18 +506,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
                 break;
 
             case 48:
@@ -578,19 +530,6 @@ class Certificates extends Util {
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
-
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
 
                 break;
 
@@ -618,19 +557,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
-
                 break;
 
 
@@ -657,19 +583,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
-
                 break;
 
             case 57:
@@ -693,19 +606,6 @@ class Certificates extends Util {
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
-
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
 
                 break;
 
@@ -731,89 +631,29 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
                 break;
         } // end switch
+
+        $pdf = new mPDF('utf-8', 'A4-L');
+        $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+        $pdf->WriteHTML($stylesheet, 1);
+        $pdf->WriteHTML($list, 2);
+        $dir_path = $this->cert_path . "/$userid/$courseid";
+        if (!is_dir($dir_path)) {
+            if (!mkdir($dir_path)) {
+                die('Could not write to disk');
+            } // end if !mkdir($dir_path)
+        } // end if !is_dir($dir_path)
+        $path = $dir_path . "/certificate.pdf";
+        $pdf->Output($path, 'F');
+
         return $list;
     }
 
     function prepare_ceriticate($courseid, $userid, $date = 0, $code = '', $renew = false) {
         $list = "";
-
-
-        /*
-          $coursename = $this->get_course_name($courseid); // string
-          $userdetails = $this->get_user_details($userid); // object
-          $firstname = strtoupper($userdetails->firstname);
-          $lastname = strtoupper($userdetails->lastname);
-          if ($date == 0) {
-          $date = time();
-          }
-          $day = date('d', $date);
-          $month = date('M', $date);
-          $year = date('Y', $date);
-          $renew_status = $this->get_course_renew_status($courseid);
-          $title = $this->get_certificate_title($courseid);
-          $code = $this->get_course_code($courseid, $userid);
-          if ($renew_status == 1) {
-          $expiration_date_sec = $date + 31536000;
-          }
-          $expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
-         */
-
-
         $list.=$this->get_certificate_template($courseid, $userid, $date, $code, $renew);
-
-
-        /*
-          $list.="<!DOCTYPE HTML SYSTEM>";
-          $list.="<head>";
-          $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
-          $list.="<link rel='stylesheet' type='text/css' href='cert.css'>";
-          $list.="</head>";
-          $list.="<body>";
-          $list.="<div class='cert'>";
-          $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
-          $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
-          $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day th of $month $year To:</span>";
-          $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
-          $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
-          $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
-          if ($renew_status == true) {
-          $list.="EXPIRATION DATE $expiration_date</p>";
-          }
-          $list.="<div align='left'><table border='0' width='675px;'><tr><td style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td><td align='left' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;margin-left:40px;'>Donna Steele<br/><span style='float:right;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none;'>Director</span></td></tr></table></div>";
-          $list.="</div>";
-          $list.="</body>";
-          $list.="</html>";
-
-
-          $pdf = new mPDF('utf-8', 'A4-L');
-          $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-          $pdf->WriteHTML($stylesheet, 1);
-          $pdf->WriteHTML($list, 2);
-          $dir_path = $this->cert_path . "/$userid";
-          if (!is_dir($dir_path)) {
-          if (!mkdir($dir_path)) {
-          die('Could not write to disk');
-          } // end if !mkdir($dir_path)
-          } // end if !is_dir($dir_path)
-          $path = $dir_path . "/certificate.pdf";
-          $pdf->Output($path, 'F');
-         * 
-         */
-        $dir_path = $this->cert_path . "/$userid";
+        $dir_path = $this->cert_path . "/$userid/$courseid";
         $path = $dir_path . "/certificate.pdf";
         return $path;
     }
@@ -1159,7 +999,7 @@ class Certificates extends Util {
                 //$this->update_certificate_data($id, $certificate->date);
             } // end foreach
         } // end if count($certs_array)>0
-       // $list.="Selected Certificate(s) were renewed";
+        // $list.="Selected Certificate(s) were renewed";
         return $list;
     }
 
@@ -1336,11 +1176,12 @@ class Certificates extends Util {
     }
 
     function create_new_certificate($cert, $issue, $expire) {
-        
+
         $coursename = $this->get_course_name($cert->courseid); // string
         $userdetails = $this->get_user_details($cert->userid); // object
+        $courseid = $cert->courseid;
         $userid = $cert->userid;
-        $this->create_label($cert->courseid, $userid);
+        $this->create_label($courseid, $userid);
         $firstname = strtoupper($userdetails->firstname);
         $lastname = strtoupper($userdetails->lastname);
         $day = date('dS', $issue);
@@ -1352,14 +1193,6 @@ class Certificates extends Util {
         $code = $this->get_course_code($cert->courseid, $cert->userid);
 
 
-        /*
-          echo "Certificate ID: " . $cert->id;
-          echo "User ID: " . $userid . "<br>";
-          echo "User credentials: " . $firstname . "&nbsp;" . $lastname . "<br>";
-          echo "Course name: " . $coursename . "<br>";
-          echo "Issue date: " . $issue_date . "<br>";
-          echo "Expiration date: " . $expiration_date . "<br>";
-         */
         switch ($cert->courseid) {
 
             case 41:
@@ -1388,21 +1221,7 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
-
                 break;
-
 
             case 44:
                 $list.="<!DOCTYPE HTML SYSTEM>";
@@ -1431,19 +1250,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
-
                 break;
 
             case 45:
@@ -1461,7 +1267,7 @@ class Certificates extends Util {
                         . "Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture,<br> "
                         . "Patient bill of rights, order of draws, needle/syringe, winged infusion (butterfly), lancet, evacuated tube system, and corrective techniques.<br><br>"
                         . "The workshop also discusses procedures to preform an Electrocardiogram.</span>";
-                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $cert->code<br>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
@@ -1471,19 +1277,6 @@ class Certificates extends Util {
 
                 $list.="</body>";
                 $list.="</html>";
-
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
 
                 break;
 
@@ -1509,18 +1302,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
                 break;
 
             case 48:
@@ -1537,7 +1318,7 @@ class Certificates extends Util {
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
-                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $cert->code<br>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
@@ -1546,19 +1327,8 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
                 break;
+
             case 49:
                 $list.="<!DOCTYPE HTML SYSTEM>";
                 $list.="<head>";
@@ -1583,19 +1353,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
-
                 break;
 
             case 51:
@@ -1612,7 +1369,7 @@ class Certificates extends Util {
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam.</span>";
-                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $cert->code<br>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
@@ -1621,18 +1378,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
                 break;
 
             case 57:
@@ -1657,19 +1402,6 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
-
                 break;
 
             default:
@@ -1685,7 +1417,7 @@ class Certificates extends Util {
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
-                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $cert->code<br>";
+                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
@@ -1694,20 +1426,22 @@ class Certificates extends Util {
                 $list.="</body>";
                 $list.="</html>";
 
-                $pdf = new mPDF('utf-8', 'A4-L');
-                $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-                $pdf->WriteHTML($stylesheet, 1);
-                $pdf->WriteHTML($list, 2);
-                $dir_path = $this->cert_path . "/$userid";
-                if (!is_dir($dir_path)) {
-                    if (!mkdir($dir_path)) {
-                        die('Could not write to disk');
-                    } // end if !mkdir($dir_path)
-                } // end if !is_dir($dir_path)
-                $path = $dir_path . "/certificate.pdf";
-                $pdf->Output($path, 'F');
                 break;
         } // end switch
+
+        $pdf = new mPDF('utf-8', 'A4-L');
+        $stylesheet = file_get_contents($this->cert_path . '/cert.css');
+        $pdf->WriteHTML($stylesheet, 1);
+        $pdf->WriteHTML($list, 2);
+
+        $dir_path = $this->cert_path . "/$userid/$courseid";
+        if (!is_dir($dir_path)) {
+            if (!mkdir($dir_path)) {
+                die('Could not write to disk');
+            } // end if !mkdir($dir_path)
+        } // end if !is_dir($dir_path)
+        $path = $dir_path . "/certificate.pdf";
+        $pdf->Output($path, 'F');
     }
 
     function get_create_box() {
@@ -1788,6 +1522,44 @@ class Certificates extends Util {
         $this->add_certificate_data($cert, $issue, $expire);
         $list.="Certificate has been created";
         return $list;
+    }
+
+    // ***************** Migration code *********************
+
+    function get_old_location_cartificates($courseid = null) {
+        $certificates = array();
+        if ($courseid == null) {
+            $query = "select * from mdl_certificates";
+        } // end if 
+        else {
+            $query = "select * from mdl_certificates where courseid=$courseid";
+        } // end else
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cert = new stdClass();
+            foreach ($row as $key => $value) {
+                $cert->$key = $value;
+            } // end foreach
+            $certificates[] = $cert;
+        } // end while
+        $this->create_new_location_certificates_list($certificates);
+    }
+
+    function create_new_location_certificates_list($certificates) {
+        $total = count($certificates);
+        $i = 0;
+        foreach ($certificates as $cert) {
+            $user = $this->get_user_details($cert->userid);
+            $cname = $this->get_course_name($cert->courseid);
+            $issue = date('m-d-Y', $cert->issue_date);
+            $exp = date('m-d-Y', $cert->expiration_date);
+            echo "$user->firstname $user->lastname $cname $issue $exp  <br>";
+            $this->create_new_certificate($cert, $cert->issue_date, $cert->expiration_date);
+            echo "New location certificate has been created ... Item No $i of $total<br>";
+            echo"<hr><br>";
+            $i++;
+        } // end foreach
+        echo "Total certificates processed: " . count($certificates) . "<br>";
     }
 
 }

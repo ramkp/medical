@@ -354,7 +354,8 @@ class navClass extends Util {
                         $end = $start + $year_expiration_sec;
                         $cert->create_certificate2($courseid, $this->user->id, $start, $end);
                     } // end if $exists==0                    
-                    $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>$coursename - Print Certificate</a></li>";
+                    //$list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>$coursename - Print Certificate</a></li>";
+                    $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename - Print Certificate</a></li>";
                     $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>$coursename - Renew Certificate</a></li>";
                     //$list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
                 } // end if $compleation_status!=0        
