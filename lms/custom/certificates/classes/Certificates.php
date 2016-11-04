@@ -470,7 +470,7 @@ class Certificates extends Util {
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of hands-on clinical exam and written certification exam.<br>"
                         . "Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture,<br> "
                         . "Patient bill of rights, order of draws, needle/syringe, winged infusion (butterfly), lancet, evacuated tube system, and corrective techniques.<br><br>"
-                        . "The workshop also discusses procedures to preform an Electrocardiogram.</span>";
+                        . "The workshop also discusses procedures to perform an Electrocardiogram.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
@@ -1266,7 +1266,7 @@ class Certificates extends Util {
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of hands-on clinical exam and written certification exam.<br>"
                         . "Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture,<br> "
                         . "Patient bill of rights, order of draws, needle/syringe, winged infusion (butterfly), lancet, evacuated tube system, and corrective techniques.<br><br>"
-                        . "The workshop also discusses procedures to preform an Electrocardiogram.</span>";
+                        . "The workshop also discusses procedures to perform an Electrocardiogram.</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
