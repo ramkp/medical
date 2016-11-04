@@ -1265,6 +1265,10 @@ class Report extends Util {
                 . "and p.userid=c.userid "
                 . "and p.refunded=0 and p.psum='$renew_payment' and "
                 . "p.pdate between $unix_start and $unix_end";
+        $query = "select pdate, refunded, sum(psum) as total "
+                . "from mdl_card_payments "
+                . "where psum='$renew_payment' and refunded=0 and "
+                . "pdate between $unix_start and $unix_end";
         //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -1279,12 +1283,16 @@ class Report extends Util {
                 . "where p.courseid=c.courseid "
                 . "and p.userid=c.userid and p.psum='$renew_payment' and "
                 . "p.pdate between $unix_start and $unix_end";
+        $query = "select pdate, sum(psum) as total from mdl_partial_payments "
+                . "where psum='$renew_payment' and "
+                . "pdate between $unix_start and $unix_end";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $recert2 = $row['total'];
         }
         $recert = $recert1 + $recert2;
         $payments->recert = $recert;
+        $payments->total = $payments->card + $payments->cash + $payments->cheque + $payments->invoice;
 
         return $payments;
     }
@@ -1310,7 +1318,8 @@ class Report extends Util {
         $list.="<th style='padding:15px;'>Cash</th>";
         $list.="<th style='padding:15px;'>Cheque</th>";
         $list.="<th style='padding:15px;'>Invoices</th>";
-        $list.="<th style='padding:15px;'>Re-Certification</th>";
+        $list.="<th style='padding:15px;'>Total</th>";
+        $list.="<th style='padding:15px;'>Re-Cert</th>";
         $list.="</tr>";
 
         switch ($item->interval) {
@@ -1318,6 +1327,10 @@ class Report extends Util {
                 $year_start = date('Y', $unix_start);
                 $year_end = date('Y', $unix_end);
                 $yearnumber = $year_end - $year_start;
+                //echo "Year number: " . $yearnumber . "<br>";
+                if ($yearnumber == 0) {
+                    $yearnumber = 1;
+                }
                 for ($i = 1; $i <= $yearnumber; $i++) {
                     $y = date('Y', $unix_start);
                     $year_days_number = date("z", mktime(0, 0, 0, 12, 31, $y)) + 1;
@@ -1331,6 +1344,7 @@ class Report extends Util {
                         $list.="<td style='padding:15px;'>$$payments->cash</td>";
                         $list.="<td style='padding:15px;'>$$payments->cheque</td>";
                         $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                        $list.="<td style='padding:15px;'>$$payments->total</td>";
                         $list.="<td style='padding:15px;'>$$payments->recert</td>";
                         $list.="</tr>";
                         $unix_start = $added;
@@ -1343,13 +1357,14 @@ class Report extends Util {
                         $list.="<td style='padding:15px;'>$$payments->cash</td>";
                         $list.="<td style='padding:15px;'>$$payments->cheque</td>";
                         $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                        $list.="<td style='padding:15px;'>$$payments->total</td>";
                         $list.="<td style='padding:15px;'>$$payments->recert</td>";
                         $list.="</tr>";
                     } /// end else
                 } // end for
                 $total_payments = $this->get_period_payments($courseid, $original_unix_start, $added);
                 $list.="<tr>";
-                $list.="<th style='padding-left:15px;padding-right:15px;' colspan='6'><hr/></th>";
+                $list.="<th style='padding-left:15px;padding-right:15px;' colspan='7'><hr/></th>";
                 $list.="</tr>";
                 $list.="<tr style='font-weight:bolder;'>";
                 $list.="<th style='padding:15px;'>" . date('m-d-Y', $original_unix_start) . " " . date('m-d-Y', $added) . "</th>";
@@ -1357,6 +1372,7 @@ class Report extends Util {
                 $list.="<th style='padding:15px;'>$$total_payments->cash</th>";
                 $list.="<th style='padding:15px;'>$$total_payments->cheque</th>";
                 $list.="<th style='padding:15px;'>$$total_payments->invoice</th>";
+                $list.="<th style='padding:15px;'>$$total_payments->total</th>";
                 $list.="<th style='padding:15px;'>$$total_payments->recert</th>";
                 $list.="</tr>";
                 $list.="</table>";
@@ -1385,6 +1401,7 @@ class Report extends Util {
                         $list.="<td style='padding:15px;'>$$payments->cash</td>";
                         $list.="<td style='padding:15px;'>$$payments->cheque</td>";
                         $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                        $list.="<td style='padding:15px;'>$$payments->total</td>";
                         $list.="<td style='padding:15px;'>$$payments->recert</td>";
                         $list.="</tr>";
                         $unix_start = $added;
@@ -1397,13 +1414,14 @@ class Report extends Util {
                         $list.="<td style='padding:15px;'>$$payments->cash</td>";
                         $list.="<td style='padding:15px;'>$$payments->cheque</td>";
                         $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                        $list.="<td style='padding:15px;'>$$payments->total</td>";
                         $list.="<td style='padding:15px;'>$$payments->recert</td>";
                         $list.="</tr>";
                     } /// end else
                 } // end for
                 $total_payments = $this->get_period_payments($courseid, $original_unix_start, $added);
                 $list.="<tr>";
-                $list.="<th style='padding-left:15px;padding-right:15px;' colspan='6'><hr/></th>";
+                $list.="<th style='padding-left:15px;padding-right:15px;' colspan='7'><hr/></th>";
                 $list.="</tr>";
                 $list.="<tr style='font-weight:bolder;'>";
                 $list.="<th style='padding:15px;'>" . date('m-d-Y', $original_unix_start) . " " . date('m-d-Y', $added) . "</th>";
@@ -1411,6 +1429,7 @@ class Report extends Util {
                 $list.="<th style='padding:15px;'>$$total_payments->cash</th>";
                 $list.="<th style='padding:15px;'>$$total_payments->cheque</th>";
                 $list.="<th style='padding:15px;'>$$total_payments->invoice</th>";
+                $list.="<th style='padding:15px;'>$$total_payments->total</th>";
                 $list.="<th style='padding:15px;'>$$total_payments->recert</th>";
                 $list.="</tr>";
                 $list.="</table>";
@@ -1438,6 +1457,7 @@ class Report extends Util {
                             $list.="<td style='padding:15px;'>$$payments->cash</td>";
                             $list.="<td style='padding:15px;'>$$payments->cheque</td>";
                             $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                            $list.="<td style='padding:15px;'>$$payments->total</td>";
                             $list.="<td style='padding:15px;'>$$payments->recert</td>";
                             $list.="</tr>";
                             $unix_start = $added;
@@ -1451,6 +1471,7 @@ class Report extends Util {
                                 $list.="<td style='padding:15px;'>$$payments->cash</td>";
                                 $list.="<td style='padding:15px;'>$$payments->cheque</td>";
                                 $list.="<td style='padding:15px;'>$$payments->invoice</td>";
+                                $list.="<td style='padding:15px;'>$$payments->total</td>";
                                 $list.="<td style='padding:15px;'>$$payments->recert</td>";
                                 $list.="</tr>";
                                 //return;
@@ -1462,7 +1483,7 @@ class Report extends Util {
                     } // end for
                     $total_payments = $this->get_period_payments($courseid, $original_unix_start, $added);
                     $list.="<tr>";
-                    $list.="<th style='padding-left:15px;padding-right:15px;' colspan='6'><hr/></th>";
+                    $list.="<th style='padding-left:15px;padding-right:15px;' colspan='7'><hr/></th>";
                     $list.="</tr>";
                     $list.="<tr style='font-weight:bolder;'>";
                     $list.="<th style='padding:15px;'>" . date('m-d-Y', $original_unix_start) . " " . date('m-d-Y', $added) . "</th>";
@@ -1470,6 +1491,7 @@ class Report extends Util {
                     $list.="<th style='padding:15px;'>$$total_payments->cash</th>";
                     $list.="<th style='padding:15px;'>$$total_payments->cheque</th>";
                     $list.="<th style='padding:15px;'>$$total_payments->invoice</th>";
+                    $list.="<th style='padding:15px;'>$$total_payments->total</th>";
                     $list.="<th style='padding:15px;'>$$total_payments->recert</th>";
                     $list.="</tr>";
                     $list.="</table>";
@@ -1497,8 +1519,8 @@ class Report extends Util {
 
         switch ($posted_interval) {
             case 'year':
-                if ($days < 730) {
-                    $list.="Selected period should contain at least two years";
+                if ($days < 270) {
+                    $list.="Selected period should contain at least one year";
                     return $list;
                 } // end if
                 else {
