@@ -1265,11 +1265,15 @@ class Report extends Util {
                 . "and p.userid=c.userid "
                 . "and p.refunded=0 and p.psum='$renew_payment' and "
                 . "p.pdate between $unix_start and $unix_end";
-        $query = "select pdate, refunded, sum(psum) as total "
-                . "from mdl_card_payments "
-                . "where psum='$renew_payment' and refunded=0 and "
-                . "pdate between $unix_start and $unix_end";
+
+        /*
+          $query = "select pdate, refunded, sum(psum) as total "
+          . "from mdl_card_payments "
+          . "where psum='$renew_payment' and refunded=0 and "
+          . "pdate between $unix_start and $unix_end";
+         */
         //echo "Query: ".$query."<br>";
+
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $recert1 = $row['total'];
@@ -1283,9 +1287,13 @@ class Report extends Util {
                 . "where p.courseid=c.courseid "
                 . "and p.userid=c.userid and p.psum='$renew_payment' and "
                 . "p.pdate between $unix_start and $unix_end";
-        $query = "select pdate, sum(psum) as total from mdl_partial_payments "
-                . "where psum='$renew_payment' and "
-                . "pdate between $unix_start and $unix_end";
+
+        /*
+          $query = "select pdate, sum(psum) as total from mdl_partial_payments "
+          . "where psum='$renew_payment' and "
+          . "pdate between $unix_start and $unix_end";
+         */
+
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $recert2 = $row['total'];
