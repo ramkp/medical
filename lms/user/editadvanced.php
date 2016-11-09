@@ -167,7 +167,7 @@ if ($usernew = $userform->get_data()) {
     //print_r($usernew);
     //die();
     $usercreated = false;
-    
+
 
     // Update pure pwd field if any
     if ($usernew->newpassword != '') {
@@ -176,7 +176,6 @@ if ($usernew = $userform->get_data()) {
                 . "where id=$usernew->id";
         $db->query($query);
     } // end if $usernew->newpassword!=''
-    
     // Update address field
 
     if (empty($usernew->auth)) {
@@ -325,7 +324,10 @@ if ($usernew = $userform->get_data()) {
         }
     } else {
         \core\session\manager::gc(); // Remove stale sessions.
-        redirect("$CFG->wwwroot/$CFG->admin/user.php");
+        // Always stay on user's profile which was edited
+        $returnurl = new moodle_url('/user/profile.php', array('id' => $user->id));
+        redirect($returnurl);
+        //redirect("$CFG->wwwroot/$CFG->admin/user.php");
     }
     // Never reached..
 } // end if $usernew = $userform->get_data()
