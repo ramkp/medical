@@ -27,7 +27,8 @@ echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . 
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/vendor/jquery.ui.widget.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/jquery.iframe-transport.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/jquery.fileupload.js'></script>";
-echo "<script src='https://cdn.ckeditor.com/4.5.6/standard/ckeditor.js'></script>";
+//echo "<script src='https://cdn.ckeditor.com/4.5.6/standard/ckeditor.js'></script>";
+echo '<script src="//cdn.ckeditor.com/4.5.11/full/ckeditor.js"></script>';
 //echo "<script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/jquery.simplePagination.js'></script>";
 echo "<link type='text/css' rel='stylesheet' href='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/simplePagination.css'/>";
@@ -40,26 +41,25 @@ echo "</script>";
 echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
 echo"<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
 echo "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.js'></script>";
-
 ?>
 
 <script>
 
     /*
-    $(function () {
+     $(function () {
+     $("#start").datepicker();
+     $("#end").datepicker();
+     });
+     */
+
+    $(document).ready(function () {
+
         $("#start").datepicker();
-        $("#end").datepicker();
-    });
-    */
-
-    $(document).ready(function(){
-
-    	$("#start").datepicker();
         $("#end").datepicker();
         $("#week1").datepicker();
         $("#week2").datepicker();
 
-      
+
     }); // end of $(document).ready(function(){	
 
 </script>

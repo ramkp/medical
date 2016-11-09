@@ -49,7 +49,8 @@ class Dashboard extends Util {
                 $query = "select * from mdl_card_payments "
                         . "where userid=$userid and courseid=$courseid and refunded=0 ";
                 $card_payments_num = $this->db->numrows($query);
-
+                
+                //echo "Card payments num: ".$card_payments_num."<br>";
                 // 2. Check among invoice payments
                 $query = "select * from mdl_invoice "
                         . "where userid=$userid and courseid=$courseid and i_status=1";
@@ -120,6 +121,7 @@ class Dashboard extends Util {
                 else {
                     $status = 0;
                 }
+                //$status=1; // installment users consider as paid ....
             } // end else when it is installment user
         } // end else 
         return $status;

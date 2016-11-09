@@ -12,6 +12,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mp
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/classes/Invoice.php');
+include $_SERVER['DOCUMENT_ROOT'] . "/lms/editor/fckeditor.php";
 
 class Certificates extends Util {
 
@@ -87,8 +88,9 @@ class Certificates extends Util {
         return $list;
     }
 
-    function create_certificates_list($certificates, $toolbar = true, $search = false) {
+    function prepare_certificate_tab_content($certificates, $toolbar = true, $search = false) {
         $list = "";
+
         if (count($certificates) > 0) {
             if ($toolbar == true) {
                 $create_cert_block = $this->get_create_box();
@@ -222,7 +224,121 @@ class Certificates extends Util {
             $list.="</div>";
             $list.=$this->get_send_certificate_page();
         } // end else
+
         return $list;
+    }
+
+    function get_certificates_templates_tab() {
+        $list = '';
+        $courses_list = $this->get_courses_list();
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'>Program: </span><span class='span6'>$courses_list</span>";
+        $list.="</div>";
+
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'>Certificate issuer</span>";
+        $list.="<span class='span9'><input type='text' id='cert_issuer' style='width:640px;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'>Certificate title</span>";
+        $list.="<span class='span9'><input type='text' id='cert_title' style='width:640px;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span12'><textarea name='editor1' id='editor1' rows='10' cols='80'>
+                Please select program to edit/view certificate template
+            </textarea>
+            <script>
+                // Replace the <textarea id='editor1'> with a CKEditor
+                // instance, using default configuration.
+                CKEDITOR.replace( 'editor1' );
+            </script></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span12'><br/></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'>Signature person #1</span>";
+        $list.="<span class='span3'><input type='text' id='person_name1'></span>";
+        $list.="<span class='span3'><input type='text' id='person_title1'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'>Signature person #2</span>";
+        $list.="<span class='span3'><input type='text' id='person_name2'></span>";
+        $list.="<span class='span3'><input type='text' id='person_title2'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'>Signature person #3</span>";
+        $list.="<span class='span3'><input type='text' id='person_name3'></span>";
+        $list.="<span class='span3'><input type='text' id='person_title3'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span12' id='template_err' style='color:red;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span2'></span>";
+        $list.="<span class='span3'><button type='button' id='preview_btn' class='btn btn-primary'>Preview</button></span>";
+        $list.="<span class='span3'><button type='button' id='save_btn' class='btn btn-primary'>Save</button></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<br/><br/><span class='span12' id='preview_container'></span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function get_courses_list() {
+        $list = "";
+        $list.="<select id='courses_list' style='width:650px;'>";
+        $list.="<option value='0' selected>Program</option>";
+        $query = "select * from mdl_course where cost>0 and visible=1";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $list.="<option value='" . $row[id] . "'>" . $row['fullname'] . "</option>";
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    function create_certificates_list($certificates, $toolbar = true, $search = false, $tabs = true) {
+        $list = "";
+        $certificates_tab = $this->prepare_certificate_tab_content($certificates, $toolbar, $search);
+        $templates_tab = $this->get_certificates_templates_tab();
+        $list.="<ul class='nav nav-tabs'>
+                    <li class='active'><a data-toggle='tab' href='#certs_tab'>Certificates</a></li>
+                    <li><a data-toggle='tab' href='#templates_tab'>Templates</a></li>
+                 </ul>";
+
+        $list.="<div class='tab-content'>
+        
+        <div id='certs_tab' class='tab-pane fade in active'>
+        <h3>Certificates</h3>
+              <p>$certificates_tab</p>
+        </div>
+
+        <div id='templates_tab' class='tab-pane fade'>
+        <h3>Templates</h3>
+        <p>$templates_tab</p>
+        </div>
+  
+        </div>";
+
+
+        if ($tabs) {
+            return $list;
+        } // end if
+        else {
+            return $certificates_tab;
+        } // end else
     }
 
     function is_certificate_expired($courseid) {
@@ -374,8 +490,6 @@ class Certificates extends Util {
         }
         $cert_issue_date = $this->get_certificate_issue_date($courseid, $userid);
         $issue_date = ($cert_issue_date == 0) ? time() : $cert_issue_date;
-        //$day = date('d', $issue_date);
-        //$month = date('M', $issue_date);
         $day = date('dS', $issue_date);
         $month = date('F', $issue_date);
         $year = date('Y', $issue_date);
@@ -671,17 +785,22 @@ class Certificates extends Util {
         return $date;
     }
 
-    function get_course_category($id) {
+    function get_course_category($id, $code = false) {
         $query = "select category from mdl_course where id=$id";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $categoryid = $row['category'];
         } // end while
-        if ($categoryid == 2 || $categoryid == 4) {
-            return true;
-        } // end if $categoryid==2 || $categoryid==4
+        if ($code == false) {
+            if ($categoryid == 2 || $categoryid == 4) {
+                return true;
+            } // end if $categoryid==2 || $categoryid==4
+            else {
+                return false;
+            } // end else
+        } // end if
         else {
-            return false;
+            return $categoryid;
         } // end else
     }
 
@@ -757,7 +876,7 @@ class Certificates extends Util {
             } // end foreach
             $certificates[] = $certificate;
         } // end while
-        $list = $this->create_certificates_list($certificates, false);
+        $list = $this->create_certificates_list($certificates, false, false, false);
         return $list;
     }
 
@@ -911,7 +1030,7 @@ class Certificates extends Util {
                 }
                 $certificates[] = $certificate;
             } // end while
-            $list.=$this->create_certificates_list($certificates, false, true);
+            $list.=$this->create_certificates_list($certificates, false, true, false);
         } // end if num>0
         else {
             $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -1560,6 +1679,226 @@ class Certificates extends Util {
             $i++;
         } // end foreach
         echo "Total certificates processed: " . count($certificates) . "<br>";
+    }
+
+    // ************************* Certificates Editor **************************
+
+    function get_ceftificate_data($id) {
+        $query = "select * from mdl_certificate_templates where courseid=$id";
+        $num = $this->db->numrows($query);
+        $template = new stdClass();
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            $template->status = 1;
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $template->issuer = $row['issuer'];
+                $template->title = $row['title'];
+                $template->content = $row['content'];
+                $template->person1 = $row['person1'];
+                $template->person1_title = $row['person1_title'];
+                $template->person2 = $row['person2'];
+                $template->person2_title = $row['person2_title'];
+                $template->person3 = $row['person3'];
+                $template->person3_title = $row['person3_title'];
+            } // end while
+        } // end if $num > 0
+        else {
+            $template->status = 0;
+        }
+        return json_encode($template);
+    }
+
+    function peview_template($template) {
+        $list = "";
+        $tempObject = json_decode($template);
+        $tempObject->userid = 11772;
+
+        //$coursename = $this->get_course_name($tempObject->courseid); // string
+        $categoryid = $this->get_course_category($tempObject->courseid, true);
+        $userdetails = $this->get_user_details($tempObject->userid); // object
+        $firstname = strtoupper($userdetails->firstname);
+        $lastname = strtoupper($userdetails->lastname);
+
+        $issue_date = time();
+        $day = date('dS', $issue_date);
+        $month = date('F', $issue_date);
+        $year = date('Y', $issue_date);
+        $renew_status = $this->get_course_renew_status($tempObject->courseid);
+        $code = $this->get_course_code($tempObject->courseid, $tempObject->userid);
+
+        if ($renew_status == 1) {
+            $expiration_date_sec = $issue_date + 31536000;
+        } // end if $renew_status == 1
+        //echo "Category ID: ".$categoryid."<br>";
+        $expiration_date = strtoupper(date('m-d-Y', $expiration_date_sec));
+        if ($categoryid == 2) {
+            // workshops
+            $list.="<!DOCTYPE HTML SYSTEM>";
+            $list.="<head>";
+            $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+            $list.="<link rel='stylesheet' type='text/css' href='/lms/custom/certificates/cert2.css'>";
+            $list.="</head>";
+            $list.="<body>";
+            $list.="<div class='cert'>";
+            $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$tempObject->issuer</span><br>";
+            $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>$tempObject->title the $day of $month $year To:</span>";
+            $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
+            $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>$tempObject->content</span>";
+            $list.="<br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+            if ($renew_status == true) {
+                $list.="EXPIRATION DATE $expiration_date</p>";
+            } // end if $renew_status == true                                 
+
+            $list.="<br><br><div align='left'><table border='0' align='left' width='675px;'><tr>";
+
+            if ($tempObject->person1 != '' && $tempObject->person1_title != '') {
+                $list.="<td align='left' style='padding-left:35px;font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>$tempObject->person1<br/><span style='float:cebter;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>$tempObject->person1_title</span></td>";
+            }
+
+            if ($tempObject->person2 != '' && $tempObject->person2_title != '') {
+                $list.="<td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>$tempObject->person2<br/><span style='float:center;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>$tempObject->person2_title</span></td>";
+            }
+
+            if ($tempObject->person3 != '' && $tempObject->person3_title != '') {
+                $list.="<td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>$tempObject->person3<br/><span style='float:center;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>$tempObject->person3_title</span></td>";
+            }
+
+            $list.="</tr></table></div>";
+            $list.="</div>";
+
+            $list.="</body>";
+            $list.="</html>";
+        } // end $categoryid==2
+        if ($categoryid == 5) {
+            // health care courses
+            $list.="<!DOCTYPE HTML SYSTEM>";
+            $list.="<head>";
+            $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+            $list.="<link rel='stylesheet' type='text/css' href='/lms/custom/certificates/cert2.css'>";
+            $list.="</head>";
+            $list.="<body>";
+            $list.="<div style='text-align:center;'>";
+            $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
+            $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>$tempObject->issuer</span>";
+            $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Certification of Completion</span><br>";
+            $list.="<br><span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
+            $list.="<br><span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
+            $list.="<span style='text-align:center;font-size:16pt;'>$tempObject->content </span><br>";
+            $list.="<span style='text-align:center;font-size:26pt;'>$tempObject->title</span><br>";
+            $list.="<br><br><span style='text-align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
+            if ($renew_status == true) {
+                $list.="EXPIRATION DATE $expiration_date</p>";
+            } // end if $renew_status == true                                 
+            // President signature
+
+            $list.="<br><br><div align='left'><table border='0' align='center' width='675px;'><tr>";
+
+            if ($tempObject->person1 != '' && $tempObject->person1_title != '') {
+                $list.="<td align='left' style='padding-left:35px;font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>$tempObject->person1<br/><span style='float:cebter;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>$tempObject->person1_title</span></td>";
+            }
+
+            if ($tempObject->person2 != '' && $tempObject->person2_title != '') {
+                $list.="<td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>$tempObject->person2<br/><span style='float:center;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>$tempObject->person2_title</span></td>";
+            }
+
+            if ($tempObject->person3 != '' && $tempObject->person3_title != '') {
+                $list.="<td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>$tempObject->person3<br/><span style='float:center;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>$tempObject->person3_title</span></td>";
+            }
+
+            $list.="</tr></table></div>";
+            $list.="</div>";
+
+            $list.="</body>";
+            $list.="</html>";
+        } // end if $categoryid==5
+
+        if ($categoryid == 3 || $categoryid == 4) {
+            // exams
+            $list.="<!DOCTYPE HTML SYSTEM>";
+            $list.="<head>";
+            $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+            $list.="<link rel='stylesheet' type='text/css' href='/lms/custom/certificates/cert2.css'>";
+            $list.="</head>";
+            $list.="<body>";
+            $list.="<div class='cert'>";
+            $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$tempObject->issuer</span><br>";
+            $list.="<br><br><span style='align:center;font-weight:bold;font-size:25pt;'>$tempObject->title </span>";
+            $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
+            $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
+            $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>$tempObject->content</span>";
+            $list.="<br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+            if ($renew_status == true) {
+                $list.="EXPIRATION DATE $expiration_date</p>";
+            } // end if $renew_status == true                                 
+
+            $list.="<br><br><div align='left'><table border='0' align='left' width='675px;'><tr>";
+
+            if ($tempObject->person1 != '' && $tempObject->person1_title != '') {
+                $list.="<td align='left' style='padding-left:35px;font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>$tempObject->person1<br/><span style='float:cebter;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>$tempObject->person1_title</span></td>";
+            }
+
+            if ($tempObject->person2 != '' && $tempObject->person2_title != '') {
+                $list.="<td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>$tempObject->person2<br/><span style='float:center;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>$tempObject->person2_title</span></td>";
+            }
+
+            if ($tempObject->person3 != '' && $tempObject->person3_title != '') {
+                $list.="<td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>$tempObject->person3<br/><span style='float:center;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>$tempObject->person3_title</span></td>";
+            }
+
+            $list.="</tr></table></div>";
+            $list.="</div>";
+
+            $list.="</body>";
+            $list.="</html>";
+        }
+
+        return $list;
+    }
+
+    function create_template($template) {
+        $tempObject = json_decode($template);
+        $query = "select * from mdl_certificate_templates "
+                . "where courseid=$tempObject->courseid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $query2 = "update mdl_certificate_templates "
+                    . "set issuer='$tempObject->issuer', "
+                    . "title='$tempObject->title', "
+                    . "content='$tempObject->content', "
+                    . "person1='$tempObject->person1',  "
+                    . "person1_title='$tempObject->person1_title', "
+                    . "person2='$tempObject->person2', "
+                    . "person2_title='$tempObject->person2_title', "
+                    . "person3='$tempObject->person3', "
+                    . "person3_title='$tempObject->person3_title' "
+                    . "where courseid=$tempObject->courseid";
+        } // end if $num>0
+        else {
+            $query2 = "insert into mdl_certificate_templates "
+                    . "(courseid,"
+                    . "issuer,"
+                    . "title,"
+                    . "content,"
+                    . "person1,"
+                    . "person1_title,"
+                    . "person2,"
+                    . "person2_title,"
+                    . "person3,"
+                    . "person3_title) "
+                    . "values('$tempObject->courseid',"
+                    . "'$tempObject->issuer',"
+                    . "'$tempObject->title',"
+                    . "'$tempObject->content',"
+                    . "'$tempObject->person1',"
+                    . "'$tempObject->person1_title',"
+                    . "'$tempObject->person2',"
+                    . "'$tempObject->person2_title',"
+                    . "'$tempObject->person3',"
+                    . "'$tempObject->person3_title')";
+        } // end else
+        $this->db->query($query2);
+        $list = "Certificate template was added/updated";
+        return $list;
     }
 
 }

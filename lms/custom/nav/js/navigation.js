@@ -2324,7 +2324,7 @@ $(document).ready(function () {
     });
     $('#region-main').on('change', 'select', function (event) {
 
-//console.log(event.target.id);
+        //console.log(event.target.id);
 
         if (event.target.id == 'invoice_categories') {
             var id = $('#invoice_categories').val();
@@ -3060,6 +3060,43 @@ $(document).ready(function () {
 
     $('body').on('change', 'select', function (event) {
 
+        if (event.target.id == 'courses_list') {
+            $('#preview_container').html('');
+            var courseid = $('#courses_list').val();
+            if (courseid > 0) {
+                var url = "/lms/custom/certificates/get_certificate_data.php";
+                $.post(url, {id: courseid}).done(function (data) {
+                    var template = JSON.parse(data);
+                    console.log(template);
+                    if (template.status == 0) {
+                        $('#template_err').html('');
+                        $('#cert_issuer').val('');
+                        $('#cert_title').val('');
+                        CKEDITOR.instances.editor1.setData('');
+                        $('#person_name1').val('');
+                        $('#person_title1').val('');
+                        $('#person_name2').val('');
+                        $('#person_title2').val('');
+                        $('#person_name3').val('');
+                        $('#person_title3').val('');
+                        $('#template_err').html('Selected program does not contain certificate template. Please create it');
+                    } // end if template.status==0
+                    else {
+                        $('#template_err').html('');
+                        $('#cert_issuer').val(template.issuer);
+                        $('#cert_title').val(template.title);
+                        CKEDITOR.instances.editor1.setData(template.content);
+                        $('#person_name1').val(template.person1);
+                        $('#person_title1').val(template.person1_title);
+                        $('#person_name2').val(template.person2);
+                        $('#person_title2').val(template.person2_title);
+                        $('#person_name3').val(template.person3);
+                        $('#person_title3').val(template.person3_title);
+                    } // end else
+                }); // end if $.post
+            } // end if
+        }
+
         if (event.target.id == 'any_invoice_categories') {
             var id = $('#any_invoice_categories').val();
             console.log('Category id: ' + id);
@@ -3449,6 +3486,84 @@ $(document).ready(function () {
         }
 
 
+        if (event.target.id == 'preview_btn') {
+            var courseid = $('#courses_list').val();
+            var issuer = $('#cert_issuer').val();
+            var title = $('#cert_title').val();
+            var content = CKEDITOR.instances.editor1.getData();
+            var person1 = $('#person_name1').val();
+            var person1_title = $('#person_title1').val();
+            var person2 = $('#person_name2').val();
+            var person2_title = $('#person_title2').val();
+            var person3 = $('#person_name3').val();
+            var person3_title = $('#person_title3').val();
+
+            var template = {courseid: courseid,
+                issuer: issuer,
+                title: title,
+                content: content,
+                person1: person1,
+                person1_title: person1_title,
+                person2: person2,
+                person2_title: person2_title,
+                person3: person3,
+                person3_title: person3_title};
+            //console.log('Template params: ' + JSON.stringify(template));
+            //console.log('Content: ' + content);
+
+            if (courseid > 0 && issuer != '' && title != '' && content != '' && person1 != '' && person1_title != '') {
+                $('#template_err').html('');
+                var url = "/lms/custom/certificates/preview_template.php";
+                var request = {template: JSON.stringify(template)};
+                $.post(url, request).done(function (data) {
+                    //console.log(data);
+                    $('#preview_container').html(data);
+                });
+            } // end if 
+            else {
+                $('#template_err').html('Please select program and provide template params');
+            } // end else
+
+        }
+
+        if (event.target.id == 'save_btn') {
+            var courseid = $('#courses_list').val();
+            var issuer = $('#cert_issuer').val();
+            var title = $('#cert_title').val();
+            var content = CKEDITOR.instances.editor1.getData();
+            var person1 = $('#person_name1').val();
+            var person1_title = $('#person_title1').val();
+            var person2 = $('#person_name2').val();
+            var person2_title = $('#person_title2').val();
+            var person3 = $('#person_name3').val();
+            var person3_title = $('#person_title3').val();
+
+            var template = {courseid: courseid,
+                issuer: issuer,
+                title: title,
+                content: content,
+                person1: person1,
+                person1_title: person1_title,
+                person2: person2,
+                person2_title: person2_title,
+                person3: person3,
+                person3_title: person3_title};
+            //console.log('Template params: ' + JSON.stringify(template));
+
+            if (courseid > 0 && issuer != '' && title != '' && content != '' && person1 != '' && person1_title != '') {
+                $('#template_err').html('');
+                if (confirm('Create/Update Certificate template for current program?')) {
+                    var url = "/lms/custom/certificates/create_template.php";
+                    var request = {template: JSON.stringify(template)};
+                    $.post(url, request).done(function (data) {
+                        $('#preview_container').html(data);
+                    });
+                } // end if confirm
+            } // end if 
+            else {
+                $('#template_err').html('Please select program and provide template params');
+            } // end else
+        }
 
     }); // end of body click event
 

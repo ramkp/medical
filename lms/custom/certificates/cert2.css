@@ -1,0 +1,42 @@
+@page {
+    /*background: url('/assets/logo/logo_college.jpg') ;*/
+    background: url('./certificate_logo.png') ; 
+    background-repeat: no-repeat;
+    /* background-size: 675px 533px; */
+    background-position: center;
+    opacity: 0.1;
+}
+
+.cert {
+    display: block;
+    position: relative;             
+    text-align:center;
+    width: 850px;
+    height: 695px;             
+    margin: 0 auto;        
+    background: url('./certificate_logo.png') ; 
+    background-repeat: no-repeat;
+    background-size: 335px 300px; 
+    background-position: 50% 50%;
+    
+}
+
+@font-face { 
+    font-family:king; src: url('/assets/fonts/font-cert/KingCityFont.ttf'); 
+}  
+
+.cert::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /* background-image: url('/assets/logo/logo_college.jpg');*/
+    background: url('./certificate_logo.png') ;
+    background-repeat: no-repeat;
+    /* background-size: 675px 533px; */
+    background-position: center;
+    opacity: 0.1;
+}
