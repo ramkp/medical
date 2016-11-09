@@ -60,7 +60,7 @@ class register_model extends CI_Model {
         $drop_down = "";
         $items = "<option value='01'>01</option>
                 <option value='0' selected>Month</option>
-                <option value='03'>02</option>
+                <option value='02'>02</option>
                 <option value='03'>03</option>
                 <option value='04'>04</option>
                 <option value='05'>05</option>
