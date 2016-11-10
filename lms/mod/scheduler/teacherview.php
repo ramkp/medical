@@ -124,10 +124,13 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     // Saves original slot
     $slot->save();
 
-    // Notify workshop users
+    // Notify non Phleb workshop users 
+    // other users notified inside save_additional_slot()
     if ($courseid != 44 && $courseid != 45) {
-        $slots_array = array($slot->slotid);
-        $ds->notify_students($slots_array);
+        if (property_exists($slot, 'slotid')) {
+            $slots_array = array($slot->slotid);
+            $ds->notify_students($slots_array);
+        }
     }
 }
 
@@ -239,15 +242,17 @@ if ($action == 'addslot') {
 
     if ($mform->is_cancelled()) {
         redirect($returnurl);
-    } else if ($formdata = $mform->get_data()) {
+    } // end if
+    else if ($formdata = $mform->get_data()) {
         scheduler_save_slotform($scheduler, $course, 0, $formdata);
         echo $output->action_message(get_string('oneslotadded', 'scheduler'));
-    } else {
+    }  // end elseif
+    else {
         echo $output->heading(get_string('addsingleslot', 'scheduler'));
         $mform->display();
         echo $output->footer($course);
         die;
-    }
+    } // end else
 }
 /* * ********************************** View : Update single slot form *************************************** */
 if ($action == 'updateslot') {
