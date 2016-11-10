@@ -253,7 +253,7 @@ class Installment extends Util {
     function get_installment_users() {
         $list = "";
         $users = array();
-        $query = "select * from mdl_installment_users "
+        $query = "select * from mdl_installment_users where canceled=0 "
                 . "order by created desc limit 0, $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -344,6 +344,14 @@ class Installment extends Util {
                 $list.="</div>";
 
                 $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.="<span class='span10'><button class='btn btn-primary' id='subs_$userObject->subscription_id' data-subsid='$userObject->subscription_id'>Cancel</button></span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.="<span class='span10' id='subs_err'></span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid' style='text-align:left;'>";
                 $list.="<span class='span10'><hr/></span>";
                 $list.="</div>";
             } // end foreach
@@ -410,7 +418,7 @@ class Installment extends Util {
             $page = $page - 1;
             $offset = $rec_limit * $page;
         }
-        $query = "select * from mdl_installment_users "
+        $query = "select * from mdl_installment_users where canceled=0 "
                 . "order by created desc  LIMIT $offset, $rec_limit";
         //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
@@ -428,7 +436,8 @@ class Installment extends Util {
     function search_subs($item) {
         $list = "";
         $userid = $this->get_userid_by_fio($item);
-        $query = "select * from mdl_installment_users where userid=$userid";
+        $query = "select * from mdl_installment_users where userid=$userid "
+                . "and canceled=0";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -483,6 +492,22 @@ class Installment extends Util {
 
         $this->db->query($query);
         $list .= "Subscription successfully created";
+        return $list;
+    }
+
+    function cancel_subs($subsID) {
+        $list = "";
+        $pr = new ProcessPayment();
+        $status = $pr->cancelSubscription($subsID);
+        if ($status) {
+            $query = "update mdl_installment_users set canceled=1 "
+                    . "where subscription_id='$subsID'";
+            $this->db->query($query);
+            $list.="Subscription with ID: $subsID was canceled. Please reload the page.";
+        } // end if
+        else {
+            $list.="Error canceling subscription";
+        } // end else
         return $list;
     }
 

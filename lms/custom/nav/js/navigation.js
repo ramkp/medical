@@ -3565,6 +3565,21 @@ $(document).ready(function () {
             } // end else
         }
 
+        if (event.target.id.indexOf("subs_") >= 0) {
+            var elID = '#' + event.target.id;
+            var subsID = $(elID).data('subsid');
+            console.log('Subscritption ID: ' + subsID);
+            if (subsID > 0) {
+                if (confirm('Cancel current subscription?')) {
+                    var url = "/lms/custom/installment/cancel_subscription.php";
+                    var request = {subsID: subsID};
+                    $.post(url, request).done(function (data) {
+                        $('#subs_err').html(data);
+                    });
+                } // end if
+            } // end if
+        }
+
     }); // end of body click event
 
 

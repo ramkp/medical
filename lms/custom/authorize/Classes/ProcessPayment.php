@@ -379,7 +379,7 @@ class ProcessPayment {
     function createSubscription($subs) {
 
         //$merchantAuthentication = $this->sandbox_authorize();
-        $merchantAuthentication=$this->authorize();
+        $merchantAuthentication = $this->authorize();
 
         $amount = round($subs->amount / $subs->payments_num);
         $names = explode(" ", $subs->holder); // card holder name
@@ -436,6 +436,54 @@ class ProcessPayment {
             return $response->getSubscriptionId();
         } // end if  
         else {
+            $errorMessages = $response->getMessages()->getMessage();
+            echo "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+            return false;
+        }
+    }
+
+    function getSubscriptionStatus($subscriptionId) {
+        $merchantAuthentication = $this->authorize();
+        $refId = 'ref' . time();
+
+        $request = new AnetAPI\ARBGetSubscriptionStatusRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setSubscriptionId($subscriptionId);
+        $controller = new AnetController\ARBGetSubscriptionStatusController($request);
+
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+            return $response->getStatus();
+        } // end if  
+        else {
+            echo "ERROR :  Invalid response\n";
+            $errorMessages = $response->getMessages()->getMessage();
+            echo "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+            return false;
+        } // end else
+
+        return $response;
+    }
+
+    function cancelSubscription($subscriptionId) {
+        // Common Set Up for API Credentials
+        $merchantAuthentication = $this->authorize();
+        $refId = 'ref' . time();
+
+        $request = new AnetAPI\ARBCancelSubscriptionRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setSubscriptionId($subscriptionId);
+
+        $controller = new AnetController\ARBCancelSubscriptionController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+            return true;
+        } // end if  
+        else {
+            echo "ERROR :  Invalid response\n";
             $errorMessages = $response->getMessages()->getMessage();
             echo "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
             return false;

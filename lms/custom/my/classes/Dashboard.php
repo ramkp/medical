@@ -49,7 +49,7 @@ class Dashboard extends Util {
                 $query = "select * from mdl_card_payments "
                         . "where userid=$userid and courseid=$courseid and refunded=0 ";
                 $card_payments_num = $this->db->numrows($query);
-                
+
                 //echo "Card payments num: ".$card_payments_num."<br>";
                 // 2. Check among invoice payments
                 $query = "select * from mdl_invoice "
@@ -89,39 +89,18 @@ class Dashboard extends Util {
                 else {
                     $any_invoice_num = 0;
                 }
-
                 if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $free_num > 0 || $any_invoice_num > 0) {
                     $status = 1;
                 } // end if $card_payments_num>0 || $invoice_payments_num>0
             } // end if $installment_status==0
             else {
-                $interval = 604800; // 7 days in sec
                 $query = "select * from mdl_installment_users "
                         . "where userid=$userid "
-                        . "and courseid=$courseid";
+                        . "and courseid=$courseid and canceled=0";
                 $result = $this->db->query($query);
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $subscription_id = $row['subscription_id'];
-                    $subscription_start = $row['subscription_start'];
+                    $status = $row['completed']; // could be 0/1
                 }
-                if (is_numeric($subscription_id)) {
-                    $user_interval = time() - $subscription_start;
-                    if ($user_interval <= $interval) {
-                        $status = 1;
-                    } // end if $user_interval<=$interval
-                    else {
-                        $query = "select * from mdl_card_payments "
-                                . "where userid=$userid and "
-                                . "courseid=$courseid "
-                                . "and refunded=0 "
-                                . " and pdate>$subscription_start";
-                        $status = $this->db->numrows($query);
-                    } // end else
-                } // end if is_numeric($subscription_id)
-                else {
-                    $status = 0;
-                }
-                //$status=1; // installment users consider as paid ....
             } // end else when it is installment user
         } // end else 
         return $status;
