@@ -208,7 +208,8 @@ class Register {
 
             $drop_down.="<select id='register_courses' style='width:120px;'>";
             $drop_down.="<option value='0' selected>Program</option>";
-            $query = "select id, fullname from mdl_course where category=$cat_id and cost>0";
+            $query = "select id, fullname from mdl_course where "
+                    . "category=$cat_id and cost>0 and visible='1'";
             $num = $this->db->numrows($query);
             if ($num > 0) {
                 $result = $this->db->query($query);
