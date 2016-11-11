@@ -1502,6 +1502,12 @@ class Payment {
         return json_encode($course);
     }
 
+    function delete_user($email) {
+        $query = "update mdl_user set deleted='1' "
+                . "where username='" . strtolower($email) . "'";
+        $this->db->query($query);
+    }
+
     function enroll_user2($user) {
         $list = "";
         /*
@@ -1571,6 +1577,7 @@ class Payment {
             $pr = new ProcessPayment();
             $status = $pr->make_transaction2($order);
             if ($status === false) {
+                $this->delete_user($user->email);
                 $list.= "<div class='container-fluid' style='text-align:center;'>";
                 $list.= "<span class='span8' style='color:red;font-weight:bold;'>Transaction failed. Credit card declined.</span>";
                 $list.="</div>";
