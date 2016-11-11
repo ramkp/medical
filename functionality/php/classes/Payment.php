@@ -1503,7 +1503,7 @@ class Payment {
     }
 
     function delete_user($email) {
-        $query = "update mdl_user set deleted='1' "
+        $query = "delete from mdl_user "
                 . "where username='" . strtolower($email) . "'";
         $this->db->query($query);
     }
