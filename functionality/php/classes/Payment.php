@@ -1621,9 +1621,10 @@ class Payment {
             } // end else
         } // end if $signup_status  === true
         else {
-            $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span8'>Signup error happened </span>";
-            $list.="</div>";
+            // We do not show this error to user
+            //$list.="<div class='container-fluid' style='text-align:center;'>";
+            //$list.="<span class='span8'>Signup error happened </span>";
+            //$list.="</div>";
         }
         return $list;
     }
