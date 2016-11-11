@@ -25,7 +25,7 @@ class Subscription {
                 $subsID = $row['subscription_id'];
                 $status = $pr->getSubscriptionStatus($subsID);
                 echo "<p align='center'>Subscription with ID=$subsID has status: $status </p>";
-                if ($status == 'expired') {
+                if (strtolower($status) == 'expired') {
                     $query = "update mdl_installment_users set completed=1 "
                             . "where subscription_id='$subsID'";
                     $this->db->query($query);
