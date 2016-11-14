@@ -19,6 +19,7 @@ class Students {
     public $obs_quizid = 102;
     public $phleb_quizid = 101;
     public $passing_grade = 75;
+    public $exam_module = 24;
 
     function __construct() {
         $db = new pdo_db();
@@ -1717,6 +1718,7 @@ class Students {
 
     function get_grade_item_name($id) {
         $query = "select * from mdl_grade_items where id=$id";
+        //echo 'Query: ' . $query . "<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $name = $row['itemname'];
@@ -1729,6 +1731,16 @@ class Students {
         $this->db->query($query);
     }
 
+    function is_exam_item($itemid) {
+        $query = "select * from mdl_course_modules where id=$itemid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $module = $row['module'];
+        }
+        $status = ($module == $this->exam_module) ? 1 : 0;
+        return $status;
+    }
+
     function check_exam_students() {
         $exam_users = $this->get_users_grades(0);
         if (count($exam_users) > 0) {
@@ -1737,20 +1749,19 @@ class Students {
             foreach ($exam_users as $user) {
                 $courseid = $this->get_course_id_by_quiz_id($user->itemid);
                 $itemname = $this->get_grade_item_name($user->itemid);
-                if ($courseid > 0 && $user->timecreated != '') {
+                if ($courseid > 0 && $user->timemodified != '') {
                     $taken_user = new stdClass();
                     $taken_user->userid = $user->userid;
                     $taken_user->courseid = $courseid;
                     $taken_user->itemname = $itemname;
                     $taken_user->grade = $user->rawgrade;
-                    $taken_user->date = $user->timecreated;
+                    $taken_user->date = $user->timemodified;
                     $taken_exam_users[$user->timecreated] = $taken_user;
                     $this->mark_student_grade_item_as_processed($user->id);
-                    if ($user->rawgrade >= $this->passing_grade) {
-                        $pass = $this->is_course_autopass($courseid);
-                        if ($pass == 1) {
-                            $this->make_students_course_course_completed($courseid, $user->userid);
-                        } // end if
+                    $exam_status = $this->is_exam_item($user->itemid);
+                    $pass = $this->is_course_autopass($courseid);
+                    if ($user->rawgrade >= $this->passing_grade && $exam_status == 1 && $pass == 1) {
+                        $this->make_students_course_course_completed($courseid, $user->userid);
                     } // end if $user->rawgrade>=$this->passing_grade
                 } // end if $courseid>0
             } // end foreach
