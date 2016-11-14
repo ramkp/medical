@@ -1747,13 +1747,25 @@ class Students {
                     $taken_exam_users[$user->timecreated] = $taken_user;
                     $this->mark_student_grade_item_as_processed($user->id);
                     if ($user->rawgrade >= $this->passing_grade) {
-                        $this->make_students_course_course_completed($courseid, $user->userid);
+                        $pass = $this->is_course_autopass($courseid);
+                        if ($pass == 1) {
+                            $this->make_students_course_course_completed($courseid, $user->userid);
+                        } // end if
                     } // end if $user->rawgrade>=$this->passing_grade
                 } // end if $courseid>0
             } // end foreach
             ksort($taken_exam_users);
             $this->send_exam_passed_notification($taken_exam_users);
         } // end if count($exam_users
+    }
+
+    function is_course_autopass($id) {
+        $query = "select * from mdl_course where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $pass = $row['autopass'];
+        }
+        return $pass;
     }
 
     /*     * ************* Code related to typehead json data ***************** */
