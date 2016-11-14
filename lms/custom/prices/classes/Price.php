@@ -98,15 +98,7 @@ class Price extends Util {
         if ($this->session->justloggedin == 1) {
 
             $price_items = array();
-            $query = "select id, "
-                    . "fullname, "
-                    . "installment, "
-                    . "num_payments, "
-                    . "cost, "
-                    . "discount_status, "
-                    . "discount_size, "
-                    . "taxes, expired "
-                    . "from mdl_course "
+            $query = "select *  from mdl_course "
                     . "where category=$id and visible=1";
             $num = $this->db->numrows($query);
             if ($num) {
@@ -243,6 +235,16 @@ class Price extends Util {
         return $list;
     }
 
+    function auto_pass($id) {
+        $query = "select * from mdl_course where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $pass = $row['autopass'];
+        }
+        $autopass = ($pass == 1) ? "<input type='checkbox' id='pass_$id' value='$pass' checked>" : "<input type='checkbox' id='pass_$id' value='$pass'>";
+        return $autopass;
+    }
+
     function create_item_block2($price_items, $category_name) {
 
         $list = "";
@@ -253,8 +255,9 @@ class Price extends Util {
                 $course_discount = $this->get_discount_dropdown('course', $item->id);
                 $group_discount = $this->get_discount_dropdown('group', $item->id);
                 $states = $this->get_course_states($item->id);
-                $installment_checkbox = $this->get_installment_checkbox($item->id, $item->installment);
-                $installment_payments = $this->get_installment_num_payments($item->id, $item->installment, $item->num_payments);
+                //$installment_checkbox = $this->get_installment_checkbox($item->id, $item->installment);
+                //$installment_payments = $this->get_installment_num_payments($item->id, $item->installment, $item->num_payments);
+                $pass_checkbox = $this->auto_pass($item->id);
                 $taxes = $this->course_tax_status($item->id, $item->taxes);
                 $expire = $this->get_expiration_status($item->id, $item->expired);
                 $list.= "<div class='container-fluid'>";
@@ -299,6 +302,10 @@ class Price extends Util {
 
                 $list.= "<div class='container-fluid'>";
                 $list.="<span class='span3'>Program expires</span><span class='span1'>$expire</span>";
+                $list.= "</div>";
+
+                $list.= "<div class='container-fluid'>";
+                $list.="<span class='span3'>Program auto-pass</span><span class='span1'>$pass_checkbox</span>";
                 $list.= "</div>";
 
                 $list.= "<div class='container-fluid'>";
@@ -361,7 +368,7 @@ class Price extends Util {
         } // end if count($states)>0
     }
 
-    function update_item_price($course_id, $course_cost, $course_discount, $course_group_discount, $installment, $num_payments, $states, $taxes, $expire) {
+    function update_item_price($course_id, $course_cost, $course_discount, $course_group_discount, $installment, $num_payments, $states, $taxes, $expire, $pass) {
         // Update mdl_course table        
         $num_payments = ($num_payments == '') ? 0 : $num_payments;
         $query = "update mdl_course "
@@ -369,7 +376,7 @@ class Price extends Util {
                 . "discount_size=$course_discount , "
                 . "installment=$installment, "
                 . "num_payments=$num_payments, expired=$expire, "
-                . "taxes=$taxes "
+                . "taxes=$taxes , autopass=$pass "
                 . "where id=$course_id";
         //echo $query;
         $this->db->query($query);

@@ -374,13 +374,22 @@ $(document).ready(function () {
         var num_payments_id = '#num_payments_' + courseid;
         var num_payments = $(num_payments_id).val();
         var taxes_num = '#taxes_' + courseid;
-        var taxes; // checkbox status
+        var taxes; // checkbox
         var expire_num = '#expire_' + courseid;
-        var expire // checkbox status
+        var expire, pass; // checkboxes
+        var pass_num = 'pass_' + courseid;
+
+        if ($(pass_num).is(':checked')) {
+            pass = 1;
+        } // end if 
+        else {
+            pass = 0;
+        }
 
         if ($(taxes_num).is(':checked')) {
             taxes = 1;
-        } else {
+        } // end if 
+        else {
             taxes = 0;
         }
         console.log('Taxes status: ' + taxes);
@@ -400,8 +409,6 @@ $(document).ready(function () {
         else {
             installment = 0;
         }
-
-//var states_ident = $(states_id + ':selected');       
         console.log(states_id);
         $(states_id).each(function (i, selected) {
             states[i] = $(selected).val();
@@ -423,12 +430,12 @@ $(document).ready(function () {
         if (course_cost != 0 && states.length > 0) {
             $(price_id_err).html('');
             if (validateNum(course_cost)) {
-// Prepare and send AJAX request ...
                 $('#price_err').html('');
                 var url = "/lms/custom/prices/edit.php";
                 var request = {
                     course_id: courseid,
                     course_cost: course_cost,
+                    pass: pass,
                     course_discount: course_discount,
                     course_group_discount: course_group_discount,
                     installment: installment,
@@ -437,7 +444,6 @@ $(document).ready(function () {
                     expire: expire,
                     states: JSON.stringify(states)};
                 $.post(url, request).done(function (data) {
-//alert ('Server response: '+data);
                     $(price_id_err).html("<span style='color:green;'>" + data + "</span>");
                 });
             } // end if validateNum(course_cost
