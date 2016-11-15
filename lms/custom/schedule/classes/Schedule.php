@@ -21,6 +21,17 @@ class Schedule extends Util {
         parent::__construct();
         $this->courseid = $COURSE->id;
         $this->labels_path = $_SERVER['DOCUMENT_ROOT'] . '/print';
+        $this->create_scheduler_data();
+    }
+
+    function create_scheduler_data() {
+        $query = "select * from mdl_scheduler_slots";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $location[] = mb_convert_encoding($row['appointmentlocation'], 'UTF-8');
+        }
+        //array_unique($location);
+        file_put_contents('/home/cnausa/public_html/lms/custom/utils/wslocation.json', json_encode($location));
     }
 
     function get_course_scheduler($courseid) {

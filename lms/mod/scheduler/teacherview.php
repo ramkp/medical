@@ -244,7 +244,7 @@ if ($action == 'addslot') {
     <script type="text/javascript">
         $(document).ready(function () {
 
-        $.get('/lms/custom/utils/workshops.json', function (data) {
+        $.get('/lms/custom/utils/wslocation.json', function (data) {
         $('#id_appointmentlocation').typeahead({source: data, items: 24});
         }, 'json');
                 
