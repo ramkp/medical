@@ -135,7 +135,7 @@ $(document).ready(function () {
     function add_user_to_slot() {
         var slotid = $('#slots').val();
         var username = $('#users').val();
-
+        var schedulerid = $('#schedulerid').val();
         if (username == '') {
             alert('Please slelect student and workshop!');
             return;
@@ -145,9 +145,9 @@ $(document).ready(function () {
             $.post(url, {username: username}).done(function (userid) {
                 console.log('User ID: ' + userid);
                 console.log('Slot ID:' + slotid);
-                if (userid > 0 && slotid > 0) {
+                if (userid > 0 && slotid!='') {
                     var url = "/lms/custom/schedule/add_user_to_slot.php";
-                    $.post(url, {slotid: slotid, userid: userid}).done(function (data) {
+                    $.post(url, {slotid: slotid, userid: userid, schedulerid: schedulerid}).done(function (data) {
                         console.log('Server response: ' + data);
                         document.location.reload();
                     });
@@ -701,6 +701,11 @@ $(document).ready(function () {
                             $.get('/lms/custom/utils/data.json', function (data) {
                                 $('#users').typeahead({source: data, items: 24});
                             }, 'json');
+
+                            $.get('/lms/custom/utils/workshops.json', function (data) {
+                                $('#slots').typeahead({source: data, items: 24});
+                            }, 'json');
+
 
                         });
                     })
@@ -1448,6 +1453,7 @@ $(document).ready(function () {
                 var url = "/lms/custom/schedule/print_certificates.php";
                 $.post(url, {courseid: courseid, students: students}).done(function (filename) {
                     $('#ajax_loading').hide();
+                    //console.log('Server response: ' + filename);
                     //var url = "http://medical2.com/print/merged.pdf";
                     var url = "http://medical2.com/print/" + filename;
                     var oWindow = window.open(url, "print");
@@ -2228,6 +2234,9 @@ $(document).ready(function () {
                                 $.post(url, request).done(function (data) {
                                     $("body").append(data);
                                     $("#myModal").modal('show');
+                                    $.get('/lms/custom/utils/workshops.json', function (data) {
+                                        $('#slots').typeahead({source: data, items: 24});
+                                    }, 'json');
                                 });
                             })
                             .fail(function () {
@@ -2980,7 +2989,7 @@ $(document).ready(function () {
                 var request = {users: users, slotid: slotid, schedulerid: scheduler};
                 $.post(url, request).done(function (data) {
                     $('#program_err').html(data);
-                    //console.log('Server response: ' + data);
+                    console.log('Server response: ' + data);
                     document.location.reload();
                 });
             } // end if confirm

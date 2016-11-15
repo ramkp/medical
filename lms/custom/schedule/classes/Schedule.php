@@ -455,6 +455,8 @@ class Schedule extends Util {
             $now = time();
             $cert = new Certificates();
             foreach ($students_arr as $studentid) {
+                //echo "Course id: ".$courseid."<br>";
+                //echo "Student id: ".$studentid."<br>";
                 $cert->send_certificate($courseid, $studentid, $now, false);
                 //$pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.pdf";
                 $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/$courseid/certificate.pdf";
@@ -526,7 +528,7 @@ class Schedule extends Util {
 
     function get_students_box($courseid, $schedulerid) {
         $list = "";
-        $slots = $this->get_students_course_slots($schedulerid);
+        //$slots = $this->get_students_course_slots($schedulerid);
         $students = $this->get_course_users($courseid);
         $list.="<div id='myModal' class='modal fade'>
     <div class='modal-dialog'>
@@ -537,11 +539,13 @@ class Schedule extends Util {
             </div>
             <div class='modal-body'>
             <div class='container-fluid' style='text-align:left;'>
-            <span class='span2'>$students</span>    
+            <span class='span2'>$students</span> 
+            <input type='hidden' id='schedulerid' value='$schedulerid'>    
             </div>
             
             <div class='container-fluid' style='text-align:left;'>
-            <span class='span2'>$slots</span>    
+            <span class='span2' style='padding-left:30px;'><input type='text' id='slots' class='typeahead' style='width:265px;'></span>    
+            <br/><br/><br/><br/>
             </div>
                 
             </div>
@@ -555,9 +559,24 @@ class Schedule extends Util {
         return $list;
     }
 
+    function create_ws_json_data($schedulerid) {
+        $ws = array();
+        $now = time();
+        $query = "select * from mdl_scheduler_slots "
+                . "where schedulerid=$schedulerid "
+                . "and  starttime>=$now order by starttime";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $location = mb_convert_encoding($row['appointmentlocation'], 'UTF-8');
+            $date = mb_convert_encoding(date('m-d-Y', trim($row['starttime'])), 'UTF-8');
+            $ws[] = $date . "--" . $location;
+        }
+        file_put_contents('/home/cnausa/public_html/lms/custom/utils/workshops.json', json_encode($ws));
+    }
+
     function get_workshops_list($students, $schedulerid) {
         $list = "";
-        $slots = $this->get_students_course_slots($schedulerid);
+        $this->create_ws_json_data($schedulerid);
         $list.="<div id='myModal' class='modal fade'>
         <div class='modal-dialog'>
         <div class='modal-content'>
@@ -572,7 +591,8 @@ class Schedule extends Util {
             </div>
             
             <div class='container-fluid' style='text-align:left;'>
-            <span class='span2'>$slots</span>    
+            <span class='span2'><input type='text' id='slots' style='width:375px;'></span>  
+            <br><br><br><br>
             </div>
                 
             </div>
@@ -586,7 +606,8 @@ class Schedule extends Util {
         return $list;
     }
 
-    function add_user_to_slot($lsotid, $userid) {
+    function add_user_to_slot($slotname, $userid, $schedulerid) {
+        $lsotid = $this->get_slotid_by_name($slotname, $schedulerid);
         $query = "select * from mdl_scheduler_appointment "
                 . "where slotid=$lsotid and studentid=$userid";
         $num = $this->db->numrows($query);
@@ -629,8 +650,38 @@ class Schedule extends Util {
         return $slotid;
     }
 
-    function move_students($newslotid, $students, $schedulerid) {
+    function get_slotid_by_name($slot, $schedulerid = null) {
+        $slot_data = explode('--', $slot);
+        if ($schedulerid != null) {
+            $query = "select * from mdl_scheduler_slots "
+                    . "where schedulerid=$schedulerid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slots_array[] = $row['id'];
+            }
+            $slots = implode(',', $slots_array);
+            $query = "select * from mdl_scheduler_slots "
+                    . "where FROM_UNIXTIME(starttime,'%m-%d-%Y') ='$slot_data[0]' "
+                    . "and appointmentlocation='$slot_data[1]' and id in ($slots)";
+        } // end if
+        else {
+            $query = "select * from mdl_scheduler_slots "
+                    . "where FROM_UNIXTIME(starttime,'%m-%d-%Y') ='$slot_data[0]' "
+                    . "and appointmentlocation='$slot_data[1]' ";
+        }  // end else          
+        //echo "Query: " . $query . "<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slotid = $row['id'];
+        }
+        return $slotid;
+    }
+
+    function move_students($newslot, $students, $schedulerid) {
         $students_arr = explode(",", $students);
+        $newslotid = $this->get_slotid_by_name($newslot, $schedulerid);
+        //echo "New slot id: " . $newslotid . "<br>";
+        //die ();
         if (count($students_arr) > 0) {
             foreach ($students_arr as $studentid) {
                 $oldslotid = $this->get_current_student_slot($studentid, $schedulerid);
@@ -640,6 +691,7 @@ class Schedule extends Util {
                 //echo "Query: " . $query . "<br>";
                 $this->db->query($query);
 
+                // Custom slots table used to store user slotid     
                 $query2 = "update mdl_slots set slotid=$newslotid "
                         . "where userid=$studentid "
                         . "and slotid=$oldslotid";
