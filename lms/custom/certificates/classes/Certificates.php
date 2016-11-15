@@ -23,6 +23,7 @@ class Certificates extends Util {
     function __construct() {
         parent::__construct();
         $this->cert_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates';
+        //$this->cert_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/my_dir/certificates';
         $this->host = $_SERVER['SERVER_NAME'];
     }
 
@@ -753,12 +754,16 @@ class Certificates extends Util {
         $pdf->WriteHTML($stylesheet, 1);
         $pdf->WriteHTML($list, 2);
         $dir_path = $this->cert_path . "/$userid/$courseid";
+        //echo "Dir path: " . $dir_path . "<br>";
         if (!is_dir($dir_path)) {
-            if (!mkdir($dir_path)) {
-                die('Could not write to disk');
+            //echo "Dir does not exist ...<br>";
+            if (!mkdir($dir_path, 0777, true)) {
+                print_r(error_get_last());
+                //die('Could not write to disk');
             } // end if !mkdir($dir_path)
         } // end if !is_dir($dir_path)
         $path = $dir_path . "/certificate.pdf";
+        //echo "File path: " . $path . "<br>";
         $pdf->Output($path, 'F');
 
         return $list;
