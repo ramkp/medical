@@ -357,7 +357,7 @@ class Certificates2 {
             $stylesheet = file_get_contents($this->cert_path . '/cert.css');
             $pdf->WriteHTML($stylesheet, 1);
             $pdf->WriteHTML($list, 2);
-            $dir_path = $this->cert_path . "/$userid";
+            $dir_path = $this->cert_path . "/$userid/$courseid";
             if (!is_dir($dir_path)) {
                 if (!mkdir($dir_path)) {
                     die('Could not write to disk');
