@@ -1812,7 +1812,7 @@ class Students {
 
     /*     * ******* Code related to Certificates expiration messages ******** */
 
-    function get_certificate_reminder_message() {
+    function get_certificate_reminder_message($user_data) {
         $list = "";
 
         $list.="<p style='align:left;font-size:23px;font-weight:bold;'>Its Time To Renew your Certification!</p> 
@@ -1836,7 +1836,9 @@ class Students {
     		<hr>	
 			<p style='font-weight:bold;font-size:15px;'><span style='color:red;'>Make money orders out to</span> Medical2 Inc.</p> 
 			<hr>
-			<p style='align:left;font-weight:bold;font-size:15px;'>$100 Recertification Fee (Over 90 Days Expired)</p>
+                        <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/50/1' target='_blank'>$50 Recertification Fee </a></p>
+			<p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/75/1' target='_blank'>$75 Recertification Fee (Over 30 Days Expired)</a></p>
+                        <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/100/1' target='_blank'>$100 Recertification Fee (Over 90 Days Expired)</a></p>
 
 		    <p style='align:left;font-size:15px;font-weight:bold;color:red;'>Mailing Address: Medical2 Inc.  1830A North Gloster St, Tupelo, MS 38804</p>";
 
@@ -1865,6 +1867,7 @@ class Students {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_data = $this->get_user_data($row['userid']);
+                $user_data->courseid = $row['courseid'];
                 $coursename = $this->get_course_name($row['courseid']);
                 $this->send_certificate_expiration_data($user_data, $coursename);
                 $i++;
@@ -1889,12 +1892,12 @@ class Students {
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
         $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
-        $mail->addAddress($user_data->email);
-        //$mail->addAddress('sirromas@gmail.com');
+        //$mail->addAddress($user_data->email);
+        $mail->addAddress('sirromas@gmail.com');
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
         $mail->isHTML(true);
         $mail->Subject = 'Renew certification';
-        $mail->Body = $this->get_certificate_reminder_message();
+        $mail->Body = $this->get_certificate_reminder_message($user_data);
         if (!$mail->send()) {
             echo "<br>Error sending email ($user_data->email) .... <br>\n";
             echo "<br>-------------------------------------------------------------------<br>";
