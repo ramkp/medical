@@ -239,6 +239,21 @@ if ($action == 'addslot') {
     }
 
     $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee);
+    ?>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        $.get('/lms/custom/utils/workshops.json', function (data) {
+        $('#id_appointmentlocation').typeahead({source: data, items: 24});
+        }, 'json');
+                
+        });
+
+    </script>
+
+
+    <?php
 
     if ($mform->is_cancelled()) {
         redirect($returnurl);
