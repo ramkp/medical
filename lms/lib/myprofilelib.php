@@ -263,7 +263,7 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
                         }
                         $url = new moodle_url('/user/view.php', $params);
                         $courselisting .= html_writer::tag('li', html_writer::link($url, $ccontext->get_context_name(false), $linkattributes));
-                        $courselisting .= html_writer::tag('li', $course_schedule);
+                        //$courselisting .= html_writer::tag('li', $course_schedule);
                     } // end if !isset($course) || $mycourse->id != $course->id                    
                     else {
                         $courselisting .= html_writer::tag('li', $course->fullname);

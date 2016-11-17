@@ -206,8 +206,15 @@ class Mailer {
 
             $list.="<tr style='background-color:#F5F5F5;'>
         <td>Class info</td><td>$class_info</td>
-        </tr>
-        </tbody>
+        </tr>";
+
+            if ($catid == 2) {
+                $list.="<tr style=''>";
+                $list.="<td colspan='2'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
+                $list.="</tr>";
+            }
+
+            $list.="</tbody>
         </table>
         </div>";
             $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";

@@ -8,6 +8,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/schedule/classes/Schedule.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 
 use Dompdf\Dompdf;
@@ -18,6 +19,7 @@ class Dashboard extends Util {
     public $resolution_path2;
     public $assignment_module;
     public $assesment_path;
+    public $student_role = 5;
 
     function __construct() {
         parent::__construct();
@@ -25,6 +27,7 @@ class Dashboard extends Util {
         $this->resolution_path2 = $_SERVER['SERVER_NAME'];
         $this->assignment_module = 1;
         $this->assesment_path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/my";
+        $this->create_programs_data();
     }
 
     function is_user_paid() {
@@ -332,16 +335,6 @@ class Dashboard extends Util {
         return $num;
     }
 
-    function getEnrolId($courseid) {
-        $query = "select id from mdl_enrol
-                     where courseid=" . $courseid . " and enrol='manual'";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $enrolid = $row['id'];
-        }
-        return $enrolid;
-    }
-
     function enroll_user($courseid, $userid) {
         $contextid = $this->get_course_context($courseid);
         $enrolid = $this->getEnrolId($courseid);
@@ -452,14 +445,13 @@ class Dashboard extends Util {
                 . "where courseid=$courseid and userid=$userid and refunded=0";
         $num = $this->db->numrows($query);
         if ($num > 0) {
+            $coursename = $this->get_course_name($courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by card $" . $row['psum'] . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ")";
+                $list.="Paid by card $" . $row['psum'] . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename <span class='info' data-paymentid='c_" . $row['id'] . "'></span>";
             } // end while
         } // end if $num>0
-        else {
-            $list.="Paid by card: N/A &nbsp;";
-        }
+
         return $list;
     }
 
@@ -469,14 +461,13 @@ class Dashboard extends Util {
                 . "where courseid=$courseid and userid=$userid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
+            $coursename = $this->get_course_name($courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by cash $" . $row['i_sum'] . "&nbsp;(" . date('m-d-Y', $row['i_pdate']) . ")";
+                $list.="Paid by invoice $" . $row['i_sum'] . "&nbsp;(" . date('m-d-Y', $row['i_pdate']) . ") &nbsp; $coursename <span class='info' data-paymentid='i_" . $row['id'] . "'></span>";
             } // end while
         } // end if $num>0
-        else {
-            $list.="Paid by cash: N/A &nbsp;";
-        }
+
         return $list;
     }
 
@@ -486,24 +477,23 @@ class Dashboard extends Util {
                 . "where courseid=$courseid and userid=$userid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
+            $coursename = $this->get_course_name($courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by cash/cheque $" . $row['psum'] . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ")";
+                $list.="Paid by cash/cheque $" . $row['psum'] . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename <span class='info' data-paymentid='p_" . $row['id'] . "'></span>";
             } // end while
         } // end if $num>0
-        else {
-            $list.="Paid by cheque: N/A &nbsp;";
-        }
         return $list;
     }
 
     function get_user_payments($userid, $courseid) {
         $list = "";
         $card_payments = $this->get_user_card_payments($userid, $courseid);
-//$invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
+        $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
-        $list.=$card_payments . "&nbsp;" . $partial_payments;
-//$list.=$invoice_payments;
+        if ($card_payments != '' || $invoice_payments != '' || $partial_payments != '') {
+            $list.=$card_payments . "<br>" . $partial_payments . "<br>" . $invoice_payments;
+        }
         return $list;
     }
 
@@ -880,6 +870,677 @@ class Dashboard extends Util {
         $query = "select * from mdl_post where module='notes' and userid=$userid";
         $num = $this->db->numrows($query);
         return $num;
+    }
+
+    // ************* Code related to custom profile section  ************** /
+
+    function get_user_profile_custom_sections($id) {
+        $list = "";
+        $payments = $this->get_user_payments_block($id);
+        $workshops = $this->get_user_workshops($id);
+        $certficates = $this->get_user_certificates($id);
+        $list.="<ul class='nav nav-tabs'>
+              <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>
+              <li><a data-toggle='tab' href='#menu1'>Workshops</a></li>
+              <li><a data-toggle='tab' href='#menu2'>Certification</a></li>
+              <input type='hidden' id='userid' value='$id'>  
+            </ul>
+
+            <div class='tab-content'>
+              <div id='home' class='tab-pane fade in active'>
+                <h3>Payments</h3>
+                <p>$payments</p>
+              </div>
+              <div id='menu1' class='tab-pane fade'>
+                <h3>Workshops</h3>
+                <p>$workshops</p>
+              </div>
+              <div id='menu2' class='tab-pane fade'>
+                <h3>Certification</h3>
+                <p>$certficates</p>
+              </div>
+            </div>";
+
+        return $list;
+    }
+
+    function get_courseid_by_name($coursename, $wsname) {
+        $query = "select * from mdl_course where fullname='$coursename'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['id'];
+        }
+
+        $sch = new Schedule();
+        if ($wsname != '') {
+            $slotid = $sch->get_slotid_by_name($wsname);
+        } // end if 
+        else {
+            $slotid = 0;
+        } // end else
+        $program = array('courseid' => $courseid, 'slotid' => $slotid);
+        return json_encode($program);
+    }
+
+    function create_programs_data() {
+        $query = "select * from mdl_course where cost>0 and visible=1";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $fullname[] = mb_convert_encoding($row['fullname'], 'UTF-8');
+        }
+        file_put_contents('/home/cnausa/public_html/lms/custom/utils/programs.json', json_encode($fullname));
+    }
+
+    function get_courseid_by_contextid($id) {
+        $query = "select * from mdl_context where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['instanceid'];
+        }
+        return $courseid;
+    }
+
+    function get_user_courses($id) {
+        $courses = array();
+        $query = "select * from mdl_role_assignments "
+                . "where roleid=5 and userid=$id";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courses[] = $this->get_courseid_by_contextid($row['contextid']);
+            } // end while
+        } // end if $num > 0
+        return $courses;
+    }
+
+    function get_user_payments_block($id) {
+        $list = "";
+        $courses = $this->get_user_courses($id);
+        $list.="<div class='container-fluid' style=''>";
+        $list.="<span class='span3'><button class='profile_add_payment' style='width:175px;' data-userid='$id'>Add payment</button></span>";
+        $list.="</div><br><br>";
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $payments = $this->get_user_payments($id, $courseid);
+                if ($payments != '') {
+                    $list.="<div class='container-fluid' style=''>";
+                    $list.="<span class='span8'>" . str_replace("<br>", "", $payments) . "</span>";
+                    $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$id' data-courseid='$courseid'>Move</button></span>";
+                    $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$id' data-courseid='$courseid'>Refund</button></span>";
+                    $list.="</div>";
+                } // end if
+            } // end foreach
+        } // end if count($courses)>0
+        else {
+            $list.="N/A";
+        } // end else
+
+        return $list;
+    }
+
+    function get_worshop_course($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $schedulerid = $row['schedulerid'];
+        }
+
+        $query = "select * from mdl_scheduler where id=$schedulerid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['course'];
+        }
+        return $courseid;
+    }
+
+    function get_user_workshops($id) {
+        $list = "";
+        $list.="<div class='container-fluid' style=''>";
+        $list.="<span class='span6'><button class='profile_add_to_workshop' style='width:205px;' data-userid='$id'>Add user to workshop</button></span>";
+        $list.="</div><br><br>";
+
+        $query = "select * from mdl_scheduler_appointment where studentid=$id";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $ws = new stdClass();
+                foreach ($row as $key => $value) {
+                    $ws->$key = $value;
+                }
+                $courseid = $this->get_worshop_course($row['slotid']);
+                $ws->courseid = $courseid;
+                $app[] = $ws;
+            } // end while
+
+            foreach ($app as $ws) {
+                $query = "select * from mdl_scheduler_slots where id=$ws->slotid";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $list.="<div class='container-fluid' style=''>";
+                    $date = date('m-d-Y', $row['starttime']);
+                    $location = $row['appointmentlocation'];
+                    $notes = $row['notes'];
+                    $list.="<span class='span2'>$date</span>";
+                    $list.="<span class='span3'>$location</span>";
+                    $list.="<span class='span5'>$notes</span>";
+                    $list.="<span class='span2'><button class='profile_move_to_workshop' data-userid='$id' data-slotid='$ws->slotid' data-appid='$ws->id' data-courseid='$ws->courseid'>Move</button></span>";
+                    $list.="</div>";
+                } // end while
+            } // end foreach 
+        } // end if $num > 0
+        else {
+            $list.="N/A";
+        }
+
+        return $list;
+    }
+
+    function get_user_certificates($id) {
+        $list = "";
+        $list.="<div class='container-fluid' style=''>";
+        $list.="<span class='span4'><button class='profile_create_cert' style='width:175px;' data-userid='$id'>Create certificate</button></span>";
+        $list.="</div><br><br>";
+
+        $query = "select * from mdl_certificates where userid=$id";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $list.="<div class='container-fluid' style=''>";
+                $start = date('m-d-Y', $row['issue_date']);
+                if ($row['expiration_date'] != '') {
+                    $exp = date('m-d-Y', $row['expiration_date']);
+                } // end if
+                else {
+                    $exp = 'N/A';
+                } // end else
+                $courseid = $row['courseid'];
+                $id = $row['id'];
+                $coursename = $this->get_course_name($courseid);
+                $list.="<span class='span6'>$coursename</span>";
+                $list.="<span class='span2'>$start</span>";
+                $list.="<span class='span2'>$exp</span>";
+                $list.="<span class='span2'><button class='profile_renew_cert' data-userid='$id' data-courseid='$courseid' data-id='$id'>Renew</button></span></span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
+        else {
+            $list.="N/A";
+        } // end else
+
+        return $list;
+    }
+
+    function get_add_payment_dialog($userid) {
+        $list = "";
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Add Payment</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='userid' value='$userid'>
+                 <div class='container-fluid' style='text-align:center;'>
+                  <span class='span1'><input type='radio' name='ptype' value='card' checked>Card</span>
+                  <span class='span1'><input type='radio' name='ptype' value='cash'>Cash</span>
+                  <span class='span1'><input type='radio' name='ptype' value='cheque'>Cheque</span>
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span1'>Amount</span>
+                <span class='span3'><input type='text' id='amount' style='width:275px;'></span>
+                </div>
+                   
+                <div class='container-fluid'>
+                <span class='span1'>Program</span>
+                <span class='span3'><input type='text' id='coursename' style='width:275px;'></span>    
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span1'>Venue</span>
+                <span class='span3'><input type='text' id='wsname' style='width:275px;'></span>    
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='payment_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='add_profile_payment'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function get_payment_move_dialog($courseid, $userid) {
+        $list = "";
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Move Payment</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='userid' value='$userid'>
+                <input type='hidden' id='oldcourseid' value='$courseid'> 
+                   
+                <div class='container-fluid'>
+                <span class='span1'>Program</span>
+                <span class='span3'><input type='text' id='coursename' style='width:275px;'></span>
+                <br><br>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='payment_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='move_profile_payment'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function move_payment($payment) {
+        $payments_data = explode('_', $payment->id);
+
+        switch ($payments_data[0]) {
+            case 'c':
+                // credit cards
+                $query = "update mdl_card_payments "
+                        . "set courseid=$payment->courseid "
+                        . "where id=$payments_data[1]";
+
+                break;
+            case 'i':
+                // invoices
+                $query = "update mdl_invoice "
+                        . "set courseid=$payment->courseid "
+                        . "where id=$payments_data[1]";
+
+                break;
+            case 'p':
+                // partial payments (cash/cheque)
+                $query = "update mdl_partial_payments "
+                        . "set courseid=$payment->courseid "
+                        . "where id=$payments_data[1]";
+
+                break;
+        }
+
+        $this->assign_roles($payment->userid, $payment->courseid);
+        $this->db->query($query);
+        $list = "ok";
+        return $list;
+    }
+
+    function getCourseContext($courseid) {
+        $query = "select id from mdl_context
+                     where contextlevel=50
+                     and instanceid='" . $courseid . "' ";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $contextid = $row['id'];
+        }
+        return $contextid;
+    }
+
+    function getEnrolId($courseid) {
+        $query = "select id from mdl_enrol
+                     where courseid=" . $courseid . " and enrol='manual'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $enrolid = $row['id'];
+        }
+        return $enrolid;
+    }
+
+    function assign_roles($userid, $courseid) {
+        $roleid = $this->student_role;
+        $enrolid = $this->getEnrolId($courseid);
+        $contextid = $this->getCourseContext($courseid, $roleid);
+
+        // Check if user already enrolled?
+        $query = "select * from mdl_role_assignments "
+                . "where userid=$userid "
+                . "and contextid='$contextid'";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        //echo "Num: " . $num . "<br>";
+        if ($num == 0) {
+
+            // 1. Insert into mdl_user_enrolments table
+            $query = "insert into mdl_user_enrolments
+             (enrolid,
+              userid,
+              timestart,
+              modifierid,
+              timecreated,
+              timemodified)
+               values ('" . $enrolid . "',
+                       '" . $userid . "',
+                        '" . time() . "',   
+                        '2',
+                         '" . time() . "',
+                         '" . time() . "')";
+            //echo "Query: " . $query . "<br/>";
+            $this->db->query($query);
+
+            // 2. Insert into mdl_role_assignments table
+            $query = "insert into mdl_role_assignments
+                  (roleid,
+                   contextid,
+                   userid,
+                   timemodified,
+                   modifierid)                   
+                   values ('" . $roleid . "',
+                           '" . $contextid . "',
+                           '" . $userid . "',
+                           '" . time() . "',
+                            '2'         )";
+            //echo "Query: " . $query . "<br/>";
+            $this->db->query($query);
+        }
+    }
+
+    function add_other_payment($payment) {
+
+        // Enroll user into course
+        $this->assign_roles($payment->userid, $payment->courseid);
+        $type = ($payment->ptype == 'cash') ? 1 : 2;
+        $slotid = $payment->slotid;
+        $date = time();
+        $query = "insert into mdl_partial_payments "
+                . "(courseid,"
+                . "userid,"
+                . "slotid,"
+                . "ptype,"
+                . "psum,"
+                . "pdate) "
+                . "values($payment->courseid, "
+                . "$payment->userid, "
+                . "$slotid, "
+                . "'$type', "
+                . "'$payment->amount', "
+                . "'$date')";
+        //echo "Query: " . $query . "<br>";
+        $this->db->query($query);
+
+        if ($slotid > 0) {
+            $query = "insert into mdl_scheduler_appointment "
+                    . "(slotid,studentid,attended) "
+                    . "values($slotid,$payment->userid,0)";
+            $this->db->query($query);
+        }
+
+
+        $userObj = $this->get_user_details($payment->userid);
+        $userObj->courseid = $payment->courseid;
+        $userObj->userid = $payment->userid;
+        $userObj->slotid = $payment->slotid;
+        $userObj->payment_amount = $payment->amount;
+        $userObj->period = 0;
+        $mailer = new Mailer();
+        $mailer->send_partial_payment_confirmation($userObj);
+    }
+
+    function refund_payment($payment) {
+
+        /*
+         * 
+          echo "<pre>";
+          print_r($payment);
+          echo "</pre>";
+          die();
+         * 
+         */
+
+        $payments_data = explode('_', $payment->id);
+        switch ($payments_data[0]) {
+            case 'c':
+                // credit cards
+                $query = "select * from mdl_card_payments "
+                        . "where id=$payments_data[1]";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $amount = $row['psum'];
+                    $card_last_four = $row['card_last_four'];
+                    $exp_date = $row['exp_date'];
+                    $trans_id = $row['trans_id'];
+                }
+                $pr = new ProcessPayment();
+                $status = $pr->makeRefund($amount, $card_last_four, $exp_date, $trans_id);
+                if ($status) {
+                    $query = "update mdl_card_payments "
+                            . "set refunded=1 "
+                            . "where id=$payments_data[1]";
+                    $this->db->query($query);
+                }
+                break;
+            case 'i':
+                // invoices
+                $query = "delete from mdl_invoice "
+                        . "where id=$payments_data[1]";
+                break;
+            case 'p':
+                // partial payments (cash/cheque)
+                $query = "delete from mdl_partial_payments "
+                        . "where id=$payments_data[1]";
+                break;
+        }
+        $this->db->query($query);
+    }
+
+    function get_add_to_workshop_dialog($userid) {
+        $list = "";
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Add student to workshop</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='userid' value='$userid'>
+                   
+                <div class='container-fluid'>
+                <span class='span1'>Workshop</span>
+                <span class='span3'><input type='text' id='wsname' style='width:275px;'></span>
+                <br><br>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='ws_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='add_to_ws'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function add_user_to_workshop($ws) {
+        $sch = new Schedule();
+        $slotid = $sch->get_slotid_by_name($ws->wsname);
+        if ($slotid > 0) {
+            $query = "insert into mdl_scheduler_appointment "
+                    . "(slotid,studentid,attended) "
+                    . "values($slotid,$ws->userid,0)";
+            $this->db->query($query);
+        }
+    }
+
+    function get_move_to_workshop_dialog($courseid, $slotid, $appid) {
+        $list = "";
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Move student to other workshop</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='appid' value='$appid'>
+                <input type='hidden' id='courseid' value='$courseid'>
+                <input type='hidden' id='slotid' value='$slotid'>    
+                   
+                <div class='container-fluid'>
+                <span class='span1'>Workshop</span>
+                <span class='span3'><input type='text' id='wsname' style='width:275px;'></span>
+                <br><br>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='ws_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='move_to_ws'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function move_user_to_workshop($ws) {
+
+        //$schedulerid = $this->get_course_scheduler($ws->courseid);
+        $sch = new Schedule();
+        $slotid = $sch->get_slotid_by_name($ws->wsname);
+        if ($slotid > 0) {
+            $query = "update mdl_scheduler_appointment set slotid=$slotid "
+                    . "where id=$ws->appid";
+            $this->db->query($query);
+        }
+    }
+
+    function get_add_create_cert_dialog($userid) {
+        $list = "";
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Create user certificate</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='userid' value='$userid'>
+                   
+                <div class='container-fluid'>
+                <span class='span1'>Program</span>
+                <span class='span3'><input type='text' id='coursename' style='width:275px;'></span>
+                <br><br>
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span1'>Issue</span>
+                <span class='span3'><input type='text' id='date1' style='width:275px;'></span>
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span1'>Expire</span>
+                <span class='span3'><input type='text' id='date2' style='width:275px;'></span>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='program_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='create_user_cert'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function create_user_certificate($certificate) {
+        $start_arr = explode('/', $certificate->date1);
+        $end_arr = explode('/', $certificate->date2);
+        $start_date = $start_arr[2] . "-" . $start_arr[0] . "-" . $start_arr[1];
+        $end_date = $end_arr[2] . "-" . $end_arr[0] . "-" . $end_arr[1];
+        $cert = new Certificates();
+        $cert->create_certificate($certificate->courseid, $certificate->userid, $start_date, $end_date);
+    }
+
+    function get_renew_cert_dialog($cert) {
+        $list = "";
+
+        $query = "select * from mdl_certificates where id=$cert->id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $certificate = new stdClass();
+            foreach ($row as $key => $value) {
+                $certificate->$key = $value;
+            } // end foreach
+        } // end while
+
+        $start = date('m/d/Y', $certificate->issue_date);
+        $end = date('m/d/Y', $certificate->expiration_date);
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Renew user certificate</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='id' value='$certificate->id'>
+                
+                <div class='container-fluid'>
+                <span class='span1'>Issue</span>
+                <span class='span3'><input type='text' id='date1' style='width:275px;' value='$start'></span>
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span1'>Expire</span>
+                <span class='span3'><input type='text' id='date2' style='width:275px;' value='$end'></span>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='program_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='renew_user_cert'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+
+        return $list;
+    }
+
+    function renew_user_certificate($certificate) {
+        $certstr = $certificate->id . ",";
+        $cert = new Certificates();
+        $cert->recertificate($certstr, $certificate->date1, $certificate->date2);
     }
 
 }

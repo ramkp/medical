@@ -145,7 +145,7 @@ $(document).ready(function () {
             $.post(url, {username: username}).done(function (userid) {
                 console.log('User ID: ' + userid);
                 console.log('Slot ID:' + slotid);
-                if (userid > 0 && slotid!='') {
+                if (userid > 0 && slotid != '') {
                     var url = "/lms/custom/schedule/add_user_to_slot.php";
                     $.post(url, {slotid: slotid, userid: userid, schedulerid: schedulerid}).done(function (data) {
                         console.log('Server response: ' + data);
@@ -378,7 +378,6 @@ $(document).ready(function () {
         var expire_num = '#expire_' + courseid;
         var expire, pass; // checkboxes
         var pass_num = 'pass_' + courseid;
-
         if ($(pass_num).is(':checked')) {
             pass = 1;
         } // end if 
@@ -582,22 +581,17 @@ $(document).ready(function () {
         var url = "/lms/custom/installment/get_installment_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-
             $.get('/lms/custom/utils/courses.json', function (data) {
                 $("#installment_program").typeahead({source: data, items: 24});
             }, 'json');
-
             $.get('/lms/custom/utils/data.json', function (data) {
                 $("#installment_user ").typeahead({source: data, items: 24});
             }, 'json');
-
             $.get('/lms/custom/utils/installment_users.json', function (data) {
                 $("#installment_search").typeahead({source: data, items: 24});
             }, 'json');
-
             $('#subs_start').datepicker();
             $('#subs_exp').datepicker();
-
         });
     }
 
@@ -697,16 +691,12 @@ $(document).ready(function () {
                         $.post(url, request).done(function (data) {
                             $("body").append(data);
                             $("#myModal").modal('show');
-
                             $.get('/lms/custom/utils/data.json', function (data) {
                                 $('#users').typeahead({source: data, items: 24});
                             }, 'json');
-
                             $.get('/lms/custom/utils/workshops.json', function (data) {
                                 $('#slots').typeahead({source: data, items: 24});
                             }, 'json');
-
-
                         });
                     })
                     .fail(function () {
@@ -884,10 +874,8 @@ $(document).ready(function () {
             $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
                 $('#ajax_loading').hide();
                 $('#revenue_report_container').html(data);
-
                 $('#stat_start').datepicker();
                 $('#stat_end').datepicker();
-
             });
         } // end if courseid>0 && from!='' && to!=''
         else {
@@ -1530,8 +1518,6 @@ $(document).ready(function () {
 // Main region events processing function
     $('#region-main').on('click', 'button', function (event) {
         console.log("Item clicked: " + event.target.id);
-
-
         if (event.target.id == 'print_assignment') {
             var moduleid = $('#print_assignment').data('moduleid');
             var url = "/lms/custom/my/get_assignment_pdf.php";
@@ -2001,6 +1987,231 @@ $(document).ready(function () {
             } // end if id>0
         } // end if event.target.id.indexOf('del_slide_') >= 0
 
+        console.log('Class element clicked: ' + $(event.target).attr('class'));
+        if ($(event.target).attr('class') == 'profile_add_payment') {
+            var userid = $(this).data('userid');
+            console.log('User id: ' + userid);
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_add_payment_dialog.php";
+                            var request = {userid: userid};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $.get('/lms/custom/utils/programs.json', function (data) {
+                                    $('#coursename').typeahead({source: data, items: 24});
+                                }, 'json');
+                                $.get('/lms/custom/utils/workshops.json', function (data) {
+                                    $('#wsname').typeahead({source: data, items: 24});
+                                }, 'json');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+
+        }
+
+        if ($(event.target).attr('class') == 'profile_move_payment') {
+            var userid = $(this).data('userid');
+            var courseid = $(this).data('courseid');
+            console.log('User id: ' + userid);
+            console.log('Course id: ' + courseid);
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_payment_move_dialog.php";
+                            var request = {userid: userid, courseid: courseid};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $.get('/lms/custom/utils/programs.json', function (data) {
+                                    $('#coursename').typeahead({source: data, items: 24});
+                                }, 'json');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("#myModal").modal('show');
+            }
+            $.get('/lms/custom/utils/programs.json', function (data) {
+                $('#coursename').typeahead({source: data, items: 24});
+            }, 'json');
+        }
+
+        if ($(event.target).attr('class') == 'profile_refund_payment') {
+            var userid = $(this).data('userid');
+            var courseid = $(this).data('courseid');
+            var id = $('.info').data('paymentid');
+            if (confirm('Refund current payment?')) {
+                var url = "/lms/custom/my/refund.php";
+                var payment = {userid: userid, courseid: courseid, id: id};
+                $.post(url, {payment: JSON.stringify(payment)}).done(function (data) {
+                    console.log(data);
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    document.location.reload();
+                });
+            } // end if confirm
+        }
+
+        if ($(event.target).attr('class') == 'profile_add_to_workshop') {
+            var userid = $(this).data('userid');
+            console.log('User id: ' + userid);
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/add_to_workshop.php";
+                            var request = {userid: userid};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $.get('/lms/custom/utils/workshops.json', function (data) {
+                                    $('#wsname').typeahead({source: data, items: 24});
+                                }, 'json');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+        }
+
+        if ($(event.target).attr('class') == 'profile_move_to_workshop') {
+            var userid = $(this).data('userid');
+            var slotid = $(this).data('slotid');
+            var appid = $(this).data('appid');
+            var courseid = $(this).data('courseid');
+            console.log('Course id: ' + courseid);
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_move_to_workshop_dialog.php";
+                            var request = {userid: userid, slotid: slotid, appid: appid, courseid: courseid};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $.get('/lms/custom/utils/workshops.json', function (data) {
+                                    $('#wsname').typeahead({source: data, items: 24});
+                                }, 'json');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+
+            $.get('/lms/custom/utils/workshops.json', function (data) {
+                $('#wsname').typeahead({source: data, items: 24});
+            }, 'json');
+        }
+
+        if ($(event.target).attr('class') == 'profile_create_cert') {
+            var userid = $(this).data('userid');
+            console.log('User id: ' + userid);
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_create_cert_dialog.php";
+                            var request = {userid: userid};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $.get('/lms/custom/utils/programs.json', function (data) {
+                                    $('#coursename').typeahead({source: data, items: 24});
+                                }, 'json');
+                                $("#date1").datepicker();
+                                $("#date2").datepicker();
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+
+            $.get('/lms/custom/utils/programs.json', function (data) {
+                $('#coursename').typeahead({source: data, items: 24});
+            }, 'json');
+        }
+
+        if ($(event.target).attr('class') == 'profile_renew_cert') {
+            var id = $(this).data('id');
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_renew_cert_dialog.php";
+                            var cert = {id: id};
+                            $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $("#date1").datepicker();
+                                $("#date2").datepicker();
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+
+
+        }
+
+
+
 
     }); // end of #region-main click', 'button',
 
@@ -2339,7 +2550,7 @@ $(document).ready(function () {
     });
     $('#region-main').on('change', 'select', function (event) {
 
-        //console.log(event.target.id);
+//console.log(event.target.id);
 
         if (event.target.id == 'invoice_categories') {
             var id = $('#invoice_categories').val();
@@ -2552,12 +2763,10 @@ $(document).ready(function () {
         update_navigation_status__menu('Testimonial');
         get_testimonial_page();
     });
-
     $("#terms").click(function (event) {
         update_navigation_status__menu('Terms and Conditions');
         get_terms_page();
     });
-
     $("#Photo_Gallery").click(function (event) {
         update_navigation_status__menu('Photo Gallery');
         get_gallery_index_page();
@@ -3210,7 +3419,6 @@ $(document).ready(function () {
             var zip = $('#zip').val();
             var phone = $('#phone').val();
             var email = $('#email').val();
-
             if (courseid == 0) {
                 $('#personal_err').html('Please select ptogram');
                 return;
@@ -3270,7 +3478,6 @@ $(document).ready(function () {
             }
 
             $('#personal_err').html('');
-
             var url = "/functionality/php/is_email_exists.php";
             var request = {email: email};
             $.post(url, request).done(function (data) {
@@ -3324,9 +3531,7 @@ $(document).ready(function () {
             //var email = $('#subs_email').val();
             //var phone = $('#subs_phone').val();
             var payments_num = $('#payments_num').val();
-
             console.log('Address :' + addr);
-
             if (coursename == '') {
                 $('#subs_err').html('Please select program');
                 return;
@@ -3405,7 +3610,6 @@ $(document).ready(function () {
             }
 
             $('#subs_err').html('');
-
             var subs = {
                 coursename: coursename,
                 user: user,
@@ -3419,7 +3623,6 @@ $(document).ready(function () {
                 card_year: card_year,
                 card_month: card_month
             };
-
             $('#ajax_loader2').show();
             var url = "/lms/custom/installment/create_subs.php";
             var request = {subs: JSON.stringify(subs)};
@@ -3427,7 +3630,6 @@ $(document).ready(function () {
                 $('#ajax_loader2').hide();
                 $('#subs_err').html("<span style='color:black'>" + data + "</span>");
             });
-
         }
 
         if (event.target.id == 'installment_search_button') {
@@ -3455,9 +3657,7 @@ $(document).ready(function () {
         if (event.target.id == 'get_stat') {
 
             var interval = null;
-
             var courseid = $('#courses').val();
-
             if ($('#byyear').prop("checked")) {
                 interval = 'year';
             }
@@ -3477,7 +3677,6 @@ $(document).ready(function () {
 
             var start = $('#stat_start').val();
             var end = $('#stat_end').val();
-
             if (start == '' || end == '') {
                 $('#stat_err').html('Please select period');
                 return false;
@@ -3488,7 +3687,6 @@ $(document).ready(function () {
                 end: end,
                 interval: interval,
                 courseid: courseid};
-
             $('#stat_err').html('');
             $('#stat_data').html('');
             $('#stat_ajax_loader').show();
@@ -3512,7 +3710,6 @@ $(document).ready(function () {
             var person2_title = $('#person_title2').val();
             var person3 = $('#person_name3').val();
             var person3_title = $('#person_title3').val();
-
             var template = {courseid: courseid,
                 issuer: issuer,
                 title: title,
@@ -3552,7 +3749,6 @@ $(document).ready(function () {
             var person2_title = $('#person_title2').val();
             var person3 = $('#person_name3').val();
             var person3_title = $('#person_title3').val();
-
             var template = {courseid: courseid,
                 issuer: issuer,
                 title: title,
@@ -3594,6 +3790,183 @@ $(document).ready(function () {
                 } // end if
             } // end if
         }
+
+        if (event.target.id == 'add_profile_payment') {
+            var userid = $('#userid').val();
+            var coursename = $('#coursename').val();
+            var ptype = $("input[name='ptype']:checked").val();
+            var amount = $('#amount').val();
+            var wsname = $('#wsname').val();
+            if (amount > 0 && coursename != '') {
+                $('#payment_err').html('');
+                var url = "/lms/custom/my/get_course_id.php";
+                var request = {coursename: coursename, wsname: wsname};
+                $.post(url, request).done(function (data) {
+                    console.log('Server response: ' + data);
+                    var program = JSON.parse(data);
+                    if (program.courseid > 0) {
+                        if (ptype == 'card') {
+                            var url = "/lms/custom/my/enroll_user.php";
+                            $.post(url, {userid: userid, courseid: program.courseid}).done(function () {
+                                var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
+                                window.open(url, '_blank');
+                            });
+                        } // end if ptype == 'card'
+                        else {
+                            if (confirm('Add payment for current user?')) {
+                                var url2 = "/lms/custom/my/add_other_payment.php";
+                                var payment = {courseid: program.courseid, userid: userid, ptype: ptype, amount: amount, slotid: program.slotid};
+                                $.post(url2, {payment: JSON.stringify(payment)}).done(function (data) {
+                                    console.log(data);
+                                    $("[data-dismiss=modal]").trigger({type: "click"});
+                                    document.location.reload();
+                                });
+                            } // end if
+                        }  // end else
+                    } // end if courseid>0
+                    else {
+                        $('#payment_err').html('Error happened...');
+                    }
+                }); // end of post
+
+            } // end if amount > 0 && coursename != ''
+            else {
+                $('#payment_err').html('Please select program and provide amount');
+            } // end else 
+        }
+
+
+        if (event.target.id == 'move_profile_payment') {
+            var userid = $('#userid').val();
+            var coursename = $('#coursename').val();
+            var oldcourseid = $('#oldcourseid').val();
+            var id = $('.info').data('paymentid');
+            var wsname = '';
+            if (coursename != '') {
+                $('#payment_err').html('');
+                var url = "/lms/custom/my/get_course_id.php";
+                var request = {coursename: coursename, wsname: wsname};
+                $.post(url, request).done(function (data) {
+                    var program = JSON.parse(data);
+                    if (program.courseid > 0) {
+                        if (confirm('Move payment for current user?')) {
+                            var url2 = "/lms/custom/my/move_payment.php";
+                            var payment = {courseid: program.courseid, userid: userid, oldcourseid: oldcourseid, id: id};
+                            $.post(url2, {payment: JSON.stringify(payment)}).done(function (data) {
+                                console.log(data);
+                                $("[data-dismiss=modal]").trigger({type: "click"});
+                                document.location.reload();
+                            });
+                        } // end if
+                    } // end if
+                    else {
+                        $('#payment_err').html('Error happened...');
+                    } // end else
+                });
+            } // end if
+            else {
+                $('#payment_err').html('Please select program');
+            } // end else
+        }
+
+        if (event.target.id == 'add_to_ws') {
+            var userid = $('#userid').val();
+            var wsname = $('#wsname').val();
+            if (wsname != '') {
+                $('#ws_err').html('');
+                if (confirm('Add current user to new workshop?')) {
+                    var url = "/lms/custom/my/add_user_to_workshop.php";
+                    var ws = {wsname: wsname, userid: userid};
+                    $.post(url, {ws: JSON.stringify(ws)}).done(function (data) {
+                        console.log(data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        document.location.reload();
+                    });
+                } // end if
+            } // end if
+            else {
+                $('#ws_err').html('Please select workshop');
+            } // end else 
+        }
+
+        if (event.target.id == 'move_to_ws') {
+            var appid = $('#appid').val();
+            var wsname = $('#wsname').val();
+            var courseid = $('#courseid').val();
+            if (wsname != '') {
+                $('#ws_error').html('');
+                if (confirm('Move user to another workshop?')) {
+                    var url = "/lms/custom/my/move_workshop.php";
+                    var ws = {wsname: wsname, appid: appid, courseid: courseid};
+                    $.post(url, {ws: JSON.stringify(ws)}).done(function (data) {
+                        console.log(data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        document.location.reload();
+                    });
+                } // end if
+            } // end if
+            else {
+                $('#ws_error').html('Please select workshop');
+            } // end else 
+        }
+
+        if (event.target.id == 'create_user_cert') {
+            var userid = $('#userid').val();
+            var coursename = $('#coursename').val();
+            var date1 = $('#date1').val();
+            var date2 = $('#date2').val();
+            var wsname = '';
+            if (coursename != '' && date1 != '' && date2 != '') {
+                $('#program_err').html('');
+                if (confirm('Create certificate for current user?')) {
+                    var url = "/lms/custom/my/get_course_id.php";
+                    var request = {coursename: coursename, wsname: wsname};
+                    $.post(url, request).done(function (data) {
+                        var program = JSON.parse(data);
+                        if (program.courseid > 0) {
+                            var url = "/lms/custom/my/create_user_cert.php";
+                            var cert = {userid: userid, courseid: program.courseid, date1: date1, date2: date2};
+                            $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                                console.log(data);
+                                $("[data-dismiss=modal]").trigger({type: "click"});
+                                document.location.reload();
+                            });
+                        } // end if
+                        else {
+                            $('#program_err').html('Error happened ...');
+                        } // end else
+                    }); // end of post
+                } // end if confirm
+            } // end if coursename != '' && date1 != '' && date2 != ''
+            else {
+                $('#program_err').html('Please select program and certificate dates');
+            }
+
+        }
+
+        if (event.target.id == 'renew_user_cert') {
+            var id = $('#id').val();
+            var date1 = $('#date1').val();
+            var date2 = $('#date2').val();
+            if (date1 != '' && date2 != '') {
+                $('#program_err').html('');
+                if (confirm('Update user cetificate?')) {
+                    var url = "/lms/custom/my/renew_user_certificate.php";
+                    var cert = {id: id, date1: date1, date2: date2};
+                    $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                        console.log(data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        document.location.reload();
+                    });
+                } // end if confirm
+            } // end if
+            else {
+                $('#program_err').html('Please select certificate dates');
+            } // end else 
+
+        }
+
+
 
     }); // end of body click event
 

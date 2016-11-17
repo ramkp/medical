@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -23,7 +24,9 @@
  */
 
 namespace core_user\output\myprofile;
+
 defined('MOODLE_INTERNAL') || die;
+
 /**
  * Report log renderer's for printing reports.
  *
@@ -32,7 +35,10 @@ defined('MOODLE_INTERNAL') || die;
  * @copyright  2015 onwards Ankit Agarwal <ankit.agrr@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/my/classes/Dashboard.php';
+
 class renderer extends \plugin_renderer_base {
+
     /**
      * Render the whole tree.
      *
@@ -41,12 +47,30 @@ class renderer extends \plugin_renderer_base {
      * @return string
      */
     public function render_tree(tree $tree) {
+
+        global $USER;
+
         $return = \html_writer::start_tag('div', array('class' => 'profile_tree'));
         $categories = $tree->categories;
+
+
         foreach ($categories as $category) {
             $return .= $this->render($category);
         }
         $return .= \html_writer::end_tag('div');
+
+        $userid = $USER->id;
+
+        if ($userid == 2 || $userid == 234) {
+
+            parse_str($_SERVER['QUERY_STRING']);
+            $ds = new \Dashboard();
+
+            $return .= \html_writer::start_tag('section', array('class' => 'node_category', 'id' => 'custom_section'));
+            $return .=$ds->get_user_profile_custom_sections($id);
+            $return .= \html_writer::end_tag('section');
+        }
+
         return $return;
     }
 
@@ -59,11 +83,15 @@ class renderer extends \plugin_renderer_base {
      */
     public function render_category(category $category) {
         $classes = $category->classes;
+
         if (empty($classes)) {
             $return = \html_writer::start_tag('section', array('class' => 'node_category'));
-        } else {
+            //echo "Inside if ....<br>";
+        } // end if 
+        else {
             $return = \html_writer::start_tag('section', array('class' => 'node_category ' . $classes));
-        }
+            //echo "Inside else ... <br>";
+        } // end else
         $return .= \html_writer::tag('h3', $category->title);
         $nodes = $category->nodes;
         if (empty($nodes)) {
@@ -117,4 +145,5 @@ class renderer extends \plugin_renderer_base {
 
         return $return;
     }
+
 }
