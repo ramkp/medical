@@ -81,37 +81,48 @@ class Mailer {
     }
 
     function get_course_cost($user) {
-        $payment = new Payment();
-        $late = new Late();
-        $group_status = $this->is_group_user($user);
-        if ($group_status == 0) {
-            $course_cost_array = $payment->get_personal_course_cost($user->courseid);
-            $course_cost = $course_cost_array['cost'];
-        } // end if $group_status==0
-        else {
-            $participants = $this->get_group_user_num($user);
-            $course_cost_array = $payment->get_course_group_discount($user->courseid, $participants);
-            $course_cost = $course_cost_array['cost'];
+
+        /*
+         * 
+          $payment = new Payment();
+          $late = new Late();
+          $group_status = $this->is_group_user($user);
+          if ($group_status == 0) {
+          $course_cost_array = $payment->get_personal_course_cost($user->courseid);
+          $course_cost = $course_cost_array['cost'];
+          } // end if $group_status==0
+          else {
+          $participants = $this->get_group_user_num($user);
+          $course_cost_array = $payment->get_course_group_discount($user->courseid, $participants);
+          $course_cost = $course_cost_array['cost'];
+          }
+          $tax_status = $payment->is_course_taxable($user->courseid);
+          if ($tax_status == 1) {
+          $tax = $payment->get_state_taxes($user->state);
+          } // end if $tax_status == 1
+          else {
+          $tax = 0;
+          } // end else
+          if ($user->slotid > 0) {
+          $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
+          $late_fee = $late->get_delay_fee($user->courseid);
+          }
+          $grand_total = $course_cost;
+          if ($tax_status == 1) {
+          $grand_total = $grand_total + round(($course_cost * $tax) / 100);
+          }
+          if ($apply_delay_fee) {
+          $grand_total = $grand_total + $late_fee;
+          }
+         * 
+         */
+        $query = "select * from mdl_course where id=$user->courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cost = $row['cost'];
         }
-        $tax_status = $payment->is_course_taxable($user->courseid);
-        if ($tax_status == 1) {
-            $tax = $payment->get_state_taxes($user->state);
-        } // end if $tax_status == 1
-        else {
-            $tax = 0;
-        } // end else
-        if ($user->slotid > 0) {
-            $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
-            $late_fee = $late->get_delay_fee($user->courseid);
-        }
-        $grand_total = $course_cost;
-        if ($tax_status == 1) {
-            $grand_total = $grand_total + round(($course_cost * $tax) / 100);
-        }
-        if ($apply_delay_fee) {
-            $grand_total = $grand_total + $late_fee;
-        }
-        return $grand_total;
+
+        return $cost;
     }
 
     function get_course_category($user) {
