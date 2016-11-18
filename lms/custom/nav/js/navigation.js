@@ -1990,7 +1990,6 @@ $(document).ready(function () {
         console.log('Class element clicked: ' + $(event.target).attr('class'));
         if ($(event.target).attr('class') == 'profile_add_payment') {
             var userid = $(this).data('userid');
-            console.log('User id: ' + userid);
             if (dialog_loaded !== true) {
                 console.log('Script is not yet loaded starting loading ...');
                 dialog_loaded = true;
@@ -2026,6 +2025,7 @@ $(document).ready(function () {
         if ($(event.target).attr('class') == 'profile_move_payment') {
             var userid = $(this).data('userid');
             var courseid = $(this).data('courseid');
+            var paymentid = $(this).data('paymentid');
             console.log('User id: ' + userid);
             console.log('Course id: ' + courseid);
             if (dialog_loaded !== true) {
@@ -2036,7 +2036,7 @@ $(document).ready(function () {
                         .done(function () {
                             console.log('Script bootstrap.min.js is loaded ...');
                             var url = "/lms/custom/my/get_payment_move_dialog.php";
-                            var request = {userid: userid, courseid: courseid};
+                            var request = {userid: userid, courseid: courseid, paymentid: paymentid};
                             $.post(url, request).done(function (data) {
                                 $("body").append(data);
                                 $("#myModal").modal('show');
@@ -2061,7 +2061,8 @@ $(document).ready(function () {
         if ($(event.target).attr('class') == 'profile_refund_payment') {
             var userid = $(this).data('userid');
             var courseid = $(this).data('courseid');
-            var id = $('.info').data('paymentid');
+            var id = $(this).data('paymentid');
+            console.log('Payment id: ' + id);
             if (confirm('Refund current payment?')) {
                 var url = "/lms/custom/my/refund.php";
                 var payment = {userid: userid, courseid: courseid, id: id};
@@ -3840,7 +3841,8 @@ $(document).ready(function () {
             var userid = $('#userid').val();
             var coursename = $('#coursename').val();
             var oldcourseid = $('#oldcourseid').val();
-            var id = $('.info').data('paymentid');
+            var id = $('#d_paymentid').val();
+            console.log('Payment data: ' + id);
             var wsname = '';
             if (coursename != '') {
                 $('#payment_err').html('');

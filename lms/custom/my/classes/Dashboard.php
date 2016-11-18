@@ -448,7 +448,11 @@ class Dashboard extends Util {
             $coursename = $this->get_course_name($courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by card $" . $row['psum'] . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename <span class='info' data-paymentid='c_" . $row['id'] . "'></span>";
+                $list.="<div class='container-fluid' style=''>";
+                $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
+                $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                $list.="</div>";
             } // end while
         } // end if $num>0
 
@@ -464,7 +468,11 @@ class Dashboard extends Util {
             $coursename = $this->get_course_name($courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by invoice $" . $row['i_sum'] . "&nbsp;(" . date('m-d-Y', $row['i_pdate']) . ") &nbsp; $coursename <span class='info' data-paymentid='i_" . $row['id'] . "'></span>";
+                $list.="<div class='container-fluid' style=''>";
+                $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_pdate']) . ") &nbsp; $coursename </span>";
+                $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Move</button></span>";
+                $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Refund</button></span>";
+                $list.="</div>";
             } // end while
         } // end if $num>0
 
@@ -480,7 +488,11 @@ class Dashboard extends Util {
             $coursename = $this->get_course_name($courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="Paid by cash/cheque $" . $row['psum'] . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename <span class='info' data-paymentid='p_" . $row['id'] . "'></span>";
+                $list.="<div class='container-fluid' style=''>";
+                $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
+                $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Refund</button></span>";
+                $list.="</div>";
             } // end while
         } // end if $num>0
         return $list;
@@ -965,9 +977,7 @@ class Dashboard extends Util {
                 $payments = $this->get_user_payments($id, $courseid);
                 if ($payments != '') {
                     $list.="<div class='container-fluid' style=''>";
-                    $list.="<span class='span8'>" . str_replace("<br>", "", $payments) . "</span>";
-                    $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$id' data-courseid='$courseid'>Move</button></span>";
-                    $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$id' data-courseid='$courseid'>Refund</button></span>";
+                    $list.="<span class='span12'>$payments</span>";
                     $list.="</div>";
                 } // end if
             } // end foreach
@@ -1120,7 +1130,7 @@ class Dashboard extends Util {
         return $list;
     }
 
-    function get_payment_move_dialog($courseid, $userid) {
+    function get_payment_move_dialog($courseid, $userid, $paymentid) {
         $list = "";
 
         $list.="<div id='myModal' class='modal fade'>
@@ -1131,7 +1141,8 @@ class Dashboard extends Util {
                 </div>
                 <div class='modal-body'>
                 <input type='hidden' id='userid' value='$userid'>
-                <input type='hidden' id='oldcourseid' value='$courseid'> 
+                <input type='hidden' id='oldcourseid' value='$courseid'>
+                <input type='hidden' id='d_paymentid' value='$paymentid'>     
                    
                 <div class='container-fluid'>
                 <span class='span1'>Program</span>
