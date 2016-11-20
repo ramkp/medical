@@ -1892,7 +1892,7 @@ class Students {
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
         $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
-        //$mail->addAddress($user_data->email);
+        $mail->addAddress($user_data->email);
         $mail->addAddress('sirromas@gmail.com');
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
         $mail->isHTML(true);
