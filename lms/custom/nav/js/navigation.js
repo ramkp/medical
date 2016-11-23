@@ -2089,10 +2089,16 @@ $(document).ready(function () {
                             $.post(url, request).done(function (data) {
                                 $("body").append(data);
                                 $("#myModal").modal('show');
+
                                 $.get('/lms/custom/utils/workshops.json', function (data) {
                                     $('#wsname').typeahead({source: data, items: 24});
                                 }, 'json');
-                            });
+
+                                $.get('/lms/custom/utils/programs.json', function (data) {
+                                    $('#coursename').typeahead({source: data, items: 24});
+                                }, 'json');
+
+                            }); // end of post
                         })
                         .fail(function () {
                             console.log('Failed to load bootstrap.min.js');
@@ -3839,11 +3845,12 @@ $(document).ready(function () {
         if (event.target.id == 'add_to_ws') {
             var userid = $('#userid').val();
             var wsname = $('#wsname').val();
-            if (wsname != '') {
+            var coursename = $('#coursename').val()
+            if (wsname != '' && coursename != '') {
                 $('#ws_err').html('');
                 if (confirm('Add current user to new workshop?')) {
                     var url = "/lms/custom/my/add_user_to_workshop.php";
-                    var ws = {wsname: wsname, userid: userid};
+                    var ws = {wsname: wsname, userid: userid, coursename: coursename};
                     $.post(url, {ws: JSON.stringify(ws)}).done(function (data) {
                         console.log(data);
                         $("[data-dismiss=modal]").trigger({type: "click"});
@@ -3852,7 +3859,7 @@ $(document).ready(function () {
                 } // end if
             } // end if
             else {
-                $('#ws_err').html('Please select workshop');
+                $('#ws_err').html('Please select program and workshop');
             } // end else 
         }
 
@@ -3937,7 +3944,10 @@ $(document).ready(function () {
 
     }); // end of body click event
 
+    $('body').on('typeahead:select', function (event, suggestion) {
+        console.log('Selected item: ' + suggestion);
 
+    });
 
 }); // end of $(document).ready(function()
 

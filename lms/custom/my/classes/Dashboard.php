@@ -918,15 +918,15 @@ class Dashboard extends Util {
         return $list;
     }
 
-    function get_courseid_by_name($coursename, $wsname) {
+    function get_courseid_by_name($coursename, $wsname = '') {
         $query = "select * from mdl_course where fullname='$coursename'";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $courseid = $row['id'];
         }
 
-        $sch = new Schedule();
         if ($wsname != '') {
+            $sch = new Schedule();
             $slotid = $sch->get_slotid_by_name($wsname);
         } // end if 
         else {
@@ -1022,7 +1022,9 @@ class Dashboard extends Util {
                     $ws->$key = $value;
                 }
                 $courseid = $this->get_worshop_course($row['slotid']);
+                $coursename = $this->get_course_name($courseid);
                 $ws->courseid = $courseid;
+                $ws->coursename = $coursename;
                 $app[] = $ws;
             } // end while
 
@@ -1035,9 +1037,12 @@ class Dashboard extends Util {
                     $location = $row['appointmentlocation'];
                     $notes = $row['notes'];
                     $list.="<span class='span2'>$date</span>";
-                    $list.="<span class='span3'>$location</span>";
+                    $list.="<span class='span3'>$ws->coursename<br>$location</span>";
                     $list.="<span class='span5'>$notes</span>";
                     $list.="<span class='span2'><button class='profile_move_to_workshop' data-userid='$id' data-slotid='$ws->slotid' data-appid='$ws->id' data-courseid='$ws->courseid'>Move</button></span>";
+                    $list.="</div>";
+                    $list.="<div class='container-fluid' style=''>";
+                    $list.="<span class='12'><hr></span>";
                     $list.="</div>";
                 } // end while
             } // end foreach 
@@ -1398,8 +1403,32 @@ class Dashboard extends Util {
     }
 
     function add_user_to_workshop($ws) {
+
+        /*
+          echo "<pre>";
+          print_r($ws);
+          echo "</pre>";
+         */
+
+        $course_data = json_decode($this->get_courseid_by_name($ws->coursename));
+
+        /*
+         * 
+          echo "<pre>";
+          print_r($course_data);
+          echo "</pre>";
+         * 
+         */
+
+        $courseid = $course_data->courseid;
+        $schedulerid = $this->get_course_scheduler($courseid);
+        $wsname = $ws->wsname;
         $sch = new Schedule();
-        $slotid = $sch->get_slotid_by_name($ws->wsname);
+        $slotid = $sch->get_slotid_by_name($wsname, $schedulerid);
+        //echo "Course id: " . $courseid . "<br>";
+        //echo "Scheduler id: " . $schedulerid . "<br>";
+        //echo "User id: " . $ws->userid . "<br>";
+        //echo "Slot id: " . $slotid . "<br>";
         if ($slotid > 0) {
             $query = "insert into mdl_scheduler_appointment "
                     . "(slotid,studentid,attended) "

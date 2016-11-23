@@ -523,12 +523,12 @@ class Certificates extends Util {
                 $list.="<div>";
                 $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
-                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Certification of Completion</span><br>";
+                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Diploma of Completion</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
                 $list.="<span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>has successfully completed the </span><br>";
                 $list.="<span style='align:center;font-size:26pt;'>Certified Nurse Assistant Program</span><br>";
-                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
+                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>DIPLOMA # $code</span><br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
@@ -1328,12 +1328,12 @@ class Certificates extends Util {
                 $list.="<div>";
                 $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
-                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Certification of Completion</span><br>";
+                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Diploma of Completion</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
                 $list.="<span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>has successfully completed the </span><br>";
                 $list.="<span style='align:center;font-size:26pt;'>Certified Nurse Assistant Program</span><br>";
-                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
+                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>DIPLOMA # $code</span><br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
@@ -1785,12 +1785,12 @@ class Certificates extends Util {
             $list.="<div style='text-align:center;'>";
             $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
             $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>$tempObject->issuer</span>";
-            $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Certification of Completion</span><br>";
+            $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Diploma of Completion</span><br>";
             $list.="<br><span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
             $list.="<br><span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
             $list.="<span style='text-align:center;font-size:16pt;'>$tempObject->content </span><br>";
             $list.="<span style='text-align:center;font-size:26pt;'>$tempObject->title</span><br>";
-            $list.="<br><br><span style='text-align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
+            $list.="<br><br><span style='text-align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>DIPLOMA # $code</span><br>";
             if ($renew_status == true) {
                 $list.="EXPIRATION DATE $expiration_date</p>";
             } // end if $renew_status == true                                 
