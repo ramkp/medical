@@ -105,7 +105,9 @@ class Dashboard extends Util {
                     $status = $row['completed']; // could be 0/1
                 }
             } // end else when it is installment user
+            $status = 1; // temp workaround - allow installment users to access course
         } // end else 
+
         return $status;
     }
 
@@ -1047,13 +1049,13 @@ class Dashboard extends Util {
         return $list;
     }
 
-    function get_user_certificates($id) {
+    function get_user_certificates($userid) {
         $list = "";
         $list.="<div class='container-fluid' style=''>";
-        $list.="<span class='span4'><button class='profile_create_cert' style='width:175px;' data-userid='$id'>Create certificate</button></span>";
+        $list.="<span class='span4'><button class='profile_create_cert' style='width:175px;' data-userid='$userid'>Create certificate</button></span>";
         $list.="</div><br><br>";
 
-        $query = "select * from mdl_certificates where userid=$id";
+        $query = "select * from mdl_certificates where userid=$userid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -1069,9 +1071,10 @@ class Dashboard extends Util {
                 $courseid = $row['courseid'];
                 $id = $row['id'];
                 $coursename = $this->get_course_name($courseid);
-                $list.="<span class='span6'>$coursename</span>";
+                $list.="<span class='span4'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename</a></span>";
                 $list.="<span class='span2'>$start</span>";
                 $list.="<span class='span2'>$exp</span>";
+                $list.="<span class='span2'><button class='profile_send_cert' data-userid='$id' data-courseid='$courseid' data-id='$id'>Send</button></span></span>";
                 $list.="<span class='span2'><button class='profile_renew_cert' data-userid='$id' data-courseid='$courseid' data-id='$id'>Renew</button></span></span>";
                 $list.="</div>";
             } // end while
@@ -1366,6 +1369,12 @@ class Dashboard extends Util {
                 </div>
                 <div class='modal-body'>
                 <input type='hidden' id='userid' value='$userid'>
+                    
+                <div class='container-fluid'>
+                <span class='span1'>Program</span>
+                <span class='span3'><input type='text' id='coursename' style='width:275px;'></span>
+                <br><br>
+                </div>
                    
                 <div class='container-fluid'>
                 <span class='span1'>Workshop</span>

@@ -19,6 +19,9 @@
                     <span class='st_instagram_large' displayText='Instagram Badge'></span>
                     <span class='st__large' displayText=''></span>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.bbb.org/mississippi/business-reviews/schools-business-and-vocational/medical-2-training-institute-in-tupelo-ms-235827408/#bbbonlineclick" target="_blank" rel="nofollow"><img src="http://seal-ms.bbb.org/seals/blue-seal-200-65-bbb-235827408.png" style="border: 0;" alt="Medical 2 Training Institute BBB Business Review" /></a>
+
+                    &nbsp;&nbsp; <img id="trustwaveSealImage" src="https://sealserver.trustwave.com/seal_image.php?customerId=w6oj3BWieZxlpWYB1cFEuNc3HPZL5E&amp;size=105x54&amp;style=invert" border="0" style="cursor:pointer;" onclick="javascript:window.open('https://sealserver.trustwave.com/cert.php?customerId=w6oj3BWieZxlpWYB1cFEuNc3HPZL5E&amp;size=105x54&amp;style=invert', 'c_TW', 'location=no, toolbar=no, resizable=yes, scrollbars=yes, directories=no, status=no, width=615, height=720'); return false;" oncontextmenu="javascript:alert('Copying Prohibited by Law - Trusted Commerce is a Service Mark of TrustWave Holdings, Inc.'); return false;" alt="This site is protected by Trustwave's Trusted Commerce program" title="This site is protected by Trustwave's Trusted Commerce program">
+
                 </p>
 
             </div>
@@ -146,7 +149,7 @@
             jQuery('html, body').animate({scrollTop: 0}, duration);
             return false;
         })
-    });    
+    });
 
 </script>
 <!--

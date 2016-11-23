@@ -187,7 +187,7 @@ class Payment {
         $drop_down = "";
         $items = "<option value='01'>01</option>
                 <option value='--' selected>Month</option>
-                <option value='03'>02</option>
+                <option value='02'>02</option>
                 <option value='03'>03</option>
                 <option value='04'>04</option>
                 <option value='05'>05</option>
@@ -1201,7 +1201,7 @@ class Payment {
         $card->payment_amount = $card->sum;
 
         $installment_status = $invoice->is_installment_user($card->userid, $card->courseid);
-
+        $installment_status=0; // No any installment in manual way
         if ($installment_status == 0) {
             // Personal online payment
             if ($user_group == '' && $userid > 0) {
