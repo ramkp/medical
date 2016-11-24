@@ -40,34 +40,35 @@ class Dashboard extends Util {
 
         $contextid = $this->get_course_context($courseid);
         $roleid = $this->get_user_role($userid, $contextid);
-
+        //echo "User role: " . $roleid;
         if ($roleid <= 3) {
             return 1;
         } // end if
         else {
             $invoice = new Invoice();
             $installment_status = $invoice->is_installment_user($userid, $courseid);
+            //echo "Installment status: ".$installment_status."<br>";
             if ($installment_status == 0) {
                 // 1. Check among card payments
                 $query = "select * from mdl_card_payments "
                         . "where userid=$userid and courseid=$courseid and refunded=0 ";
                 $card_payments_num = $this->db->numrows($query);
 
-                //echo "Card payments num: ".$card_payments_num."<br>";
+                //echo "Card payments num: " . $card_payments_num . "<br>";
                 // 2. Check among invoice payments
                 $query = "select * from mdl_invoice "
                         . "where userid=$userid and courseid=$courseid and i_status=1";
                 $invoice_payments_num = $this->db->numrows($query);
-
+                //echo "Invoice payments num: " . $invoice_payments_num . "<br>";
                 // 3. Check among partial payments
                 $query = "select * from mdl_partial_payments "
                         . "where userid=$userid and courseid=$courseid";
                 $partial_num = $this->db->numrows($query);
-
+                //echo "Partial payments num: " . $partial_num . "<br>";
                 //4. Check among free access 
                 $query = "select * from mdl_free where userid=$userid";
                 $free_num = $this->db->numrows($query);
-
+                //echo "Free payments num: " . $free_num . "<br>";
                 //5. Check among any invoice payments
                 $query = "select * from mdl_any_invoice_user where userid=$userid";
                 $num = $this->db->numrows($query);
@@ -92,7 +93,8 @@ class Dashboard extends Util {
                 else {
                     $any_invoice_num = 0;
                 }
-                if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $free_num > 0 || $any_invoice_num > 0) {
+                //echo "Any invoice num: " . $card_payments_num . "<br>";
+                if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $any_invoice_num > 0) {
                     $status = 1;
                 } // end if $card_payments_num>0 || $invoice_payments_num>0
             } // end if $installment_status==0
@@ -104,8 +106,8 @@ class Dashboard extends Util {
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                     $status = $row['completed']; // could be 0/1
                 }
+                $status = 1; // temp workaround - allow installment users to access course
             } // end else when it is installment user
-            $status = 1; // temp workaround - allow installment users to access course
         } // end else 
 
         return $status;
@@ -136,9 +138,15 @@ class Dashboard extends Util {
     function get_user_course_slot($courseid, $userid) {
         $query = "select * from mdl_slots "
                 . "where courseid=$courseid and userid=$userid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $slotid = $row['slotid'];
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['slotid'];
+            }
+        } //end if
+        else {
+            $slotid = 0;
         }
         return $slotid;
     }
@@ -157,6 +165,7 @@ class Dashboard extends Util {
         $userid = $this->user->id;
         $courseid = $this->course->id;
         $slotid = $this->get_user_course_slot($courseid, $userid);
+        //echo "User slot: " . $slotid . "<br>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/$slotid/0' target='_blank'>click</a> here to pay by card. </span>";
         $list.="</div>";
