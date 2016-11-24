@@ -2213,9 +2213,40 @@ $(document).ready(function () {
                 $("body").append(data);
                 $("#myModal").modal('show');
             }
+        }
 
+        if ($(event.target).attr('class') == 'profile_send_cert') {
+            var userid = $(this).data('userid');
+            var courserid = $(this).data('courseid');
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_send_cert_dialog.php";
+                            var cert = {userid: userid, courseid: courserid};
+                            $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                                //console.log(data);
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $("#date1").datepicker();
+                                $("#date2").datepicker();
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
 
         }
+
 
 
 
@@ -3940,7 +3971,44 @@ $(document).ready(function () {
 
         }
 
+        if (event.target.id == 'default_email') {
+            if ($('#default_email').prop("checked")) {
+                $("#user_email").prop("disabled", true);
+            } // end if
+            else {
+                $("#user_email").prop("disabled", false);
+            } // end else 
+        }
 
+        if (event.target.id == 'send_user_cert') {
+            var userid = $('#userid').val();
+            var courseid = $('#courseid').val();
+            var email = $('#user_email').val();
+            if (email != '') {
+                $('#cert_err').html('');
+                var cert = {userid: userid, courseid: courseid, email: email};
+                if (confirm('Send cetificate?')) {
+                    var url = "/lms/custom/my/send_user_certificate.php";
+                    $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                        console.log(data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        document.location.reload();
+                    });
+                } // end if confirm
+            } // end if
+            else {
+                $('#cert_err').html('Please provide email');
+            } // end else 
+
+        }
+
+        if (event.target.id == '') {
+
+        }
+
+        //default_email
+        // user_email
+        //send_user_cert
 
     }); // end of body click event
 

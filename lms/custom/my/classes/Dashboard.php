@@ -1088,8 +1088,8 @@ class Dashboard extends Util {
                 $list.="<span class='span4'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename</a></span>";
                 $list.="<span class='span2'>$start</span>";
                 $list.="<span class='span2'>$exp</span>";
-                $list.="<span class='span2'><button class='profile_send_cert' data-userid='$id' data-courseid='$courseid' data-id='$id'>Send</button></span></span>";
-                $list.="<span class='span2'><button class='profile_renew_cert' data-userid='$id' data-courseid='$courseid' data-id='$id'>Renew</button></span></span>";
+                $list.="<span class='span2'><button class='profile_send_cert' data-userid='$userid' data-courseid='$courseid' data-id='$id'>Send</button></span></span>";
+                $list.="<span class='span2'><button class='profile_renew_cert' data-userid='$userid' data-courseid='$courseid' data-id='$id'>Renew</button></span></span>";
                 $list.="</div>";
             } // end while
         } // end if $num > 0
@@ -1534,6 +1534,61 @@ class Dashboard extends Util {
     </div>";
 
         return $list;
+    }
+
+    function get_send_cert_dialog($cert) {
+        $list = "";
+
+        $user = $this->get_user_details($cert->userid);
+        $email = $user->email;
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Send certificate</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='userid' value='$cert->userid'>
+                <input type='hidden' id='courseid' value='$cert->courseid'>
+                   
+                <div class='container-fluid'>
+                <span class='span3'><input type='checkbox' id='default_email' checked>Send certificate to student</span>
+                <span class='span3'><input type='text' id='user_email' style='width:275px;' disabled value='$email'></span>
+                <br><br>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='cert_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='send_user_cert'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function send_user_cetificate($cert) {
+
+        $user = $this->get_user_details($cert->userid);
+        $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$cert->userid/$cert->courseid/certificate.pdf";
+        $subject = "Medical2 - Certificate";
+        $list = "";
+        $list.="<html><body>";
+        $list.="<br/><p>Dear $user->firstname $user->lastname!</p>";
+
+        $list.="<p>Please find out certificate attached.</p>";
+        $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
+        $list.="<p>Best regards,</p>";
+        $list.="<p>Support team.</p>";
+        $list.="</body></html>";
+
+        $m = new Mailer();
+        $m->send_email($subject, $list, $cert->email, $path, 1);
     }
 
     function create_user_certificate($certificate) {
