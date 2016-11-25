@@ -4002,13 +4002,21 @@ $(document).ready(function () {
 
         }
 
-        if (event.target.id == '') {
+        if (event.target.id == 'renew_user_cert_manager') {
+            console.log('Clicked ... ');
+            var id = $('#id').val();
+            var period = $("input[name='period']:checked").val();
+            var url = "/lms/custom/my/renew_user_certificate_manager.php";
+            var cert = {id: id, period: period};
+            $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                var fullcert = $.parseJSON(data);
+                $("[data-dismiss=modal]").trigger({type: "click"});
+                var url = "http://medical2.com/index.php/payments/index/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
+                var oWindow = window.open(url, "renew");
+            });
 
         }
 
-        //default_email
-        // user_email
-        //send_user_cert
 
     }); // end of body click event
 

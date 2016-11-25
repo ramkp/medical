@@ -1603,6 +1603,8 @@ class Dashboard extends Util {
     function get_renew_cert_dialog($cert) {
         $list = "";
 
+        $userid = $this->user->id;
+
         $query = "select * from mdl_certificates where id=$cert->id";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -1612,10 +1614,12 @@ class Dashboard extends Util {
             } // end foreach
         } // end while
 
-        $start = date('m/d/Y', $certificate->issue_date);
-        $end = date('m/d/Y', $certificate->expiration_date);
+        if ($userid == 2) {
 
-        $list.="<div id='myModal' class='modal fade'>
+            $start = date('m/d/Y', $certificate->issue_date);
+            $end = date('m/d/Y', $certificate->expiration_date);
+
+            $list.="<div id='myModal' class='modal fade'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>
@@ -1645,6 +1649,49 @@ class Dashboard extends Util {
             </div>
         </div>
     </div>";
+        } // end if $userid==2
+        else {
+            $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Renew user certificate</h4>
+                </div>
+                <div class='modal-body' style='text-align:center;'>
+                <input type='hidden' id='id' value='$certificate->id'>
+                    
+                <div class='container-fluid' style='text-align:center;'>
+                <span class='span3'>Renew period:</span>
+                </div>
+                
+                 <div class='container-fluid' style='text-align:center;'>
+                 
+                 <span class='span1'>
+                 <input type='radio' name='period' class='period' value='1' checked>1 Year
+                 </span>
+                 
+                  <span class='span1'>
+                  <input type='radio' name='period' class='period' value='2'>2 Year
+                  </span>
+                 
+                  <span class='span1'>
+                  <input type='radio' name='period' class='period' value='3'>3 Year
+                  </span>
+                
+                  </div>
+
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='program_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='renew_user_cert_manager'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+        } // end else
 
 
         return $list;
@@ -1654,6 +1701,35 @@ class Dashboard extends Util {
         $certstr = $certificate->id . ",";
         $cert = new Certificates();
         $cert->recertificate($certstr, $certificate->date1, $certificate->date2);
+    }
+
+    function renew_user_certificate_manager($certificate) {
+        $query = "select * from mdl_certificates where id=$certificate->id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $userid = $row['userid'];
+            $courseid = $row['courseid'];
+        }
+        switch ($certificate->period) {
+            case 1:
+                $amount = 50;
+                break;
+            case 2:
+                $amount = 100;
+                break;
+            case 3:
+                $amount = 150;
+                break;
+        }
+        $outcert = array(
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'slot' => 0,
+            'amount' => $amount,
+            'period' => $certificate->period
+        );
+
+        return json_encode($outcert);
     }
 
 }
