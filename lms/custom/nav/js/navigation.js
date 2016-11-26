@@ -976,9 +976,10 @@ $(document).ready(function () {
         });
     }
 
-    function renew_certificate() {
+    function renew_certificate(userid, courseid) {
         var url = "/lms/custom/nav/renew_certificate.php";
-        $.post(url, {id: 1}).done(function (data) {
+        var cert = {userid: userid, courseid: courseid};
+        $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
             $('#region-main').html(data);
         });
     }
@@ -2884,9 +2885,11 @@ $(document).ready(function () {
         update_navigation_status__menu('Get Certificate');
         get_certificate();
     });
-    $("#ren_cert").click(function (event) {
+    $(".ren_cert").click(function (event) {
         update_navigation_status__menu('Renew Certificate');
-        renew_certificate();
+        var userid = $(this).data('userid');
+        var courseid = $(this).data('courseid');
+        renew_certificate(userid, courseid);
     });
     $("#renew_fee").click(function (event) {
         update_navigation_status__menu('Renew Fee');

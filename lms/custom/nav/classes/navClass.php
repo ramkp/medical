@@ -354,10 +354,11 @@ class navClass extends Util {
                         $end = $start + $year_expiration_sec;
                         $cert->create_certificate2($courseid, $this->user->id, $start, $end);
                     } // end if $exists==0                    
-                    //$list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/certificate.pdf' target='_blank'>$coursename - Print Certificate</a></li>";
+                    $userid = $this->user->id;
                     $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename - Print Certificate</a></li>";
-                    $list.="<li><a title='Renew Certificate' id='ren_cert' href='#'>$coursename - Renew Certificate</a></li>";
-                    //$list.="<li><a title='Send Certificate' id='get_cert' href='#'>Send Certificate</a></li>";
+                    if ($courseid != 41) {
+                        $list.="<li><a title='Renew Certificate' class='ren_cert' data-courseid='$courseid' data-userid='$userid' href='#'>$coursename - Renew Certificate</a></li>";
+                    }
                 } // end if $compleation_status!=0        
             } // end foreach
         } // end if count($courses)>0
@@ -619,9 +620,18 @@ class navClass extends Util {
         return $whole_renew_fee;
     }
 
-    function renew_certificate() {
+    function renew_certificate($cert) {
 
-        /* *************************************************************
+        /*
+         * 
+          echo "<pre>";
+          print_r($cert);
+          echo "</pre>";
+          die();
+         * 
+         */
+
+        /*         * ************************************************************
          *  Certificate validation is one year. So whenever user clicks
          *  Certificate could be prolonged at any time even it is not
          *  expired. There are three options:
@@ -637,61 +647,29 @@ class navClass extends Util {
          * 
          * ************************************************************* */
 
-        $courseid = $this->get_user_course($this->user->id);
-        $sum = $this->check_user_balance($courseid, $this->user->id);
-        // user must be able to renew certificate at any time even it is not expired
-        $sum=0; 
-        if ($sum > 0) {
-            $diff = 7776000; // 3 months in secs
-            $now = time();
-            $cert = new Certificates();
-            if ($this->user->id == 12937) {
-                $date = now();
-            } // end if
-            else {
-                $date = $this->get_course_completion($courseid, $this->user->id);
-            } // end else
-            if ($date > 0) {
-                $new_date = $date + 31536000; // one year later after course completion
-                if ($new_date - $now >= $diff) {
-                    $code = '';
-                    $renew = true;
-                    // We renew certificate only for one year (one year is added at Certificates module)
-                    $cert->send_certificate($courseid, $this->user->id, $date, true, $code, $renew);
-                } // end if 
-                else {
-                    $list.="<div class='container-fluid'>";
-                    $list.="<span class='span9'>Please contact site manager to get your updated certificate info@medical2.com.</span>";
-                    $list.="</div>";
-                } // end else
-            } // end if $date>0
-            else {
-                $list.="<div class='container-fluid'>";
-                $list.="<span class='span9'>You did not complete the course. Certificate is not available</span>";
-                $list.="</div>";
-            } // end else             
-        } // end if $sum>0
-        else {
-            $list.="<div class='container-fluid'>";
-            $userid = $this->user->id;
-            $renew_fee = $this->get_certificate_renew_fee($courseid, $userid);
-            $list.="<span class='span9'>Certificate renew is a paid service. Please select option: </span>";
-            $list.="</div>";
-            
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>One year prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$renew_fee/1' target='_blank'>$50 (late fee could be applied)</a></span></span>";
-            $list.="</div>";
-            
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Two years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/100/2' target='_blank'>$100</a></span></span>";
-            $list.="</div>";
-     
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Three years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/150/3' target='_blank'>$150</a></span></span>";
-            $list.="</div>";
-  
-            return $list;
-        }
+        $courseid = $cert->courseid;
+        $userid = $cert->userid;
+        $list.="<div class='container-fluid'>";
+
+        $renew_fee = $this->get_certificate_renew_fee($courseid, $userid);
+        $list.="<span class='span9'>Certificate renew is a paid service (late fee could be applied) .  Please select option: </span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span9'>One year prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$renew_fee/1' target='_blank'>$50</a></span></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span9'>Two years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/100/2' target='_blank'>$100</a></span></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span9'>Three years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/150/3' target='_blank'>$150</a></span></span>";
+
+        $list.="</div>";
+
+
+
         return $list;
     }
 
