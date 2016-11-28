@@ -440,7 +440,7 @@ class Mailer {
             $mail->addAddress($recipient);
             $mail->AddCC('info@medical2.com');
             $mail->AddCC('sirromas@gmail.com');
-            $mail->AddBCC('help@medical2.com');
+            $mail->AddCC('help@medical2.com');
             $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
             $mail->isHTML(true);
             $mail->Subject = $subject;
