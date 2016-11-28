@@ -310,13 +310,203 @@ class Certificates extends Util {
         return $list;
     }
 
+    function is_late_fee_exists($type, $length, $courseid) {
+        $query = "select * from mdl_renew_late_fees "
+                . "where courseid=$courseid and type=$type and length=$length";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function insert_course_renew_late_fee_data($courseid, $type, $length) {
+        $query = "insert into mdl_renew_late_fees "
+                . "(courseid,type,length) "
+                . "values ($courseid,$type,$length)";
+        $this->db->query($query);
+    }
+
+    function update_course_renew_late_fee() {
+        $query = "select * from mdl_course where cost>0 and visible=1 and expired=1";
+        $result = $this->db->query($query);
+        $type = 4;
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $length = 30;
+            $status = $this->is_late_fee_exists($type, $length, $row['id']);
+            if ($status == 0) {
+                $this->insert_course_renew_late_fee_data($row['id'], $type, $length);
+            } // end if
+
+            $length = 60;
+            $status = $this->is_late_fee_exists($type, $length, $row['id']);
+            if ($status == 0) {
+                $this->insert_course_renew_late_fee_data($row['id'], $type, $length);
+            } // end if
+
+            $length = 90;
+            $status = $this->is_late_fee_exists($type, $length, $row['id']);
+            if ($status == 0) {
+                $this->insert_course_renew_late_fee_data($row['id'], $type, $length);
+            } // end if
+        } // end while
+    }
+
+    function get_period_box($type, $id = null) {
+        $list = "";
+        if ($id > 0) {
+            $list.="<select id='period_types_$id'>";
+        } // end if 
+        else {
+            $list.="<select id='period_types'>";
+        } // end else
+        $query = "select * from mdl_period_type";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            if ($row['id'] == $type) {
+                $list.="<option value='" . $row['id'] . "' selected>" . $row['type'] . "</option>";
+            } // end if
+            else {
+                $list.="<option value='" . $row['id'] . "'>" . $row['type'] . "</option>";
+            } // end else
+        }
+
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_length_box($index, $id = null) {
+        $list = "";
+        if ($id > 0) {
+            $list.="<select id='period_length_$id'>";
+        } // end if
+        else {
+            $list.="<select id='period_length'>";
+        } // end else
+        for ($i = 1; $i <= 120; $i++) {
+            if ($i == $index) {
+                $list.="<option value='$i' selected>$i</option>";
+            } // end if
+            else {
+                $list.="<option value='$i'>$i</option>";
+            } // end else
+        }
+
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function update_renew_late_amount($fee) {
+        $query = "update mdl_renew_late_fees "
+                . "set type=$fee->type, "
+                . "length=$fee->length, "
+                . "amount='$fee->amount' "
+                . "where id=$fee->id";
+        //echo "Query: " . $query . "<br>";
+        $this->db->query($query);
+    }
+
+    function get_lates_tab() {
+        $list = "";
+        //$this->update_course_renew_late_fee();
+
+        $list.="<div class='container-fluid' style='font-weight:bold;'>";
+        $list.="<span class='span5'>Program</span>";
+        $list.="<span class='span2' style='text-align:center;'>Period</span>";
+
+        $list.="<span class='span2' style='padding-left:35px;text-align:center;'>Amount</span>";
+        $list.="<span class='span1'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span10' style='color:red;' id='ren_err2'></span>";
+        $list.="</div>";
+
+        $query = "select * from mdl_renew_late_fees";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+            $period = $this->get_period_box($row['type'], $id);
+            $length = $this->get_length_box($row['length'], $id);
+            $coursename = $this->get_course_name($row['courseid']);
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span5'>$coursename</span>";
+            $list.="<span class='span1'>$length</span>";
+            $list.="<span class='span1'>$period</span>";
+            $list.="<span class='span2' style='padding-left:35px;text-align:center;' id='fee_container_$id'><input type='text' id='late_amount_$id' value='" . $row['amount'] . "' style='width:25px;'></span>";
+            $list.="<span class='span1'><button id='renew_late_amount_$id' class='btn btn-primary' data-id='$id'>Update</button></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span10'><hr/></span>";
+            $list.="</div>";
+        }
+        return $list;
+    }
+
+    function is_course_renew_data_exists($courseid) {
+        $query = "select * from mdl_renew_amount where courseid=$courseid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function update_renew_courses_data() {
+        $query = "select * from mdl_course where cost>0 and visible=1 and expired=1";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $status = $this->is_course_renew_data_exists($row['id']);
+            if ($status == 0) {
+                $query2 = "insert into mdl_renew_amount "
+                        . "(courseid,amount) "
+                        . "values(" . $row['id'] . ", '50')";
+                $this->db->query($query2);
+            }
+        }
+    }
+
+    function get_renew_tab() {
+        $list = "";
+
+        $list.="<div class='container-fluid' style='font-weight:bold;'>";
+        $list.="<span class='span8'>Program</span><span class='span1'>Fee ($)</span>";
+        $list.="</div>";
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span10' style='color:red;' id='ren_err'></span>";
+        $list.="</div>";
+
+        $this->update_renew_courses_data();
+        $query = "select * from mdl_renew_amount";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+            $coursename = $this->get_course_name($row['courseid']);
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span8'>$coursename</span><span class='span1' id='amount_container_$id'><input style='width:45px;' type='text' id='amount_$id'  value='" . $row['amount'] . "'></span>";
+            $list.="<span class='span1'><button id='renew_amount_$id' class='btn btn-primary' data-id='$id'>Update</button></span>";
+            $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span11'><hr></span>";
+            $list.="</div>";
+        }
+        return $list;
+    }
+
+    function update_renew_amount($item) {
+        $query = "update mdl_renew_amount "
+                . "set amount='$item->amount' where id=$item->id";
+        $this->db->query($query);
+        return $item->amount;
+    }
+
     function create_certificates_list($certificates, $toolbar = true, $search = false, $tabs = true) {
         $list = "";
         $certificates_tab = $this->prepare_certificate_tab_content($certificates, $toolbar, $search);
         $templates_tab = $this->get_certificates_templates_tab();
+        $renew_tab = $this->get_renew_tab();
+        $lates_tab = $this->get_lates_tab();
         $list.="<ul class='nav nav-tabs'>
                     <li class='active'><a data-toggle='tab' href='#certs_tab'>Certificates</a></li>
                     <li><a data-toggle='tab' href='#templates_tab'>Templates</a></li>
+                    <li><a data-toggle='tab' href='#fee_tab'>Renew fees</a></li>   
+                    <li><a data-toggle='tab' href='#lates_tab'>Late fees</a></li>
                  </ul>";
 
         $list.="<div class='tab-content'>
@@ -328,7 +518,17 @@ class Certificates extends Util {
 
         <div id='templates_tab' class='tab-pane fade'>
         <h3>Templates</h3>
-        <p>$templates_tab</p>
+             <p>$templates_tab</p>
+        </div>
+
+        <div id='fee_tab' class='tab-pane fade'>
+        <h3>Renew fees</h3>
+             <p>$renew_tab</p>
+        </div>
+
+        <div id='lates_tab' class='tab-pane fade'>
+        <h3>Late fees&nbsp; <button class='btn btn-primary' id='add_course_late_fee'>Add</button></h3>
+             <p>$lates_tab</p>
         </div>
   
         </div>";
@@ -340,6 +540,67 @@ class Certificates extends Util {
         else {
             return $certificates_tab;
         } // end else
+    }
+
+    function get_add_late_fee_dialog() {
+        $list = "";
+        $type = $this->get_period_box(4);
+        $length = $this->get_length_box(30);
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Add renew late fee</h4>
+                </div>
+                <div class='modal-body'>
+                
+                   
+                <div class='container-fluid'>
+                <span class='span1'>Program</span>
+                <span class='span3'><input type='text' id='coursename' style='width:275px;'></span>
+                <br><br>
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span1'>Period</span>
+                <span class='span3'>$length &nbsp; $type</span>
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span1'>Amount ($)</span>
+                <span class='span3'><input type='text' id='amount' style='width:45px;'></span>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='add_renew_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='add_renew_late_fee_button'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function get_courseid_by_name($name) {
+        $query = "select * from mdl_course where fullname='$name'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
+    }
+
+    function add_renew_late_fee($fee) {
+        $courseid = $this->get_courseid_by_name($fee->coursename);
+        $query = "insert into mdl_renew_late_fees "
+                . "(courseid,type,length,amount) "
+                . "values ($courseid,$fee->type,$fee->length,'$fee->amount')";
+        $this->db->query($query);
     }
 
     function is_certificate_expired($courseid) {
@@ -1906,4 +2167,5 @@ class Certificates extends Util {
         return $list;
     }
 
+    // ************************ Late fees *****************************
 }

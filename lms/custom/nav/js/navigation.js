@@ -4020,6 +4020,104 @@ $(document).ready(function () {
 
         }
 
+        if (event.target.id.indexOf("renew_amount_") >= 0) {
+            var id = event.target.id.replace("renew_amount_", "");
+            var amount_el = '#amount_' + id;
+            var amount_container = '#amount_container_' + id;
+            var amount = $(amount_el).val();
+            console.log('ID: ' + id);
+            console.log('Amount: ' + amount);
+            if (amount != '') {
+                $('#ren_err').html('');
+                var url = "/lms/custom/certificates/update_renew_amount.php";
+                var cert = {id: id, amount: amount};
+                $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                    $(amount_container).html(data);
+                });
+
+            } // end if
+            else {
+                $('#ren_err').html('Please provide amount fee');
+            } // end else
+        }
+
+        if (event.target.id.indexOf("renew_late_amount_") >= 0) {
+            var id = event.target.id.replace("renew_late_amount_", "");
+            //var container_el = '#fee_container_' + id;
+
+            var length_el = '#period_length_' + id;
+            var length = $(length_el).val();
+
+            var type_el = '#period_types_' + id;
+            var type = $(type_el).val()
+
+            var amount_el = '#late_amount_' + id
+            var amount = $(amount_el).val();
+            if (amount != '') {
+                $('#ren_err2').html('');
+                var fee = {id: id, length: length, type: type, amount: amount};
+                var url = "/lms/custom/certificates/update_renew_late_amount.php";
+                $.post(url, {fee: JSON.stringify(fee)}).done(function (data) {
+                    console.log(data);
+                    $('#ren_err2').html("<span style='color:black'>Item has been updated</span>");
+                });
+            } // end if 
+            else {
+                $('#ren_err2').html('Please provide amount');
+            } // end else
+
+        }
+
+        if (event.target.id == 'add_course_late_fee') {
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/certificates/get_add_late_fee_dialog.php";
+                            var request = {userid: userid};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $.get('/lms/custom/utils/programs.json', function (data) {
+                                    $('#coursename').typeahead({source: data, items: 24});
+                                }, 'json');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+        }
+
+        if (event.target.id == 'add_renew_late_fee_button') {
+            var coursename = $('#coursename').val();
+            var type = $('#period_types').val();
+            var length = $('#period_length').val();
+            var amount = $('#amount').val();
+            if (coursename != '' && amount != '') {
+                $('#add_renew_err').html('');
+                var fee = {coursename: coursename, type: type, length: length, amount: amount};
+                var url = "/lms/custom/certificates/add_renew_late_amount.php";
+                $.post(url, {fee: JSON.stringify(fee)}).done(function (data) {
+                    console.log(data);
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    document.location.reload();
+                });
+                
+            } // end if
+            else {
+                $('#add_renew_err').html('Please select program and provide amount');
+            } // end else
+
+        }
 
     }); // end of body click event
 
