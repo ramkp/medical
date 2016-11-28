@@ -2133,10 +2133,8 @@ $(document).ready(function () {
                 var request = {email: email};
                 $.post(url, request).done(function (data) {
                     console.log('Server email exists response: ' + data);
-
-
                     if (data > 0) {
-                        $('#personal_err').html('Email is already in use');
+                        $('#personal_err').html("You already have an account. Please click <a href='https://medical2.com/login'  target='_blank'>here</a> to login into system using your email and password.");
                     } // end if data>0
                     else {
                         var user = {
@@ -2162,11 +2160,15 @@ $(document).ready(function () {
                             amount: amount
                         };
                         $('#ajax_loading_payment').show();
+                        $('#make_payment_personal2').prop('disabled', true);
+                        $('#make_payment_personal2').text('Processing request');
                         personal_registration_obj = JSON.stringify(user);
                         var signup_url = "/functionality/php/single_signup2.php";
                         var signup_request = {user: JSON.stringify(user)};
                         $.post(signup_url, signup_request).done(function (data) {
                             $('#ajax_loading_payment').hide();
+                            $('#make_payment_personal2').text('I Agree, Submit');
+                            $('#make_payment_personal2').prop('disabled', false);
                             $('#personal_err').html("<span style='color:black'>" + data + "</span>");
                         });
                     } // end else
