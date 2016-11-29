@@ -1741,6 +1741,15 @@ class Students {
         return $status;
     }
 
+    function get_course_category($id) {
+        $query = "select * from mdl_course where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cat = $row['category'];
+        }
+        return $cat;
+    }
+
     function check_exam_students() {
         $exam_users = $this->get_users_grades(0);
         if (count($exam_users) > 0) {
@@ -1750,6 +1759,7 @@ class Students {
                 $courseid = $this->get_course_id_by_quiz_id($user->itemid);
                 $itemname = $this->get_grade_item_name($user->itemid);
                 if ($courseid > 0 && $user->timemodified != '') {
+                    $category = $this->get_course_category($courseid);
                     $taken_user = new stdClass();
                     $taken_user->userid = $user->userid;
                     $taken_user->courseid = $courseid;
@@ -1760,7 +1770,7 @@ class Students {
                     $this->mark_student_grade_item_as_processed($user->id);
                     $exam_status = $this->is_exam_item($user->itemid);
                     $pass = $this->is_course_autopass($courseid);
-                    if ($user->rawgrade >= $this->passing_grade && $exam_status == 1 && $pass == 1) {
+                    if (($user->rawgrade >= $this->passing_grade && $exam_status == 1 && $pass == 1) || ($user->rawgrade >= $this->passing_grade && $category == 4)) {
                         $this->make_students_course_course_completed($courseid, $user->userid);
                     } // end if $user->rawgrade>=$this->passing_grade
                 } // end if $courseid>0
