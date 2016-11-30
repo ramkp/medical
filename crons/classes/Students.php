@@ -1,8 +1,9 @@
 <?php
 
 ini_set('memory_limit', '1024M'); // or you could use 1G
-require_once ('/home/cnausa/public_html/class.pdo.database.php');
+//require_once ('/home/cnausa/public_html/class.pdo.database.php');
 require_once ('/home/cnausa/public_html/functionality/php/classes/mailer/vendor/PHPMailerAutoload.php');
+require_once ('/home/cnausa/public_html/lms/custom/certificates/classes/Renew.php');
 
 class Students {
 
@@ -130,13 +131,10 @@ class Students {
         return $users;
     }
 
-    function get_renew_fee() {
-        $query = "select * from mdl_renew_fee";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $fee = $row['fee_sum'];
-        } // end while
-        return $fee;
+    function get_renew_fee($courseid) {
+        $renew = new Renew();
+        $amount = $renew->get_renew_amount($courseid);
+        return $amount;
     }
 
     function get_user_slot($courseid, $userid) {
@@ -159,11 +157,11 @@ class Students {
                 . "where pdate>1464074847 order by pdate asc";
         $num = $this->db->numrows($query);
         if ($num > 0) {
-            $renew_fee = $this->get_renew_fee();
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_payment = $row['psum'];
                 $course_cost = $this->get_course_cost($row['courseid']);
+                $renew_fee = $this->get_renew_fee($row['courseid']);
                 $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
                 if ($user_payment < $course_cost && $user_payment != $renew_fee) {
                     $wsdate = $this->get_workshop_date($slotid);
@@ -345,7 +343,7 @@ class Students {
                 . "and userid=$userid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
-            $renew_fee = $this->get_renew_fee();
+            $renew_fee = $this->get_renew_fee($courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_payment = $row['psum'];
@@ -369,7 +367,7 @@ class Students {
                 . "and userid=$userid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
-            $renew_fee = $this->get_renew_fee();
+            $renew_fee = $this->get_renew_fee($courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_payment = $row['psum'];
@@ -1156,7 +1154,7 @@ class Students {
         //echo "<br>Type: " . $type . "<br>";
         //echo "Start: " . $start . "<br>";
         //echo "End: " . $end . "<br>";
-        $renew_fee = $this->get_renew_fee();
+
         $list = "";
         $cc_list = "";
         $refund_list = "";
@@ -1194,6 +1192,7 @@ class Students {
             $cc_list.="<td style='padding:15px;font-weight:bold;' colspan='2' align='center'>Credit Card Payments</td>";
             $cc_list.="</th>";
             foreach ($card_payments as $payment) {
+                $renew_fee = $this->get_renew_fee($payment->courseid);
                 $coursename = $this->get_course_name($payment->courseid);
                 $date = date('m-d-Y h:i:s', ($payment->pdate - 86400));
                 $userdata = $this->get_user_data($payment->userid);
@@ -1245,6 +1244,7 @@ class Students {
             $refund_list.="</th>";
             foreach ($refund_payments as $payment) {
                 $coursename = $this->get_course_name($payment->courseid);
+                $renew_fee = $this->get_renew_fee($payment->courseid);
                 $date = date('m-d-Y h:i:s', ($payment->pdate - 86400));
                 $userdata = $this->get_user_data($payment->userid);
                 $firstname = $userdata->firstname;
@@ -1291,6 +1291,7 @@ class Students {
             $in_list.="</th>";
             foreach ($invoice_payments as $payment) {
                 $coursename = $this->get_course_name($payment->courseid);
+                $renew_fee = $this->get_renew_fee($payment->courseid);
                 $date = date('m-d-Y h:i:s', ($payment->i_pdate - 86400));
                 if ($payment->userid > 0) {
                     $userdata = $this->get_user_data($payment->userid);
@@ -1778,6 +1779,9 @@ class Students {
             ksort($taken_exam_users);
             $this->send_exam_passed_notification($taken_exam_users);
         } // end if count($exam_users
+        else {
+            echo "There are no users taken exam recently .... <br>";
+        }
     }
 
     function is_course_autopass($id) {
