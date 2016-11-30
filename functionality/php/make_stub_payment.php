@@ -1,5 +1,6 @@
 <?php
 
+header('Access-Control-Allow-Origin: *');
 require_once './classes/Payment.php';
 $signup = new Payment();
 $card = $_POST['card'];

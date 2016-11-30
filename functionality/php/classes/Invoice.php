@@ -5,7 +5,7 @@
  *
  * @author sirromas
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Late.php';
 
@@ -163,19 +163,16 @@ class Invoice {
         return $user;
     }
 
-    function get_renew_fee() {
-        $query = "select * from mdl_renew_fee where id=1";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $fee = $row['fee_sum'];
-        }
-        return $fee;
+    function get_renew_fee($courseid) {
+        $renew = new Renew();
+        $amount = $renew->get_renew_amount($courseid);
+        return $amount;
     }
 
     function send_renew_invoice($courseid, $userid) {
         $item_name = $this->get_course_name($courseid);
         $user_data = $this->get_invoice_user_data($userid);
-        $sum = $this->get_renew_fee();
+        $sum = $this->get_renew_fee($courseid);
         $invoice_credentials = $this->get_invoice_credentials();
         $invoice_num = $this->get_invoice_num();
         $amount = $sum;
@@ -251,12 +248,12 @@ class Invoice {
         } // end else when tax is not null
         $list.="<tr>";
         $list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:55px;'></td>";
-        $list.="</tr>";        
-        
+        $list.="</tr>";
+
         $list.="<tr bgcolor='#ff8000'>";
         $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>email: " . $invoice_credentials->email . "&nbsp;&nbsp;&nbsp; " . $invoice_credentials->site . "<br>Mailing Address: Medical2 1830A North Gloster St,  Tupelo, MS 38804 </td>";
         $list.="</tr>";
-        
+
         $list.="</table>";
         $list.="</body>";
         $list.="</html>";
@@ -295,91 +292,91 @@ class Invoice {
         $this->db->query($query);
         return $invoice_num;
     }
-    
-    function create_any_invoice ($courseid, $amount, $client) {
-    
-    	$invoice_credentials = $this->get_invoice_credentials();
-    	$invoice_num = $this->get_invoice_num();
-    	$item_name=$this->get_course_name($courseid);
-    	
-    	$list = "";
-    	$list.="<html>";
-    	$list.="<body>";
-    	$list.= "<p></p>";
-    	$list.="<br/><br/><table border='0' align='center' style='width:100%;table-layout:fixed;'>";
-    	$list.="<tr>";
-    	$list.="<td colspan='2' width='55%' style=''><img src='" . $_SERVER['DOCUMENT_ROOT'] . "/assets/logo/5.png' width='350' height=90></td><td  style='padding-left:10px;padding-right:10px;border-left:1px solid;' width='45%'>Phone: $invoice_credentials->phone<br/>Fax: $invoice_credentials->fax</td>";
-    	$list.="</tr>";
-    	$list.="<tr>";
-    	$list.="<td colspan='3' style='border-bottom:1px solid;padding-top:1px;height:10px;'></td>";
-    	$list.="</tr>";
-    	$list.="<tr>";
-    	$list.="<td style='padding-top:6px;' colspan='2'>No: $invoice_num</td><td  style='padding-left:10px;'>Date: " . date('Y/m/d', time()) . "</td>";
-    	$list.="</tr>";
-    	$list.="<tr style=''>";
-    	$list.="<td colspan='3' style='padding-top:1px;height:35px;'></td>";
-    	$list.="</tr>";
-    	$list.="<tr bgcolor='black'>";
-    	$list.="<td style='text-align:center;color:black;' width='15' height='15'>&nbsp;</td><td style='padding-left:15px;text-align:left;' width='10%' bgcolor='white'><span style='color:#ff8000;font-weight:bolder;'>INVOICE TO </span></td><td style='text-align:left;color:black;padding-left:15px;'>&nbsp;</td>";
-    	$list.="</tr>";
-    	
-    	$list.="<tr>";
-    	$list.="<td colspan='3'>$client</td>";
-    	$list.="</tr>";
-    	
-    	$list.="<tr>";
-    	$list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:40px;'></td>";
-    	$list.="</tr>";
-    	$list.="<tr bgcolor='black'>";
-    	$list.="<td style='color:white;text-align:center' width='10%'>No</td><td style='padding-left:15px;text-align:left;color:white' width='60%'>Description</td><td style='text-align:left;color:white;padding-left:15px;' width='5%'>Amount</td>";
-    	$list.="</tr>";
-    	
-    	$list.="<tr bgcolor='#FAF7F5'>";
-    	$list.="<td style='text-align:center;color:black;' width='10%' height='55'>1</td><td style='padding-left:15px;text-align:left;color:black' width='60%'>$client <br> payment for $item_name</td><td style='text-align:left;color:black;padding-left:15px;' width='5%'>$$amount </td>";
-    	$list.="</tr>";
-    	
-    	$list.="<tr>";
-    	$list.="<td></td><td style='padding:10px;' align='right'>Subtotal</td><td bgcolor='black' style='color:white;padding-left:15px;'>$" . $amount . "</td>";
-    	$list.="</tr>";
-    	
-    	$list.="<tr>";
-    	$list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$0</td>";
-    	$list.="</tr>";
-    	
-    	$list.="<tr>";
-    	$list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $amount . "</td>";
-    	$list.="</tr>";
-    	
-    	$list.="<tr>";
-    	$list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:55px;'></td>";
-    	$list.="</tr>";
-    	
-    	$list.="<tr bgcolor='#ff8000'>";
-    	$list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>email: " . $invoice_credentials->email . "&nbsp;&nbsp;&nbsp; " . $invoice_credentials->site . "<br>Mailing Address: Medical2 1830A North Gloster St,  Tupelo, MS 38804 </td>";
-    	$list.="</tr>";
-    	$list.="</table>";
-    	$list.="</body>";
-    	$list.="</html>";
-    	
-    	// instantiate and use the dompdf class
-    	$dompdf = new Dompdf();
-    	$dompdf->loadHtml($list);
-    	
-    	// (Optional) Setup the paper size and orientation
-    	$dompdf->setPaper('A4', 'portrait');
-    	
-    	// Render the HTML as PDF
-    	$dompdf->render();
-    	$output = $dompdf->output();
-    	
-    	$file_path = $this->invoice_path . "/$invoice_num.pdf";
-    	file_put_contents($file_path, $output);
-    	$data=array('num'=>$invoice_num,'file'=>$file_path);
-    	return $data;
+
+    function create_any_invoice($courseid, $amount, $client) {
+
+        $invoice_credentials = $this->get_invoice_credentials();
+        $invoice_num = $this->get_invoice_num();
+        $item_name = $this->get_course_name($courseid);
+
+        $list = "";
+        $list.="<html>";
+        $list.="<body>";
+        $list.= "<p></p>";
+        $list.="<br/><br/><table border='0' align='center' style='width:100%;table-layout:fixed;'>";
+        $list.="<tr>";
+        $list.="<td colspan='2' width='55%' style=''><img src='" . $_SERVER['DOCUMENT_ROOT'] . "/assets/logo/5.png' width='350' height=90></td><td  style='padding-left:10px;padding-right:10px;border-left:1px solid;' width='45%'>Phone: $invoice_credentials->phone<br/>Fax: $invoice_credentials->fax</td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td colspan='3' style='border-bottom:1px solid;padding-top:1px;height:10px;'></td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td style='padding-top:6px;' colspan='2'>No: $invoice_num</td><td  style='padding-left:10px;'>Date: " . date('Y/m/d', time()) . "</td>";
+        $list.="</tr>";
+        $list.="<tr style=''>";
+        $list.="<td colspan='3' style='padding-top:1px;height:35px;'></td>";
+        $list.="</tr>";
+        $list.="<tr bgcolor='black'>";
+        $list.="<td style='text-align:center;color:black;' width='15' height='15'>&nbsp;</td><td style='padding-left:15px;text-align:left;' width='10%' bgcolor='white'><span style='color:#ff8000;font-weight:bolder;'>INVOICE TO </span></td><td style='text-align:left;color:black;padding-left:15px;'>&nbsp;</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='3'>$client</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:40px;'></td>";
+        $list.="</tr>";
+        $list.="<tr bgcolor='black'>";
+        $list.="<td style='color:white;text-align:center' width='10%'>No</td><td style='padding-left:15px;text-align:left;color:white' width='60%'>Description</td><td style='text-align:left;color:white;padding-left:15px;' width='5%'>Amount</td>";
+        $list.="</tr>";
+
+        $list.="<tr bgcolor='#FAF7F5'>";
+        $list.="<td style='text-align:center;color:black;' width='10%' height='55'>1</td><td style='padding-left:15px;text-align:left;color:black' width='60%'>$client <br> payment for $item_name</td><td style='text-align:left;color:black;padding-left:15px;' width='5%'>$$amount </td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td></td><td style='padding:10px;' align='right'>Subtotal</td><td bgcolor='black' style='color:white;padding-left:15px;'>$" . $amount . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td></td><td style='padding:10px;' align='right'>Tax</td><td bgcolor='black' style='padding-left:15px;color:white;'>$0</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td></td><td style='padding:10px;' align='right'>Total</td><td bgcolor='black' style='padding-left:15px;color:white;'>$" . $amount . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:55px;'></td>";
+        $list.="</tr>";
+
+        $list.="<tr bgcolor='#ff8000'>";
+        $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>email: " . $invoice_credentials->email . "&nbsp;&nbsp;&nbsp; " . $invoice_credentials->site . "<br>Mailing Address: Medical2 1830A North Gloster St,  Tupelo, MS 38804 </td>";
+        $list.="</tr>";
+        $list.="</table>";
+        $list.="</body>";
+        $list.="</html>";
+
+        // instantiate and use the dompdf class
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($list);
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+        $output = $dompdf->output();
+
+        $file_path = $this->invoice_path . "/$invoice_num.pdf";
+        file_put_contents($file_path, $output);
+        $data = array('num' => $invoice_num, 'file' => $file_path);
+        return $data;
     }
 
     function create_user_invoice($user, $group, $participants) {
-        $late = new Late();        
+        $late = new Late();
         $user_installment_status = $this->is_installment_user($user->id, $user->courseid);
         if ($user_installment_status == 0) {
             if ($group == null) {
@@ -396,7 +393,7 @@ class Invoice {
                     $tax = 0;
                 } // end else
                 if (!property_exists($user, 'slotid')) {
-                    $user->slotid=0;
+                    $user->slotid = 0;
                 }
                 $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
                 $late_fee = $late->get_delay_fee($user->courseid);
@@ -415,7 +412,7 @@ class Invoice {
                     $tax = 0;
                 } // end else
                 if (!property_exists($group_data, 'slotid')) {
-                    $group_data->slotid=0;
+                    $group_data->slotid = 0;
                 }
                 $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
                 $late_fee = $late->get_delay_fee($group_data->courseid);
@@ -441,7 +438,7 @@ class Invoice {
             else {
                 $tax = 0;
             } // end else
-            $user->slotid=0; // It is always 0 for installment users
+            $user->slotid = 0; // It is always 0 for installment users
             $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
             $late_fee = $late->get_delay_fee($user->courseid);
             // Get invoice user data
@@ -538,12 +535,12 @@ class Invoice {
         $list.="<tr>";
         $list.="<td colspan='3' style='border-bottom:0px solid;padding-top:1px;height:55px;'></td>";
         $list.="</tr>";
-        
+
         /*
-        $list.="<tr bgcolor='#ff8000'>";
-        $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>Mailing Address: Medical2 1830A North Gloster St,  Tupelo, MS 38804 </td>";
-        $list.="</tr>";
-        */
+          $list.="<tr bgcolor='#ff8000'>";
+          $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>Mailing Address: Medical2 1830A North Gloster St,  Tupelo, MS 38804 </td>";
+          $list.="</tr>";
+         */
         $list.="<tr bgcolor='#ff8000'>";
         $list.="<td colspan='3' height='35px' style='color:white;fonr-weight:bold;' align='center'>email: " . $invoice_credentials->email . "&nbsp;&nbsp;&nbsp; " . $invoice_credentials->site . "<br>Mailing Address: Medical2 1830A North Gloster St,  Tupelo, MS 38804 </td>";
         $list.="</tr>";

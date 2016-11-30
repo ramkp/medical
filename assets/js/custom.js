@@ -796,7 +796,7 @@ $(document).ready(function () {
             $('#ajax_loading_payment').show();
             $.post(url, request).done(function (data) {
                 $('#ajax_loading_payment').hide();
-                //console.log('Server response: '+data);
+                console.log('Server response: '+data);
                 $('.form_div').html(data);
             }); // end of post
         } // end if card_type != 'Card type' && card_no!='' ...

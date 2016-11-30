@@ -5,7 +5,7 @@
  *
  * @author sirromas
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/mailer/vendor/PHPMailerAutoload.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
@@ -482,19 +482,15 @@ class Mailer {
         return $list;
     }
 
-    function get_renew_fee() {
-        $query = "select * from mdl_renew_fee";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $fee = $row['fee_sum'];
-        }
-        return $fee;
+    function get_renew_fee($courseid) {
+        $renew = new Renew();
+        $amount = $renew->get_renew_amount($courseid);
+        return $amount;
     }
 
     function get_renew_certificate_message($user) {
         $list = "";
         $course_name = $this->get_course_name($user);
-        $renew_fee = $this->get_renew_fee();
         $list.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
         $list.="</head>";
         $list.="<body><br/><br/><br/><br/>";
@@ -546,18 +542,17 @@ class Mailer {
     }
 
     function send_payment_confirmation_message($payment, $group = null, $free = null) {
-        $renew_fee = $this->get_renew_fee();
+        $renew_fee = $this->get_renew_fee($payment->courseid);
+        $recipient = $payment->bill_email;
         if ($payment->renew == null) {
             $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
             $subject = "Medical2 - payment confirmation";
             $message = $this->get_payment_confirmation_message($payment, $group, $free);
-            $recipient = $payment->bill_email;
             $this->send_email($subject, $message, $recipient);
         } // end if $payment->sum!=$renew_fee
         else {
             $subject = "Medical2 - Certificate Renew Payment";
             $message = $this->get_renew_certificate_message($payment);
-            $recipient = $payment->bill_email;
             $this->send_email($subject, $message, $recipient);
 
             // Send copy of message to info@medical2.com and sirromas@gmail.com
