@@ -228,7 +228,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Promotions' id='register_user'>Register User</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>View User</a></li>
-                                    <li><a href='#' title='Renew fee' id='renew_fee'>Renew Fee</a></li>
+                                    
                                     <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    

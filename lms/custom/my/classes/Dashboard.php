@@ -1708,18 +1708,29 @@ class Dashboard extends Util {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $userid = $row['userid'];
             $courseid = $row['courseid'];
+            $expire = $row['expiration_date'];
         }
+
+        $renew = new Renew();
+        $renew_amount = $renew->get_renew_amount($courseid);
+        $late_fee = $renew->get_renew_late_fee($courseid, $expire);
+
+        $one_year_payment = $renew_amount + $late_fee;
+        $two_year_payment = $renew_amount * 2 + $late_fee;
+        $three_year_payment = $renew_amount * 3 + $late_fee;
+
         switch ($certificate->period) {
             case 1:
-                $amount = 50;
+                $amount = $one_year_payment;
                 break;
             case 2:
-                $amount = 100;
+                $amount = $two_year_payment;
                 break;
             case 3:
-                $amount = 150;
+                $amount = $three_year_payment;
                 break;
         }
+
         $outcert = array(
             'userid' => $userid,
             'courseid' => $courseid,
