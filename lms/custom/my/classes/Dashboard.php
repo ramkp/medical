@@ -9,6 +9,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/schedule/classes/Schedule.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 
 use Dompdf\Dompdf;
@@ -151,13 +152,10 @@ class Dashboard extends Util {
         return $slotid;
     }
 
-    function get_renew_fee() {
-        $query = "select * from mdl_renew_fee";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $fee = $row['fee_sum'];
-        } // end while
-        return $fee;
+    function get_renew_fee($courseid) {
+        $renew = new Renew();
+        $amount = $renew->get_renew_amount($courseid);
+        return $amount;
     }
 
     function get_user_warning_message() {
@@ -684,9 +682,6 @@ class Dashboard extends Util {
         $invoice_payments = array();
         $course_category = $this->get_course_category($courseid);
 
-
-
-
 // 1. Get data from mdl_card_payments // payments made by card
         $query = "select * from mdl_card_payments "
                 . "where refunded=0 and courseid=$courseid "
@@ -737,7 +732,7 @@ class Dashboard extends Util {
 
         $coursename = $this->get_course_name($courseid);
         $coursecost = $this->get_course_cost($courseid);
-        $renew_fee = $this->get_renew_fee();
+        $renew_fee = $this->get_renew_fee($courseid);
         $total_paid = 0;
 
         if (count($cc_payments) > 0) {
@@ -747,12 +742,16 @@ class Dashboard extends Util {
                 $cc_list.="<tr>";
                 if ($payment->psum != $renew_fee) {
                     $cc_list.="<td style='padding:15px;'>Program/Workshop payment</td><td style='padding:15px;'>$$payment->psum</td><td style='padding:15px;'>$date</td>";
+                    $total_paid = $total_paid + $payment->psum;
                 } // end if $payment->psum!=$renew_fee
-                else {
-                    $cc_list.="<td style='padding:15px;'>Certificate renew payment</td><td style='padding:15px;'>$$payment->psum</td><td style='padding:15px;'>$date</td>";
-                } // end else
+
+                /*
+                  else {
+                  $cc_list.="<td style='padding:15px;'>Certificate renew payment</td><td style='padding:15px;'>$$payment->psum</td><td style='padding:15px;'>$date</td>";
+                  } // end else
+                 */
+
                 $cc_list.="</tr>";
-                $total_paid = $total_paid + $payment->psum;
             } // end foreach
             $cc_list.="</table>";
         } // end if count($cc_payments)>0
