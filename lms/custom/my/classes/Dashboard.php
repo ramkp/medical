@@ -1062,6 +1062,15 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function is_course_expired($id) {
+        $query = "select * from mdl_course where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $expire = $row['expired'];
+        }
+        return $expire;
+    }
+
     function get_user_certificates($userid) {
         $list = "";
         $list.="<div class='container-fluid' style=''>";
@@ -1086,7 +1095,13 @@ class Dashboard extends Util {
                 $coursename = $this->get_course_name($courseid);
                 $list.="<span class='span4'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename</a></span>";
                 $list.="<span class='span2'>$start</span>";
-                $list.="<span class='span2'>$exp</span>";
+                $expired = $this->is_course_expired($courseid);
+                if ($expired > 0) {
+                    $list.="<span class='span2'>$exp</span>";
+                } // end if
+                else {
+                    $list.="<span class='span2'>N/A</span>";
+                }
                 $list.="<span class='span2'><button class='profile_send_cert' data-userid='$userid' data-courseid='$courseid' data-id='$id'>Send</button></span></span>";
                 $list.="<span class='span2'><button class='profile_renew_cert' data-userid='$userid' data-courseid='$courseid' data-id='$id'>Renew</button></span></span>";
                 $list.="</div>";
