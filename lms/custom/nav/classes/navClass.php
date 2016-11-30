@@ -7,6 +7,7 @@
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 
@@ -513,13 +514,10 @@ class navClass extends Util {
         return $list;
     }
 
-    function get_renew_fee() {
-        $query = "select * from mdl_renew_fee";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $fee = $row['fee_sum'];
-        } // end while
-        return $fee;
+    function get_renew_fee($courseid) {
+        $renew = new Renew();
+        $amount = $renew->get_renew_amount($courseid);
+        return $amount;
     }
 
     function check_user_balance($courseid, $userid) {
@@ -527,7 +525,7 @@ class navClass extends Util {
         $year = 31104000; // 360 days in secs
         $now = time();
         $exp = $now + $year;
-        $fee = $this->get_renew_fee();
+        $fee = $this->get_renew_fee($courseid);
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid"
                 . " and userid=$userid "
@@ -594,81 +592,60 @@ class navClass extends Util {
     }
 
     function get_certificate_renew_fee($courseid, $userid) {
-        $renew_fee = $this->get_renew_fee();
+        $renew_fee = $this->get_renew_fee($courseid);
         $query = "select * from mdl_certificates "
                 . "where courseid=$courseid and userid=$userid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $expiration_date = $row['expiration_date']; // Unix timestap
         }
-        $now = time();
-        if ($now > $expiration_date) {
-            $diff = $now - $expiration_date;
-            if (($diff) >= 34300800 && ($diff) <= 39398400) {
-                // 30 days after, but less then 90 days after expiration
-                $additional_fee = 25;
-            }
-            if ($diff > 39398400) {
-                // 90 days after expiration
-                $additional_fee = 50;
-            }
-        } // end if $now>$expiration_date
-        else {
-            $additional_fee = 0;
-        } // end else
-        $whole_renew_fee = $renew_fee + $additional_fee;
-        return $whole_renew_fee;
+        $renew = new Renew();
+        $late_fee = $renew->get_renew_late_fee($courseid, $expiration_date);
+        $total_fee = $renew_fee + $late_fee;
+        return $total_fee;
     }
 
     function renew_certificate($cert) {
 
-        /*
-         * 
-          echo "<pre>";
-          print_r($cert);
-          echo "</pre>";
-          die();
-         * 
-         */
-
-        /*         * ************************************************************
-         *  Certificate validation is one year. So whenever user clicks
-         *  Certificate could be prolonged at any time even it is not
-         *  expired. There are three options:
-         * 
-         * - one year prolongation - $50 plus late fees applied (if any)
-         * - two years prolongation - $100  
-         * - three years prolongation - $150
-         * 
-         *  Additional fee for expired certificates: 
-         *  $25 if renew attempt 30 days after expiration
-         *  $50 if renew attempt 90 days after expiration
-         *  if  renew attempt 95 days after expiration - new exam
-         * 
-         * ************************************************************* */
-
         $courseid = $cert->courseid;
         $userid = $cert->userid;
-        $list.="<div class='container-fluid'>";
 
-        $renew_fee = $this->get_certificate_renew_fee($courseid, $userid);
+        $query = "select * from mdl_certificates "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $expire = $row['expiration_date'];
+        }
+
+        $renew = new Renew();
+        $renew_amount = $renew->get_renew_amount($courseid);
+        $late_fee = $renew->get_renew_late_fee($courseid, $expire);
+
+        //echo "Renew amount: " . $renew_amount . "<br>";
+        //echo "Late fee: " . $late_fee . "<brr>";
+
+
+        $one_year_payment = $renew_amount + $late_fee;
+        $two_year_payment = $renew_amount * 2 + $late_fee;
+        $three_year_payment = $renew_amount * 3 + $late_fee;
+
+        $list.="<div class='container-fluid'>";
         $list.="<span class='span9'>Certificate renew is a paid service (late fee could be applied) .  Please select option: </span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>One year prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$renew_fee/1' target='_blank'>$50</a></span></span>";
+        $list.="<span class='span9'>One year prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Two years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/100/2' target='_blank'>$100</a></span></span>";
+        $list.="<span class='span9'>Two years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Three years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/150/3' target='_blank'>$150</a></span></span>";
+        $list.="<span class='span9'>Three years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span></span>";
 
         $list.="</div>";
-
-
 
         return $list;
     }

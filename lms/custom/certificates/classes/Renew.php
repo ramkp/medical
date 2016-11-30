@@ -36,13 +36,31 @@ class Renew {
             $fees[] = $fee;
         }
 
-        $delay_days = abs(round(($expire - time()) / $day_sec));
+        //echo "Current date: " . time() . "-" . date('m-d-Y', time()) . "<br>";
+        //echo "Expire  date: " . $expire . "-" . date('m-d-Y', $expire) . "<br>";
 
-        foreach ($fees as $fee) {
-            if ($delay_days >= $fee->length) {
-                $late_fee = $fee->amount;
-            }
-        }
+        $diff = $expire - time();
+        if ($diff > 0) {
+            $late_fee = 0;
+            $delay_days = 0;
+        } // end if
+        else {
+            $delay_days = abs(floor(($expire - time()) / $day_sec));
+            foreach ($fees as $fee) {
+                if ($delay_days >= $fee->length) {
+                      /*  
+                      echo "<pre>";
+                      print_r($fee);
+                      echo "</pre><br>-----------------------------<br>";
+                      */
+                      
+                      $late_fee = $fee->amount;
+                    
+                } // end if
+            } // end foreach
+        } // end else
+        //echo "Delay days: " . $delay_days . "<br>";
+
         return $late_fee;
     }
 
