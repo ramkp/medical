@@ -869,4 +869,36 @@ class Mailer {
         }
     }
 
+    function send_survey_data($message) {
+
+        $mail = new PHPMailer();
+
+        $addressA = 'info@medical2.com';
+        $addressB = 'help@medical2.com';
+        $addressC = 'sirromas@gmail.com';
+
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->AddAddress($addressA);
+        $mail->AddAddress($addressB);
+        $mail->AddAddress($addressC);
+
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        $mail->isHTML(true);
+        $mail->Subject = 'Medical2 - Workshop Survey Results';
+        $mail->Body = $message;
+        if (!$mail->send()) {
+            return false;
+        } // end if !$mail->send()
+        else {
+            return true;
+        }
+    }
+
 }

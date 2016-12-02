@@ -1527,6 +1527,101 @@ $(document).ready(function () {
             });
         }
 
+        if (event.target.id == 'submit_survey') {
+            var courseid = $('#courseid').val();
+            var userid = $('#userid').val();
+            // Select input
+            var attend = $('#s_attend').val();
+
+            // Text input
+            var city = $('#s_city').val();
+
+            // Select inputs
+            var reg_exp = $('#s_reg_exp').val();
+            var reg_online = $('#s_register_type').val();
+            var in_prof = $('#s_in_prof').val();
+            var in_know = $('#s_in_know').val();
+            var ws_content = $('#s_ws_content').val();
+            var ws_thro = $('#s_ws_thro').val();
+            var ws_pace = $('#s_ws_pace').val();
+            var hands_exp = $('#s_hands_exp').val();
+            var ws_use = $('#s_ws_use').val();
+            var qu_answer = $('#s_qu_answer').val();
+            var co_org = $('#s_co_org').val();
+            var in_org = $('#s_in_org').val();
+            var in_clear = $('#s_in_clear').val();
+            var training_met = $('#s_training_met').val();
+            var draw_blood = $('#s_draw_blood').val();
+            var brochure = $('#s_brochure').val();
+            var recommend = $('#s_recommend').val();
+
+            // Text inputs
+            var ws_more = $('#s_more_interesting').val();
+            var improve = $('#s_improve').val();
+            var comments = $('#s_comments').val();
+
+            if (attend != '--' &&
+                    city != '' &&
+                    reg_exp != '--' &&
+                    reg_online != '--' &&
+                    in_prof != '--' &&
+                    in_know != '--' &&
+                    ws_content != '--' &&
+                    ws_thro != '--' &&
+                    ws_pace != '--' &&
+                    hands_exp != '--' &&
+                    ws_use != '--' &&
+                    qu_answer != '--' &&
+                    co_org != '--' &&
+                    in_org != '--' &&
+                    in_clear != '--' &&
+                    training_met != '--' &&
+                    draw_blood != '--' &&
+                    brochure != '--' &&
+                    recommend != '--') {
+
+                $('#survey_err').html('');
+                var survey = {courseid: courseid,
+                    userid: userid,
+                    attend: attend,
+                    city: city,
+                    reg_exp: reg_exp,
+                    reg_online: reg_online,
+                    in_prof: in_prof,
+                    in_know: in_know,
+                    ws_content: ws_content,
+                    ws_thro: ws_thro,
+                    ws_pace: ws_pace,
+                    hands_exp: hands_exp,
+                    ws_use: ws_use,
+                    qu_answer: qu_answer,
+                    co_org: co_org,
+                    in_org: in_org,
+                    in_clear: in_clear,
+                    training_met: training_met,
+                    draw_blood: draw_blood,
+                    brochure: brochure,
+                    recommend: recommend,
+                    ws_more: ws_more,
+                    improve: improve,
+                    comments: comments};
+
+                console.log(survey);
+                var url = '/lms/custom/my/send_survey_results.php';
+                $('#ajax_loader').show();
+                $('#submit_survey').prop('disabled', true);
+                $.post(url, {survey: JSON.stringify(survey)}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    alert(data);
+                    document.location.reload();
+                });
+
+            } // end if
+            else {
+                $('#survey_err').html('Please provide all required fields');
+            } // end else
+
+        }
 
         if (event.target.id == 'year_stat') {
             var year1 = $('#stat_year1').val();
@@ -4111,13 +4206,15 @@ $(document).ready(function () {
                     $("[data-dismiss=modal]").trigger({type: "click"});
                     document.location.reload();
                 });
-                
+
             } // end if
             else {
                 $('#add_renew_err').html('Please select program and provide amount');
             } // end else
 
         }
+
+
 
     }); // end of body click event
 

@@ -272,7 +272,18 @@ if ($roleid == 5 && $USER->username != 'manager' && $USER->username != 'admin') 
     echo $payments_history;
 }
 
-
+/* Workshop survey */
+$roleid = $ds->get_user_role($USER->id);
+$category = $ds->get_course_category($COURSE->id);
+$completed = $ds->is_course_completed($COURSE->id, $USER->id);
+if ($roleid == 5 && $category == 2 && $completed > 0) {
+    $status = $ds->is_ws_survey_was_completed($COURSE->id, $USER->id);
+    if ($status == 0) {
+        $survey = $ds->get_workshop_survey($COURSE->id, $USER->id);
+        echo $survey;
+        die();
+    }
+} // end if
 // Course wrapper start.
 echo html_writer::start_tag('div', array('class' => 'course-content'));
 

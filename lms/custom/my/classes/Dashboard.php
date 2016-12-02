@@ -21,6 +21,7 @@ class Dashboard extends Util {
     public $assignment_module;
     public $assesment_path;
     public $student_role = 5;
+    public $workshop_category = 2;
 
     function __construct() {
         parent::__construct();
@@ -1755,6 +1756,516 @@ class Dashboard extends Util {
         );
 
         return json_encode($outcert);
+    }
+
+    // ******************* Code related to students survey ********************
+
+    function is_course_completed($courseid, $userid) {
+        $query = "select * from mdl_course_completions "
+                . "where course=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function is_ws_survey_was_completed($courseid, $userid) {
+        $query = "select * from mdl_ws_survey "
+                . "where courseid=$courseid "
+                . "and userid=$userid "
+                . "and viewed=1";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_attend_box() {
+        $list = "";
+        $list.="<select id='s_attend' style='width:220px;'>";
+        $list.="<option value='--' selected>Please select</option>";
+        $list.="<option value='0' >No</option>";
+        $list.="<option value='1' >Yes</option>";
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_brochure_box() {
+        $list = "";
+        $list.="<select id='s_brochure' style='width:220px;'>";
+        $list.="<option value='--' selected>Please select</option>";
+        $list.="<option value='0' >No</option>";
+        $list.="<option value='1' >Yes</option>";
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_register_box() {
+        $list = "";
+        $list.="<select id='s_register_type' style='width:220px;'>";
+        $list.="<option value='--' selected>Please select</option>";
+        $list.="<option value='0' >Online</option>";
+        $list.="<option value='1' >By call</option>";
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_recommend_box() {
+        $list = "";
+        $list.="<select id='s_recommend' style='width:220px;'>";
+        $list.="<option value='--' selected>Please select</option>";
+        $list.="<option value='0' >No</option>";
+        $list.="<option value='1' >Yes</option>";
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_rate_box($input_id) {
+        $list = "";
+        $list.="<select id='s_$input_id' style='width:220px;'>";
+        $list.="<option value='--' selected>Please select</option>";
+        $list.="<option value='1'>1</option>";
+        $list.="<option value='2'>2</option>";
+        $list.="<option value='3'>3</option>";
+        $list.="<option value='4'>4</option>";
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_workshop_survey($courseid, $userid) {
+        $list = "";
+
+        $attend = $this->get_attend_box();
+        $register = $this->get_register_box();
+
+        $list.="<input type='hidden' id='courseid' value='$courseid'>";
+
+        $list.="<input type='hidden' id='userid' value='$userid'>";
+
+        $list.="<div class='container-fluid' style='font-weight:bold;font-size:16px;'>";
+        $list.="<span class='span9'>Please complete one time survey:</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span9'>Rate the following. Select your answers 1-Excellent, 2-Good, 3-Needs improvement, 4-Very disappointing</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Did you attend a workshop for Phlebotomy or IV Therapy?*</span>";
+        $list.="<span class='span3'>$attend</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>What city was your workshop?*</span>";
+        $list.="<span class='span3'><input type='text' id='s_city'></span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('reg_exp');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>How was your registration experience?*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Did you register on line or by call in*</span>";
+        $list.="<span class='span3'>$register</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('in_prof');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Instructor’s professionalism*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('in_know');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Knowledge of Instructor*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('ws_content');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Workshop content*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('ws_thro');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Thoroughness of workshop*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('ws_pace');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Pace of the workshop*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('hands_exp');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Hands’ on experience*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('ws_use');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Usefulness of the content of workshop*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('qu_answer');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Questions were answered*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('co_org');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Content was organized*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('in_org');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Instructor was organized*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('in_clear');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Instructor was clear and understandable*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('training_met');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Training met my expectations*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_rate_box('draw_blood');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>How many times did you attempt to draw blood on another student?*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_brochure_box('brochure');
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Were you given a 4 page handout with questions to answer?*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $rate_box = $this->get_recommend_box();
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Would you recommend Medical 2 to friends, family, etc?*</span>";
+        $list.="<span class='span3'>$rate_box</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>What would have made the workshop more interesting? </span>";
+        $list.="<span class='span3'><textarea id='s_more_interesting' style='width:206px;'></textarea></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>How would you suggest Medical 2 improve the workshop? </span>";
+        $list.="<span class='span3'><textarea id='s_improve' style='width:206px;'></textarea></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'>Any comments</span>";
+        $list.="<span class='span3'><textarea id='s_comments' style='width:206px;'></textarea></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span9' id='survey_err' style='color:red;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span9' style='text-align:center;display:none;' id='ajax_loader'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span6'><button id='submit_survey'>Submit</button></span>";
+        $list.="<span class='span3'></span>";
+        $list.="</div><br/><br/><br/>";
+
+        return $list;
+    }
+
+    function get_workshop_courses() {
+        $query = "select * from mdl_course "
+                . "where category=$this->workshop_category";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $ids[] = $row['id'];
+        }
+        $list = implode(',', $ids);
+        return $list;
+    }
+
+    function is_survey_exists($courseid, $userid) {
+        $query = "select * from mdl_ws_survey "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_workshop_completed_users() {
+        $list = $this->get_workshop_courses();
+        $query = "select * from mdl_course_completions where course in ($list)";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $user = new stdClass();
+            foreach ($row as $key => $value) {
+                $user->$key = $value;
+            } // end foreach
+            $users[] = $user;
+        } // end while
+        return $users;
+    }
+
+    function create_users_survey() {
+        $i = 0;
+        $users = $this->get_workshop_completed_users();
+        foreach ($users as $user) {
+            $status = $this->is_survey_exists($user->course, $user->userid);
+            if ($status == 0) {
+                $query = "insert into mdl_ws_survey "
+                        . "(courseid,userid) "
+                        . "values($user->course,$user->userid)";
+                echo "Query: " . $query . "<br>";
+                $this->db->query($query);
+            } // end if
+        } // end foreach
+    }
+
+    function get_ws_item_score($score) {
+        switch ($score) {
+            case "1":
+                $item = "Excellent";
+                break;
+
+            case "2":
+                $item = "Good";
+                break;
+
+            case "3":
+                $item = "Needs improvement";
+                break;
+
+            case "4":
+                $item = "Very disappointing";
+                break;
+        }
+
+        return $item;
+    }
+
+    function get_survey_message($survey) {
+        $list = "";
+
+        $user = $this->get_user_details($survey->userid);
+        $coursename = $this->get_course_name($survey->courseid);
+
+        $list.="<html>";
+        $list.="<body>";
+        $list.="<table>";
+
+        $list.="<tr>";
+        $list.="<td align='center' colspan='2' style='padding:15px;font-weight:bold;'>Workshop survey results</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Student</td>";
+        $list.="<td style='padding:15px;'>$user->firstname $user->lastname</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Program</td>";
+        $list.="<td style='padding:15px;'>$coursename</td>";
+        $list.="</tr>";
+
+        $attent_status = ($survey->attend == 1) ? 'Yes' : 'No';
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Did you attend a workshop for Phlebotomy or IV Therapy? </td>";
+        $list.="<td style='padding:15px;'>$attent_status</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>What city was your workshop?</td>";
+        $list.="<td style='padding:15px;'>$survey->city</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->reg_exp);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>How was your registration experience? </td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = ($survey->reg_online == 0) ? 'Online' : 'By call';
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Did you register Online or By call in</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->in_prof);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Instructor’s professionalism </td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->in_know);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Knowledge of Instructor</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->ws_content);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Workshop content</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->ws_thro);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Thoroughness of workshop</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->ws_pace);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Pace of the workshop</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->hands_exp);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Hands’ on experience</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->ws_use);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Usefulness of the content of workshop</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->qu_answer);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Questions were answered</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->co_org);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Content was organized</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->in_org);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Instructor was organized</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->in_clear);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Instructor was clear and understandable</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = $this->get_ws_item_score($survey->training_met);
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Training met my expectations</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>How many times did you attempt to draw blood on another student?</td>";
+        $list.="<td style='padding:15px;'>$survey->draw_blood</td>";
+        $list.="</tr>";
+
+        $item = ($survey->brochure == 1) ? 'Yes' : 'No';
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Were you given a 4 page handout with questions to answer?</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $item = ($survey->recommend == 1) ? 'Yes' : 'No';
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Would you recommend Medical 2 to friends, family, etc?</td>";
+        $list.="<td style='padding:15px;'>$item</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>What would have made the workshop more interesting?</td>";
+        $list.="<td style='padding:15px;'>$survey->ws_more</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>How would you suggest Medical 2 improve the workshop?</td>";
+        $list.="<td style='padding:15px;'>$survey->improve</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Any comments</td>";
+        $list.="<td style='padding:15px;'>$survey->comments</td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+        $list.="</body>";
+        $list.="</html>";
+
+
+        return $list;
+    }
+
+    function send_survey_results($survey) {
+
+        //echo "<pre>";
+        //print_r($survey);
+        //echo "</pre><br>-----------------------------------------<br>";
+        //die();
+
+        $list = "";
+        $now = time();
+        $query = "update mdl_ws_survey "
+                . "set  attend='$survey->attend', "
+                . "city='$survey->city', "
+                . "reg_exp='$survey->reg_exp', "
+                . "reg_online='$survey->reg_online', "
+                . "in_prof='$survey->in_prof', "
+                . "in_know='$survey->in_know', "
+                . "ws_content='$survey->ws_content', "
+                . "ws_thro='$survey->ws_thro', "
+                . "ws_pace='$survey->ws_pace', "
+                . "hands_exp='$survey->hands_exp', "
+                . "ws_use='$survey->ws_use', "
+                . "qu_answer='$survey->qu_answer', "
+                . "co_org='$survey->co_org', "
+                . "in_org='$survey->in_org', "
+                . "in_clear='$survey->in_clear', "
+                . "training_met='$survey->training_met', "
+                . "draw_blood='$survey->draw_blood', "
+                . "brochure='$survey->brochure', "
+                . "recommend='$survey->recommend', "
+                . "ws_more='$survey->ws_more',"
+                . "improve='$survey->improve', "
+                . "comments='$survey->comments', "
+                . "viewed=1, viewed_date='$now' "
+                . " where courseid=$survey->courseid "
+                . "and userid=$survey->userid";
+        //echo "Query: " . $query . "<br>";
+        //die();
+        $this->db->query($query);
+
+        $m = new Mailer();
+        $message = $this->get_survey_message($survey);
+        $m->send_survey_data($message);
+        $list.="Thank you!";
+        return $list;
     }
 
 }
