@@ -1,13 +1,10 @@
 <?php
 
-
 /**
  * Description of class
  *
  * @author sirromas
  */
-
-
 class pdo_db {
 
     private $databaseName;
@@ -17,7 +14,7 @@ class pdo_db {
     private $db;
 
     function __construct() {
-        $config_data = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/lms/db.xml');        
+        $config_data = file_get_contents('/home/cnausa/public_html/lms/db.xml');
         $config = new SimpleXMLElement($config_data);
         $this->databaseName = $config->db_name;
         $this->host = $config->db_host;
@@ -34,13 +31,13 @@ class pdo_db {
 
     public function numrows($query) {
         //echo "Query: ".$query."<br/>";
-        $result = $this->db->query($query); 
+        $result = $this->db->query($query);
         return $result->rowCount();
     }
 
     public function query($query) {
         //echo "Query: ".$query."<br/>";
-        return $this->db->query($query);      
+        return $this->db->query($query);
     }
 
 }
