@@ -16,8 +16,8 @@ class Mailer {
 
     public $mail_smtp_host = 'mail.medical2.com';
     public $mail_smtp_port = 25;
-    //public $mail_smtp_user = 'info@medical2.com';
-    public $mail_smtp_user = 'medical2@medical2.com';
+    public $mail_smtp_user = 'info@medical2.com';
+    //public $mail_smtp_user = 'medical2@medical2.com';
     public $mail_smtp_pwd = 'aK6SKymc';
     public $invoice_path;
     public $registration_path;
