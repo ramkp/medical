@@ -784,12 +784,12 @@ class Certificates extends Util {
                 $list.="<div>";
                 $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
-                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Diploma of Completion</span><br>";
+                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Certification of Completion</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
                 $list.="<span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>has successfully completed the </span><br>";
-                $list.="<span style='align:center;font-size:26pt;'>Certified Nurse Assistant Program</span><br>";
-                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>DIPLOMA # $code</span><br>";
+                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Certified Nurse Assistant Program</span><br>";
+                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
@@ -935,7 +935,6 @@ class Certificates extends Util {
 
                 break;
 
-
             case 51:
                 $coursename = "Phlebotomy Technician Exam";
                 $list.="<!DOCTYPE HTML SYSTEM>";
@@ -956,6 +955,62 @@ class Certificates extends Util {
                 }
                 $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
+                $list.="</body>";
+                $list.="</html>";
+
+                break;
+
+            case 55:
+
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div>";
+                $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
+                $list.="<span style='align:center;font-size:16pt;'><br><br>Presents in recognition on this the $day of $month, $year</span><br>";
+                $list.="<br><span style='align:center;font-size:16pt;'>this <span style='align:center;font-weight:bold;font-size:30pt;'>Diploma</span> to</span><br>";
+                $list.="<span style='align:center;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<span style='align:center;font-size:16pt;'><br>for successfully completion of the requirements in the program of</span><br>";
+                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Medical Assistant</span><br>";
+                $list.="<span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'><br>DIPLOMA # $code</span><br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                } // end if $renew_status == true                                 
+                // President signature
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Mrs. Vicky Gunter<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
+                $list.="</div>";
+
+                $list.="</body>";
+                $list.="</html>";
+
+                break;
+
+            case 56:
+
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div>";
+                $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
+                $list.="<span style='align:center;font-size:16pt;'><br><br>Presents in recognition on this the $day of $month, $year</span><br>";
+                $list.="<br><span style='align:center;font-size:16pt;'>this <span style='align:center;font-weight:bold;font-size:30pt;'>Certificate</span> to</span><br>";
+                $list.="<span style='align:center;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<span style='align:center;font-size:16pt;'><br>for successfully completion of the requirements in the program of</span><br>";
+                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Medical Administrative Assistant</span><br>";
+                $list.="<span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'><br>CERTIFICATE # $code</span><br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                } // end if $renew_status == true                                 
+                // President signature
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Mrs. Vicky Gunter<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
+                $list.="</div>";
+
                 $list.="</body>";
                 $list.="</html>";
 
@@ -1581,6 +1636,7 @@ class Certificates extends Util {
         switch ($cert->courseid) {
 
             case 41:
+
                 $list.="<!DOCTYPE HTML SYSTEM>";
                 $list.="<head>";
                 $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
@@ -1589,17 +1645,16 @@ class Certificates extends Util {
                 $list.="<div>";
                 $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
-                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Diploma of Completion</span><br>";
+                $list.="<br><br><span style='align:center;font-weight:bold;font-size:35pt;'>Certification of Completion</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
                 $list.="<span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>has successfully completed the </span><br>";
-                $list.="<span style='align:center;font-size:26pt;'>Certified Nurse Assistant Program</span><br>";
-                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>DIPLOMA # $code</span><br>";
+                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Certified Nurse Assistant Program</span><br>";
+                $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                //$list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Terri McCord, RN<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Coodinator</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></p";
                 $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Terri McCord, RN<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Coodinator</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director, Agent # C-3110</span></td></tr></table></p";
                 $list.="</div>";
 
@@ -1765,6 +1820,62 @@ class Certificates extends Util {
 
                 break;
 
+            case 55:
+
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div>";
+                $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
+                $list.="<span style='align:center;font-size:16pt;'><br><br>Presents in recognition on this the $day of $month, $year</span><br>";
+                $list.="<br><span style='align:center;font-size:16pt;'>this <span style='align:center;font-weight:bold;font-size:30pt;'>Diploma</span> to</span><br>";
+                $list.="<span style='align:center;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<span style='align:center;font-size:16pt;'><br>for successfully completion of the requirements in the program of</span><br>";
+                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Medical Assistant</span><br>";
+                $list.="<span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'><br>DIPLOMA # $code</span><br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                } // end if $renew_status == true                                 
+                // President signature
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Mrs. Vicky Gunter<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
+                $list.="</div>";
+
+                $list.="</body>";
+                $list.="</html>";
+
+                break;
+
+            case 56:
+
+                $list.="<!DOCTYPE HTML SYSTEM>";
+                $list.="<head>";
+                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list.="</head>";
+                $list.="<body>";
+                $list.="<div>";
+                $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
+                $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
+                $list.="<span style='align:center;font-size:16pt;'><br><br>Presents in recognition on this the $day of $month, $year</span><br>";
+                $list.="<br><span style='align:center;font-size:16pt;'>this <span style='align:center;font-weight:bold;font-size:30pt;'>Certificate</span> to</span><br>";
+                $list.="<span style='align:center;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<span style='align:center;font-size:16pt;'><br>for successfully completion of the requirements in the program of</span><br>";
+                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Medical Administrative Assistant</span><br>";
+                $list.="<span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'><br>CERTIFICATE # $code</span><br>";
+                if ($renew_status == true) {
+                    $list.="EXPIRATION DATE $expiration_date</p>";
+                } // end if $renew_status == true                                 
+                // President signature
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Mrs. Vicky Gunter<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
+                $list.="</div>";
+
+                $list.="</body>";
+                $list.="</html>";
+
+                break;
+
             case 57:
                 $list.="<!DOCTYPE HTML SYSTEM>";
                 $list.="<head>";
@@ -1816,7 +1927,10 @@ class Certificates extends Util {
 
         $pdf = new mPDF('utf-8', 'A4-L');
         $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-        $pdf->WriteHTML($stylesheet, 1);
+
+        if ($courseid != 55 && $courseid != 56) {
+            $pdf->WriteHTML($stylesheet, 1);
+        }
         $pdf->WriteHTML($list, 2);
 
         $dir_path = $this->cert_path . "/$userid/$courseid";
