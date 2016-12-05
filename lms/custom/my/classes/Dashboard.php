@@ -2112,7 +2112,7 @@ class Dashboard extends Util {
 
         $item = $this->get_ws_item_score($survey->in_prof);
         $list.="<tr>";
-        $list.="<td style='padding:15px;'>Instructor’s professionalism </td>";
+        $list.="<td style='padding:15px;'>Instructor professionalism </td>";
         $list.="<td style='padding:15px;'>$item</td>";
         $list.="</tr>";
 
@@ -2142,7 +2142,7 @@ class Dashboard extends Util {
 
         $item = $this->get_ws_item_score($survey->hands_exp);
         $list.="<tr>";
-        $list.="<td style='padding:15px;'>Hands’ on experience</td>";
+        $list.="<td style='padding:15px;'>Hands on experience</td>";
         $list.="<td style='padding:15px;'>$item</td>";
         $list.="</tr>";
 
