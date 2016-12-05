@@ -788,7 +788,7 @@ class Certificates extends Util {
                 $list.="<span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
                 $list.="<span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>has successfully completed the </span><br>";
-                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Certified Nurse Assistant Program</span><br>";
+                $list.="<span style='align:center;font-size:40pt;'>Certified Nurse Assistant Program</span><br>";
                 $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
@@ -1067,7 +1067,11 @@ class Certificates extends Util {
 
         $pdf = new mPDF('utf-8', 'A4-L');
         $stylesheet = file_get_contents($this->cert_path . '/cert.css');
-        $pdf->WriteHTML($stylesheet, 1);
+
+        if ($courseid != 41 && $courseid != 55 && $courseid != 56) {
+            $pdf->WriteHTML($stylesheet, 1);
+        }
+
         $pdf->WriteHTML($list, 2);
         $dir_path = $this->cert_path . "/$userid/$courseid";
         //echo "Dir path: " . $dir_path . "<br>";
@@ -1649,7 +1653,7 @@ class Certificates extends Util {
                 $list.="<span style='align:center;font-size:16pt;'>Presents and declares on this the $day of $month, $year</span><br>";
                 $list.="<span style='align:center;font-size:40pt;'>$firstname $lastname</span><br>";
                 $list.="<span style='align:center;font-size:16pt;'>has successfully completed the </span><br>";
-                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Certified Nurse Assistant Program</span><br>";
+                $list.="<span style='align:center;font-size:40pt;'>Certified Nurse Assistant Program</span><br>";
                 $list.="<br><br><span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code</span><br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
@@ -1928,7 +1932,7 @@ class Certificates extends Util {
         $pdf = new mPDF('utf-8', 'A4-L');
         $stylesheet = file_get_contents($this->cert_path . '/cert.css');
 
-        if ($courseid != 55 && $courseid != 56) {
+        if ($courseid != 41 && $courseid != 55 && $courseid != 56) {
             $pdf->WriteHTML($stylesheet, 1);
         }
         $pdf->WriteHTML($list, 2);
