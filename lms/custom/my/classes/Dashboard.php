@@ -1825,10 +1825,10 @@ class Dashboard extends Util {
         $list = "";
         $list.="<select id='s_$input_id' style='width:220px;'>";
         $list.="<option value='--' selected>Please select</option>";
-        $list.="<option value='1'>1</option>";
-        $list.="<option value='2'>2</option>";
-        $list.="<option value='3'>3</option>";
-        $list.="<option value='4'>4</option>";
+        $list.="<option value='1'>Excellent</option>";
+        $list.="<option value='2'>Good</option>";
+        $list.="<option value='3'>Needs improvement</option>";
+        $list.="<option value='4'>Very disappointing</option>";
         $list.="</select>";
 
         return $list;
