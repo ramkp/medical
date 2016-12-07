@@ -1829,13 +1829,12 @@ class Dashboard extends Util {
             $list.="<option value='1'>Excellent</option>";
             $list.="<option value='2'>Good</option>";
             $list.="<option value='3'>Needs improvement</option>";
-            $list.="<option value='4'>Very disappointing</option>";
         } // end if
         else {
             $list.="<option value='1'>1</option>";
             $list.="<option value='2'>2</option>";
             $list.="<option value='3'>3</option>";
-            $list.="<option value='4'>4</option>";
+            $list.="<option value='4'>More than 3</option>";
         } // end else
         $list.="</select>";
 
@@ -1861,83 +1860,19 @@ class Dashboard extends Util {
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Did you attend a workshop for Phlebotomy or IV Therapy?*</span>";
-        $list.="<span class='span3'>$attend</span>";
-        $list.="</div>";
-
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>What city was your workshop?*</span>";
+        $list.="<span class='span6'>What city was your workshop in?*</span>";
         $list.="<span class='span3'><input type='text' id='s_city'></span>";
-        $list.="</div>";
-
-        $rate_box = $this->get_rate_box('reg_exp');
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>How was your registration experience?*</span>";
-        $list.="<span class='span3'>$rate_box</span>";
-        $list.="</div>";
-
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Did you register on line or by call in*</span>";
-        $list.="<span class='span3'>$register</span>";
         $list.="</div>";
 
         $rate_box = $this->get_rate_box('in_prof');
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Instructor’s professionalism*</span>";
-        $list.="<span class='span3'>$rate_box</span>";
-        $list.="</div>";
-
-        $rate_box = $this->get_rate_box('in_know');
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Knowledge of Instructor*</span>";
-        $list.="<span class='span3'>$rate_box</span>";
-        $list.="</div>";
-
-        $rate_box = $this->get_rate_box('ws_content');
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Workshop content*</span>";
-        $list.="<span class='span3'>$rate_box</span>";
-        $list.="</div>";
-
-        $rate_box = $this->get_rate_box('ws_thro');
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Thoroughness of workshop*</span>";
-        $list.="<span class='span3'>$rate_box</span>";
-        $list.="</div>";
-
-        $rate_box = $this->get_rate_box('ws_pace');
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Pace of the workshop*</span>";
-        $list.="<span class='span3'>$rate_box</span>";
-        $list.="</div>";
-
-        $rate_box = $this->get_rate_box('hands_exp');
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Hands’ on experience*</span>";
-        $list.="<span class='span3'>$rate_box</span>";
-        $list.="</div>";
-
-        $rate_box = $this->get_rate_box('ws_use');
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Usefulness of the content of workshop*</span>";
+        $list.="<span class='span6'>Instructor’s professionalism and knowledge*</span>";
         $list.="<span class='span3'>$rate_box</span>";
         $list.="</div>";
 
         $rate_box = $this->get_rate_box('qu_answer');
         $list.="<div class='container-fluid'>";
         $list.="<span class='span6'>Questions were answered*</span>";
-        $list.="<span class='span3'>$rate_box</span>";
-        $list.="</div>";
-
-        $rate_box = $this->get_rate_box('co_org');
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Content was organized*</span>";
-        $list.="<span class='span3'>$rate_box</span>";
-        $list.="</div>";
-
-        $rate_box = $this->get_rate_box('in_org');
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span6'>Instructor was organized*</span>";
         $list.="<span class='span3'>$rate_box</span>";
         $list.="</div>";
 
@@ -2062,10 +1997,6 @@ class Dashboard extends Util {
             case "3":
                 $item = "Needs improvement";
                 break;
-
-            case "4":
-                $item = "Very disappointing";
-                break;
         }
 
         return $item;
@@ -2080,7 +2011,7 @@ class Dashboard extends Util {
         $list.="<html>";
         $list.="<body>";
         $list.="<table>";
-
+            
         $list.="<tr>";
         $list.="<td align='center' colspan='2' style='padding:15px;font-weight:bold;'>Workshop survey results</td>";
         $list.="</tr>";
@@ -2095,86 +2026,20 @@ class Dashboard extends Util {
         $list.="<td style='padding:15px;'>$coursename</td>";
         $list.="</tr>";
 
-        $attent_status = ($survey->attend == 1) ? 'Yes' : 'No';
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Did you attend a workshop for Phlebotomy or IV Therapy? </td>";
-        $list.="<td style='padding:15px;'>$attent_status</td>";
-        $list.="</tr>";
-
         $list.="<tr>";
         $list.="<td style='padding:15px;'>What city was your workshop?</td>";
         $list.="<td style='padding:15px;'>$survey->city</td>";
         $list.="</tr>";
 
-        $item = $this->get_ws_item_score($survey->reg_exp);
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>How was your registration experience? </td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
-        $item = ($survey->reg_online == 0) ? 'Online' : 'By call';
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Did you register Online or By call in</td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
         $item = $this->get_ws_item_score($survey->in_prof);
         $list.="<tr>";
-        $list.="<td style='padding:15px;'>Instructor professionalism </td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
-        $item = $this->get_ws_item_score($survey->in_know);
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Knowledge of Instructor</td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
-        $item = $this->get_ws_item_score($survey->ws_content);
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Workshop content</td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
-        $item = $this->get_ws_item_score($survey->ws_thro);
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Thoroughness of workshop</td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
-        $item = $this->get_ws_item_score($survey->ws_pace);
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Pace of the workshop</td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
-        $item = $this->get_ws_item_score($survey->hands_exp);
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Hands on experience</td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
-        $item = $this->get_ws_item_score($survey->ws_use);
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Usefulness of the content of workshop</td>";
+        $list.="<td style='padding:15px;'>Instructor professionalism and knowledge</td>";
         $list.="<td style='padding:15px;'>$item</td>";
         $list.="</tr>";
 
         $item = $this->get_ws_item_score($survey->qu_answer);
         $list.="<tr>";
         $list.="<td style='padding:15px;'>Questions were answered</td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
-        $item = $this->get_ws_item_score($survey->co_org);
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Content was organized</td>";
-        $list.="<td style='padding:15px;'>$item</td>";
-        $list.="</tr>";
-
-        $item = $this->get_ws_item_score($survey->in_org);
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Instructor was organized</td>";
         $list.="<td style='padding:15px;'>$item</td>";
         $list.="</tr>";
 

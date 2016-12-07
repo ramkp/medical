@@ -1531,24 +1531,24 @@ $(document).ready(function () {
             var courseid = $('#courseid').val();
             var userid = $('#userid').val();
             // Select input
-            var attend = $('#s_attend').val();
+            var attend = 1;
 
             // Text input
             var city = $('#s_city').val();
 
             // Select inputs
-            var reg_exp = $('#s_reg_exp').val();
-            var reg_online = $('#s_register_type').val();
+            var reg_exp = 1;
+            var reg_online = 1;
             var in_prof = $('#s_in_prof').val();
-            var in_know = $('#s_in_know').val();
-            var ws_content = $('#s_ws_content').val();
-            var ws_thro = $('#s_ws_thro').val();
-            var ws_pace = $('#s_ws_pace').val();
-            var hands_exp = $('#s_hands_exp').val();
-            var ws_use = $('#s_ws_use').val();
+            var in_know = 1;
+            var ws_content = 1;
+            var ws_thro = 1;
+            var ws_pace = 1;
+            var hands_exp = 1;
+            var ws_use = 1;
             var qu_answer = $('#s_qu_answer').val();
-            var co_org = $('#s_co_org').val();
-            var in_org = $('#s_in_org').val();
+            var co_org = 1;
+            var in_org = 1;
             var in_clear = $('#s_in_clear').val();
             var training_met = $('#s_training_met').val();
             var draw_blood = $('#s_draw_blood').val();
