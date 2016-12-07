@@ -1047,8 +1047,9 @@ class Dashboard extends Util {
                     $notes = $row['notes'];
                     $list.="<span class='span2'>$date</span>";
                     $list.="<span class='span3'>$ws->coursename<br>$location</span>";
-                    $list.="<span class='span5'>$notes</span>";
+                    $list.="<span class='span3'>$notes</span>";
                     $list.="<span class='span2'><button class='profile_move_to_workshop' data-userid='$id' data-slotid='$ws->slotid' data-appid='$ws->id' data-courseid='$ws->courseid'>Move</button></span>";
+                    $list.="<span class='span2'><button class='profile_cancel_workshop' data-userid='$id' data-slotid='$ws->slotid' data-appid='$ws->id' data-courseid='$ws->courseid'>Remove</button></span>";
                     $list.="</div>";
                     $list.="<div class='container-fluid' style=''>";
                     $list.="<span class='12'><hr></span>";
@@ -2011,7 +2012,7 @@ class Dashboard extends Util {
         $list.="<html>";
         $list.="<body>";
         $list.="<table>";
-            
+
         $list.="<tr>";
         $list.="<td align='center' colspan='2' style='padding:15px;font-weight:bold;'>Workshop survey results</td>";
         $list.="</tr>";
@@ -2139,6 +2140,11 @@ class Dashboard extends Util {
         $m->send_survey_data($message);
         $list.="Thank you!";
         return $list;
+    }
+
+    function remove_from_ws($id) {
+        $query = "delete from mdl_scheduler_appointment where id=$id ";
+        $this->db->query($query);
     }
 
 }

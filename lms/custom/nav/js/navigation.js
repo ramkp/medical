@@ -2245,6 +2245,17 @@ $(document).ready(function () {
             }, 'json');
         }
 
+        if ($(event.target).attr('class') == 'profile_cancel_workshop') {
+            var appid = $(this).data('appid');
+            if (confirm('Remove current student from selected workshop?')) {
+                var url = "/lms/custom/my/remove_from_workshop.php";
+                $.post(url, {id: appid}).done(function () {
+                    document.location.reload();
+                });
+            }
+
+        }
+
         if ($(event.target).attr('class') == 'profile_create_cert') {
             var userid = $(this).data('userid');
             console.log('User id: ' + userid);
