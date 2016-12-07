@@ -223,7 +223,7 @@ $host = $_SERVER['HTTP_HOST'];
                                     <li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Career College Courses<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
                                             <li><a class="dropdown-toggle" href="http://<?php echo $host ?>/programs/program/career-courses" id="ws"  title="">Healthcare Career Courses </a></li>
-                                            <!--<li><a href="http://<?php echo $host ?>/index.php/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>-->                                            
+                                            <li><a href="http://<?php echo $host ?>/index.php/register2/school_app" id="sch" title="School Application">School Application</a></li>                                            
                                             <!--<li><a href="http://<?php echo $host ?>/index.php/programs/program/3/" id="exam" title="">Online Courses</a></li>-->                                            
                                         </ul>
                                     </li>                                    

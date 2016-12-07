@@ -1565,6 +1565,9 @@ $(document).ready(function () {
     $('#gallery').click(function () {
         self.location = $('#gallery').attr('href');
     });
+    $('#sch').click(function () {
+        self.location = $('#sch').attr('href');
+    });
     /***************************************************************************
      * 
      * 
