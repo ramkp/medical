@@ -1,5 +1,6 @@
 <?php
 
+header('Access-Control-Allow-Origin: *');
 require_once './classes/Register.php';
 $r = new Register();
 $courseid = $_POST['id'];

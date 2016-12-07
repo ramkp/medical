@@ -67,8 +67,8 @@ $(document).ready(function () {
 
     $('#birth').mask("9999/99/99");
     $('#graduate_date').mask("9999");
-    $('#phone1').mask("(999) 999-999");
-    $('#phone2').mask("(999) 999-999");
+    $('#phone1').mask("(999) 999-9999");
+    $('#phone2').mask("(999) 999-9999");
     $('#app_date').datepicker();
 
     var domain = 'medical2.com';

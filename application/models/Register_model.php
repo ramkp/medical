@@ -1059,8 +1059,8 @@ class register_model extends CI_Model {
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Provide 2 contact phones numbers, email and birth of date *:</span>";
-        $list.="<span class='span2'><input type='text' id='phone1' placeholder='(___) ___-___'   required></span>";
-        $list.="<span class='span2'><input type='text' id='phone2' placeholder='(___) ___-___'   required></span>";
+        $list.="<span class='span2'><input type='text' id='phone1' placeholder='(___) ___-____'   required></span>";
+        $list.="<span class='span2'><input type='text' id='phone2' placeholder='(___) ___-____'   required></span>";
         $list.="<span class='span2'><input type='email' id='email' placeholder='Email' required  style='width:140px;'></span>";
         $list.="<span class='span2'><input type='text' id='birth'  placeholder='yyyy/mm/dd' required></span>";
         $list.="</div>";
