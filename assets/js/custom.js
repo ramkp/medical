@@ -65,6 +65,12 @@ $(document).ready(function () {
      * 
      **************************************************************************/
 
+    $('#birth').mask("9999/99/99");
+    $('#graduate_date').mask("9999");
+    $('#phone1').mask("(999) 999-999");
+    $('#phone2').mask("(999) 999-999");
+    $('#app_date').datepicker();
+
     var domain = 'medical2.com';
     /***************************************************************************
      * 
@@ -796,7 +802,7 @@ $(document).ready(function () {
             $('#ajax_loading_payment').show();
             $.post(url, request).done(function (data) {
                 $('#ajax_loading_payment').hide();
-                console.log('Server response: '+data);
+                console.log('Server response: ' + data);
                 $('.form_div').html(data);
             }); // end of post
         } // end if card_type != 'Card type' && card_no!='' ...
@@ -1947,6 +1953,17 @@ $(document).ready(function () {
         });
     });
 
+
+    $("#programs").change(function () {
+        var url = "https://" + domain + "/functionality/php/get_school_programs_slots.php";
+        var id = $('#programs').val();
+        var request = {id: id};
+        console.log('Course ID: ' + id);
+        $.post(url, request).done(function (data) {
+            $('#program_schedule').html(data);
+        });
+    });
+
     $("body").click(function (event) {
         console.log('Element clicked: ' + event.target.id);
         if (event.target.id == 'ok') {
@@ -2184,6 +2201,99 @@ $(document).ready(function () {
             verify_group_common_section();
         }
 
+        if (event.target.id == 'shcool_apply') {
+            var courseid = $('#programs').val();
+            var ssn = 'To be provided later';
+            var slotid = $('#slotid').val();
+            var last = $('#last').val();
+            var first = $('#first').val();
+            var middle = $('#middle').val();
+            var maiden = $('#maiden').val();
+            var street = $('#street').val();
+            var city = $('#city').val();
+            var state = $('#state').val();
+            var zip = $('#zip').val();
+            var phone1 = $('#phone1').val();
+            var phone2 = $('#phone2').val();
+            var email = $('#email').val();
+            var birth = $('#birth').val();
+            var education = $('#education').val();
+            var edu_name = $('#edu_name').val();
+            var graduate_date = $('#graduate_date').val();
+            var work = $('#work').val();
+            var pc_knoweldge = $('#pc_knoweldge').val();
+            var cert_status = $('#cert_status').val();
+            var cert_area = $('#cert_area').val();
+            var reason = $('#reason').val();
+
+            if (last != '' &&
+                    first != '' &&
+                    middle != '' &&
+                    maiden != '' &&
+                    street != '' &&
+                    city != '' &&
+                    state > 0 &&
+                    zip != '' &&
+                    phone1 != '' &&
+                    phone2 != '' &&
+                    email != '' &&
+                    birth != '' &&
+                    education > 0 &&
+                    edu_name != '' &&
+                    graduate_date != '' &&
+                    work != '' &&
+                    pc_knoweldge > 0 &&
+                    cert_status > 0 &&
+                    reason != '') {
+
+                $('#app_err').html('');
+                if (slotid == 0) {
+                    $('#app_err').html('Please select class');
+                    return;
+                } // end if
+                else {
+                    $('#app_err').html('');
+                    var app = {courseid: courseid,
+                        ssn: ssn,
+                        slotid: slotid,
+                        last: last,
+                        first: first,
+                        middle: middle,
+                        maiden: maiden,
+                        street: street,
+                        city: city,
+                        state: state,
+                        zip: zip,
+                        phone1: phone1,
+                        phone2: phone2,
+                        email: email,
+                        birth: birth,
+                        education: education,
+                        edu_name: edu_name,
+                        graduate_date: graduate_date,
+                        work: work,
+                        pc_knoweldge: pc_knoweldge,
+                        cert_status: cert_status,
+                        cert_area: cert_area,
+                        reason: reason};
+                    $('#ajax_loading').show();
+                    var url = "/functionality/php/send_school_app.php";
+                    $.post(url, {app: JSON.stringify(app)}).done(function (data) {
+                        $('#ajax_loading').hide();
+                        $('.panel-body').html(data);
+                    });
+
+                }
+
+            } // end if
+            else {
+                $('#app_err').html('Please provide required fields');
+                return;
+            } // end else
+
+
+
+        }
 
     }); // end of $("body").click(function (event) {    
 

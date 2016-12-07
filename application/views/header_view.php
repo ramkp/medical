@@ -99,7 +99,7 @@ $host = $_SERVER['HTTP_HOST'];
                 $meta = "Photo Gallery, Workshops";
                 break;
         }
-        
+
         //echo "Title: ".$title."<br>";
         //echo "Meta: ".$meta."<br>";
         ?>
@@ -146,7 +146,7 @@ $host = $_SERVER['HTTP_HOST'];
         <meta name="viewport" content="width=device-width, initial-scale=1.0">        
         <noscript>
         <link rel="stylesheet" type="text/css" href="https://<?php echo $host ?>/lms/theme/lambda/style/nojs.css" />
-
+        
         </noscript>
 
         <!--
@@ -154,13 +154,13 @@ $host = $_SERVER['HTTP_HOST'];
         <link rel='stylesheet' href='//blueimp.github.io/Gallery/css/blueimp-gallery.min.css'>
         <link rel='stylesheet' href='//assets/gallery/css/bootstrap-image-gallery.min.css'>
         -->
-
+        <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     </head>
 
     <body  id="page-site-index" class="format-site course path-site safari dir-ltr lang-en yui-skin-sam yui3-skin-sam mycodebusters-com--medical-lms pagelayout-frontpage course-1 context-2 notloggedin two-column has-region-side-pre used-region-side-pre has-region-side-post used-region-side-post has-region-footer-left empty-region-footer-left has-region-footer-middle empty-region-footer-middle has-region-footer-right empty-region-footer-right has-region-hidden-dock empty-region-hidden-dock layout-option-nonavbar">
 
         <div class="skiplinks"><a class="skip" href="#maincontent">Skip to main content</a></div>
-
+        
         <script type="text/javascript" src="https://<?php echo $host ?>/lms/theme/yui_combo.php?rollup/3.17.2/yui-moodlesimple-min.js&amp;rollup/1451892663/mcore-min.js"></script><script type="text/javascript" src="https://<?php echo $host ?>/lms/theme/jquery.php/core/jquery-1.11.3.min.js"></script>
         <script type="text/javascript" src="https://<?php echo $host ?>/lms/theme/jquery.php/theme_lambda/jquery.easing.1.3.js"></script>
         <script type="text/javascript" src="https://<?php echo $host ?>/lms/theme/jquery.php/theme_lambda/camera.min.1.11.js"></script>
@@ -168,10 +168,8 @@ $host = $_SERVER['HTTP_HOST'];
         <!--<script type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>-->        
         <script type="text/javascript" src="https://<?php echo $host ?>/assets/js/custom.js"></script>        
         <script type="text/javascript" src="https://<?php echo $host ?>/assets/js/selectbox/jquery.selectBox.js"></script>        
-        <!--
-        <script type="text/javascript" src='http://medical2.com/assets/js/attrchange.js'></script>
-        <script type="text/javascript" src='http://medical2.com/assets/js/attrchange_ext.js'></script>
-        -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js"></script>
+        <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <script type="text/javascript">
             //<![CDATA[
             document.body.className += ' jsenabled';
@@ -264,8 +262,7 @@ $host = $_SERVER['HTTP_HOST'];
                                     //if (msie == 0) {
                                     if (width >= 1024) {
                                         document.write('<li class="dropdown" id="translator_container"><span id="google_translate_element" style="vertical-align:middle;"></span></li>');
-                                    }
-                                    else {
+                                    } else {
                                         document.write('<li class="dropdown" id="translator_container"><a><span id="google_translate_element" style="vertical-align:middle;"></span></a><br></li>');
                                     }
                                     function googleTranslateElementInit() {

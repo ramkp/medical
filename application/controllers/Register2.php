@@ -32,4 +32,12 @@ class Register2 extends CI_Controller {
         $this->load->view('footer_view');
     }
 
+    function school_app() {
+        $form = $this->register_model->get_scholl_app_form();
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('register_view', $data);
+        $this->load->view('footer_view');
+    }
+
 }

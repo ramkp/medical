@@ -6,6 +6,7 @@
  * @author sirromas
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '//functionality/php/classes/Mailer.php';
 
 class Register {
 
@@ -565,6 +566,228 @@ class Register {
         } // end if $schedulerid>0
         $drop_down.="</select>";
         return $drop_down;
+    }
+
+    function get_school_program_slots($courseid) {
+
+        $list = "";
+        $now = time();
+        $list.="<select id='slotid' style='width:355px;' required>";
+
+        $query = "select * from mdl_scheduler where course=$courseid";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $schedulerid = $row['id'];
+            }
+
+            $query = "select * from mdl_scheduler_slots "
+                    . "where schedulerid=$schedulerid "
+                    . "and starttime>=$now";
+            //echo "Query: " . $query . "<br>";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $slot_item = date('m-d-Y', $row['starttime']) . " - " . str_replace("/", " , ", $row['appointmentlocation']);
+                    $list.="<option value='" . $row['id'] . "'>$slot_item</option>";
+                }
+            } // end if $num > 0
+            else {
+                $list.="<option value='0' selected>N/A</option>";
+            } // end else
+            $list.="</select>";
+        } // end if $num>0
+        else {
+            $list.="<option value='0' selected>N/A</option>";
+        }
+
+        return $list;
+    }
+
+    function get_edu_level($id) {
+        switch ($id) {
+            case 1:
+                $item = "High School";
+                break;
+            case 2:
+                $item = "GED";
+                break;
+            case 3:
+                $item = "College";
+                break;
+            case 4:
+                $item = "Study";
+                break;
+        }
+        return $item;
+    }
+
+    function get_scholl_app_msg($app) {
+        $list = "";
+
+        $program = $this->get_coure_name_by_id($app->courseid);
+        $slot = $this->get_slot_data($app->slotid);
+        $slot_block = date('m-d-Y', $slot->starttime) . " - " . str_replace("/", ",", $slot->appointmentlocation);
+        $state = $this->get_state_name($app->state);
+        $edu_level = $this->get_edu_level($app->education);
+        $pc = ($app->pc_knoweldge == 1) ? 'Yes' : 'No';
+        $cert = ($app->cert_status == 1) ? 'Yes' : 'No';
+
+        $list.="<html>";
+        $list.="<body>";
+        $list.="<table>";
+
+        $list.="<tr>";
+        $list.="<td align='center' colspan='2' style='padding:15px;font-weight:bold;'>School application</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Program applied</td>";
+        $list.="<td style='padding:15px;'>$program</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Class</td>";
+        $list.="<td style='padding:15px;'>$slot_block</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Name</td>";
+        $list.="<td style='padding:15px;'>$app->last $app->first $app->middle $app->maiden</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Address</td>";
+        $list.="<td style='padding:15px;'>$app->street $app->city $state $app->zip</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Phone1</td>";
+        $list.="<td style='padding:15px;'>$app->phone1</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Phone2</td>";
+        $list.="<td style='padding:15px;'>$app->phone2</td>";
+        $list.="</tr>";
+
+        $list.="<td style='padding:15px;'>Social Number</td>";
+        $list.="<td style='padding:15px;'>$app->ssn</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Email</td>";
+        $list.="<td style='padding:15px;'>$app->email</td>";
+        $list.="</tr>";
+        $list.="<tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Date of birth</td>";
+        $list.="<td style='padding:15px;'>$app->birth</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Education</td>";
+        $list.="<td style='padding:15px;'>$edu_level $app->edu_name $app->graduate_date</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Work experience</td>";
+        $list.="<td style='padding:15px;'>$app->work</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Do you have a working knowledge of computers?</td>";
+        $list.="<td style='padding:15px;'>$pc</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Have you ever been certified or licensed?</td>";
+        $list.="<td style='padding:15px;'>$cert</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Certification area</td>";
+        $list.="<td style='padding:15px;'>$app->cert_area</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='padding:15px;'>Why do you want to take this program?</td>";
+        $list.="<td style='padding:15px;'>$app->reason</td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+        $list.="</body>";
+        $list.="</html>";
+
+        return $list;
+    }
+
+    function send_school_app($app) {
+
+        $list = "";
+        $now = time();
+        $query = "insert into mdl_school_app "
+                . "(courseid,"
+                . "slotid,"
+                . "ssn,"
+                . "last,"
+                . "first,"
+                . "middle,"
+                . "maiden,"
+                . "street,"
+                . "city,"
+                . "state,"
+                . "phone1,"
+                . "phone2,"
+                . "email,"
+                . "birth,"
+                . "education,"
+                . "edu_name,"
+                . "graduate_date,"
+                . "work,"
+                . "pc_knoweldge,"
+                . "cert_status,"
+                . "cert_area,"
+                . "reason,"
+                . "app_date) "
+                . "values($app->courseid,"
+                . "$app->slotid,"
+                . "'$app->ssn',"
+                . "'$app->last',"
+                . "'$app->first',"
+                . "'$app->middle',"
+                . "'$app->maiden',"
+                . "'$app->street',"
+                . "'$app->city',"
+                . "$app->state,"
+                . "'$app->phone1',"
+                . "'$app->phone2',"
+                . "'$app->email',"
+                . "'$app->birth',"
+                . "$app->education,"
+                . "'$app->edu_name',"
+                . "'$app->graduate_date',"
+                . "'$app->work',"
+                . "'$app->pc_knoweldge',"
+                . "'$app->cert_status',"
+                . "'$app->cert_area', "
+                . "'$app->reason',"
+                . "'$now')";
+        //echo "Query: " . $query . "<br>";
+        $this->db->query($query);
+        $m = new Mailer();
+        $msg = $this->get_scholl_app_msg($app);
+        $m->send_school_app_msg($msg);
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span10'>Thank you! Your application is received. We get back to you soon.</span>";
+        $list.="</div>"; // end of container-fluid
+
+        return $list;
     }
 
 }

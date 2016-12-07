@@ -382,7 +382,7 @@ class register_model extends CI_Model {
     }
 
     public function get_program_schedule($slotid) {
-        
+
         $list = "";
         $query = "select * from mdl_scheduler_slots where id=$slotid";
         $result = $this->db->query($query);
@@ -740,7 +740,7 @@ class register_model extends CI_Model {
             $list.="<span class='span1'><input type='hidden' value='$courseObj->raw_cost' id='payment_sum'></span>";
             $list.="<span class='span3'>$program_schedule</span>";
             $list.="</div>"; // end of container-fluid
-            
+
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default
             // ********************  Individual registration form **************************        
@@ -787,7 +787,7 @@ class register_model extends CI_Model {
             $list.="<span class='span8'><hr></span>";
             $list.="</div>";
 
-            /* ********************** Payment section ********************* */
+            /*             * ********************* Payment section ********************* */
             $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;' id='course_fee'>";
             $list.="<span class='span2'>Selected program</span>";
             $list.="<span class='span2' id='dyn_course_name'>$selected_program</span>";
@@ -910,6 +910,231 @@ class register_model extends CI_Model {
         </div>
     </div>
 </div>";
+        return $list;
+    }
+
+    // ******************* School Application Form ************************//
+
+    function get_college_programs() {
+        $list = "";
+        $list.="<select id='programs' style='width:155px;' required>";
+        $list.="<option value='0' selected>Program</option>";
+        $query = "select * from mdl_course where category=5 and cost>0 and visible=1";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $list.="<option value='$row->id'>$row->fullname</option>";
+        }
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_gender_box() {
+        $list = "";
+        $list.="<select id='gender' style='width:155px;' required>";
+        $list.="<option value='0' selected>Gender</option>";
+        $list.="<option value='m'>Male</option>";
+        $list.="<option value='f'>Female</option>";
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_education_box() {
+        $list = "";
+        $list.="<select id='education' style='width:155px;' required>";
+        $list.="<option value='0' selected>Education</option>";
+        $list.="<option value='1'>High School</option>";
+        $list.="<option value='2'>GED</option>";
+        $list.="<option value='3'>College</option>";
+        $list.="<option value='4'>Study</option>";
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_state_list2() {
+        $list = "";
+        $list.="<select id='state' style='width:155px;' required>";
+        $list.="<option value='0' selected>State</option>";
+        $query = "select * from mdl_states ";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $list.="<option value='$row->id'>$row->state</option>";
+        }
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_pc_box() {
+        $list = "";
+        $list.="<select id='pc_knoweldge' style='width:155px;' required>";
+        $list.="<option value='0' selected>Please select</option>";
+        $list.="<option value='1'>Yes</option>";
+        $list.="<option value='2'>No</option>";
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_certified_box() {
+        $list = "";
+        $list.="<select id='cert_status' style='width:155px;' required>";
+        $list.="<option value='0' selected>Please select</option>";
+        $list.="<option value='1'>Yes</option>";
+        $list.="<option value='2'>No</option>";
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_program_classes($courseid = NULL) {
+        $list = "";
+        $list.="<select id='slotid' style='width:355px;' required>";
+
+        if ($courseid != NULL) {
+            $now = time();
+            $query = "select * from mdl_scheduler where course=$courseid";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $schedulerid = $row->id;
+            }
+
+            $query = "select * from mdl_scheduler_slots "
+                    . "where schedulerid=$schedulerid "
+                    . "and starttime>=$now";
+            $result = $this->db->query($query);
+            if ($result->num_rows() > 0) {
+                foreach ($query->result() as $row) {
+                    $slot_item = date('m-d-Y', $row->starttime) . "-" . $row->appointmentlocation;
+                    $list.="<option value='$row->id'>$slot_item</option>";
+                }
+            } // end if
+            else {
+                $list.="<option value='0'>N/A</option>";
+            } // end else
+        } // end if $courseid != NULL
+        else {
+            $list.="<option value='0' selected>Please select</option>";
+        }
+
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_scholl_app_form() {
+        $list = "";
+
+        $programs = $this->get_college_programs();
+        $states = $this->get_state_list2();
+        $pc = $this->get_pc_box();
+        $cert = $this->get_certified_box();
+        $slots = $this->get_program_classes();
+
+        $list.="<br/><div  class='form_div2' >";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>School application</h5></div>";
+        $list.="<div class='panel-body' style='text-align:center;'>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>I am registering for*:</span>";
+        $list.="<span class='span2'>$programs</span>";
+        $list.="<span class='span2'>Choose a Class</span>";
+        $list.="<span class='span4' id='program_schedule'>$slots</span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Name*</span>";
+        $list.="<span class='span2'><input type='text' id='last' placeholder='(Last)'     required ></span>";
+        $list.="<span class='span2'><input type='text' id='first' placeholder='(First)'   required ></span>";
+        $list.="<span class='span2'><input type='text' id='middle' placeholder='(Middle)' required ></span>";
+        $list.="<span class='span2'><input type='text' id='maiden' placeholder='(Maiden)' required ></span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Address*</span>";
+        $list.="<span class='span2'><input type='text' id='street' placeholder='(Street)' required  ></span>";
+        $list.="<span class='span2'><input type='text' id='city' placeholder='(City)'     required  ></span>";
+        $list.="<span class='span2'>$states</span>";
+        $list.="<span class='span2'><input type='text' id='zip' placeholder='(Zip)'  required></span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Provide 2 contact phones numbers, email and birth of date *:</span>";
+        $list.="<span class='span2'><input type='text' id='phone1' placeholder='(___) ___-___'   required></span>";
+        $list.="<span class='span2'><input type='text' id='phone2' placeholder='(___) ___-___'   required></span>";
+        $list.="<span class='span2'><input type='email' id='email' placeholder='Email' required  style='width:140px;'></span>";
+        $list.="<span class='span2'><input type='text' id='birth'  placeholder='yyyy/mm/dd' required></span>";
+        $list.="</div>";
+
+        $list.="<br><div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Level of Education:</span>";
+        $list.="<span class='span7'>(give name of school, year graduated) Understand you must supply Medical2 with a copy of HS diploma, GED certificate, or HS transcript upon beginning program of study.</span>";
+        $list.="</div>"; // end of container-fluid
+
+        $edu = $this->get_education_box();
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Education*:</span>";
+        $list.="<span class='span2'>$edu</span>";
+        $list.="<span class='span4'><input type='text' id='edu_name' style='width:340px;'></span>";
+        $list.="<span class='span2'><input type='text' id='graduate_date' placeholder='YYYY' required></span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<br><div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Work experience*:</span>";
+        $list.="<span class='span7'>Beginning with present or last employer (name, address, dates employed, type of work)*</span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>&nbsp;</span>";
+        $list.="<span class='span8'><textarea id='work' style='width:740px;' rows='5' required></textarea></span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Do you have a working knowledge of computers?*:</span>";
+        $list.="<span class='span2'>$pc</span>";
+        $list.="<span class='span2'>Have you ever been certified or licensed in a medical field before and what field?</span>";
+        $list.="<span class='span2'>$cert</span>";
+        $list.="<span class='span2'><input type='text' id='cert_area'></span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<br><div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Why do you want to take this program?*</span>";
+        $list.="<span class='span8'><textarea id='reason' style='width:740px;' rows='5' required></textarea></span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>&nbsp;</span>";
+        $list.="<span class='span8'>Medical 2 Career College and the State of Mississippi requires that all students validate no history of the following according to Mississippi Code of 1972, Section 43-11-13.</span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<br><div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>&nbsp;</span>";
+        $list.="<span class='span8'>By signing below, I attest I have not been convicted of or pleaded guilty or nolo contendere to a felony of possession or sale of drugs, murder, manslaughter, armed robbery, rape, sexual battery, any gratification of lust, aggravated assault, or felonious abuse and/or battery of a vulnerable adult. I have not been convicted of or pleaded guilty or nolo contendere to other crimes which his/her employer has and/or would determine to be disqualifying for employment. By signing below, I give Medical 2 Career College permission to conduct a background check in accordance with the Mississippi State Law with the Department of Health Nurse Registry to provide a clean medical abuse record with the State of Mississippi and permission to conduct a background with the Mississippi Department of Public Safety. </span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<br><div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>&nbsp;</span>";
+        $list.="<span class='span8'>I am applying for admittance as a student at Medical 2 Career College in a healthcare program. Falsification of information on any application is reason for dismissal and loss of all payments made.  </span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span10' style='text-align:center;display:none;' id='ajax_loading'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>&nbsp;</span>";
+        $list.="<span class='span8' id='app_err' style='color:red;'></span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>&nbsp;</span>";
+        $list.="<span class='span8' style='text-align:center;'><button class='btn btn-primary' id='shcool_apply'>Submit</button></span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="</div>"; // end of panel-body
+        $list.="</div>"; // end of panel panel-default
+
+        $list.="</div><br/>";
+
         return $list;
     }
 
