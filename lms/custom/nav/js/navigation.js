@@ -2293,6 +2293,33 @@ $(document).ready(function () {
             }, 'json');
         }
 
+        if ($(event.target).attr('class') == 'delete_profile_user') {
+            var userid = $(this).data('userid');
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_delete_user_dialog.php";
+                            var request = {id: userid};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+        }
+
         if ($(event.target).attr('class') == 'profile_renew_cert') {
             var id = $(this).data('id');
             if (dialog_loaded !== true) {
@@ -4223,6 +4250,33 @@ $(document).ready(function () {
                 $('#add_renew_err').html('Please select program and provide amount');
             } // end else
 
+        }
+
+        if (event.target.id == 'delete_user_profile') {
+            var userid = $('#userid').val();
+            console.log('User id: ' + userid);
+            var dbpwd = $('#dbpwd').val();
+            var pwd = $('#pwd').val();
+            if (pwd != '') {
+                $('#user_err').html('');
+                if (pwd == dbpwd) {
+                    $('#user_err').html('');
+                    if (confirm('Are you sure?')) {
+                        var url = "/lms/custom/my/delete_profile_user.php";
+                        $.post(url, {userid: userid}).done(function () {
+                            var redirect_url = 'https://medical2.com/lms/my/';
+                            $("[data-dismiss=modal]").trigger({type: "click"});
+                            document.location.reload();
+                        });
+                    } // end if
+                } // end if
+                else {
+                    $('#user_err').html('Wrong password');
+                }
+            } // end if
+            else {
+                $('#user_err').html('Please provide password to complete this operation');
+            } // end else
         }
 
 

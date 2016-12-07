@@ -902,10 +902,12 @@ class Dashboard extends Util {
         $payments = $this->get_user_payments_block($id);
         $workshops = $this->get_user_workshops($id);
         $certficates = $this->get_user_certificates($id);
+        $other = $this->get_other_tab($id);
         $list.="<ul class='nav nav-tabs'>
               <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>
               <li><a data-toggle='tab' href='#menu1'>Workshops</a></li>
               <li><a data-toggle='tab' href='#menu2'>Certification</a></li>
+              <li><a data-toggle='tab' href='#menu3'>Other</a></li>  
               <input type='hidden' id='userid' value='$id'>  
             </ul>
 
@@ -922,7 +924,21 @@ class Dashboard extends Util {
                 <h3>Certification</h3>
                 <p>$certficates</p>
               </div>
+              <div id='menu3' class='tab-pane fade'>
+                <h3>Other</h3>
+                <p>$other</p>
+              </div> 
             </div>";
+
+        return $list;
+    }
+
+    function get_other_tab($id) {
+        $list = "";
+
+        $list.="<div class='container-fluid'>";
+        $list.="<button data-userid='$id' class='delete_profile_user' style='width:175px;'>Delete User</button>";
+        $list.="</div>";
 
         return $list;
     }
@@ -1196,6 +1212,52 @@ class Dashboard extends Util {
     </div>";
 
         return $list;
+    }
+
+    function get_delete_user_dialog($userid) {
+        $list = "";
+
+        $query = "select * from mdl_refund_pwd where id=1";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $dbpwd = $row['pwd'];
+        }
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Delete User</h4>
+                </div>
+                <div class='modal-body'>
+                
+                <input type='hidden' id='userid' value='$userid'>
+                <input type='hidden' id='dbpwd' value='$dbpwd'>
+                    
+                <div class='container-fluid'>
+                <span class='span1'>Password</span>
+                <span class='span3'><input type='text' id='pwd' style='width:275px;'></span>
+                <br><br>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='user_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='delete_user_profile'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function delete_profile_user($userid) {
+        $query = "update mdl_user set deleted=1 where id=$userid";
+        $this->db->query($query);
     }
 
     function move_payment($payment) {
