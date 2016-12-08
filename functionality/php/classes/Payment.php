@@ -1382,15 +1382,27 @@ class Payment {
         return $list;
     }
 
+    function get_workshop_overrided_cost($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cost = $row['cost'];
+        }
+        return $cost;
+    }
+
     function get_course_data($courseid, $slotid) {
         $query = "select * from mdl_course where id=$courseid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $name = $row['fullname'];
-            $cost = $row['cost'];
+            $coursecost = $row['cost'];
             $categoryid = $row['category'];
             $discount_size = $row['discount_size'];
         }
+
+        $wscost = $this->get_workshop_overrided_cost($slotid);
+        $cost = ($wscost > 0) ? $wscost : $coursecost;
 
         if ($discount_size > 0) {
             $initial_amount = $cost - (($cost * $discount_size) / 100);
