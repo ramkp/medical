@@ -1383,10 +1383,15 @@ class Payment {
     }
 
     function get_workshop_overrided_cost($slotid) {
-        $query = "select * from mdl_scheduler_slots where id=$slotid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $cost = $row['cost'];
+        if ($slotid > 0) {
+            $query = "select * from mdl_scheduler_slots where id=$slotid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $cost = $row['cost'];
+            }
+        } // end if
+        else {
+            $cost = 0;
         }
         return $cost;
     }
