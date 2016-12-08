@@ -132,6 +132,9 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $mform->addElement('date_time_selector', 'starttime', get_string('date', 'scheduler'));
         $mform->setDefault('starttime', time());
         $mform->addHelpButton('starttime', 'choosingslotstart', 'scheduler');
+        
+        // Optional workshop cost
+        $mform->addElement('text', 'cost', 'Workshop cost ($)', array('optional'  => true));
 
         // Duration of the slot
         $this->add_duration_field();
