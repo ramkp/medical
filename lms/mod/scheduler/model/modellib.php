@@ -8,9 +8,7 @@
  * @copyright  2014 Henning Bostelmann and others (see README.txt)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * A generic MVC model
@@ -19,9 +17,8 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mvc_model {
-
+    
 }
-
 
 /**
  * A model mirroring one datebase record in a specific table of the Moodle DB
@@ -63,12 +60,12 @@ abstract class mvc_record_model extends mvc_model {
      * @return mixed
      */
     public function __get($key) {
-        if (method_exists($this, 'get_'.$key)) {
-            return $this->{'get_'.$key}();
+        if (method_exists($this, 'get_' . $key)) {
+            return $this->{'get_' . $key}();
         } else if (property_exists($this->data, $key)) {
             return $this->data->{$key};
         } else {
-            throw new coding_exception('unknown property: '.$key);
+            throw new coding_exception('unknown property: ' . $key);
         }
     }
 
@@ -82,8 +79,8 @@ abstract class mvc_record_model extends mvc_model {
      * @return mixed
      */
     public function __set($key, $value) {
-        if (method_exists($this, 'set_'.$key)) {
-            $this->{'set_'.$key}($value);
+        if (method_exists($this, 'set_' . $key)) {
+            $this->{'set_' . $key}($value);
         } else {
             $this->data->{$key} = $value;
         }
@@ -96,12 +93,15 @@ abstract class mvc_record_model extends mvc_model {
         global $DB;
         if (is_null($this->data)) {
             throw new coding_exception('Missing data, cannot save');
-        } else if (property_exists($this->data, 'id') && ($this->data->id)) {
+        } // end if 
+        else if (property_exists($this->data, 'id') && ($this->data->id)) {
             $DB->update_record($this->get_table(), $this->data);
-        } else {
+        }  // end elseif
+        else {
             $newid = $DB->insert_record($this->get_table(), $this->data);
             $this->data->id = $newid;
-        }
+        } // end else
+        return (int) $this->data->id;
     }
 
     /**
@@ -150,7 +150,6 @@ abstract class mvc_record_model extends mvc_model {
 
 }
 
-
 abstract class mvc_child_record_model extends mvc_record_model {
 
     private $parentrec;
@@ -177,6 +176,7 @@ abstract class mvc_child_record_model extends mvc_record_model {
 }
 
 abstract class mvc_model_factory {
+
     public abstract function create();
 
     public function create_from_id($id) {
@@ -206,8 +206,8 @@ abstract class mvc_child_model_factory extends mvc_model_factory {
         $new->load_record($rec);
         return $new;
     }
-}
 
+}
 
 class mvc_child_list {
 
@@ -219,8 +219,7 @@ class mvc_child_list {
     private $childrenfordeletion;
     private $parentmodel;
 
-    public function __construct(mvc_record_model $parent, $childtable, $childfield,
-                                mvc_model_factory $factory) {
+    public function __construct(mvc_record_model $parent, $childtable, $childfield, mvc_model_factory $factory) {
         $this->children = null;
         $this->childcount = -1;
         $this->childfield = $childfield;
@@ -305,7 +304,7 @@ class mvc_child_list {
 
     public function remove_child(mvc_child_record_model $child) {
         if (is_null($this->children) || !in_array($child, $this->children)) {
-            throw new coding_exception ('Child record to remove not found in list');
+            throw new coding_exception('Child record to remove not found in list');
         }
         $key = array_search($child, $this->children, true);
         unset($this->children[$key]);

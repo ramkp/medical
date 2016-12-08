@@ -813,9 +813,14 @@ class Schedule extends Util {
             //echo "Query: " . $query . "<br>";
             //die();
             $this->db->query($query);
-            $slots_array = array($slot->slotid, $slotid);
-            $this->notify_students($slots_array);
+            //$slots_array = array($slot->slotid, $slotid);
+            //$this->notify_students($slots_array);
         } // end if $_REQUEST['what'] == 'updateslot') 
+    }
+
+    function set_workshop_cost($id, $slot) {
+        $query = "update mdl_scheduler_slots set cost='$slot->cost' where id=$id";
+        $this->db->query($query);
     }
 
     function get_worskhop_update_message($slotid) {

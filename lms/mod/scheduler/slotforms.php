@@ -135,7 +135,10 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         
         // Optional workshop cost
         $mform->addElement('text', 'cost', 'Workshop cost ($)', array('optional'  => true));
-
+        $mform->setType('cost', PARAM_TEXT);
+       
+        
+        
         // Duration of the slot
         $this->add_duration_field();
 

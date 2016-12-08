@@ -47,6 +47,7 @@ function scheduler_prepare_formdata(scheduler_slot $slot) {
 function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid, $data) {
 
     global $DB, $COURSE;
+    $ds = new Schedule();
     $courseid = $COURSE->id;
     //echo "Course ID: ".$courseid."<br>";
     if ($slotid) {
@@ -57,13 +58,16 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
         $slot = new scheduler_slot($scheduler);
     }
 
+    /*
+      echo "<pre>";
+      print_r($data);
+      echo "</pre>";
+      die();
+     */
 
-    //echo "<pre>";
-    //print_r($data);
-    //echo "</pre>";
-    //die();
     // Set new data from input form.
     $slot->starttime = $data->starttime;
+    $slot->cost = $data->cost;
     $slot->duration = $data->duration;
     $slot->teacherid = $data->teacherid;
     $slot->notes = $data->notes['text'];
@@ -107,7 +111,7 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
 
     // Add additional slot for other course 
     if ($courseid == 44 || $courseid == 45) {
-        $ds = new Schedule();
+
         if ($courseid == 44) {
             // Add same slot for Phlebotomy with EKG Workshop course
             $schedulerid = 5;
@@ -121,17 +125,17 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
         $ds->save_additional_slot($slot);
         //die('Stopped');
     } // end if $courseid == 44 || $courseid == 45
-    // Saves original slot
-    $slot->save();
 
-    // Notify non Phleb workshop users 
-    // other users notified inside save_additional_slot()
-    if ($courseid != 44 && $courseid != 45) {
+    $current_slot_id = $slot->save();
+    $ds->set_workshop_cost($current_slot_id, $slot);
+
+    // Notify students about workshop changes 
+    if ($_REQUEST['what'] == 'updateslot') {
         if (property_exists($slot, 'slotid')) {
             $slots_array = array($slot->slotid);
             $ds->notify_students($slots_array);
-        }
-    }
+        } // end if
+    } // end if 
 }
 
 function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, $groupid = 0) {
@@ -244,10 +248,10 @@ if ($action == 'addslot') {
     <script type="text/javascript">
         $(document).ready(function () {
 
-        $.get('/lms/custom/utils/wslocation.json', function (data) {
-        $('#id_appointmentlocation').typeahead({source: data, items: 24});
-        }, 'json');
-                
+            $.get('/lms/custom/utils/wslocation.json', function (data) {
+                $('#id_appointmentlocation').typeahead({source: data, items: 24});
+            }, 'json');
+
         });
 
     </script>
