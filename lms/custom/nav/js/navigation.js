@@ -1527,6 +1527,31 @@ $(document).ready(function () {
             });
         }
 
+        if (event.target.id == 'add_campus') {
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/campus/get_add_dialog.php";
+                            var request = {id: id, type: type};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("#myModal").modal('show');
+            } // end else
+        }
+
         if (event.target.id == 'submit_survey') {
             var courseid = $('#courseid').val();
             var userid = $('#userid').val();
@@ -1674,7 +1699,7 @@ $(document).ready(function () {
             } // end else
         }
 
-// Save price item
+
         if (event.target.id.indexOf("price_") >= 0) {
             update_item_price(event.target.id);
         }
@@ -2083,7 +2108,51 @@ $(document).ready(function () {
             } // end if id>0
         } // end if event.target.id.indexOf('del_slide_') >= 0
 
+        /********************************************************************
+         * 
+         *                     Class based listeners
+         *
+         ********************************************************************/
+
         console.log('Class element clicked: ' + $(event.target).attr('class'));
+
+        if ($(event.target).attr('class') == 'edit_campus') {
+            var id = $(this).data('id');
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/campus/get_edit_dialog.php";
+                            $.post(url, {id: id}).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+        }
+
+        if ($(event.target).attr('class') == 'del_campus') {
+            var id = $(this).data('id');
+            console.log('ID: ' + id);
+            if (confirm('Are you sure?')) {
+                var url = "/lms/custom/campus/del_campus.php";
+                $.post(url, {id: id}).done(function () {
+                    get_campus_page();
+                });
+            }
+        }
+
         if ($(event.target).attr('class') == 'profile_add_payment') {
             var userid = $(this).data('userid');
             if (dialog_loaded !== true) {
@@ -2874,7 +2943,6 @@ $(document).ready(function () {
     function get_partial_payments_page() {
         var url = "/lms/custom/partial/get_partial_payments_page.php";
         $.post(url, {id: 1}).done(function (data) {
-//console.log(data);
             $('#region-main').html(data);
             $.get('/lms/custom/utils/data.json', function (data) {
                 $("#search_partial").typeahead({source: data, items: 24});
@@ -2884,6 +2952,13 @@ $(document).ready(function () {
 
     function get_index_page() {
         var url = "/lms/custom/index/get_index_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function get_campus_page() {
+        var url = "/lms/custom/campus/get_campus_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
@@ -2903,9 +2978,13 @@ $(document).ready(function () {
      * 
      ************************************************************************/
 
-// Show price items
+
     $("#prices").click(function (event) {
         get_price_items_from_category(event.target.id);
+    });
+    $("#campus").click(function (event) {
+        update_navigation_status__menu('Campus Locations');
+        get_campus_page(event.target.id);
     });
     $("#index").click(function (event) {
         update_navigation_status__menu('Index page');
@@ -4276,6 +4355,51 @@ $(document).ready(function () {
             } // end if
             else {
                 $('#user_err').html('Please provide password to complete this operation');
+            } // end else
+        }
+
+        if (event.target.id == 'add_campus_location') {
+            var lat = $('#lat').val();
+            var lon = $('#lon').val();
+            var name = $('#name').val();
+            var desc = $('#desc').val();
+            if (lat != '' && lon != '' && name != '' && desc != '') {
+                $('#campus_err').html('');
+                var url = "/lms/custom/campus/add_new_campus.php";
+                var campus = {lat: lat, lon: lon, name: name, desc: desc};
+                console.log(campus);
+                $.post(url, {campus: JSON.stringify(campus)}).done(function (data) {
+                    console.log('Server response: ' + data);
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_campus_page();
+                });
+
+            } // end if
+            else {
+                $('#campus_err').html('Please provide all required fields');
+            } // end else
+        }
+
+        if (event.target.id == 'edit_campus_location') {
+            var lat = $('#lat').val();
+            var lon = $('#lon').val();
+            var name = $('#name').val();
+            var desc = $('#desc').val();
+            var id = $('#id').val();
+            if (lat != '' && lon != '' && name != '' && desc != '') {
+                $('#campus_err').html('');
+                var url = "/lms/custom/campus/edit_campus.php";
+                var campus = {lat: lat, lon: lon, name: name, desc: desc, id: id};
+                console.log(campus);
+                $.post(url, {campus: JSON.stringify(campus)}).done(function (data) {
+                    console.log('Server response: ' + data);
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_campus_page();
+                });
+
+            } // end if
+            else {
+                $('#campus_err').html('Please provide all required fields');
             } // end else
         }
 

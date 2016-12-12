@@ -209,7 +209,7 @@ $host = $_SERVER['HTTP_HOST'];
                                             <li><a href="http://<?php echo $host ?>/programs/program/3/" id="exam" title="">CEUs & Online Courses</a></li>
                                             <li><a href="http://<?php echo $host ?>/programs/program/4/" id="college" title="">Online Certification Exams</a></li>                     
                                             -->
-                                            <li><a href="http://<?php echo $host ?>/programs/program/certification-workshops" id="cs" title="">Hands-On Certification Workshops</a></li>                                            
+                                            <li><a href="http://<?php echo $host ?>/programs/program/certification-workshops" id="cs" title="">Workshops & Schedule</a></li>                                            
                                             <li><a href="http://<?php echo $host ?>/programs/program/online-courses/" id="exam" title="">CEUs & Online Courses</a></li>
                                             <li><a href="http://<?php echo $host ?>/programs/program/certification-exams/" id="college" title="">Online Certification Exams</a></li>                     
                                         </ul>
