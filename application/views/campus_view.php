@@ -22,6 +22,7 @@ echo $data;
                 var marker = new google.maps.Marker({
                     position: myLatLng,
                     map: map,
+                    label: m.name,
                     title: m.name,
                     zIndex: i
                 }); // end marker                
