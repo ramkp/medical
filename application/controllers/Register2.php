@@ -40,4 +40,17 @@ class Register2 extends CI_Controller {
         $this->load->view('footer_view');
     }
 
+    function get_campus_data() {
+        $data = $this->register_model->get_campus_locations();
+        echo $data;
+    }
+
+    function campus() {
+        $page = $this->register_model->get_campus_page();
+        $data = array('data' => $page);
+        $this->load->view('header_view');
+        $this->load->view('campus_view', $data);
+        $this->load->view('footer_view');
+    }
+
 }

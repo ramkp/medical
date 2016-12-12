@@ -1138,4 +1138,39 @@ class register_model extends CI_Model {
         return $list;
     }
 
+    function get_campus_locations() {
+        $items = array();
+        $query = "select * from mdl_campus";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $items[] = $row;
+            }
+        } // end if
+        return json_encode($items);
+    }
+
+    function get_campus_page() {
+        $list = "";
+
+        $list.="<br/><div  class='form_div2' >";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Campus Locations</h5></div>";
+        $list.="<div class='panel-body' style='text-align:center;'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<div class='span11' id='map' style='border: 1px solid #ccc;height:475px'></div>";
+        $list.="</div>";
+        
+        $list.="</div>"; // end of panel-body
+        $list.="</div>"; // end of panel panel-default
+
+        $list.="</div><br/>";
+
+
+        return $list;
+    }
+
 }
