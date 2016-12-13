@@ -1109,15 +1109,64 @@ class Schedule extends Util {
         return $list;
     }
 
-    function get_schedule_page() {
+    //* ******************* Code related to Schedule ******************** *//
+
+    function get_course_schedulerid($id) {
+        $query = "select * from mdl_course_modules "
+                . "where course=$id and module=23";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
+    }
+
+    function get_scheduled_courses() {
+
         $list = "";
 
+        $query = "select * from mdl_scheduler";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $sch_id[] = $row['course'];
+        }
+        $sch_id_list = implode(',', $sch_id);
+        $query = "select * from mdl_course "
+                . "where visible=1 "
+                . "and cost>0 "
+                . "and id in ($sch_id_list)";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $name = $this->get_course_name($row['id']);
+                $pageid = $this->get_course_schedulerid($row['id']);
+                $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.="<span class='span9'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/mod/scheduler/view.php?id=$pageid' target='_blank'>$name</a></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='text-align:left;'>";
+                $list.="<span class='span9'><hr/></span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
+        else {
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span9'>N/A</span>";
+            $list.="</div>";
+        } // end else
+
+        return $list;
+    }
+
+    function get_schedule_page() {
+        $list = "";
+        $courses = $this->get_scheduled_courses();
         $list.="<div class='panel panel-default'>";
         $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Workshops schedule</h5></div>";
         $list.="<div class='panel-body'>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>AAA.....</span>";
+        $list.="<span class='span12'>$courses</span>";
         $list.="</div>";
 
         $list.="</div>";
