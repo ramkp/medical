@@ -34,7 +34,7 @@ echo $data;
                     }
                 })(marker, i));
             }) // end each            
-            map.fitBounds(bounds);
+           map.fitBounds(bounds);
         }); // end if post
 
     }); //end of document ready

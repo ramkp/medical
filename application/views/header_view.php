@@ -224,7 +224,7 @@ $host = $_SERVER['HTTP_HOST'];
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
                                             <li><a class="dropdown-toggle" href="http://<?php echo $host ?>/programs/program/career-courses" id="ws"  title="">Healthcare Career Courses </a></li>
                                             <li><a href="http://<?php echo $host ?>/index.php/register2/school_app" id="sch" title="School Application">School Application</a></li>                                            
-                                            <!--<li><a href="http://<?php echo $host ?>/index.php/programs/program/3/" id="exam" title="">Online Courses</a></li>-->                                            
+                                            <li><a href="http://<?php echo $host ?>/index.php/register2/campus" id="campus" title="School Campus Locations">School Campus Locations</a></li>                                            
                                         </ul>
                                     </li>                                    
 

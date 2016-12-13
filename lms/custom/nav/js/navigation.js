@@ -2964,6 +2964,13 @@ $(document).ready(function () {
         });
     }
 
+    function get_schedule_page() {
+        var url = "/lms/custom/schedule/get_schedule_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     function get_refund_page() {
 //console.log('It is refund page ...');
         var url = "/lms/custom/payments/get_refund_page.php";
@@ -2985,6 +2992,10 @@ $(document).ready(function () {
     $("#campus").click(function (event) {
         update_navigation_status__menu('Campus Locations');
         get_campus_page(event.target.id);
+    });
+    $("#sch").click(function (event) {
+        update_navigation_status__menu('Workshops schedule');
+        get_schedule_page();
     });
     $("#index").click(function (event) {
         update_navigation_status__menu('Index page');

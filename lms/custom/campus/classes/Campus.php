@@ -16,8 +16,8 @@ class Campus extends Util {
         $list.="<div class='panel-body'>";
 
         $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
-        $list.="<span class='span1'>Lng</span>";
         $list.="<span class='span1'>Lat</span>";
+        $list.="<span class='span1'>Lng</span>";
         $list.="<span class='span2'>Name</span>";
         $list.="<span class='span5'>Short Description</span>";
         $list.="</div>";

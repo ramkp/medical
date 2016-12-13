@@ -1109,4 +1109,22 @@ class Schedule extends Util {
         return $list;
     }
 
+    function get_schedule_page() {
+        $list = "";
+
+        $list.="<div class='panel panel-default'>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Workshops schedule</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>AAA.....</span>";
+        $list.="</div>";
+
+        $list.="</div>";
+        $list.="</div>";
+
+
+        return $list;
+    }
+
 }

@@ -1568,6 +1568,9 @@ $(document).ready(function () {
     $('#sch').click(function () {
         self.location = $('#sch').attr('href');
     });
+    $('#campus').click(function () {
+        self.location = $('#campus').attr('href');
+    });
     /***************************************************************************
      * 
      * 
