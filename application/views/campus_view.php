@@ -9,6 +9,7 @@ echo $data;
         var url = "http://medical2.com/index.php/register2/get_campus_data";
         $.post(url, {id: 1}).done(function (data) {
             var $obj_data = jQuery.parseJSON(data);
+
             var map = new google.maps.Map(document.getElementById('map'), {
                 scrollwheel: false,
                 zoom: 8
@@ -22,7 +23,7 @@ echo $data;
                 var marker = new google.maps.Marker({
                     position: myLatLng,
                     map: map,
-                    label: m.name,
+                    //label: m.name,
                     title: m.name,
                     zIndex: i
                 }); // end marker                
@@ -34,11 +35,46 @@ echo $data;
                     }
                 })(marker, i));
             }) // end each            
-           map.fitBounds(bounds);
+            map.fitBounds(bounds);
+            var directionsService = new google.maps.DirectionsService;
+            var directionsDisplay = new google.maps.DirectionsRenderer;
+            directionsDisplay.setMap(map);
+
+            var onChangeHandler = function () {
+                calculateAndDisplayRoute(directionsService, directionsDisplay);
+            };
+            document.getElementById('get_driver_directions').addEventListener('click', onChangeHandler);
+
         }); // end if post
+
+
+
+        function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+            var start = document.getElementById('start').value;
+            var end = document.getElementById('end').value;
+
+            if (start != '' && end != '') {
+                $('map_err').html('');
+                directionsService.route({
+                    origin: start,
+                    destination: end,
+                    travelMode: 'DRIVING'
+                }, function (response, status) {
+                    if (status === 'OK') {
+                        directionsDisplay.setDirections(response);
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+            } // end if
+            else {
+                $('map_err').html('Please provide your location and select destination');
+            }
+        }
 
     }); //end of document ready
 
 </script>
+
 
 
