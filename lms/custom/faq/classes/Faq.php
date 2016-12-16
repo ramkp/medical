@@ -55,15 +55,32 @@ class Faq extends Util {
         return $list;
     }
 
-    function get_categories_list() {
+    function get_categories_list($edit = false, $catid = null) {
         $list = "";
-        $list .= "<select id='faq_categories' style='width:275px;'>";
-        $list .= "<option value='0'>FAQ Category</option>";
+        if ($edit == false) {
+            $list .= "<select id='faq_categories' style='width:275px;'>";
+        } // end if
+        else {
+            $list .= "<select id='faq_categories2' style='width:275px;'>";
+        }
+        if ($catid == null) {
+            $list .= "<option value='0' selected>FAQ Category</option>";
+        }
         $query = "select * from mdl_faq_category order by name";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $list .= "<option value='" . $row ['id'] . "'>" . $row ['name'] . "</option>";
-        }
+            if ($catid == null) {
+                $list .= "<option value='" . $row ['id'] . "'>" . $row ['name'] . "</option>";
+            } // end if $catid == null)
+            else {
+                if ($row['id'] == $catid) {
+                    $list .= "<option value='" . $row ['id'] . "' selected>" . $row ['name'] . "</option>";
+                } // end if $row['catid'] == $catid
+                else {
+                    $list .= "<option value='" . $row ['id'] . "'>" . $row ['name'] . "</option>";
+                } // end else 
+            } // end else
+        } // end while
         $list .= "</select>";
         return $list;
     }
@@ -75,6 +92,8 @@ class Faq extends Util {
             $list .= "<div class='container-fluid' style='text-align:center;'>";
             $list .= "<span class='span6'>$categories</span>";
             $list.="<span class='span1'><a href='#' onClick='return false;'><img id='faq_add' title='Add question' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/add'></a></span>";
+            $list.="<span class='span1'><a href='#' onCLick='return false;'><img id='faq_add_cat' src='https://medical2.com/lms/theme/image.php/lambda/core/1479536192/i/withsubcat' title='Add category'></a></span>";
+            $list.="<span class='span1'><a href='#' onClick='return false'><img id='del_cat' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete category'></a></span>";
             $list .= "</div>";
             $list .= "<div class='container-fluid' style='text-align:left;'>";
             $list .= "<span class='span9' id='faq_container'></span>";
@@ -161,6 +180,104 @@ class Faq extends Util {
         return $list;
     }
 
+    function get_add_cat_dialog() {
+        $list = "";
+
+        $list.="<div id='myModal' class='modal fade'>
+		<div class='modal-dialog modal-lg'>
+		<div class='modal-content'>
+		<div class='modal-header'>
+		<h4 class='modal-title'>Add FAQ category</h4>
+		</div>
+		<div class='modal-body'>
+		
+		<div class='container-fluid' style='text-align:left;'>
+		<table align='center'>
+		
+		<tr>
+		<td style='padding:15px;'>Name:*</span><td style='padding:15px;'><input type='text' id='cat_name' style='width:375px;' ></td>
+		</tr>
+		
+		<tr>
+		<td colspan='2' style='padding:15px;'><span style='text-align:center' id='faq_err'></span></td>
+		</tr>
+		
+		</table>
+		
+		</div>
+		
+		<div class='modal-footer'>
+		<span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel_faq_edit'>Cancel</button></span>
+		<span align='center'><button type='button' class='btn btn-primary'  id='add_cat'>Ок</button></span>
+		</div>
+		</div>
+		</div>
+		</div>";
+
+        return $list;
+    }
+
+    function get_del_cat_dialog() {
+        $list = "";
+
+        $cats = $this->get_categories_list(TRUE);
+
+        $list.="<div id='myModal' class='modal fade'>
+		<div class='modal-dialog modal-lg'>
+		<div class='modal-content'>
+		<div class='modal-header'>
+		<h4 class='modal-title'>Delete FAQ category</h4>
+		</div>
+		<div class='modal-body'>
+		
+		<div class='container-fluid' style='text-align:left;'>
+		<table align='center'>
+		
+		<tr>
+		<td style='padding:15px;'><span class='span1'>Category:*</span><span class='span3'>$cats</span></td>
+		</tr>
+		
+		<tr>
+		<td colspan='2' style='padding:15px;'><span style='text-align:center' id='faq_err'></span></td>
+		</tr>
+		
+		</table>
+		
+		</div>
+		
+		<div class='modal-footer'>
+		<span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel_faq_edit'>Cancel</button></span>
+		<span align='center'><button type='button' class='btn btn-primary'  id='del_cat_button'>Ок</button></span>
+		</div>
+		</div>
+		</div>
+		</div>";
+
+        return $list;
+    }
+
+    function is_category_exists($name) {
+        $query = "select * from mdl_faq_category where name='$name'";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function is_cat_has_items($id) {
+        $query = "select * from mdl_faq_old where catid=$id";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function delete_cat($id) {
+        $query = "delete from mdl_faq_category where id=$id";
+        $this->db->query($query);
+    }
+
+    function add_category($name) {
+        $query = "insert into mdl_faq_category (name) value ('$name')";
+        $this->db->query($query);
+    }
+
     function get_faq_eit_page($id) {
         $list = "";
 
@@ -169,8 +286,10 @@ class Faq extends Util {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $q = $row['q'];
             $a = $row['a'];
+            $catid = $row['catid'];
         }
 
+        $cat = $this->get_categories_list(true, $catid);
 
         $list.="<div id='myModal' class='modal fade'>
         <div class='modal-dialog modal-lg'>
@@ -190,7 +309,11 @@ class Faq extends Util {
                 </tr>
                 
                 <tr>
-                <td style='padding:15px;' colspan='2'><textarea id='a' style='width:468px;height:182px;'>$a</textarea></td>
+                <td style='padding:15px;'>Category*</span><td style='padding:15px;'>$cat</td>
+                </tr>
+                
+                <tr>
+                <td style='padding:15px;' colspan='2'><textarea id='a' style='width:468px;height:120px;'>$a</textarea></td>
                 </tr>
                 
                 <tr>
@@ -212,8 +335,8 @@ class Faq extends Util {
         return $list;
     }
 
-    function update_qa($id, $q, $a) {
-        $query = "update mdl_faq_old set q='$q', a='$a' where id=$id";
+    function update_qa($id, $q, $a, $catid) {
+        $query = "update mdl_faq_old set q='$q', a='$a', catid=$catid where id=$id";
         $this->db->query($query);
         $list = 'ok';
         return $list;

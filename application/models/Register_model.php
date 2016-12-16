@@ -1217,7 +1217,7 @@ class register_model extends CI_Model {
 
         $list.="<div class='container-fluid' style='1px solid #ccc;'>";
         $list.="<div class='span4' style=''>$map</div>";
-        $list.="<div class='span7' id='map' style='border: 1px solid #ccc;height:475px'></div>";
+        $list.="<div class='span6' id='map' style='border: 1px solid #ccc;height:475px'></div>";
         $list.="</div>";
 
         $list.="</div>"; // end of panel-body

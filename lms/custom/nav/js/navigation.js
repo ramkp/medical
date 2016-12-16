@@ -3292,7 +3292,7 @@ $(document).ready(function () {
 
         if (event.target.id.indexOf("faq_edit_") >= 0) {
             var id = event.target.id.replace("faq_edit_", "");
-            console.log('ID ' + id);
+            //console.log('ID ' + id);
             var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
             $.getScript(js_url).done(function () {
                 var url = "https://" + domain + "/lms/custom/faq/get_faq_edit_page.php";
@@ -3310,11 +3310,11 @@ $(document).ready(function () {
 
         if (event.target.id == 'cancel_faq_edit') {
             $("#myModal").remove();
+            $("[data-dismiss=modal]").trigger({type: "click"});
             dialog_loaded = false;
         }
 
         if (event.target.id == 'faq_add') {
-            console.log('FAQ add ....');
             var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
             $.getScript(js_url).done(function () {
                 var url = "https://" + domain + "/lms/custom/faq/faq_add.php";
@@ -3327,6 +3327,87 @@ $(document).ready(function () {
             }).fail(function () {
                 console.log('Failed to load bootstrap.min.js');
             });
+        }
+
+        if (event.target.id == 'faq_add_cat') {
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url).done(function () {
+                var url = "https://" + domain + "/lms/custom/faq/get_add_cat_dialog.php";
+                var request = {id: id};
+                $.post(url, request).done(function (data) {
+                    $("body").append(data);
+                    $("#myModal").modal('show');
+                });
+            }).fail(function () {
+                console.log('Failed to load bootstrap.min.js');
+            });
+        }
+
+        if (event.target.id == 'del_cat') {
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url).done(function () {
+                var url = "https://" + domain + "/lms/custom/faq/get_del_cat_dialog.php";
+                var request = {id: id};
+                $.post(url, request).done(function (data) {
+                    $("body").append(data);
+                    $("#myModal").modal('show');
+                });
+            }).fail(function () {
+                console.log('Failed to load bootstrap.min.js');
+            });
+        }
+
+
+        if (event.target.id == 'del_cat_button') {
+            var catid = $('#faq_categories2').val();
+            console.log('Category ID: ' + catid);
+            if (catid > 0) {
+                $('#faq_err').html('');
+                var url1 = "https://" + domain + "/lms/custom/faq/cat_has_items.php";
+                $.post(url1, {id: catid}).done(function (data) {
+                    if (data == 0) {
+                        if (confirm('Delete current category?')) {
+                            $('#faq_err').html('');
+                            var url2 = "https://" + domain + "/lms/custom/faq/delete_cat.php";
+                            $.post(url2, {id: catid}).done(function () {
+                                $("[data-dismiss=modal]").trigger({type: "click"});
+                                $('#faq').trigger({type: "click"});
+                            });
+                        } // end if confirm
+                    } // end if data == 0
+                    else {
+                        $('#faq_err').html('Selected category contains questions. Deletion is impossible');
+                    } // end else
+                }); // end of post
+
+            } // end if
+            else {
+                $('#faq_err').html('Please select category');
+            } // end else
+        }
+
+        if (event.target.id == 'add_cat') {
+            var name = $('#cat_name').val();
+            if (name != '') {
+                $('#faq_err').html('');
+                var url1 = "/lms/custom/faq/exists.php";
+                $.post(url1, {name: name}).done(function (data) {
+                    if (data == 0) {
+                        $('#faq_err').html('');
+                        var url2 = "/lms/custom/faq/add_category.php";
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        $.post(url2, {name: name}).done(function () {
+                            $('#faq').trigger({type: "click"});
+                        });
+                    } // end if
+                    else {
+                        $('#faq_err').html('Category name already exists');
+                    } // end else 
+                }) // end of post
+            } // end if
+            else {
+                $('#faq_err').html('Please provide category name');
+            } // end else 
         }
 
         if (event.target.id == 'add_faq') {
@@ -3358,23 +3439,23 @@ $(document).ready(function () {
 
         }
 
-
-
         if (event.target.id == 'update_faq') {
             var id = $('#id').val();
             var q = $('#q').val();
             var a = $('#a').val();
-            var url = "/lms/custom/faq/update_faq.php";
-            var request = {id: id, q: q, a: a};
-            $.post(url, request).done(function (data) {
-                update_navigation_status__menu('FAQ');
-                var url = "/lms/custom/faq/get_faq_page.php";
-                $.post(url, {id: 1}).done(function (data) {
-                    $("#myModal").remove();
-                    dialog_loaded = false;
-                    $('#region-main').html(data);
-                });
-            });
+            var catid = $('#faq_categories2').val();
+            if (catid > 0 && q != '' && a != '') {
+                $('#faq_err').html('');
+                var url = "/lms/custom/faq/update_faq.php";
+                var request = {id: id, q: q, a: a, catid: catid};
+                $.post(url, request).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    $('#faq').trigger({type: "click"});
+                }); // end of post
+            } // end if
+            else {
+                $('#faq_err').html('Please provide required data in required fields');
+            }
         }
 
         if (event.target.id.indexOf("del_slot_") >= 0) {
