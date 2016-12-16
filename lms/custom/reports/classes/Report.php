@@ -289,6 +289,7 @@ class Report extends Util {
             $timestamp = time();
             $unix_from = strtotime("midnight", $timestamp);
             $unix_to = strtotime("tomorrow", $unix_from) - 1;
+            //$unix_to = $unix_from + 86400;
         } // end if $from==$to
         else {
             $unix_from = strtotime($from);
