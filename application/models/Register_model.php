@@ -1160,7 +1160,7 @@ class register_model extends CI_Model {
         $query = "select * from mdl_campus";
         $result = $this->db->query($query);
         foreach ($result->result() as $row) {
-            $list.="<option value='$row->id'>$row->campus_desc</option>";
+            $list.="<option value='$row->campus_desc'>$row->campus_desc</option>";
         }
 
         $list.="</select>";
@@ -1189,11 +1189,11 @@ class register_model extends CI_Model {
         }
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span4' style='padding-left:6px;'><input type='text'id='start'  placeholder='Start Location ...' style='width:282px;'></span>";
+        $list.="<span class='span4' style='padding-left:6px;'><input type='text'id='start'  placeholder='Your Location ...' style='width:282px;'></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span4' style='padding-left:6px;'><input type='text'id='end'  placeholder='End Location ...' style='width:282px;'></span>";
+        $list.="<span class='span4' style='padding-left:6px;'>$locations</span>";
         $list.="</div>";
         
         $list.="<div class='container-fluid' style='text-align:left;'>";
