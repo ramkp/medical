@@ -537,7 +537,7 @@ class Register {
             $slot_data = $this->get_slot_data($slotid);
             $locations = explode("/", $slot_data->appointmentlocation);
             $statename = $locations[0];
-            $now = time() + 86400;
+            $now = time();
             if ($future == true) {
                 $query = "select * from mdl_scheduler_slots "
                         . "where schedulerid=$schedulerid "
