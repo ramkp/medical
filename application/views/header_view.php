@@ -38,21 +38,22 @@ $host = $_SERVER['HTTP_HOST'];
         switch ($url) {
             case "/":
                 $title = "Phlebotomy Training Program | Medical2 Career College";
-                $meta = "Medical2 Career College licensed by the State of Mississippi
-                Commission, provides online phlebotomy training program in US. Visit 
-                us now to know more.";
+                $meta = "Medical2  provides One day 100%  hands-on phlebotomy "
+                        . "training & Certification workshops nationwide. "
+                        . "We also provide healthcare career courses through "
+                        . "Medical2 Career College. Visit us to learn more.";
                 break;
             case "/programs/detailes/44":
-                $title = "Phlebotomy Certification Training Workshop | Medical2";
-                $meta = "Our proven one day hands-on phlebotomy certification workshop is
-                designed to save your time & money which covers all important skills
-                and techniques. Register Now!";
+                $title = "Phlebotomy Training  | Phlebotomy Certification Workshops  |  Medical2";
+                $meta = "Our proven one day 100%  hands-on phlebotomy training &  certification
+                    workshops are designed to save your time & money which covers 
+                    all important Aspect of phlebotomy skills and techniques. Register Now!
+";
                 break;
             case "/programs/detailes/57":
-                $title = "Phlebotomy Certification Exam Online | Medical2 Career College";
-                $meta = "Register in Medical2 Phlebotomy Online Certification Exam. It covers
-                all aspects of phlebotomy (basic and advance) and will last for
-                approximately 3 hours.";
+                $title = "Phlebotomy Certification Exam Online | For Experienced Phlebotomist Only.";
+                $meta = "Register For Medical2 Phlebotomy Technician Certification Exam Online. 
+                    It covers all aspects of phlebotomy (basic and advance). Phlebotomist Only.";
                 break;
             case '/programs/program/certification-workshops';
                 $title = 'Hands-On Certification Workshops';
