@@ -801,9 +801,13 @@ class Dashboard extends Util {
         $list.="<tr>";
         $list.="<th>$coursename - payments history</th>";
         $list.="</tr>";
-        $list.="<tr>";
-        $list.="<th>Program/Workshop fee - $$coursecost</th>";
-        $list.="</tr>";
+
+        /*
+          $list.="<tr>";
+          $list.="<th>Program/Workshop fee - $$coursecost</th>";
+          $list.="</tr>";
+         */
+
         $list.="<tr>";
         $list.="<td>$cc_list</td>";
         $list.="</tr>";
@@ -814,9 +818,11 @@ class Dashboard extends Util {
         $list.="<td>$inv_list</td>";
         $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td style='padding:15px;'>Your unpaid balance - $$clear_balance</td>";
-        $list.="</tr>";
+        /*
+          $list.="<tr>";
+          $list.="<td style='padding:15px;'>Your unpaid balance - $$clear_balance</td>";
+          $list.="</tr>";
+         */
 
         $list.="</table><br>";
 
