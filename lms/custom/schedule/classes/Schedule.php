@@ -760,6 +760,34 @@ class Schedule extends Util {
 
         if ($_REQUEST['what'] == 'addslot') {
             $query = "insert into mdl_scheduler_slots "
+                    . "(schedulerid, cost,"
+                    . "starttime,"
+                    . "duration, "
+                    . "exclusivity, "
+                    . "emaildate, "
+                    . "teacherid, "
+                    . "appointmentlocation,"
+                    . "timemodified,"
+                    . "notes,"
+                    . "hideuntil) "
+                    . "values($slot->schedulerid, $slot->cost,"
+                    . "'$slot->starttime', "
+                    . "'$slot->duration', "
+                    . "'$slot->exclusivity', "
+                    . "'$slot->emaildate', "
+                    . "$slot->teacherid, "
+                    . "'$slot->appointmentlocation',"
+                    . "'$slot->timemodified',"
+                    . "'$slot->notes',"
+                    . "'$slot->timemodified')";
+            //echo "Query: " . $query . "<br>";
+            $this->db->query($query);
+
+            // Add additional workshop for EKG only course
+            $ekg_schedulerid = 22;
+            $start = time()+86400*2;
+
+            $query = "insert into mdl_scheduler_slots "
                     . "(schedulerid,"
                     . "starttime,"
                     . "duration, "
@@ -770,8 +798,8 @@ class Schedule extends Util {
                     . "timemodified,"
                     . "notes,"
                     . "hideuntil) "
-                    . "values($slot->schedulerid,"
-                    . "'$slot->starttime', "
+                    . "values($ekg_schedulerid,"
+                    . "'$start', "
                     . "'$slot->duration', "
                     . "'$slot->exclusivity', "
                     . "'$slot->emaildate', "
