@@ -29,6 +29,15 @@ class Mailer {
         $this->registration_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/registrations';
     }
 
+    function get_workshop_cost($id) {
+        $query = "select * from mdl_scheduler_slots where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cost = $row['cost'];
+        }
+        return $cost;
+    }
+
     function get_course_name($user) {
         $query = "select * from mdl_course where id=$user->courseid";
         //echo "Query: " . $query . "<br>";
@@ -138,7 +147,9 @@ class Mailer {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
+        $ws_cost = $this->get_workshop_cost($user->slotid);
         $course_cost = $this->get_course_cost($user);
+        $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $catid = $this->get_course_category($user);
         $p = new Payment();
         $state = $p->get_state_name_by_id($user->state);
@@ -199,7 +210,7 @@ class Mailer {
         <td>Applied Progarm</td><td>$course_name</td>
         </tr>
         <tr >
-        <td>Program fee</td><td>$$course_cost</td>
+        <td>Program fee</td><td>$$cost</td>
         </tr>";
 
             if (property_exists($user, 'payment_amount')) {
@@ -290,7 +301,9 @@ class Mailer {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
+        $ws_cost = $this->get_workshop_cost($user->slotid);
         $course_cost = $this->get_course_cost($user);
+        $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $catid = $this->get_course_category($user);
         $p = new Payment();
         $state = $p->get_state_name_by_id($user->state);
@@ -351,7 +364,7 @@ class Mailer {
         <td>Applied Progarm</td><td>$course_name</td>
         </tr>
         <tr >
-        <td>Program fee</td><td>$$course_cost</td>
+        <td>Program fee</td><td>$$cost</td>
         </tr>";
 
         if (property_exists($user, 'payment_amount')) {

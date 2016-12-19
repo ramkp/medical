@@ -524,6 +524,15 @@ class Students {
         return $instructors;
     }
 
+    function get_workshop_cost($id) {
+        $query = "select * from mdl_scheduler_slots where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cost = $row['cost'];
+        }
+        return $cost;
+    }
+
     function prepare_report($workshops) {
         $list = "";
         $i = 0;
@@ -534,10 +543,11 @@ class Students {
             if (count($participants) > 0) {
 
                 $owe_sum = 0;
-
+                $ws_cost = $this->get_workshop_cost($ws);
                 $courseid = $this->get_workshop_course($ws);
                 $coursename = $this->get_course_name($courseid);
-                $cost = $this->get_course_cost($courseid);
+                $course_cost = $this->get_course_cost($courseid);
+                $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
                 $wsdate = $this->get_workshop_date($ws);
                 $start_date = date('m-d-Y h:i:s', $wsdate);
                 $list.="<table >";
