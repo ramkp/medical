@@ -1510,6 +1510,20 @@ $(document).ready(function () {
         } // end if file_data != '' && file_data.length != 0 && state > 0 && month > 0 && year > 0        
     }
 
+    function get_users_states() {
+        var url = "/lms/custom/promotion/get_user_states.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#workshop_user_states').html(data);
+        });
+    }
+
+    function get_user_cities_by_state(id, slotid) {
+        var url = "/lms/custom/promotion/get_user_cities.php";
+        $.post(url, {id: id, slotid: slotid}).done(function (data) {
+            $('#workshop_user_cities').html(data);
+        });
+    }
+
     /**********************************************************************
      * 
      *                       Events processing block
@@ -1526,6 +1540,27 @@ $(document).ready(function () {
                 var oWindow = window.open(url, "print");
             });
         }
+
+        if (event.target.id == 'get_campaign_users') {
+            var courseid = $('#courses').val();
+            var slotid = $('#workshops').val();
+            var state_code = $('#user_states').val();
+            var cityid = $('#user_cities').val();
+            if (courseid > 0) {
+                $('#prom_err').html('');
+                var url = "/lms/custom/promotion/get_campaign_users.php";
+                var user_criteria = {courseid: courseid, slotid: slotid, state_name: state_code, city_name: cityid};
+                $.post(url, {user_criteria: JSON.stringify(user_criteria)}).done(function (data) {
+                    $('#workshop_users').html(data);
+                    $('#create_div').show();
+                });
+            } // end if
+            else {
+                $('#prom_err').html('Please select program');
+            } // end else
+        }
+
+
 
         if (event.target.id == 'add_campus') {
             if (dialog_loaded !== true) {
@@ -1899,6 +1934,47 @@ $(document).ready(function () {
 
         }
 
+
+        if (event.target.id == 'create_new_campaign') {
+            var users = [];
+            var id;
+            $("#camp_users :selected").map(function (i, el) {
+                id = $(el).val();
+                if (id > 0) {
+                    users.push(id);
+                }
+            });
+            var ul = users.length;
+            console.log('Users length: ' + ul);
+            if (ul > 0) {
+                $('#prom_err').html('');
+                if (dialog_loaded !== true) {
+                    console.log('Script is not yet loaded starting loading ...');
+                    dialog_loaded = true;
+                    var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                    $.getScript(js_url)
+                            .done(function () {
+                                console.log('Script bootstrap.min.js is loaded ...');
+                                var url = "/lms/custom/promotion/get_create_campaign_dialog.php";
+                                $.post(url, {users: JSON.stringify(users)}).done(function (data) {
+                                    $("body").append(data);
+                                    $("#myModal").modal('show');
+                                });
+                            })
+                            .fail(function () {
+                                console.log('Failed to load bootstrap.min.js');
+                            });
+                } // dialog_loaded!=true
+                else {
+                    console.log('Script already loaded');
+                    $("body").append(data);
+                    $("#myModal").modal('show');
+                }
+            }// end if ul>0
+            else {
+                $('#prom_err').html('Please select students');
+            }  // end else
+        }
 
         if (event.target.id == 'create_cert_button') {
             var courseid = $('#courses').val();
@@ -2814,9 +2890,12 @@ $(document).ready(function () {
 
         if (event.target.id == 'courses') {
             var id = $('#courses').val();
+            var slotid = 0;
             get_course_users(id);
-            get_course_promotion_users(id);
+            get_users_states();
+            get_user_cities_by_state(id, slotid);
             get_course_workshops(id);
+
         }
 
         if (event.target.id == 'send_courses') {
@@ -2825,8 +2904,15 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'workshops') {
-            var id = $('#workshops').val();
-            get_workshop_users(id);
+            //var id = $('#workshops').val();
+            //get_workshop_users(id);
+            //get_users_states();
+        }
+
+        if (event.target.id == 'user_states') {
+            var id = $('#user_states').val();
+            var slotid = $('#workshops').val();
+            get_user_cities_by_state(id, slotid);
         }
 
         if (event.target.id == 'users') {
@@ -4495,6 +4581,24 @@ $(document).ready(function () {
             } // end else
         }
 
+        if (event.target.id == 'create_new_campaign_done') {
+            var users = $('#users').val();
+            console.log('Users list: ' + users);
+            var text = $('#campaign_text').val();
+            if (text != '') {
+                $('#campaign_err').html('');
+                if (confirm('Send this message to selected users?')) {
+                    var url = "/lms/custom/promotion/add_new_campaign2.php";
+                    $.post(url, {text: text, users: users}).done(function (data) {
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        $('#region-main').html(data);
+                    });
+                } // end if
+            } // end if
+            else {
+                $('#campaign_err').html('Please provide campaign text');
+            } // end else
+        }
 
 
     }); // end of body click event
