@@ -327,12 +327,16 @@ $(document).ready(function () {
     }
 
     function get_certificates_page() {
-        var url = "/lms/custom/certificates/list.php";
+        var url = "/lms/custom/hotels/list.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-            $.get('/lms/custom/utils/data.json', function (data) {
-                $("#search_certificate").typeahead({source: data, items: 24});
-            }, 'json');
+        });
+    }
+
+    function get_hotels_page() {
+        var url = "/lms/custom/hotels/list.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
         });
     }
 
@@ -2331,8 +2335,16 @@ $(document).ready(function () {
                                 $("body").append(data);
                                 $("#myModal").modal('show');
 
-                                $.get('/lms/custom/utils/workshops.json', function (data) {
-                                    $('#wsname').typeahead({source: data, items: 24});
+                                /*
+                                 $.get('/lms/custom/utils/workshops.json', function (data) {
+                                 console.log(data);
+                                 $('#wsname').typeahead({source: data, items: 240});
+                                 }, 'json');
+                                 */
+
+                                $.post('/lms/custom/utils/workshops.json', {id: 1}, function (data) {
+                                    console.log(data);
+                                    $('#wsname').typeahead({source: data, items: 240});
                                 }, 'json');
 
                                 $.get('/lms/custom/utils/programs.json', function (data) {
@@ -3102,6 +3114,10 @@ $(document).ready(function () {
     $("#Certificates").click(function (event) {
         update_navigation_status__menu('Certificates');
         get_certificates_page();
+    });
+    $("#hotels").click(function (event) {
+        update_navigation_status__menu('Hotels');
+        get_hotels_page();
     });
     $("#promote").click(function (event) {
         update_navigation_status__menu('Promotions');
