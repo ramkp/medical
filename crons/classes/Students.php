@@ -1834,6 +1834,22 @@ class Students {
         echo "Data are created \n";
     }
 
+    function create_ws_json_data() {
+        $ws = array();
+        $now = time();
+        $query = "select * from mdl_scheduler_slots "
+                . "where  starttime>=$now order by starttime";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $location = mb_convert_encoding($row['appointmentlocation'], 'UTF-8');
+            $date = mb_convert_encoding(date('m-d-Y', trim($row['starttime'])), 'UTF-8');
+            $ws[] = $date . "--" . $location;
+        }
+        file_put_contents('/home/cnausa/public_html/lms/custom/utils/workshops.json', json_encode($ws));
+        echo "Total items: ".count($ws);
+        echo "<p>Workshop data are created ...</p>";
+    }
+
     /*     * ******* Code related to Certificates expiration messages ******** */
 
     function get_certificate_reminder_message($user_data) {
