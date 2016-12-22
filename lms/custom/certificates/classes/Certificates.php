@@ -109,8 +109,9 @@ class Certificates extends Util {
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='deselect_all'>Deselect all</a></span>";
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='print_certs'>Print Certificate</a></span>";
                 $list.="<span class='span2'><a href='#' onclick='return false;' id='print_labels'>Print Label</a></span>";
-                $list.="<span class='span2'><a href='#' onclick='return false;' id='create_cert'>Create Certificate</a></span>";
-
+                if ($this->user->id == 2) {
+                    $list.="<span class='span2'><a href='#' onclick='return false;' id='create_cert'>Create Certificate</a></span>";
+                }
                 if ($this->user->id == 2) {
                     $list.="<span class='span2'><a href='#' onclick='return false;' id='recertificate'>Re-Certificate</a></span>";
                 } // end if $this->user->id==2

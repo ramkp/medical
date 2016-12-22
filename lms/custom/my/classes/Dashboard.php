@@ -1098,7 +1098,9 @@ class Dashboard extends Util {
     function get_user_certificates($userid) {
         $list = "";
         $list.="<div class='container-fluid' style=''>";
-        $list.="<span class='span4'><button class='profile_create_cert' style='width:175px;' data-userid='$userid'>Create certificate</button></span>";
+        if ($this->user->id == 2) {
+            $list.="<span class='span4'><button class='profile_create_cert' style='width:175px;' data-userid='$userid'>Create certificate</button></span>";
+        }
         $list.="</div><br><br>";
 
         $query = "select * from mdl_certificates where userid=$userid";
