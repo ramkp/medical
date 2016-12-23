@@ -137,8 +137,6 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $mform->addElement('text', 'cost', 'Workshop cost ($)', array('optional'  => true));
         $mform->setType('cost', PARAM_TEXT);
        
-        
-        
         // Duration of the slot
         $this->add_duration_field();
 
@@ -159,8 +157,8 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $mform->setDefault('remindersel', -1);
 
         // Slot comments
-        $mform->addElement('editor', 'notes', get_string('comments', 'scheduler'), array('rows' => 3, 'columns' => 60), array('collapsed' => true));
-        $mform->setType('notes', PARAM_RAW); // must be PARAM_RAW for rich text editor content
+        $mform->addElement('text', 'notes', 'Hotel/Venue', array('size'=>83), array('collapsed' => true));
+        $mform->setType('notes', PARAM_TEXT); // must be PARAM_RAW for rich text editor content
 
         // Appointments
 

@@ -250,6 +250,12 @@ class Hotel extends Util {
     }
 
     function add_hotel($hotel) {
+
+        mysql_connect("localhost", "cnausa_lms", "^pH+F8*[AEdT") or
+                die("Could not connect: " . mysql_error());
+        mysql_select_db("cnausa_lms");
+        $addr = mysql_real_escape_string($hotel->addr);
+
         $query = "insert into mdl_hotels "
                 . "(state,"
                 . "city,"
@@ -260,25 +266,30 @@ class Hotel extends Util {
                 . "room) "
                 . "values('$hotel->state',"
                 . "'$hotel->city',"
-                . "'$hotel->addr',"
+                . "'$addr',"
                 . "'$hotel->phone',"
                 . "'$hotel->contact',"
                 . "'$hotel->charge',"
                 . "'$hotel->room')";
-        $this->db->query($query);
+        mysql_query($query);
     }
 
     function update_hotel($hotel) {
+        mysql_connect("localhost", "cnausa_lms", "^pH+F8*[AEdT") or
+                die("Could not connect: " . mysql_error());
+        mysql_select_db("cnausa_lms");
+        $addr = mysql_real_escape_string($hotel->addr);
+
         $query = "update mdl_hotels "
                 . "set state='$hotel->state', "
                 . "city='$hotel->city', "
-                . "address='$hotel->addr', "
+                . "address='$addr', "
                 . "phone='$hotel->phone', "
                 . "contact='$hotel->contact', "
                 . "charge='$hotel->charge', "
                 . "room='$hotel->room' "
                 . "where id=$hotel->id";
-        $this->db->query($query);
+        mysql_query($query);
     }
 
     function del_hotel($id) {

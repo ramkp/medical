@@ -58,12 +58,16 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
         $slot = new scheduler_slot($scheduler);
     }
 
+  
     /*
+     * 
       echo "<pre>";
       print_r($data);
       echo "</pre>";
       die();
+     * 
      */
+
 
     // Set new data from input form.
     $slot->starttime = $data->starttime;
@@ -73,11 +77,21 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     $slot->notes = $data->notes['text'];
     $slot->exclusivity = $data->exclusivity;
     $slot->emaildate = $data->emaildate;
-    $slot->notesformat = $data->notes['format'];
+    $slot->notes = addslashes($data->notes);
+    $slot->notesformat = 1;
     $slot->appointmentlocation = $data->appointmentlocation;
     $slot->hideuntil = $data->hideuntil;
     $slot->emaildate = $data->emaildate;
     $slot->timemodified = time();
+
+    /*
+     * 
+      echo "<pre>";
+      print_r($slot);
+      echo "</pre>";
+      die();
+     * 
+     */
 
     $currentapps = $slot->get_appointments();
     $processedstuds = array();
@@ -252,6 +266,10 @@ if ($action == 'addslot') {
                 $('#id_appointmentlocation').typeahead({source: data, items: 24});
             }, 'json');
 
+            $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
+                $('#id_notes').typeahead({source: data, items: 240});
+            }, 'json');
+
         });
 
     </script>
@@ -305,11 +323,47 @@ if ($action == 'updateslot') {
     else if ($formdata = $mform->get_data()) {
         scheduler_save_slotform($scheduler, $course, $slotid, $formdata);
         echo $output->action_message(get_string('slotupdated', 'scheduler'));
+        ?>
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                $.get('/lms/custom/utils/wslocation.json', function (data) {
+                    $('#id_appointmentlocation').typeahead({source: data, items: 24});
+                }, 'json');
+
+                $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
+                    $('#id_notes').typeahead({source: data, items: 240});
+                }, 'json');
+
+            });
+
+        </script>
+
+        <?php
+
     } // end else if $formdata = $mform->get_data()
     else {
         echo $output->heading(get_string('updatesingleslot', 'scheduler'));
         $mform->display();
         echo $output->footer($course);
+        ?>
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                $.get('/lms/custom/utils/wslocation.json', function (data) {
+                    $('#id_appointmentlocation').typeahead({source: data, items: 24});
+                }, 'json');
+
+                $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
+                    $('#id_notes').typeahead({source: data, items: 240});
+                }, 'json');
+
+            });
+
+        </script>
+
+        <?php
+
         die;
     } // end else
 }
