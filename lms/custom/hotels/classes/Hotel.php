@@ -70,7 +70,13 @@ class Hotel extends Util {
 
         if ($toolbar) {
             $list.="<div class='panel panel-default' id='payment_options' style='margin-bottom:0px;'>";
-            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Hotels &nbsp; <button id='add_hotel'>Add</button></h5></div>";
+            $list.="<div class='panel-heading' style='text-align:left;'>";
+            $list.="<h5 class='panel-title'>Hotels &nbsp; ";
+            $list.="<button id='add_hotel'>Add</button>&nbsp;&nbsp;";
+            $list.="<input type='text' id='search_state' placeholder='State'>&nbsp;";
+            $list.="<input type='text' id='search_city' placeholder='City'>&nbsp;";
+            $list.="<button id='hotel_search'>Search</button>&nbsp;";
+            $list.="<button id='reset_search_hotel'>Resest</button></h5></div>";
             $list.="<div class='panel-body'>";
 
             $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
@@ -105,6 +111,9 @@ class Hotel extends Util {
             $list.="<span class='span4'>There are no any hotels added</span>";
             $list.="</div>";
         } // end else
+        $list.="</div>";
+        $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+        $list.="<span class='span10'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
         if ($toolbar) {
             if ($toolbar == true) {
@@ -334,6 +343,32 @@ class Hotel extends Util {
             $hotels[] = $h;
         } // end while
         $list = $this->create_hotels_page($hotels, false);
+        return $list;
+    }
+
+    function search_hotel($state, $city) {
+        $hotels = array();
+        if ($state != '' && $city == '') {
+            $query = "select * from mdl_hotels where state like '%$state%'";
+        }
+        if ($state == '' && $city != '') {
+            $query = "select * from mdl_hotels where city like '%$city%'";
+        }
+        if ($state != '' && $city != '') {
+            $query = "select * from mdl_hotels where city like '%$city%'";
+        }
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $h = new stdClass();
+                foreach ($row as $key => $value) {
+                    $h->$key = $value;
+                } // end foreach
+                $hotels[] = $h;
+            } // end while
+            $list = $this->create_hotels_page($hotels, false);
+        } // end if $num > 0
         return $list;
     }
 

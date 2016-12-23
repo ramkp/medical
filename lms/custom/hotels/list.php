@@ -29,6 +29,15 @@ echo $list;
 
     });
 
+    $.post('/lms/custom/utils/states.json', {id: 1}, function (data) {
+        $('#search_state').typeahead({source: data, items: 240});
+    }, 'json');
+
+    $.post('/lms/custom/utils/cities.json', {id: 1}, function (data) {
+        $('#search_city').typeahead({source: data, items: 240});
+    }, 'json');
+
+
 </script>
 
 

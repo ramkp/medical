@@ -4774,6 +4774,25 @@ $(document).ready(function () {
             }
         }
 
+        if (event.target.id == 'hotel_search') {
+            var state = $('#search_state').val();
+            var city = $('#search_city').val();
+            if (state != '' || city != '') {
+                $('#ajax_loader').show();
+                var url = "/lms/custom/hotels/search_hotel.php";
+                $.post(url, {state: state, city: city}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#pagination').hide();
+                    $('#hotels_container').html(data);
+                });
+            } // end if
+        }
+
+        if (event.target.id == 'reset_search_hotel') {
+            get_hotels_page();
+        }
+
+
     }); // end of body click event
 
     $('body').on('typeahead:select', function (event, suggestion) {
