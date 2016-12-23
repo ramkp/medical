@@ -10,6 +10,20 @@ class Hotel extends Util {
         parent::__construct();
         $this->create_states_data();
         $this->create_city_data();
+        $this->create_hotels_data();
+    }
+
+    function create_hotels_data() {
+        $query = "select * from mdl_hotels";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $location = mb_convert_encoding($row['address'], 'UTF-8');
+                $ws[] = $location;
+            }
+            file_put_contents('/home/cnausa/public_html/lms/custom/utils/hotels.json', json_encode($ws));
+        }
     }
 
     function create_states_data() {
