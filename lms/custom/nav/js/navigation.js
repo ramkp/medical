@@ -327,7 +327,7 @@ $(document).ready(function () {
     }
 
     function get_certificates_page() {
-        var url = "/lms/custom/hotels/list.php";
+        var url = "/lms/custom/certificates/list.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
         });
@@ -1545,6 +1545,43 @@ $(document).ready(function () {
             });
         }
 
+        if (event.target.id == 'add_hotel') {
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/hotels/get_add_hotel_dialog.php";
+                            var cert = {userid: userid, courseid: courserid};
+                            $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                                //console.log(data);
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+
+                                $.post('/lms/custom/utils/states.json', {id: 1}, function (data) {
+                                    $('#state').typeahead({source: data, items: 240});
+                                }, 'json');
+
+                                $.post('/lms/custom/utils/cities.json', {id: 1}, function (data) {
+                                    $('#city').typeahead({source: data, items: 52000});
+                                }, 'json');
+
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+
+        }
+
         if (event.target.id == 'get_campaign_users') {
             var courseid = $('#courses').val();
             var slotid = $('#workshops').val();
@@ -2537,9 +2574,6 @@ $(document).ready(function () {
             }
 
         }
-
-
-
 
 
     }); // end of #region-main click', 'button',
@@ -4616,6 +4650,129 @@ $(document).ready(function () {
             } // end else
         }
 
+        if (event.target.id == 'add_hotel_button') {
+            console.log('Clicked ...');
+            var state = $('#state').val();
+            var city = $('#city').val();
+            var addr = $('#addr').val();
+            var phone = $('#phone').val();
+            var contact = $('#contact').val();
+            var charge = $('#charge').val();
+            var room = $('#room').val();
+
+            if (state != '' &&
+                    city != '' &&
+                    addr != '' &&
+                    phone != '' &&
+                    contact != '' &&
+                    charge != '' && room != '') {
+                var hotel = {state: state,
+                    city: city,
+                    addr: addr,
+                    phone: phone,
+                    contact: contact,
+                    charge: charge,
+                    room: room};
+
+                $('#hotel_err').html('');
+                var url = "/lms/custom/hotels/add_new_hotel.php";
+                $.post(url, {hotel: JSON.stringify(hotel)}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_hotels_page();
+                });
+            } // end if
+            else {
+                $('#hotel_err').html('Please provide all require fields');
+            } // end else 
+        }
+
+        console.log('Class element clicked: ' + $(event.target).attr('class'));
+
+
+        if (event.target.id.indexOf("hotel_edit_") >= 0) {
+            var id = event.target.id.replace("hotel_edit_", "");
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/hotels/get_edit_hotel_dialog.php";
+                            var request = {id: id};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+
+                                $.post('/lms/custom/utils/states.json', {id: 1}, function (data) {
+                                    $('#state').typeahead({source: data, items: 240});
+                                }, 'json');
+
+                                $.post('/lms/custom/utils/cities.json', {id: 1}, function (data) {
+                                    $('#city').typeahead({source: data, items: 52000});
+                                }, 'json');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+        }
+
+
+        if (event.target.id == 'update_hotel_button') {
+            var id = $('#id').val();
+            var state = $('#state').val();
+            var city = $('#city').val();
+            var addr = $('#addr').val();
+            var phone = $('#phone').val();
+            var contact = $('#contact').val();
+            var charge = $('#charge').val();
+            var room = $('#room').val();
+
+            if (state != '' &&
+                    city != '' &&
+                    addr != '' &&
+                    phone != '' &&
+                    contact != '' &&
+                    charge != '' && room != '') {
+                var hotel = {state: state,
+                    city: city,
+                    id: id,
+                    addr: addr,
+                    phone: phone,
+                    contact: contact,
+                    charge: charge,
+                    room: room};
+
+                $('#hotel_err').html('');
+                var url = "/lms/custom/hotels/update_hotel.php";
+                $.post(url, {hotel: JSON.stringify(hotel)}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_hotels_page();
+                });
+            } // end if
+            else {
+                $('#hotel_err').html('Please provide all require fields');
+            } // end else 
+
+        }
+
+        if (event.target.id.indexOf("hotel_del_") >= 0) {
+            var id = event.target.id.replace("hotel_del_", "");
+            if (confirm('Delete current hotel?')) {
+                var url = "/lms/custom/hotels/del_hotel.php";
+                $.post(url, {id: id}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_hotels_page();
+                });
+            }
+        }
 
     }); // end of body click event
 
