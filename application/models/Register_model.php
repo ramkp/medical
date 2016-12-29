@@ -676,7 +676,7 @@ class register_model extends CI_Model {
             $list.="<div id='diff_address' style='display:none;'>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Mailing Address*</span>";
+            $list.="<span class='span2'>Billing Address*</span>";
             $list.="<span class='span2'><input type='text' id='addr2' name='addr2'  ></span>";
             $list.="<span class='span2'>City*</span>";
             $list.="<span class='span2'><input type='text' id='city2' name='city2'  ></span>";
