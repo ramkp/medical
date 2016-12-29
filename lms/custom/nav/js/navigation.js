@@ -340,6 +340,35 @@ $(document).ready(function () {
         });
     }
 
+
+    function get_inventory_page() {
+        var url = "/lms/custom/inventory/get_inventory_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+
+            $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
+                $('#hotel_search').typeahead({source: data, items: 2400});
+            }, 'json');
+
+            $('#h_start').datepicker();
+            $('#h_end').datepicker();
+        });
+    }
+
+    function get_hotel_expenses_page() {
+        var url = "/lms/custom/inventory/get_inventory_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+
+            $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
+                $('#hotel_search').typeahead({source: data, items: 2400});
+            }, 'json');
+
+            $('#h_start').datepicker();
+            $('#h_end').datepicker();
+        });
+    }
+
     function get_state_taxes_list() {
         var url = "/lms/custom/taxes/index.php";
         $.post(url, {id: 1}).done(function (data) {
@@ -3153,6 +3182,11 @@ $(document).ready(function () {
         update_navigation_status__menu('Hotels');
         get_hotels_page();
     });
+    $("#inventory").click(function (event) {
+        update_navigation_status__menu('Inventory');
+        get_inventory_page();
+    });
+
     $("#promote").click(function (event) {
         update_navigation_status__menu('Promotions');
         get_promotion_page();
@@ -4792,6 +4826,149 @@ $(document).ready(function () {
             get_hotels_page();
         }
 
+        if (event.target.id == 'inventory_add_hotel_button') {
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/inventory/get_add_hotel_dialog.php";
+                            var request = {id: id};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+
+                                $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
+                                    $('#inventory_hotels_list').typeahead({source: data, items: 2400});
+                                }, 'json');
+
+                                $('#pdate').datepicker();
+
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+        }
+
+        if (event.target.id == 'add_hotel_to_inventory') {
+            var hotel = $('#inventory_hotels_list').val();
+            var amount = $('#amount').val();
+            var pdate = $('#pdate').val();
+
+            if (hotel != '' && amount != '' && pdate != '') {
+                $('#inv_err').html('');
+                var hotelObj = {hotel: hotel, amount: amount, pdate: pdate};
+                var url = "/lms/custom/inventory/add_hotel.php";
+                $.post(url, {hotel: JSON.stringify(hotelObj)}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_inventory_page();
+                    $("a[data-toggle='tab']").trigger({type: "click"});
+                });
+            } // end if
+            else {
+                $('#inv_err').html('Please provide all required fields');
+            } // end else
+        }
+
+        if (event.target.id.indexOf("inv_hotel2_edit_") >= 0) {
+            var id = event.target.id.replace("inv_hotel2_edit_", "");
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/inventory/get_edit_hotel_dialog.php";
+                            var request = {id: id};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+
+                                $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
+                                    $('#inventory_hotels_list').typeahead({source: data, items: 2400});
+                                }, 'json');
+
+                                $('#pdate').datepicker();
+
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+
+        }
+
+        if (event.target.id == 'update_hotel_inventory') {
+            var hotel = $('#inventory_hotels_list').val();
+            var amount = $('#amount').val();
+            var pdate = $('#pdate').val();
+            var id = $('#id').val();
+
+            if (hotel != '' && amount != '' && pdate != '') {
+                $('#inv_err').html('');
+                var hotelObj = {hotel: hotel, amount: amount, pdate: pdate, id: id};
+                var url = "/lms/custom/inventory/update_hotel.php";
+                $.post(url, {hotel: JSON.stringify(hotelObj)}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_inventory_page();
+                    $("a[data-toggle='tab']").trigger({type: "click"});
+                });
+            } // end if
+            else {
+                $('#inv_err').html('Please provide all required fields');
+            } // end else
+        }
+
+        if (event.target.id.indexOf("inv_hotel2_del_") >= 0) {
+            var id = event.target.id.replace("inv_hotel2_del_", "");
+            console.log('Hotel ID: ' + id);
+            if (confirm('Delete current hotel payment?')) {
+                var url = "/lms/custom/inventory/del_hotel.php";
+                $.post(url, {id: id}).done(function () {
+                    get_inventory_page();
+                });
+            }
+        }
+
+        if (event.target.id == 'inventory_hotel_search_button') {
+            var hotel = $('#hotel_search').val();
+            var start = $('#h_start').val();
+            var end = $('#h_end').val();
+
+            if (hotel != '' || start != '' || end != '') {
+                $('#hotel_ajax_loader').show();
+                var hotelObj = {addr: hotel, start: start, end: end};
+                var url = "/lms/custom/inventory/search_hotel_items.php";
+                $.post(url, {hotel: JSON.stringify(hotelObj)}).done(function (data) {
+                    $('#hotel_ajax_loader').hide();
+                    $('#h_pagination').hide();
+                    $('#inventory_hotels_container').html(data);
+                });
+            }
+        }
+
+        if (event.target.id == 'inventory_hotel_cancel_search_button') {
+            get_inventory_page();
+        }
+
+
+
 
     }); // end of body click event
 
@@ -4799,6 +4976,5 @@ $(document).ready(function () {
         console.log('Selected item: ' + suggestion);
 
     });
-
 }); // end of $(document).ready(function()
 

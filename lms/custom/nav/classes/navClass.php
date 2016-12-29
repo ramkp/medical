@@ -132,6 +132,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Schedule' id='sch'>Schedule</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
+                                    <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Promotions' id='register_user'>Register User</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>View User</a></li>
@@ -230,6 +231,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>
                                     <li><a href='#' title='Schedule' id='sch'>Schedule</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
+                                    <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Promotions' id='register_user'>Register User</a></li>
