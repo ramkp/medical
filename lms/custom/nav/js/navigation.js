@@ -356,7 +356,7 @@ $(document).ready(function () {
     }
 
     function get_hotel_expenses_page() {
-        var url = "/lms/custom/inventory/get_inventory_page.php";
+        var url = "/lms/custom/inventory/get_hotel_expenses_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
 
@@ -3186,6 +3186,10 @@ $(document).ready(function () {
         update_navigation_status__menu('Inventory');
         get_inventory_page();
     });
+    $("#hotel_expenses").click(function (event) {
+        update_navigation_status__menu('Hotel Expenses');
+        get_hotel_expenses_page()
+    });
 
     $("#promote").click(function (event) {
         update_navigation_status__menu('Promotions');
@@ -4870,8 +4874,7 @@ $(document).ready(function () {
                 var url = "/lms/custom/inventory/add_hotel.php";
                 $.post(url, {hotel: JSON.stringify(hotelObj)}).done(function () {
                     $("[data-dismiss=modal]").trigger({type: "click"});
-                    get_inventory_page();
-                    $("a[data-toggle='tab']").trigger({type: "click"});
+                    get_hotel_expenses_page();
                 });
             } // end if
             else {
@@ -4941,7 +4944,7 @@ $(document).ready(function () {
             if (confirm('Delete current hotel payment?')) {
                 var url = "/lms/custom/inventory/del_hotel.php";
                 $.post(url, {id: id}).done(function () {
-                    get_inventory_page();
+                    get_hotel_expenses_page()
                 });
             }
         }
@@ -4964,7 +4967,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'inventory_hotel_cancel_search_button') {
-            get_inventory_page();
+            get_hotel_expenses_page();
         }
 
 
