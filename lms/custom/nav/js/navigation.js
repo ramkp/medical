@@ -337,6 +337,7 @@ $(document).ready(function () {
         var url = "/lms/custom/hotels/list.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+
         });
     }
 
@@ -346,12 +347,12 @@ $(document).ready(function () {
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
 
-            $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
-                $('#hotel_search').typeahead({source: data, items: 2400});
+            $.post('/lms/custom/utils/books.json', {id: 1}, function (data) {
+                $('#b_search').typeahead({source: data, items: 2400});
             }, 'json');
 
-            $('#h_start').datepicker();
-            $('#h_end').datepicker();
+            $('#b_start').datepicker();
+            $('#b_end').datepicker();
         });
     }
 
@@ -4863,6 +4864,40 @@ $(document).ready(function () {
             }
         }
 
+        if (event.target.id == 'inventory_add_b_button') {
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/inventory/get_add_book_dialog.php";
+                            var request = {id: id};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+
+                                $.post('/lms/custom/utils/courses.json', {id: 1}, function (data) {
+                                    $('#courses_list').typeahead({source: data, items: 2400});
+                                }, 'json');
+
+                                $('#pdate').datepicker();
+
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+        }
+
+
         if (event.target.id == 'add_hotel_to_inventory') {
             var hotel = $('#inventory_hotels_list').val();
             var amount = $('#amount').val();
@@ -4914,7 +4949,44 @@ $(document).ready(function () {
                 $("body").append(data);
                 $("#myModal").modal('show');
             }
+        }
 
+        if (event.target.id.indexOf("inv_book_edit_") >= 0) {
+            var id = event.target.id.replace("inv_book_edit_", "");
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/inventory/get_edit_book_dialog.php";
+                            var request = {id: id};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+
+                                $.post('/lms/custom/utils/courses.json', {id: 1}, function (data) {
+                                    $('#courses_list').typeahead({source: data, items: 2400});
+                                }, 'json');
+
+                                $.post('/lms/custom/utils/data.json', {id: 1}, function (data) {
+                                    $('#student').typeahead({source: data, items: 240000});
+                                }, 'json');
+
+                                $('#pdate').datepicker();
+
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
         }
 
         if (event.target.id == 'update_hotel_inventory') {
@@ -4938,13 +5010,52 @@ $(document).ready(function () {
             } // end else
         }
 
+        if (event.target.id == 'update_book_to_inventory') {
+            var coursename = $('#courses_list').val();
+            var pub = $('#pub').val();
+            var title = $('#title').val();
+            var cost = $('#cost').val();
+            var pdate = $('#pdate').val();
+            var student = $('#student').val();
+            var id = $('#id').val();
+            if (coursename != '' && pub != '' && title != '' && cost != '' && pdate != '') {
+                $('#inv_err').html('');
+                var book = {
+                    coursename: coursename,
+                    pub: pub,
+                    title: title,
+                    cost: cost,
+                    pdate: pdate,
+                    student: student,
+                    id: id
+                };
+                var url = "/lms/custom/inventory/update_book.php";
+                $.post(url, {book: JSON.stringify(book)}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_inventory_page();
+                });
+            } // end if
+            else {
+                $('#inv_err').html('Please provide all required fields');
+            } // end else
+        }
+
         if (event.target.id.indexOf("inv_hotel2_del_") >= 0) {
             var id = event.target.id.replace("inv_hotel2_del_", "");
-            console.log('Hotel ID: ' + id);
             if (confirm('Delete current hotel payment?')) {
                 var url = "/lms/custom/inventory/del_hotel.php";
                 $.post(url, {id: id}).done(function () {
                     get_hotel_expenses_page()
+                });
+            }
+        }
+
+        if (event.target.id.indexOf("inv_book_del_") >= 0) {
+            var id = event.target.id.replace("inv_book_del_", "");
+            if (confirm('Delete current book?')) {
+                var url = "/lms/custom/inventory/del_book.php";
+                $.post(url, {id: id}).done(function () {
+                    get_inventory_page();
                 });
             }
         }
@@ -4966,8 +5077,59 @@ $(document).ready(function () {
             }
         }
 
+        if (event.target.id == 'inventory_b_search_button') {
+            var title = $('#b_search').val();
+            var start = $('#b_start').val();
+            var end = $('#b_end').val();
+
+            if (title != '' || start != '' || end != '') {
+                $('#book_ajax_loader').show();
+                var bookObj = {title: title, start: start, end: end};
+                var url = "/lms/custom/inventory/search_book_items.php";
+                $.post(url, {book: JSON.stringify(bookObj)}).done(function (data) {
+                    $('#book_ajax_loader').hide();
+                    $('#b_pagination').hide();
+                    $('#b_container').html(data);
+                });
+            }
+        }
+
+        if (event.target.id == 'inventory_b_cancel_search_button') {
+            get_inventory_page();
+        }
+
         if (event.target.id == 'inventory_hotel_cancel_search_button') {
             get_hotel_expenses_page();
+        }
+
+        if (event.target.id == 'add_book_to_inventory') {
+            var coursename = $('#courses_list').val();
+            var pub = $('#pub').val();
+            var title = $('#title').val();
+            var cost = $('#cost').val();
+            var pdate = $('#pdate').val();
+            var total = $('#total_books').val();
+
+            if (coursename != '' && pub != '' && title != '' && cost != '' && pdate != '') {
+                $('#inv_err').html('');
+                var book = {
+                    coursename: coursename,
+                    pub: pub,
+                    title: title,
+                    cost: cost,
+                    pdate: pdate,
+                    total: total
+                };
+                var url = "/lms/custom/inventory/add_book.php";
+                $.post(url, {book: JSON.stringify(book)}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_inventory_page();
+                });
+
+            } // end if
+            else {
+                $('#inv_err').html('Please provide all required fields');
+            } // end else
         }
 
 

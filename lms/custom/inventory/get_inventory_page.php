@@ -1,9 +1,8 @@
 <?php
-
 require_once './classes/Inventory.php';
 $in = new Inventory();
 $list = $in->get_inventory_page();
-$total=$in->get_total_hotels();
+$btotal = $in->get_books_hotels();
 echo $list;
 ?>
 
@@ -12,19 +11,19 @@ echo $list;
     $(document).ready(function () {
 
         $(function () {
-            $('#h_pagination').pagination({
-                items: <?php echo $total; ?>,
+            $('#b_pagination').pagination({
+                items: <?php echo $btotal; ?>,
                 itemsOnPage: <?php echo $in->limit; ?>,
                 cssStyle: 'light-theme'
             });
         });
 
-        $("#h_pagination").click(function () {
-            var page = $('#h_pagination').pagination('getCurrentPage');
+        $("#b_pagination").click(function () {
+            var page = $('#b_pagination').pagination('getCurrentPage');
             console.log('Page: ' + page);
-            var url = "/lms/custom/inventory/get_hotel_item.php";
+            var url = "/lms/custom/inventory/get_book_item.php";
             $.post(url, {id: page}).done(function (data) {
-                $('#inventory_hotels_container').html(data);
+                $('#b_container').html(data);
             });
         });
 
