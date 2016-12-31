@@ -157,27 +157,37 @@ class User extends Util {
         $list = "";
         $users = array();
         $data = explode(' ', $email);
-        $firstname = $data[1];
-        $lastname = $data[0];
-        if ($firstname == '') {
-            $firstname = $data[2];
-        }
-        $query = "select * from mdl_user "
-                . "where deleted=0 "
-                . " and ( email like '%" . trim($email) . "%' "
-                . "or (firstname='$firstname' and lastname='$lastname') "
-                . "or phone1 like '%$email%') "
-                . " order by lastname ";
-        //echo "Query: ".$query."<br>";
-        $num = $this->db->numrows($query);
-        if ($num == 0) {
+
+        if (count($data) == 1) {
             $query = "select * from mdl_user "
                     . "where deleted=0 "
                     . " and ( email like '%" . trim($email) . "%' "
-                    . "or (firstname like '%$firstname%') "
-                    . "or phone1 like '%$email%') "
+                    . "or phone1 like '%" . trim($email) . "%') "
                     . " order by lastname ";
         }
+
+        if (count($data) == 2) {
+
+            $firstname = $data[1];
+            $lastname = $data[0];
+
+            $query = "select * from mdl_user "
+                    . "where deleted=0 "
+                    . " and ( firstname like '%$firstname%' and lastname like '%$lastname%') "
+                    . " order by lastname ";
+        }
+
+        if (count($data) == 3) {
+            $firstname = $data[2];
+            $lastname = $data[0];
+            
+            $query = "select * from mdl_user "
+                    . "where deleted=0 "
+                    . " and ( firstname like '%$firstname%' and lastname like '%$lastname%') "
+                    . " order by lastname ";
+            
+        }
+
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
