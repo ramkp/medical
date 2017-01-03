@@ -780,36 +780,36 @@ class Schedule extends Util {
                     . "'$slot->timemodified',"
                     . "'$slot->notes',"
                     . "'$slot->timemodified')";
-            //echo "Query: " . $query . "<br>";
             $this->db->query($query);
 
             // Add additional workshop for EKG only course
-            $ekg_schedulerid = 22;
-            $start = time()+86400*2;
+            /*
+              $ekg_schedulerid = 22;
+              $start = time()+86400*2;
 
-            $query = "insert into mdl_scheduler_slots "
-                    . "(schedulerid,"
-                    . "starttime,"
-                    . "duration, "
-                    . "exclusivity, "
-                    . "emaildate, "
-                    . "teacherid, "
-                    . "appointmentlocation,"
-                    . "timemodified,"
-                    . "notes,"
-                    . "hideuntil) "
-                    . "values($ekg_schedulerid,"
-                    . "'$start', "
-                    . "'$slot->duration', "
-                    . "'$slot->exclusivity', "
-                    . "'$slot->emaildate', "
-                    . "$slot->teacherid, "
-                    . "'$slot->appointmentlocation',"
-                    . "'$slot->timemodified',"
-                    . "'$slot->notes',"
-                    . "'$slot->timemodified')";
-            //echo "Query: " . $query . "<br>";
-            $this->db->query($query);
+              $query = "insert into mdl_scheduler_slots "
+              . "(schedulerid,"
+              . "starttime,"
+              . "duration, "
+              . "exclusivity, "
+              . "emaildate, "
+              . "teacherid, "
+              . "appointmentlocation,"
+              . "timemodified,"
+              . "notes,"
+              . "hideuntil) "
+              . "values($ekg_schedulerid,"
+              . "'$start', "
+              . "'$slot->duration', "
+              . "'$slot->exclusivity', "
+              . "'$slot->emaildate', "
+              . "$slot->teacherid, "
+              . "'$slot->appointmentlocation',"
+              . "'$slot->timemodified',"
+              . "'$slot->notes',"
+              . "'$slot->timemodified')";
+              $this->db->query($query);
+             */
         } // end if $_REQUEST['what'] == 'addslot'
 
         if ($_REQUEST['what'] == 'updateslot') {
