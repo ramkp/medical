@@ -549,10 +549,21 @@ $(document).ready(function () {
     }
 
     function verify_personal_payment_section() {
+        var sum;
+        var user_group = $('#user_group').val();
+        console.log('Group: '+user_group);
+        if (user_group != '') {
+            sum = $('#group_payment_sum').val();
+        } // end if
+        else {
+            sum = $('#payment_sum').val();
+        }
+        
+        console.log('Sum: '+sum);
+
         var dashboard = $('#dashboard').val();
         var card = $('#card_type').text();
         var card_type = card.trim();
-        var sum = $('#payment_sum').val();
         var email = $('#email').val();
         var card_no = $('#card_no').val();
         var card_holder = $('#card_holder').val();
@@ -646,7 +657,6 @@ $(document).ready(function () {
             return false;
         }
 
-        var user_group = $('#user_group').val();
         if (card_type != 'Card type' && card_no != '' && card_holder != '' && card_year != '--' && card_month != '--' && bill_addr != '' && bill_city != '' && bill_zip != '' && bill_email != '' && validateEmail(bill_email) == true) {
             $('#personal_payment_err').html('');
             var card = {sum: sum,
@@ -668,6 +678,10 @@ $(document).ready(function () {
                 renew: renew,
                 user_group: user_group,
                 bill_email: bill_email};
+
+            console.log('Payment object: ' + JSON.stringify(card));
+            
+            
             var url = "https://" + domain + "/functionality/php/make_stub_payment.php";
             var request = {card: JSON.stringify(card)};
             $('#ajax_loading_payment').show();
@@ -676,6 +690,8 @@ $(document).ready(function () {
                 //console.log('Server response: '+data);
                 $('.form_div').html(data);
             }); // end of post
+            
+
         } // end if card_type != 'Card type' && card_no!='' ...
     }
 

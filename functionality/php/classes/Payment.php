@@ -688,9 +688,11 @@ class Payment {
             if ($group_data == '') {
                 $course_name = $this->get_course_name($users->courseid);
                 if ($sum == false) {
+                    // Here we take personal course cost
                     $course_cost = $this->get_personal_course_cost($users->courseid);
                 } // end if $renew == false
                 else {
+                    // Predefined cost sent from partial payments module
                     $course_cost = array('cost' => $sum, 'discount' => 0);
                 }
                 $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
@@ -712,9 +714,11 @@ class Payment {
             else {
                 $course_name = $this->get_course_name($group_data->courseid);
                 if ($sum == false) {
+                    // Here we take group course cost
                     $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
                 } // end if $renew == false 
                 else {
+                    // Predefined cost sent from partial payments module
                     $course_cost = array('cost' => $sum, 'discount' => 0);
                 } // end else
 
@@ -744,9 +748,11 @@ class Payment {
 
             if ($apply_delay_fee) {
                 if ($group_data == '') {
+                    // Personal delay fee
                     $grand_total = $course_cost['cost'] + $late_fee;
                 } // end if $group_data == ''
                 else {
+                    // Group delay fee
                     $grand_total = $course_cost['cost'] + $late_fee * $participants;
                 } // end else 
             } // end if $apply_delay_fee
@@ -768,18 +774,32 @@ class Payment {
                 if ($apply_delay_fee) {
                     if ($group_data == '') {
                         $list.="<span class='span2'>$cost_block+$$late_fee (late fee)<br>Total: $grand_total</span>";
+                        // This is personal course cost
+                        $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
                     } // end if $group_data == ''
                     else {
                         $list.="<span class='span2'>$cost_block+$" . $late_fee * $participants . " (late fee)<br>Total: $grand_total</span>";
+                        // This is group course cost
+                        $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='group_payment_sum' />";
                     } // end else                    
                 } // end if $apply_delay_fee
                 else {
-                    $list.="<span class='span2'>$cost_block</span>";
-                } // end else                 
-                $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
+                    if ($group_data == '') {
+                        $list.="<span class='span2'>$cost_block</span>";
+                        // This is personal course cost
+                        $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
+                    } // end if $group_data == ''
+                    else {
+                        $list.="<span class='span2'>$cost_block</span>";
+                        // This is group course cost
+                        $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='group_payment_sum' />";
+                    } // end else
+                } // end else when no late fee                
+
                 $list.="</div>";
             } // end if $tax==0
             else {
+                // The case when we apply taxes
                 $tax_sum = round(($course_cost['cost'] * $tax) / 100, 2);
                 $grand_total = round(($course_cost['cost'] + $tax_sum), 2);
 
@@ -1196,6 +1216,14 @@ class Payment {
         $card->country = "US";
         $card->payment_amount = $card->sum;
 
+        /*
+          echo "<pre>";
+          print_r($card);
+          echo "</pre>";
+          die('stopped');
+         */
+
+
         // Personal online payment
         if ($user_group == '' && $userid > 0) {
             $state_code = $this->get_state_code($card->state);
@@ -1259,7 +1287,7 @@ class Payment {
             }
         } // end if $user_group==''        
         if ($user_group != '' && $userid > 0) {
-            //$user_payment_data = $this->get_user_payment_credentials($userid);
+            // Payment from inside admin/student part
             $order = new stdClass();
             $names = explode(" ", $card->card_holder);
             //print_r($names);
@@ -1309,7 +1337,7 @@ class Payment {
                 $this->enroll->add_user_to_course_schedule($card->userid, $card);
             } // end else             
         } // end if $user_group!='' && $userid!=''
-        // Group online payment
+        // ***************** Group online payment ********************
         if ($user_group != '' && $userid == '') {
 
             $group_users = $this->get_group_users($user_group);
@@ -1361,7 +1389,7 @@ class Payment {
                   print_r($group_users);
                   echo "<br>---------------------------------<br>";
                  */
-
+                $mailer->send_group_payment_message($card);
                 if (count($group_users > 0)) {
                     foreach ($group_users as $userid) {
                         $slotid = $this->get_group_users_slot($userid);
@@ -1370,7 +1398,7 @@ class Payment {
                         $card->userid = $userid;
                         $this->enroll->add_user_to_course_schedule($userid, $card);
                         $card->sum = round(($group_sum / count($group_users)), 2); // Sum for every group participant 
-                        $this->add_payment_to_db($card); // adds payment result to DB
+                        $this->add_payment_to_db($card); // adds divided payment sum to DB for every student
                         $this->confirm_user($user->username);
                         $mailer->send_group_payment_confirmation_message($user);
                     } // end foreach
