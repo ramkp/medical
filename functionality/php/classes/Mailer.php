@@ -337,7 +337,19 @@ class Mailer {
         <td>Last name</td><td>$user->last_name</td>
         </tr>
         <tr style='background-color:#F5F5F5;'>
+        <td>Email</td><td>$user->bill_email</td>
+        </tr>
+        <tr style='background-color:#F5F5F5;'>
+        <td>Address</td><td>$user->bill_addr</td>
+        </tr>
+        <tr >
+        <td>City</td><td>$user->bill_city</td>
+        </tr>        
+        <tr style='background-color:#F5F5F5;'>
         <td>State</td><td>$state</td>
+        </tr>
+        <tr >
+        <td>Zip</td><td>$user->bill_zip</td>
         </tr>
         <tr style='background-color:#F5F5F5;'>
         <td>Applied Progarm</td><td>$course_name</td>

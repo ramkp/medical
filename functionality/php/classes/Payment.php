@@ -1190,6 +1190,12 @@ class Payment {
         $userid = $card->userid;
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
+        
+        /*********************************************************************
+         *  Please be aware $user_payment_data could be null in case of 
+         *  group registration
+         *********************************************************************/
+        
         $user_payment_data = $this->get_user_payment_credentials($card->userid); // compatible if user does not exist
         // Make card object compatible with confirmation email
         $names = explode(" ", $card->card_holder);
@@ -1201,7 +1207,7 @@ class Payment {
             $firstname = $names[0] . " " . $names[1];
             $lastname = $names[2];
         } // end else
-
+       
         $card->email = $user_payment_data->email;
         $card->slotid = $this->get_user_slotid($card->courseid, $card->userid); // compatible if user does not exist
         $card->first_name = $firstname;
@@ -1222,7 +1228,6 @@ class Payment {
           echo "</pre>";
           die('stopped');
          */
-
 
         // Personal online payment
         if ($user_group == '' && $userid > 0) {
@@ -1337,6 +1342,7 @@ class Payment {
                 $this->enroll->add_user_to_course_schedule($card->userid, $card);
             } // end else             
         } // end if $user_group!='' && $userid!=''
+        
         // ***************** Group online payment ********************
         if ($user_group != '' && $userid == '') {
 
