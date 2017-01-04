@@ -84,14 +84,12 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     $slot->emaildate = $data->emaildate;
     $slot->timemodified = time();
 
-    /*
-     * 
+      /*  
       echo "<pre>";
       print_r($slot);
       echo "</pre>";
       die();
-     * 
-     */
+      */
 
     $currentapps = $slot->get_appointments();
     $processedstuds = array();
