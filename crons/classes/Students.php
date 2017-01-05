@@ -338,6 +338,7 @@ class Students {
         $partial1 = array(); // CC payments
         $partial2 = array(); // Other payments
         // CC payments
+
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid "
                 . "and userid=$userid";
@@ -346,6 +347,11 @@ class Students {
             $renew_fee = $this->get_renew_fee($courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                // Weird workaround for only three students
+                if ($row['userid'] == 13325 || $row['userid'] == 13326 || $row['userid'] == 13327) {
+                    $row['psum'] = 500; // We make their payment as $500, but in fact they paid only $450
+                } // end if $userid==13325 || $userid==13326 || $userid==13326
+
                 $user_payment = $row['psum'];
                 $course_cost = $this->get_course_cost($row['courseid']);
                 $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
@@ -928,7 +934,7 @@ class Students {
 
             $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
             $mail->addAddress($a_email);
-            $mail->addAddress($b_email);
+            //$mail->addAddress($b_email);
             $mail->addAddress($m_email);
             $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
 
@@ -939,7 +945,7 @@ class Students {
 
             if (!$mail->send()) {
                 echo "Message could not be sent to $a_email \n";
-                echo "Message could not be sent to $b_email \n";
+                //echo "Message could not be sent to $b_email \n";
                 echo "Message could not be sent to $m_email \n";
                 echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
             } // end if !$mail->send()        
@@ -1846,7 +1852,7 @@ class Students {
             $ws[] = $date . "--" . $location;
         }
         file_put_contents('/home/cnausa/public_html/lms/custom/utils/workshops.json', json_encode($ws));
-        echo "Total items: ".count($ws);
+        echo "Total items: " . count($ws);
         echo "<p>Workshop data are created ...</p>";
     }
 
