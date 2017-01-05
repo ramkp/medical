@@ -1,3 +1,5 @@
+<!--googleoff: all-->
+
 <footer id="page-footer" class="container-fluid">
 
     <div class="footerlinks">
@@ -26,6 +28,8 @@
 
             </div>
 
+<!--googleon: all-->            
+    
             <script type="text/javascript">
                 var LHCChatOptions = {};
                 LHCChatOptions.opt = {widget_height: 340, widget_width: 300, popup_height: 520, popup_width: 500};
