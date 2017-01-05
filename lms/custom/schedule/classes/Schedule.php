@@ -1032,13 +1032,30 @@ class Schedule extends Util {
         $paid_amount = 0;
         $unpaid_amount = 0;
         $courseid = $this->get_course_id($slotid);
-        $course_cost = $this->get_course_cost($courseid);
-
+        //echo "Course id: ".$courseid."<br>";
         $query = "select * from mdl_scheduler_appointment where slotid=$slotid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+
+                if ($courseid == 44 || $courseid == 45) {
+                    $year = $this->get_user_payment_year($row['studentid']);
+                    $student = $this->get_user_details($row['studentid']);
+                    //echo "Student $student->firstname $student->lastname Payment  Year: " . $year . "<br>";
+                    //echo "<br>-------------------------------------------------------------------<br>";
+                    if ($year == '2016') {
+                        // We handle history prices
+                        $course_cost = 450;
+                    } // end if $year == '2016'
+                    else {
+                        $course_cost = $this->get_course_cost($courseid);
+                    } // end else
+                } // end if $courseid == 44 || $courseid == 45
+                else {
+                    $course_cost = $this->get_course_cost($courseid);
+                } // end else
+
                 $student_payment = $this->get_student_payment($courseid, $row['studentid']);
                 $paid_amount = $paid_amount + $student_payment;
                 $diff = $student_payment - $course_cost;
@@ -1080,46 +1097,88 @@ class Schedule extends Util {
 
     function get_student_payment($courseid, $userid) {
         $paid = 0;
-        // 1. Get payment from credit cards
-        $query = "select * from mdl_card_payments "
-                . "where courseid=$courseid and userid=$userid";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $paid = $paid + $row['psum'];
-            }
-        }
 
-        // 2. Get payment from cash or partial payments
-        $query = "select * from mdl_partial_payments "
-                . "where courseid=$courseid and userid=$userid";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $paid = $paid + $row['psum'];
+        // Weird workaround for only three students
+        if ($userid == 13325 || $userid == 13326 || $userid == 13327) {
+            $paid = 500; // We make their payment as $500, but in fact they paid only $450
+        } // end if $userid==13325 || $userid==13326 || $userid==13326
+        else {
+            // 1. Get payment from credit cards
+            $query = "select * from mdl_card_payments "
+                    . "where courseid=$courseid and userid=$userid";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $paid = $paid + $row['psum'];
+                }
             }
-        }
 
-        // 3.Get payment from invoice table
-        $query = "select * from mdl_invoice "
-                . "where courseid=$courseid "
-                . "and userid=$userid and i_status=1";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $paid = $paid + $row['i_sum'];
+            // 2. Get payment from cash or partial payments
+            $query = "select * from mdl_partial_payments "
+                    . "where courseid=$courseid and userid=$userid";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $paid = $paid + $row['psum'];
+                }
             }
-        }
+
+            // 3.Get payment from invoice table
+            $query = "select * from mdl_invoice "
+                    . "where courseid=$courseid "
+                    . "and userid=$userid and i_status=1";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $paid = $paid + $row['i_sum'];
+                }
+            }
+        } // end else 
 
         return $paid;
     }
 
+    function get_user_payment_year($userid) {
+        // Check credit card payments
+        $query = "select * from mdl_card_payments where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $pdate = date('Y', $row['pdate']);
+            }
+        } // end if$num > 0
+        // Check cash/cheque payments
+        $query = "select * from mdl_partial_payments where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $pdate = date('Y', $row['pdate']);
+            }
+        } // end if$num > 0
+
+        return $pdate;
+    }
+
     function get_student_balance($courseid, $userid) {
         $list = "";
-        $course_cost = $this->get_course_cost($courseid);
+        if ($courseid == 44 || $courseid == 45) {
+            $year = $this->get_user_payment_year($userid);
+            if ($year == '2016') {
+                // We handle history prices
+                $course_cost = 450;
+            } // end if $year == '2016'
+            else {
+                $course_cost = $this->get_course_cost($courseid);
+            } // end else
+        } // end if $courseid == 44 || $courseid == 45
+        else {
+            $course_cost = $this->get_course_cost($courseid);
+        } // end else
         $student_payment = $this->get_student_payment($courseid, $userid);
         $diff = $student_payment - $course_cost;
         if ($diff < 0) {
