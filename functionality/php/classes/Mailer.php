@@ -147,8 +147,16 @@ class Mailer {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
-        $ws_cost = $this->get_workshop_cost($user->slotid);
         $course_cost = $this->get_course_cost($user);
+        /* ******************************************************************
+         *  Apply workaround if slot is not selected - use course cost
+         * *******************************************************************/
+        if ($user->slotid > 0) {
+            $ws_cost = $this->get_workshop_cost($user->slotid);
+        } // end if $user->slotid>0
+        else {
+            $ws_cost = 0;
+        } // end else
         $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $catid = $this->get_course_category($user);
         $p = new Payment();
@@ -297,12 +305,19 @@ class Mailer {
         $this->send_common_message($subject, $list, $user->email);
     }
 
-    function send_group_payment_message($user, $printed_data=null) {
+    function send_group_payment_message($user, $printed_data = null) {
         $list = "";
         $course_name = $this->get_course_name($user);
-        //$class_info = $this->get_classs_info($user);
-        $ws_cost = $this->get_workshop_cost($user->slotid);
         $course_cost = $this->get_course_cost($user);
+        /* ******************************************************************
+         *  Apply workaround if slot is not selected - use course cost
+         * *******************************************************************/
+        if ($user->slotid > 0) {
+            $ws_cost = $this->get_workshop_cost($user->slotid);
+        } // end if $user->slotid>0
+        else {
+            $ws_cost = 0;
+        } // end else
         $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $catid = $this->get_course_category($user);
         $p = new Payment();
@@ -382,9 +397,9 @@ class Mailer {
         </div>";
         $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
         $list.="</body></html>";
-        $subject="Medical2 - Group Payment Confirmation";
-        $recipient='sirromas@outlook.com';
-        $payment_amount=$user->payment_amount;
+        $subject = "Medical2 - Group Payment Confirmation";
+        $recipient = 'sirromas@outlook.com';
+        $payment_amount = $user->payment_amount;
         $this->send_signup_confirmation_email($subject, $list, $recipient, $payment_amount);
     }
 
@@ -392,8 +407,16 @@ class Mailer {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
-        $ws_cost = $this->get_workshop_cost($user->slotid);
         $course_cost = $this->get_course_cost($user);
+        /* ******************************************************************
+         *  Apply workaround if slot is not selected - use course cost
+         * ****************************************************************** */
+        if ($user->slotid > 0) {
+            $ws_cost = $this->get_workshop_cost($user->slotid);
+        } // end if $user->slotid>0
+        else {
+            $ws_cost = 0;
+        } // end else
         $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $catid = $this->get_course_category($user);
         $p = new Payment();
@@ -632,7 +655,7 @@ class Mailer {
     }
 
     function send_payment_confirmation_message($payment, $group = null, $free = null) {
-        $renew_fee = $this->get_renew_fee($payment->courseid);
+        //$renew_fee = $this->get_renew_fee($payment->courseid);
         $recipient = $payment->bill_email;
         if ($payment->renew == null) {
             $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
