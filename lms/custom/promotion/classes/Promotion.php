@@ -238,7 +238,7 @@ class Promotion extends Util {
         $list.="<p align='center'>Dear $detailes->firstname $detailes->lastname!</p>";
         $list.="<p align='justify'>$content</p>";
         $list.="<p align='justify'>Best regards,</p>";
-        $list.="<p align='justify'>Mediacl2 team.</p>";
+        $list.="<p align='justify'>Medical2 team.</p>";
         $list.="</body>";
         $list.="</html>";
         return $list;
