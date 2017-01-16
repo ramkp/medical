@@ -148,9 +148,9 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
-         * *******************************************************************/
+         * ****************************************************************** */
         if ($user->slotid > 0) {
             $ws_cost = $this->get_workshop_cost($user->slotid);
         } // end if $user->slotid>0
@@ -309,9 +309,9 @@ class Mailer {
         $list = "";
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
-         * *******************************************************************/
+         * ****************************************************************** */
         if ($user->slotid > 0) {
             $ws_cost = $this->get_workshop_cost($user->slotid);
         } // end if $user->slotid>0
@@ -408,7 +408,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -601,9 +601,22 @@ class Mailer {
         return $amount;
     }
 
+    function get_user_data($user) {
+        $query = "select * from mdl_user where id=$user->userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $user = new stdClass();
+            foreach ($row as $key => $value) {
+                $user->$key = $value;
+            }
+        }
+        return $user;
+    }
+
     function get_renew_certificate_message($user) {
         $list = "";
         $course_name = $this->get_course_name($user);
+        $userdata = $this->get_user_data($user);
         $list.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
         $list.="</head>";
         $list.="<body><br/><br/><br/><br/>";
@@ -619,11 +632,11 @@ class Mailer {
         <tbody>
         
         <tr style='background-color:#F5F5F5;'>
-        <td>First name</td><td>$user->first_name</td>
+        <td>First name</td><td>$userdata->firstname</td>
         </tr>
         
         <tr>
-        <td>Last name</td><td>$user->last_name</td>
+        <td>Last name</td><td>$userdata->lastname</td>
         </tr>
         
         <tr style='background-color:#F5F5F5;'>

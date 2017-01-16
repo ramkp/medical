@@ -549,17 +549,17 @@ $(document).ready(function () {
     }
 
     function verify_personal_payment_section() {
-        var sum;
+        var sum, firstname, lastname;
         var user_group = $('#user_group').val();
-        console.log('Group: '+user_group);
+        console.log('Group: ' + user_group);
         if (user_group != '') {
             sum = $('#group_payment_sum').val();
         } // end if
         else {
             sum = $('#payment_sum').val();
         }
-        
-        console.log('Sum: '+sum);
+
+        console.log('Sum: ' + sum);
 
         var dashboard = $('#dashboard').val();
         var card = $('#card_type').text();
@@ -597,15 +597,44 @@ $(document).ready(function () {
         }
 
         if (card_holder != '') {
-            var names_arr = card_holder.split(" ");
-            console.log('Billing name: ' + card_holder);
-            console.log('Billing firstname: ' + names_arr[0]);
-            console.log('Billing lastname: ' + names_arr[1]);
-            if (typeof (names_arr[1]) === "undefined") {
+            // Remove double spaces between words
+            var clean_holder = card_holder.replace(/\s\s+/g, ' ');
+            var names_arr = clean_holder.split(" ");
+
+            console.log('names array length: ' + names_arr.length);
+
+            if (names_arr.length == 1) {
                 $('#personal_payment_err').html('Please provide correct card holder name separated by space');
                 return;
             }
-        }
+
+            if (names_arr.length == 2) {
+                console.log('Two names case ....');
+                console.log('Holder name: ' + card_holder);
+                firstname = names_arr[0];
+                lastname = names_arr[1];
+                console.log('Billing firstname: ' + firstname);
+                console.log('Billing lastname: ' + lastname);
+                if (typeof (firstname) === "undefined" || firstname == '' || typeof (lastname) === "undefined" || lastname == '') {
+                    $('#personal_payment_err').html('Please provide correct card holder name separated by space');
+                    return;
+                }
+            } // end if names_arr.length == 2
+
+            if (names_arr.length == 3) {
+                console.log('Three names case ...');
+                console.log('Holder name: ' + card_holder);
+                firstname = names_arr[0] + ' ' + names_arr[1];
+                lastname = names_arr[2];
+                console.log('Billing firstname: ' + firstname);
+                console.log('Billing lastname: ' + lastname);
+                if (typeof (firstname) === "undefined" || firstname == '' || typeof (lastname) === "undefined" || lastname == '') {
+                    $('#personal_payment_err').html('Please provide correct card holder name separated by space');
+                    return;
+                }
+            } // end if names_arr.length == 3
+
+        } // end if card_holder != ''
 
         if (card_year == '--') {
             $('#personal_payment_err').html('Please select card expiration year');
@@ -668,7 +697,7 @@ $(document).ready(function () {
                 participants: participants,
                 card_type: card_type,
                 card_no: card_no,
-                card_holder: card_holder,
+                card_holder: clean_holder,
                 card_year: card_year,
                 card_month: card_month,
                 bill_addr: bill_addr,
@@ -680,8 +709,8 @@ $(document).ready(function () {
                 bill_email: bill_email};
 
             console.log('Payment object: ' + JSON.stringify(card));
-            
-            
+
+
             var url = "https://" + domain + "/functionality/php/make_stub_payment.php";
             var request = {card: JSON.stringify(card)};
             $('#ajax_loading_payment').show();
@@ -690,7 +719,7 @@ $(document).ready(function () {
                 //console.log('Server response: '+data);
                 $('.form_div').html(data);
             }); // end of post
-            
+
 
         } // end if card_type != 'Card type' && card_no!='' ...
     }
@@ -2014,7 +2043,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'make_payment_personal2') {
-
+            var b_firstname, b_lastname;
             var courseid = $('#selected_course').val();
             var slotid = $('#selected_slot').val();
             var amount = $('#payment_sum').val();
@@ -2141,15 +2170,44 @@ $(document).ready(function () {
                 }
 
                 if (billing_name != '') {
-                    var names_arr = billing_name.split(" ");
-                    console.log('Billing name: ' + billing_name);
-                    console.log('Billing firstname: ' + names_arr[0]);
-                    console.log('Billing lastname: ' + names_arr[1]);
-                    if (typeof (names_arr[1]) === "undefined") {
+                    // Remove double spaces between words
+                    var clean_billing_name = billing_name.replace(/\s\s+/g, ' ');
+                    var names_arr = clean_billing_name.split(" ");
+
+                    console.log('names array length: ' + names_arr.length);
+
+                    if (names_arr.length == 1) {
                         $('#personal_err').html('Please provide correct card holder name separated by space');
                         return;
                     }
-                }
+
+                    if (names_arr.length == 2) {
+                        console.log('Two names case ....');
+                        console.log('Holder name: ' + billing_name);
+                        b_firstname = names_arr[0];
+                        b_lastname = names_arr[1];
+                        console.log('Billing firstname: ' + b_firstname);
+                        console.log('Billing lastname: ' + b_lastname);
+                        if (typeof (b_firstname) === "undefined" || b_firstname == '' || typeof (b_lastname) === "undefined" || b_lastname == '') {
+                            $('#personal_err').html('Please provide correct card holder name separated by space');
+                            return;
+                        }
+                    } // end if names_arr.length == 2
+
+                    if (names_arr.length == 3) {
+                        console.log('Three names case ...');
+                        console.log('Holder name: ' + billing_name);
+                        b_firstname = names_arr[0] + ' ' + names_arr[1];
+                        b_lastname = names_arr[2];
+                        console.log('Billing firstname: ' + b_firstname);
+                        console.log('Billing lastname: ' + b_lastname);
+                        if (typeof (b_firstname) === "undefined" || b_firstname == '' || typeof (b_lastname) === "undefined" || b_lastname == '') {
+                            $('#personal_err').html('Please provide correct card holder name separated by space');
+                            return;
+                        }
+                    } // end if names_arr.length == 3
+
+                } // end if billing_name != ''
 
                 if (cardnumber == '') {
                     $('#personal_err').html('Please provide card number');
@@ -2179,7 +2237,7 @@ $(document).ready(function () {
                         var user = {
                             first_name: firstname,
                             last_name: lastname,
-                            billing_name: billing_name,
+                            billing_name: clean_billing_name,
                             addr: addr,
                             city: city,
                             state: state,
