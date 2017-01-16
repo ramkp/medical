@@ -293,6 +293,9 @@ class navClass extends Util {
         else {
             $list = $list . "<li><a href='' title='There are no price items' >There are no price items</a></li>";
         }
+        // Add link to course management part
+        //https://medical2.com/lms/course/management.php
+        $list.="<li><a href='https://".$_SERVER['SERVER_NAME']."/lms/course/management.php' target='_blank'>Courses Management</a></li>";
         $list = $list . "</ul>";
         return $list;
     }
