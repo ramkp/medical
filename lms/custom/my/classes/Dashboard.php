@@ -68,7 +68,7 @@ class Dashboard extends Util {
                 $partial_num = $this->db->numrows($query);
                 //echo "Partial payments num: " . $partial_num . "<br>";
                 //4. Check among free access 
-                $query = "select * from mdl_free where userid=$userid";
+                $query = "select * from mdl_free where courseid=$courseid and userid=$userid";
                 $free_num = $this->db->numrows($query);
                 //echo "Free payments num: " . $free_num . "<br>";
                 //5. Check among any invoice payments
@@ -96,7 +96,7 @@ class Dashboard extends Util {
                     $any_invoice_num = 0;
                 }
                 //echo "Any invoice num: " . $card_payments_num . "<br>";
-                if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $any_invoice_num > 0) {
+                if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $any_invoice_num > 0 || $free_num > 0) {
                     $status = 1;
                 } // end if $card_payments_num>0 || $invoice_payments_num>0
             } // end if $installment_status==0
@@ -1142,7 +1142,7 @@ class Dashboard extends Util {
 
     function get_add_payment_dialog($userid) {
         $list = "";
-
+        $cuser = $this->user->id;
         $list.="<div id='myModal' class='modal fade'>
         <div class='modal-dialog'>
             <div class='modal-content'>
@@ -1150,14 +1150,24 @@ class Dashboard extends Util {
                     <h4 class='modal-title'>Add Payment</h4>
                 </div>
                 <div class='modal-body'>
-                <input type='hidden' id='userid' value='$userid'>
-                 <div class='container-fluid' style='text-align:center;'>
+                <input type='hidden' id='userid' value='$userid'>";
+        if ($cuser == 2) {
+            $list.="<div class='container-fluid' style='text-align:center;'>
                   <span class='span1'><input type='radio' name='ptype' value='card' checked>Card</span>
                   <span class='span1'><input type='radio' name='ptype' value='cash'>Cash</span>
                   <span class='span1'><input type='radio' name='ptype' value='cheque'>Cheque</span>
-                </div>
-                
-                <div class='container-fluid'>
+                  <span class='span1'><input type='radio' name='ptype' value='free'>Free</span>
+                </div>";
+        } // end if $userid==2
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>
+                  <span class='span1'><input type='radio' name='ptype' value='card' checked>Card</span>
+                  <span class='span1'><input type='radio' name='ptype' value='cash'>Cash</span>
+                  <span class='span1'><input type='radio' name='ptype' value='cheque'>Cheque</span>
+                </div>";
+        } // end else
+
+        $list.="<div class='container-fluid'>
                 <span class='span1'>Amount</span>
                 <span class='span3'><input type='text' id='amount' style='width:275px;'></span>
                 </div>
@@ -1374,23 +1384,28 @@ class Dashboard extends Util {
 
         // Enroll user into course
         $this->assign_roles($payment->userid, $payment->courseid);
-        $type = ($payment->ptype == 'cash') ? 1 : 2;
-        $slotid = $payment->slotid;
-        $date = time();
-        $query = "insert into mdl_partial_payments "
-                . "(courseid,"
-                . "userid,"
-                . "slotid,"
-                . "ptype,"
-                . "psum,"
-                . "pdate) "
-                . "values($payment->courseid, "
-                . "$payment->userid, "
-                . "$slotid, "
-                . "'$type', "
-                . "'$payment->amount', "
-                . "'$date')";
-        //echo "Query: " . $query . "<br>";
+        if ($payment->ptype != 'free') {
+            $type = ($payment->ptype == 'cash') ? 1 : 2;
+            $slotid = $payment->slotid;
+            $date = time();
+            $query = "insert into mdl_partial_payments "
+                    . "(courseid,"
+                    . "userid,"
+                    . "slotid,"
+                    . "ptype,"
+                    . "psum,"
+                    . "pdate) "
+                    . "values($payment->courseid, "
+                    . "$payment->userid, "
+                    . "$slotid, "
+                    . "'$type', "
+                    . "'$payment->amount', "
+                    . "'$date')";
+        } // end if $payment->ptype!='free'
+        else {
+            $query = "insert into mdl_free (courseid, userid) "
+                    . "values ($payment->courseid,$payment->userid)";
+        } // end else
         $this->db->query($query);
 
         if ($slotid > 0) {
