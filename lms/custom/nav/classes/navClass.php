@@ -129,21 +129,27 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                   
-                                    <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Schedule' id='sch'>Schedule</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
-                                    <li><a href='#' title='Promotions' id='register_user'>Register User</a></li>
-                                    <li><a href='#' title='User credentials' id='user_cred'>View User</a></li>
-                                    <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
-                                    <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
-                                    <li><a href='#' title='Google Map' id='late_fee'>Late Fee</a></li>                                    
+                                    <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                 </ul>
                             </li>
+                            
+                            <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='user_tab'>User<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
+                                    <li><a href='#' title='Promotions' id='register_user'>Register User</a></li>
+                                    <li><a href='#' title='User credentials' id='user_cred'>View User</a></li>
+                                    <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
+                                    <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
+                                </ul>
+                            </li> 
+                            
                             <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Manage Site Pages<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='About' id='about'>About page</a></li>
@@ -235,17 +241,23 @@ class navClass extends Util {
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
-                                    <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
-                                    <li><a href='#' title='Promotions' id='register_user'>Register User</a></li>
-                                    <li><a href='#' title='User credentials' id='user_cred'>View User</a></li>
-                                    
-                                    <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
-                                    <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                 </ul>
                             </li>
+                            
+                            <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='user_tab'>User<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
+                                    <li><a href='#' title='Register User' id='register_user'>Register User</a></li>
+                                    <li><a href='#' title='View User' id='user_cred'>View User</a></li>
+                                    <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
+                                    <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
+                                </ul>
+                            </li>    
+                            
+
                             <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Manage Site Pages<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='About' id='about'>About page</a></li>
