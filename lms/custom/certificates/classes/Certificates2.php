@@ -373,6 +373,8 @@ class Certificates2 {
 
     function renew_certificate($courseid, $userid, $expire_year) {
         $template = $this->get_certificate_template($courseid, $userid, $expire_year);
+        $m = new Mailer();
+        $m->send_updated_certificate($courseid, $userid);
         return $template;
     }
 

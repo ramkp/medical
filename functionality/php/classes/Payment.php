@@ -1191,7 +1191,7 @@ class Payment {
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
 
-        /*         * *******************************************************************
+        /* ********************************************************************
          *  Please be aware $user_payment_data could be null in case of 
          *  group registration
          * ******************************************************************* */
