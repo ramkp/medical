@@ -1,0 +1,2 @@
+User-agent: * Disallow: /lms/custom/invoices/ Disallow: /lms/custom/certificates/
+Sitemap: https://medical2.com/sitemap.xml
