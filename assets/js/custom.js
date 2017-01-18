@@ -1423,7 +1423,7 @@ $(document).ready(function () {
     function get_schedule_course_state() {
         var stateid = $('#schedule_states').val();
         var courseid = $('#schedule_courses').val();
-        var url = "http://" + domain + "/functionality/php/get_schedule_course_state.php";
+        var url = "https://" + domain + "/functionality/php/get_schedule_course_state.php";
         var request = {stateid: stateid, courseid: courseid};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
@@ -1435,7 +1435,7 @@ $(document).ready(function () {
 
     function get_schedule_course() {
         var courseid = $('#schedule_courses').val();
-        var url = "http://" + domain + "/functionality/php/get_schedule_course.php";
+        var url = "https://" + domain + "/functionality/php/get_schedule_course.php";
         var request = {courseid: courseid};
         $('#ajax_loading_schedule').show();
         $.post(url, request).done(function (data) {
@@ -1508,7 +1508,7 @@ $(document).ready(function () {
          $('#gallery_container').html(data);
          });
          */
-        var url = "http://" + domain + "/index.php/gallery/matched/" + state + "/" + month + "/" + year;
+        var url = "https://" + domain + "/index.php/gallery/matched/" + state + "/" + month + "/" + year;
         window.location = url;
     }
 
@@ -1996,7 +1996,7 @@ $(document).ready(function () {
     $("#faq_cat").change(function () {
         var id = $('#faq_cat').val();
         $('#ajax_loader').show();
-        var url = "http://" + domain + "/functionality/php/get_category_faqs.php";
+        var url = "https://" + domain + "/functionality/php/get_category_faqs.php";
         var request = {id: id};
         $.post(url, request).done(function (data) {
             $('#ajax_loader').hide();

@@ -6,7 +6,7 @@ echo $data;
 
     $(document).ready(function () {
 
-        var url = "http://medical2.com/index.php/register2/get_campus_data";
+        var url = "https://medical2.com/index.php/register2/get_campus_data";
         $.post(url, {id: 1}).done(function (data) {
             var $obj_data = jQuery.parseJSON(data);
 
