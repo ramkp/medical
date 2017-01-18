@@ -1267,10 +1267,11 @@ class Certificates extends Util {
 
     function create_label($courseid, $userid) {
         $user_address = $this->get_user_address_data($userid);
-        $pdf = new PDF_Label('L7163');
+        $pdf = new PDF_Label('5162');
         $pdf->AddPage();
-        $text = sprintf("%s\n%s\n%s\n%s", "$user_address->firstname $user_address->lastname", "$user_address->address", "$user_address->state/" . $user_address->city . "", "$user_address->zip");
+        $text = sprintf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s", "From:", "Medical2 Inc", "1830A North Gloster St,Tupelo", "MS 38804", "--------------------------------------------------------","                       $user_address->firstname $user_address->lastname","                       $user_address->address", "                       $user_address->city, " . $user_address->state . " $user_address->zip");
         $pdf->Add_Label($text);
+        
         $dir_path = $this->cert_path . "/$userid";
         if (!is_dir($dir_path)) {
             if (!mkdir($dir_path)) {
