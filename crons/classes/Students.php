@@ -934,7 +934,7 @@ class Students {
 
             $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
             $mail->addAddress($a_email);
-            //$mail->addAddress($b_email);
+            $mail->addAddress($b_email);
             $mail->addAddress($m_email);
             $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
 
