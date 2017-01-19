@@ -1172,7 +1172,7 @@ class register_model extends CI_Model {
         $list = "";
         $locations =$this->get_location_dropdown();
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span4'><img src='http://medical2.com/assets/img/m2.jpg' class='img-rounded' width='100%' height='100%'></span>";
+        $list.="<span class='span4'><img src='https://medical2.com/assets/img/m2.jpg' class='img-rounded' width='100%' height='100%'></span>";
         $list.="</div><br>";
 
 

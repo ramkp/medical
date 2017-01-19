@@ -23,7 +23,7 @@ class slides {
             } // end else
             $path = $_SERVER['DOCUMENT_ROOT'] . '/assets/slides/';
             $file = trim(str_replace($path, '', $row['path']));
-            $img_path = 'http://' . $_SERVER['SERVER_NAME'] . "/assets/slides/$file";
+            $img_path = 'https://' . $_SERVER['SERVER_NAME'] . "/assets/slides/$file";
             $list.="<div class='fill' style='background-image:url($img_path);height:375px;'></div>                        ";
             $list.="</div>";
         } // end while
