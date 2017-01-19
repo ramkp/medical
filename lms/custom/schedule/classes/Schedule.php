@@ -190,10 +190,6 @@ class Schedule extends Util {
         return $apps;
     }
 
-    function is_user_paid() {
-        
-    }
-
     function get_student_course_completion_status($courseid, $userid) {
         $query = "select * from mdl_course_completions "
                 . "where course=$courseid "
@@ -843,7 +839,61 @@ class Schedule extends Util {
             $this->db->query($query);
             //$slots_array = array($slot->slotid, $slotid);
             //$this->notify_students($slots_array);
+            $students = $this->get_workshop_students_list($slot->slotid);
+            $this->send_workshop_students_list($slotid, $students);
         } // end if $_REQUEST['what'] == 'updateslot') 
+    }
+
+    function get_workshop_students_list($slotid) {
+        $students = array();
+        $query = "select * from mdl_scheduler_appointment where slotid=$slotid";
+        //echo "Query:".$query."<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $students[] = $row['studentid'];
+            } // end while
+        } // end if $num > 0
+        return $students;
+    }
+
+    function get_workshop_course_name($schedulerid) {
+        $query = "select * from mdl_scheduler where id=$schedulerid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['course'];
+        }
+        $coursename = $this->get_course_name($courseid);
+        return $coursename;
+    }
+
+    function send_workshop_students_list($slotid, $students) {
+        $list = "";
+        if (count($students) > 0) {
+            $ws = $this->get_workshop_detailes($slotid); // object
+            $coursename = $this->get_workshop_course_name($ws->schedulerid);
+            $date = date('m-d-Y', $ws->starttime);
+            $list.="<html>";
+            $list.="<body>";
+            $list.="<p align='center'>$coursename - $date - $ws->appointmentlocation</p>";
+            $list.="<table align='center'>";
+            foreach ($students as $userid) {
+                $user = $this->get_user_details($userid);
+                $list.="<tr>";
+                $list.="<td style='padding:15px'>$user->firstname  $user->lastname</td>";
+                $list.="<td style='padding:15px'>$user->email</td>";
+                $list.="<td style='padding:15px'>$user->phone1</td>";
+                $list.="</tr>";
+            }
+
+            $list.="</table>";
+            $list.="</body>";
+            $list.="</html>";
+
+            $m = new Mailer();
+            $m->send_workshop_students_list($list);
+        } // end if count($students)>0
     }
 
     function set_workshop_cost($id, $slot) {
