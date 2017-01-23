@@ -293,7 +293,7 @@ class Schedule extends Util {
             $list.="<span class='span2'><a href='#' id='complete' onClick='return false;'>Make passed</a></span>";
             $list.="<span class='span2'><a href='#' id='pending' onClick='return false;'>Make pending</a></span>";
             $list.="<span class='span2'><a href='#' id='move' onClick='return false;'>Move</a></span>";
-            $list.="<span class='span2'><a href='#' id='delete' onClick='return false;'>Remove</a></span>";
+            //$list.="<span class='span2'><a href='#' id='delete' onClick='return false;'>Remove</a></span>";
             $list.="<span class='span2'><a href='#' id='print' onClick='return false;'>Print certificates</a></span>";
             $list.="<span class='span2'><a href='#' id='labels' onClick='return false;'>Print labels</a></span>";
             $list.="<span class='span2'><a href='#' id='send' onClick='return false;'>Send certificates</a></span>";
@@ -881,10 +881,12 @@ class Schedule extends Util {
             $list.="<table align='center'>";
             foreach ($students as $userid) {
                 $user = $this->get_user_details($userid);
+                $date = date('m-d-Y', $user->timecreated);
                 $list.="<tr>";
                 $list.="<td style='padding:15px'>$user->firstname  $user->lastname</td>";
                 $list.="<td style='padding:15px'>$user->email</td>";
                 $list.="<td style='padding:15px'>$user->phone1</td>";
+                $list.="<td style='padding:15px'>$date</td>";
                 $list.="</tr>";
             }
 
@@ -1091,12 +1093,15 @@ class Schedule extends Util {
             $course_cost = $b->get_item_cost($courseid, $slotid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $student_payment = $b->get_student_payments($courseid, $row['studentid']);
-                $paid_amount = $paid_amount + $student_payment;
-                $diff = $student_payment - $course_cost;
-                if ($diff < 0) {
-                    $unpaid_amount = $unpaid_amount + abs($diff);
-                } // end if
+                $status = $this->is_user_deleted($row['studentid']);
+                if ($status == 0) {
+                    $student_payment = $b->get_student_payments($courseid, $row['studentid']);
+                    $paid_amount = $paid_amount + $student_payment;
+                    $diff = $student_payment - $course_cost;
+                    if ($diff < 0) {
+                        $unpaid_amount = $unpaid_amount + abs($diff);
+                    } // end if
+                } // end if user->deleted=0 
             } // end while
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Total students:</span>";
