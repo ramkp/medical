@@ -1419,15 +1419,22 @@ $(document).ready(function () {
             $('#sch_err').html('');
             var students = selected.join();
             var courseid = $('#courseid').val();
-            console.log('Course ID: ' + courseid);
-            console.log('Students: ' + students);
             if (confirm('Change selected students course status to passed?')) {
-                $('#ajax_loading').show();
-                var url = "/lms/custom/schedule/compete_students.php";
-                $.post(url, {courseid: courseid, students: students}).done(function () {
-                    $('#ajax_loading').hide();
-                    document.location.reload();
-                });
+                var check_url = "/lms/custom/schedule/check_student_balance.php";
+                $.post(check_url, {courseid: courseid, students: students}).done(function (data) {
+                    console.log('Balance status: ' + data);
+                    if (data == 0) {
+                        $('#ajax_loading').show();
+                        var url = "/lms/custom/schedule/compete_students.php";
+                        $.post(url, {courseid: courseid, students: students}).done(function () {
+                            $('#ajax_loading').hide();
+                            document.location.reload();
+                        });
+                    } // end if data == 0
+                    else {
+                        $('#sch_err').html('Some student(s) do not have zero balance due. ');
+                    } // end else
+                }); // end of $.post(check_url
             } // end if confirm
         } // selected.length>0
         else {

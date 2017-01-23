@@ -1130,6 +1130,57 @@ class Schedule extends Util {
         return $cost;
     }
 
+    function get_student_slot($courseid, $studentid) {
+
+        $query = "select * from mdl_scheduler where course=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $schedulerid = $row['id'];
+        }
+
+        $query = "select * from mdl_scheduler_slots "
+                . "where schedulerid=$schedulerid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $course_slots_arr[] = $row['id'];
+        }
+
+        $course_slots = implode(',', $course_slots_arr);
+
+        $query = "select * from mdl_scheduler_appointment "
+                . "where studentid=$studentid and slotid in ($course_slots)";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['slotid'];
+            } // end while
+        } // end if $num > 0
+        else {
+            $slotid = 0;
+        }
+        return $slotid;
+    }
+
+    function check_students_balance($courseid, $students) {
+        $b = new Balance();
+        $students_arr = explode(',', $students);
+        $total_balance = 0;
+        if (is_array($students_arr)) {
+            foreach ($students_arr as $studentid) {
+                $slotid = $this->get_student_slot($courseid, $studentid);
+                $balance = $b->get_user_balance($courseid, $studentid, $slotid);
+                $total_balance = $total_balance + $balance;
+            } // end foreach
+            return $total_balance;
+        } // is_array($students)
+        else {
+            $slotid = $this->get_student_slot($courseid, $students);
+            $balance = $b->get_user_balance($courseid, $students, $slotid);
+            return $balance;
+        } // end else 
+    }
+
     function get_student_payment($courseid, $userid) {
         $paid = 0;
 
