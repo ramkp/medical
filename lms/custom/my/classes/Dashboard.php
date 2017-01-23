@@ -1381,13 +1381,12 @@ class Dashboard extends Util {
     }
 
     function add_other_payment($payment) {
-
+        $date = time();
         // Enroll user into course
         $this->assign_roles($payment->userid, $payment->courseid);
         if ($payment->ptype != 'free') {
             $type = ($payment->ptype == 'cash') ? 1 : 2;
             $slotid = $payment->slotid;
-            $date = time();
             $query = "insert into mdl_partial_payments "
                     . "(courseid,"
                     . "userid,"
@@ -1403,8 +1402,11 @@ class Dashboard extends Util {
                     . "'$date')";
         } // end if $payment->ptype!='free'
         else {
-            $query = "insert into mdl_free (courseid, userid) "
-                    . "values ($payment->courseid,$payment->userid)";
+            $query = "insert into mdl_free (courseid, userid, psum, pdate) "
+                    . "values ($payment->courseid,"
+                    . "$payment->userid, "
+                    . "'$payment->amount', "
+                    . "'$date')";
         } // end else
         $this->db->query($query);
 
