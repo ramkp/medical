@@ -1274,6 +1274,25 @@ class Dashboard extends Util {
     }
 
     function delete_profile_user($userid) {
+        // 1. Delete user payments
+        // 2. // Delete user itself
+        // a) Delete credit card payment
+        // b) Delete cash payments
+        // c) Delete free payments 
+        // d) Delete invoice payments
+
+        $query = "delete from mdl_card_payments where userid=$userid";
+        $this->db->query($query);
+
+        $query = "delete from mdl_partial_payments where userid=$userid";
+        $this->db->query($query);
+
+        $query = "delete from mdl_free where userid=$userid";
+        $this->db->query($query);
+
+        $query = "delete from mdl_invoice where userid=$userid";
+        $this->db->query($query);
+
         $query = "update mdl_user set deleted=1 where id=$userid";
         $this->db->query($query);
     }
