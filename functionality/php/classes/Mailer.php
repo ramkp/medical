@@ -305,11 +305,16 @@ class Mailer {
         $this->send_common_message($subject, $list, $user->email);
     }
 
+    function get_group_students_num_by_amount($program_cost, $paid_amount) {
+        $num = round($paid_amount / $program_cost);
+        return $num;
+    }
+
     function send_group_payment_message($user, $printed_data = null) {
         $list = "";
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /*  ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -319,6 +324,7 @@ class Mailer {
             $ws_cost = 0;
         } // end else
         $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
+        $students_num = $this->get_group_students_num_by_amount($cost, $user->payment_amount);
         $catid = $this->get_course_category($user);
         $p = new Payment();
         $state = $p->get_state_name_by_id($user->state);
@@ -345,6 +351,9 @@ class Mailer {
 
         $list.="</thead>
         <tbody>
+        <tr>
+        <td>Total students</td><td>$students_num</td>
+        </tr>
         <tr style='background-color:#F5F5F5;'>
         <td>First name</td><td>$user->first_name</td>
         </tr>
@@ -397,8 +406,8 @@ class Mailer {
         </div>";
         $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
         $list.="</body></html>";
-        $subject = "Medical2 - Group Payment Confirmation";
-        $recipient = 'sirromas@outlook.com';
+        $subject = "Medical2 - Group Registration";
+        $recipient = $user->bill_email;
         $payment_amount = $user->payment_amount;
         $this->send_signup_confirmation_email($subject, $list, $recipient, $payment_amount);
     }
@@ -408,7 +417,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
