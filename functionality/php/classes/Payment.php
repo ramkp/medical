@@ -1627,7 +1627,7 @@ class Payment {
         $list = "";
         $signup_status = $this->enroll->single_signup($user);
         if ($signup_status === true) {
-            $list.="Registration is successfull";
+            $list.="Registration is successful";
             // Confirm user account
             $query = "update mdl_user set confirmed=1 where username='$user->email'";
             $this->db->query($query);

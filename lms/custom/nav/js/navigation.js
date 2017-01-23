@@ -3958,7 +3958,7 @@ $(document).ready(function () {
             var phone = $('#phone').val();
             var email = $('#email').val();
             if (courseid == 0) {
-                $('#personal_err').html('Please select ptogram');
+                $('#personal_err').html('Please select program');
                 return;
             }
 
