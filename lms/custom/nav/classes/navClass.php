@@ -237,6 +237,7 @@ class navClass extends Util {
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>
+                                    <li><a href='#' title='Moodle Permissions' id='mpermission' onClick='return false;'>Moodle Permissions</a></li>
                                     <li><a href='#' title='Schedule' id='sch'>Schedule</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>

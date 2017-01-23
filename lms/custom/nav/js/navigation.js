@@ -1,6 +1,14 @@
 
 $(document).ready(function () {
 
+    $('#mpermission').click(function () {
+        var url = 'https://medical2.com/lms/admin/roles/manage.php';
+        //window.open = url;
+        var win = window.open(url, '_blank');
+        win.focus();
+    });
+
+
     var domain = 'medical2.com';
     var dialog_loaded;
     console.log("ready!");
