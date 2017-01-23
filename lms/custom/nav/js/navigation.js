@@ -2278,6 +2278,25 @@ $(document).ready(function () {
 
         console.log('Class element clicked: ' + $(event.target).attr('class'));
 
+
+        if ($(event.target).attr('class') == 'profile_user_suspend') {
+            var userid = $(this).data('userid');
+            var state = $(this).data('status');
+            var msg;
+            if (state == 0) {
+                msg = 'Suspend current user?';
+            } // end if 
+            else {
+                msg = 'Activate current user?';
+            }
+            if (confirm(msg)) {
+                var url = "/lms/custom/my/suspend_user.php";
+                $.post(url, {userid: userid, state: state}).done(function () {
+                    document.location.reload();
+                });
+            }
+        }
+
         if ($(event.target).attr('class') == 'edit_campus') {
             var id = $(this).data('id');
             if (dialog_loaded !== true) {

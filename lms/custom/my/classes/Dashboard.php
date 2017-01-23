@@ -939,14 +939,39 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function is_user_suspended($userid) {
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $suspended = $row['suspended'];
+        }
+        return $suspended;
+    }
+
     function get_other_tab($id) {
         $list = "";
+        $userid = $this->user->id;
+        $suspended = $this->is_user_suspended($id);
+        $title = ($suspended == 0) ? 'Suspend' : 'Activate';
+        $button = "<button class='profile_user_suspend' data-userid='$id' data-status='$suspended'>$title</button>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<button data-userid='$id' class='delete_profile_user' style='width:175px;'>Delete User</button>";
+        if ($userid == 2) {
+            $list.="<span class='span2'><button data-userid='$id' class='delete_profile_user' style='width:175px;'>Delete User</button></span>";
+            $list.= "<span class='span2'>$button</span>";
+        } // end if $this->user->id == 2
+        else {
+            $list.= "<span class='span2'>$button</span>";
+        }
         $list.="</div>";
 
         return $list;
+    }
+
+    function suspend_user($userid, $state) {
+        $status = ($state == 0) ? 1 : 0;
+        $query = "update mdl_user set suspended=$status where id=$userid";
+        $this->db->query($query);
     }
 
     function get_courseid_by_name($coursename, $wsname = '') {
