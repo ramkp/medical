@@ -3141,6 +3141,13 @@ $(document).ready(function () {
         });
     }
 
+    function get_instructors_page() {
+        var url = "/lms/custom/instructors/get_instructors_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     /************************************************************************
      * 
      *                   Menu processing items
@@ -3162,6 +3169,10 @@ $(document).ready(function () {
     $("#index").click(function (event) {
         update_navigation_status__menu('Index page');
         get_index_page();
+    });
+    $("#instructors").click(function (event) {
+        update_navigation_status__menu('Instructors');
+        get_instructors_page();
     });
     $("#about").click(function (event) {
         update_navigation_status__menu('About');

@@ -147,6 +147,7 @@ class navClass extends Util {
                                     <li><a href='#' title='User credentials' id='user_cred'>View User</a></li>
                                     <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
+                                    <li><a href='#' title='Instructors' id='instructors'>Instructors</a></li>
                                 </ul>
                             </li> 
                             
@@ -254,6 +255,7 @@ class navClass extends Util {
                                     <li><a href='#' title='View User' id='user_cred'>View User</a></li>
                                     <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
+                                    <li><a href='#' title='Instructors' id='instructors'>Instructors</a></li>
                                 </ul>
                             </li>    
                             
@@ -307,7 +309,7 @@ class navClass extends Util {
         }
         // Add link to course management part
         //https://medical2.com/lms/course/management.php
-        $list.="<li><a href='https://".$_SERVER['SERVER_NAME']."/lms/course/management.php' target='_blank'>Courses Management</a></li>";
+        $list.="<li><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/course/management.php' target='_blank'>Courses Management</a></li>";
         $list = $list . "</ul>";
         return $list;
     }

@@ -6,6 +6,7 @@
  * @author sirromas
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/balance/classes/Balance.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
@@ -360,7 +361,7 @@ class Schedule extends Util {
                         else {
                             $status = "Pending";
                         } // end else                        
-                        $student_balance = $this->get_student_balance($courseid, $student->studentid);
+                        $student_balance = $this->get_student_balance($courseid, $student->studentid, $slot->id);
                         $list.= "<div class='container-fluid' style='text-align:left;'>";
                         $list.="<span class='span1'><input type='checkbox' class='students' name='studentid' value='$student->studentid'></span>";
                         $list.="<span class='span5'><a href='https://medical2.com/lms/user/profile.php?id=$student->studentid'  target='_blank'>$user_data->firstname $user_data->lastname $user_data->phone1&nbsp; $user_data->email</a>&nbsp; $student_balance</span>";
@@ -1086,27 +1087,11 @@ class Schedule extends Util {
         $query = "select * from mdl_scheduler_appointment where slotid=$slotid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
+            $b = New Balance();
+            $course_cost = $b->get_item_cost($courseid, $slotid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-
-                if ($courseid == 44 || $courseid == 45) {
-                    $year = $this->get_user_payment_year($row['studentid']);
-                    $student = $this->get_user_details($row['studentid']);
-                    //echo "Student $student->firstname $student->lastname Payment  Year: " . $year . "<br>";
-                    //echo "<br>-------------------------------------------------------------------<br>";
-                    if ($year == '2016') {
-                        // We handle history prices
-                        $course_cost = 450;
-                    } // end if $year == '2016'
-                    else {
-                        $course_cost = $this->get_course_cost($courseid);
-                    } // end else
-                } // end if $courseid == 44 || $courseid == 45
-                else {
-                    $course_cost = $this->get_course_cost($courseid);
-                } // end else
-
-                $student_payment = $this->get_student_payment($courseid, $row['studentid']);
+                $student_payment = $b->get_student_payments($courseid, $row['studentid']);
                 $paid_amount = $paid_amount + $student_payment;
                 $diff = $student_payment - $course_cost;
                 if ($diff < 0) {
@@ -1214,22 +1199,11 @@ class Schedule extends Util {
         return $pdate;
     }
 
-    function get_student_balance($courseid, $userid) {
+    function get_student_balance($courseid, $userid, $slotid) {
         $list = "";
-        if ($courseid == 44 || $courseid == 45) {
-            $year = $this->get_user_payment_year($userid);
-            if ($year == '2016') {
-                // We handle history prices
-                $course_cost = 450;
-            } // end if $year == '2016'
-            else {
-                $course_cost = $this->get_course_cost($courseid);
-            } // end else
-        } // end if $courseid == 44 || $courseid == 45
-        else {
-            $course_cost = $this->get_course_cost($courseid);
-        } // end else
-        $student_payment = $this->get_student_payment($courseid, $userid);
+        $b = new Balance();
+        $course_cost = $b->get_item_cost($courseid, $slotid);
+        $student_payment = $b->get_student_payments($courseid, $userid);
         $diff = $student_payment - $course_cost;
         if ($diff < 0) {
             $unpaid_amount = abs($diff);
