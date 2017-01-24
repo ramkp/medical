@@ -1889,6 +1889,10 @@ $(document).ready(function () {
                                 $.post(url, request).done(function (data) {
                                     $("body").append(data);
                                     $("#myModal").modal('show');
+                                    $.get('/lms/custom/utils/data.json', function (data) {
+                                        $('#search_user_input').typeahead({source: data, items: 24});
+                                    }, 'json');
+
                                 });
                             })
                             .fail(function () {
@@ -3947,18 +3951,17 @@ $(document).ready(function () {
 
             var invoice_id = $('#invoice_id').val();
             var type = $('#invoice_payment_type').val();
-            var users_el = $('#users');
-            console.log('Users element: ' + users_el);
-            if (invoice_id != '' && type != '' && typeof (users_el) != 'undefined' && users_el != null) {
+            if (invoice_id > 0 && type != '') {
                 $('#any_invoice_users_err').html("");
-                var users = $('#users').val();
-                var users_list = users.join();
-                if (users_list != '' && users_list != 0) {
+                var user = $('#search_user_input').val();
+                if (user != '') {
                     $('#any_invoice_users_err').html("");
                     var url = "/lms/custom/invoices/attach_any_invoice_payment.php";
-                    $.post(url, {invoice_id: invoice_id, type: type, users_list: users_list}).done(function (data) {
+                    $.post(url, {invoice_id: invoice_id, type: type, users_list: user}).done(function (data) {
+                        console.log(data);
+
                         $("[data-dismiss=modal]").trigger({type: "click"});
-                        get_open_invoices_page();
+                        //get_open_invoices_page();
                     }); // end if $.post
 
                 } // end if users_list != '' && users_list != 0 

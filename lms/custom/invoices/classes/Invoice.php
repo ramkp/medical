@@ -574,36 +574,39 @@ class Invoices extends Util {
     function attach_any_invoice_payment($invoice_id, $type, $users_list) {
         //$args = func_get_args();
         //var_export($args);
-
-        $users_array = explode(',', $users_list);
-
-        if (count($users_array) > 0) {
-            // 1. Make invoice as paid
-            $date = time();
-            $query = "update mdl_invoice "
-                    . "set i_status=1, "
-                    . "i_ptype=$type, "
-                    . "i_pdate='$date' "
-                    . "where id=$invoice_id";
-            $this->db->query($query);
-
-            foreach ($users_array as $userid) {
-
-                // 2. Attach payment to users 
-                $query = "insert into mdl_any_invoice_user "
-                        . "(invoiceid, userid) "
-                        . "values($invoice_id, $userid)";
+        // Please be aware $users_list is single user first and last name
+        $invoice_userid = $this->get_userid_by_fio($users_list);
+        if ($invoice_userid > 0) {
+            $users_array = array();
+            array_push($users_array, $invoice_userid);
+            if (count($users_array) > 0) {
+                // 1. Make invoice as paid
+                $date = time();
+                $query = "update mdl_invoice "
+                        . "set i_status=1, "
+                        . "i_ptype=$type, "
+                        . "i_pdate='$date' "
+                        . "where id=$invoice_id";
                 $this->db->query($query);
 
-                //3. Confirm user's accounts
-                $query = "update mdl_user set confirmed=1 where id=$userid";
-                $this->db->query($query);
-            } // end foreach
-            $list = 1;
-        } // end if count($users_array)>0
-        else {
-            $list = 0;
-        }
+                foreach ($users_array as $userid) {
+
+                    // 2. Attach payment to users 
+                    $query = "insert into mdl_any_invoice_user "
+                            . "(invoiceid, userid) "
+                            . "values($invoice_id, $userid)";
+                    $this->db->query($query);
+
+                    //3. Confirm user's accounts
+                    $query = "update mdl_user set confirmed=1 where id=$userid";
+                    $this->db->query($query);
+                } // end foreach
+                $list = 1;
+            } // end if count($users_array)>0
+            else {
+                $list = 0;
+            }
+        } // end if $userid > 0
 
         return $list;
     }
@@ -927,24 +930,17 @@ class Invoices extends Util {
         <input type='hidden' id='invoice_id' value='$id'>
         <input type='hidden' id='invoice_payment_type' value='$type'>   
             
-        <div class='modal-dialog modal-lg'>
-        <div class='modal-content'>
+        <div class='modal-dialog'>
+        <div class='modal-content' >
             <div class='modal-header'>                
                 <h4 class='modal-title'>Attach payment</h4>
                 </div> 
                 
-                <div class='modal-body'>     
+                <div class='modal-body' style='height:200px;'>     
                 
                 <div class='container-fluid' style='text-align:center;'>
-                $programs  
-                </div>
-                          
-                <div class='container-fluid' style='text-align:center;'>
-                <span id='invoice_category_courses'></span>    
-                </div>
-                
-                <div class='container-fluid' style='text-align:center;'>
-                <span id='invoice_courses_users'></span>    
+                <span>User*</span>
+                <span><input type='text' id='search_user_input'></span>    
                 </div>
                 
                 <div class='container-fluid' style='text-align:center;'>

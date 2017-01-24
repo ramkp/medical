@@ -58,13 +58,13 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
         $slot = new scheduler_slot($scheduler);
     }
 
-  
-     /*
+
+    /*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
       die();
-    */
+     */
 
 
     // Set new data from input form.
@@ -82,12 +82,12 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     $slot->emaildate = $data->emaildate;
     $slot->timemodified = time();
 
-      /*  
+    /*
       echo "<pre>";
       print_r($slot);
       echo "</pre>";
       die();
-      */
+     */
 
     $currentapps = $slot->get_appointments();
     $processedstuds = array();
@@ -120,21 +120,26 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     }
 
     // Add additional slot for other course 
-    if ($courseid == 44 || $courseid == 45) {
+    // Temporary disabled
+    /*
+      if ($courseid == 44 || $courseid == 45) {
 
-        if ($courseid == 44) {
-            // Add same slot for Phlebotomy with EKG Workshop course
-            $schedulerid = 5;
-        } // end if $courseid==44
+      if ($courseid == 44) {
+      // Add same slot for Phlebotomy with EKG Workshop course
+      $schedulerid = 5;
+      } // end if $courseid==44
 
-        if ($courseid == 45) {
-            // Add same slot for Phlebotomy Workshop course
-            $schedulerid = 6;
-        }
-        $slot->schedulerid = $schedulerid;
-        $ds->save_additional_slot($slot);
-        //die('Stopped');
-    } // end if $courseid == 44 || $courseid == 45
+      if ($courseid == 45) {
+      // Add same slot for Phlebotomy Workshop course
+      $schedulerid = 6;
+      }
+      $slot->schedulerid = $schedulerid;
+      $ds->save_additional_slot($slot);
+      //die('Stopped');
+      } // end if $courseid == 44 || $courseid == 45
+     */
+
+
 
     $current_slot_id = $slot->save();
     $ds->set_workshop_cost($current_slot_id, $slot);
