@@ -37,23 +37,30 @@ $host = $_SERVER['HTTP_HOST'];
         //echo "URL: ".$url."<br>";
         switch ($url) {
             case "/":
-                $title = "Phlebotomy Training Program | Medical2 Career College";
+                $title = "";
                 $meta = "Medical2  provides One day 100%  hands-on phlebotomy "
                         . "training & Certification workshops nationwide. "
                         . "We also provide healthcare career courses through "
                         . "Medical2 Career College. Visit us to learn more.";
+                $desc = "Medical2 provides One day 100% hands-on phlebotomy training &amp; Certification
+                       workshops nationwide. We also provide healthcare career courses through
+                       Medical2 Career College. Visit us to learn more.";
                 break;
             case "/programs/detailes/44":
-                $title = "Phlebotomy Training  | Phlebotomy Certification Workshops  |  Medical2";
+                $title = "Phlebotomy Training Online | Phlebotomy Classes Online | Medical2";
                 $meta = "Our proven one day 100%  hands-on phlebotomy training &  certification
                     workshops are designed to save your time & money which covers 
-                    all important Aspect of phlebotomy skills and techniques. Register Now!
-";
+                    all important Aspect of phlebotomy skills and techniques. Register Now!";
+                $desc = "Our proven one day 100% hands-on phlebotomy training & certification
+                       workshops are designed to save your time & money which covers all important
+                       Aspect of phlebotomy skills and techniques. Register Now!";
                 break;
             case "/programs/detailes/57":
-                $title = "Phlebotomy Certification Exam Online | For Experienced Phlebotomist Only.";
+                $title = "Phlebotomy Certification Exam Online | Medical2 Career College";
                 $meta = "Register For Medical2 Phlebotomy Technician Certification Exam Online. 
                     It covers all aspects of phlebotomy (basic and advance). Phlebotomist Only.";
+                $desc = "Register For Medical2 Phlebotomy Technician Certification Exam Online. It
+                       covers all aspects of phlebotomy (basic and advance). Phlebotomist Only.";
                 break;
             case '/programs/program/certification-workshops';
                 $title = 'Hands-On Certification Workshops';
@@ -109,6 +116,7 @@ $host = $_SERVER['HTTP_HOST'];
         <link rel="shortcut icon" href="https://<?php echo $host ?>/lms/theme/image.php/lambda/theme/1451892772/favicon" />
         <meta https-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="keywords" content="<?php echo $meta; ?>" />
+        <meta name="description" content="<?php echo $desc; ?>" />
         <link rel="stylesheet" type="text/css" href="https://<?php echo $host ?>/lms/theme/yui_combo.php?rollup/3.17.2/yui-moodlesimple-min.css" /><script id="firstthemesheet" type="text/css">/** Required in order to fix style inclusion problems in IE with YUI **/</script><link rel="stylesheet" type="text/css" href="https://<?php echo $host ?>/lms/theme/styles.php/lambda/1451892772/all" />
         <link href="https://<?php echo $host ?>/assets/css/full-slider.css" rel="stylesheet">
         <script type="text/javascript">
