@@ -59,14 +59,12 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     }
 
   
-    /*
-     * 
+     /*
       echo "<pre>";
       print_r($data);
       echo "</pre>";
       die();
-     * 
-     */
+    */
 
 
     // Set new data from input form.
@@ -77,7 +75,7 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     $slot->notes = $data->notes['text'];
     $slot->exclusivity = $data->exclusivity;
     $slot->emaildate = $data->emaildate;
-    $slot->notes = addslashes($data->notes);
+    //$slot->notes = addslashes($data->notes);
     $slot->notesformat = 1;
     $slot->appointmentlocation = $data->appointmentlocation;
     $slot->hideuntil = $data->hideuntil;
