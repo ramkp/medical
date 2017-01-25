@@ -135,13 +135,14 @@ class navClass extends Util {
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
-                                    <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
+                                                                        
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                 </ul>
                             </li>
                             
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='user_tab'>User<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Promotions' id='register_user'>Register User</a></li>
                                     <li><a href='#' title='User credentials' id='user_cred'>View User</a></li>
@@ -244,13 +245,14 @@ class navClass extends Util {
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
-                                    <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>                                    
+                                                                        
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                 </ul>
                             </li>
                             
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='user_tab'>User<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Register User' id='register_user'>Register User</a></li>
                                     <li><a href='#' title='View User' id='user_cred'>View User</a></li>
