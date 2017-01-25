@@ -72,10 +72,10 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
     $slot->cost = $data->cost;
     $slot->duration = $data->duration;
     $slot->teacherid = $data->teacherid;
-    $slot->notes = $data->notes['text'];
+    //$slot->notes = addslashes($data->notes['text']);
     $slot->exclusivity = $data->exclusivity;
     $slot->emaildate = $data->emaildate;
-    //$slot->notes = addslashes($data->notes);
+    $slot->notes = addslashes($data->notes);
     $slot->notesformat = 1;
     $slot->appointmentlocation = $data->appointmentlocation;
     $slot->hideuntil = $data->hideuntil;
@@ -155,7 +155,7 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
 
 function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, $groupid = 0) {
     global $output;
-
+    $ds = new Schedule();
     $availableslots = $scheduler->get_slots_available_to_student($studentid);
 
     $startdatemem = '';
@@ -176,7 +176,8 @@ function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, 
             $url->param('what', 'schedulegroup');
             $url->param('subaction', 'dochooseslot');
             $url->param('groupid', $groupid);
-        } else {
+        } // end if groupid        
+        else {
             $url->param('what', 'schedule');
             $url->param('subaction', 'dochooseslot');
             $url->param('studentid', $studentid);
@@ -243,10 +244,11 @@ if ($action != 'view') {
 
 echo $output->header();
 
-//echo "Action: " . $action . "<br>";
-//echo "Course id: " . $COURSE->id . "<br>";
-//echo "Module id: " . $cm->id . "<br>";
-
+/*
+echo "Action: " . $action . "<br>";
+echo "Course id: " . $COURSE->id . "<br>";
+echo "Module id: " . $cm->id . "<br>";
+*/
 
 /* * ********************************** View : New single slot form *************************************** */
 if ($action == 'addslot') {
@@ -266,14 +268,12 @@ if ($action == 'addslot') {
             $.get('/lms/custom/utils/wslocation.json', function (data) {
                 $('#id_appointmentlocation').typeahead({source: data, items: 24});
             }, 'json');
-
             $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
                 $('#id_notes').typeahead({source: data, items: 240});
             }, 'json');
+            // Load autosuggestion for editable di
 
-        });
-
-    </script>
+        });</script>
 
 
     <?php
@@ -307,7 +307,15 @@ if ($action == 'updateslot') {
       echo "<br>Subpage: $subpage<br>";
      * 
      */
-
+    
+    $data->notes = $data->notes['text'];
+    
+    /*
+    echo "<pre>";
+    print_r($data);
+    echo "</pre>";
+    */
+    
     //echo "Module id: ".$cm->id."<br>";
     $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid, 'subpage' => $subpage, 'offset' => $offset));
     $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage, 'offset' => $offset));
@@ -328,15 +336,17 @@ if ($action == 'updateslot') {
         <script type="text/javascript">
             $(document).ready(function () {
 
+                
                 $.get('/lms/custom/utils/wslocation.json', function (data) {
                     $('#id_appointmentlocation').typeahead({source: data, items: 24});
                 }, 'json');
-
                 $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
                     $('#id_notes').typeahead({source: data, items: 240});
                 }, 'json');
+                
+                
 
-            });
+            }); // end of document ready
 
         </script>
 
@@ -354,11 +364,9 @@ if ($action == 'updateslot') {
                 $.get('/lms/custom/utils/wslocation.json', function (data) {
                     $('#id_appointmentlocation').typeahead({source: data, items: 24});
                 }, 'json');
-
                 $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
                     $('#id_notes').typeahead({source: data, items: 240});
                 }, 'json');
-
             });
 
         </script>

@@ -8,7 +8,7 @@ $(document).ready(function () {
         win.focus();
     });
 
-
+  
     var domain = 'medical2.com';
     var dialog_loaded;
     console.log("ready!");

@@ -163,12 +163,12 @@ class scheduler_editslot_form extends scheduler_slotform_base {
         $mform->setDefault('remindersel', -1);
 
         // Slot comments - input type is editor
-        //$mform->addElement('text', 'notes', 'Hotel/Venue', array('size'=>83));
-        //$mform->setType('notes', PARAM_RAW); // must be PARAM_RAW for rich text editor content
-        //$mform->setDefault('notes', time());
+        $mform->addElement('text', 'notes', 'Hotel/Venue', array('size'=>83));
+        $mform->setType('notes', PARAM_TEXT); // must be PARAM_RAW for rich text editor content
+        $mform->setDefault('notes', time());
 
-        $mform->addElement('editor', 'notes', get_string('comments', 'scheduler'), array('rows' => 3, 'columns' => 60), array('collapsed' => true));
-        $mform->setType('notes', PARAM_RAW); // must be PARAM_RAW for rich text editor content
+        //$mform->addElement('editor', 'notes', get_string('comments', 'scheduler'), array('rows' => 3, 'columns' => 60), array('collapsed' => true));
+        //$mform->setType('notes', PARAM_RAW); // must be PARAM_RAW for rich text editor content
         
         // Appointments
 

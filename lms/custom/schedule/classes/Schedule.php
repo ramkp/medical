@@ -1325,6 +1325,15 @@ class Schedule extends Util {
         return $list;
     }
 
+    function get_scheduler_venus() {
+        $query = "select notes from mdl_scheduler_slots";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $notes[] = $row['notes'];
+        }
+        return $notes;
+    }
+
     function get_schedule_page() {
         $list = "";
         $courses = $this->get_scheduled_courses();
