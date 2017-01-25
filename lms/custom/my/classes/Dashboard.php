@@ -1062,6 +1062,12 @@ class Dashboard extends Util {
         return $courseid;
     }
 
+    function is_workshop_slot_exists($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
     function get_user_workshops($id) {
         $list = "";
         $list.="<div class='container-fluid' style=''>";
@@ -1069,19 +1075,29 @@ class Dashboard extends Util {
         $list.="</div><br><br>";
 
         $query = "select * from mdl_scheduler_appointment where studentid=$id";
+
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $ws = new stdClass();
-                foreach ($row as $key => $value) {
-                    $ws->$key = $value;
-                }
-                $courseid = $this->get_worshop_course($row['slotid']);
-                $coursename = $this->get_course_name($courseid);
-                $ws->courseid = $courseid;
-                $ws->coursename = $coursename;
-                $app[] = $ws;
+                $status = $this->is_workshop_slot_exists($row['slotid']);
+                if ($status > 0) {
+                    $ws = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $ws->$key = $value;
+                    }
+                    $courseid = $this->get_worshop_course($row['slotid']);
+                    $coursename = $this->get_course_name($courseid);
+                    $ws->courseid = $courseid;
+                    $ws->coursename = $coursename;
+                    /*
+                      echo "<pre>";
+                      print_r($ws);
+                      echo "<br></pre>";
+                     */
+
+                    $app[] = $ws;
+                } // end if $status > 0
             } // end while
 
             foreach ($app as $ws) {
