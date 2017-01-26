@@ -13,6 +13,22 @@ class Groups extends Util {
 
     function __construct() {
         parent::__construct();
+        $this->create_groups_data();
+    }
+
+    function create_groups_data() {
+        $query = "select * from mdl_groups where courseid>0 order by name";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $has_members = $this->is_has_users($row['id']);
+                if ($has_members > 0) {
+                    $groupnames[] = mb_convert_encoding($row['name'], 'UTF-8');
+                } // end if $has_members > 0
+            } // end while 
+            file_put_contents('/home/cnausa/public_html/lms/custom/utils/groups.json', json_encode($groupnames));
+        } // end if $num > 0
     }
 
     function is_has_users($groupid) {
@@ -48,6 +64,20 @@ class Groups extends Util {
         $list = "";
 
         if ($toolbar) {
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'><input type='text' id='group_search_text'></span>";
+            $list.="<span class='span2'><button id='search_group_button'>Search</button></span>";
+            $list.="<span calss='span2'><button id='clear_search_group_button'>Clear</button></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+            $list.="<span class='span9'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span9'><hr/></span>";
+            $list.="</div>";
+
             $list.="<div class='row-fluid' style='font-weight:bold;'>";
             $list.="<span class='span3'>Group Name</span>";
             $list.="<span class='span3'>Course Name</span>";
@@ -147,6 +177,29 @@ class Groups extends Util {
             }
         } // end while
         $list = $this->create_groups_page($groups, false);
+        return $list;
+    }
+
+    function search_group_item($item) {
+        $list = "";
+        $groups = array();
+        $query = "select * from mdl_groups where name like '%$item%' "
+                . "order by name";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $has_users = $this->is_has_users($row['id']);
+                if ($has_users > 0) {
+                    $g = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $g->$key = $value;
+                    } // end foreach
+                    $groups[] = $g;
+                } // end if $has_users > 0
+            } // end while
+        } // end if $num > 0
+        $list.= $this->create_groups_page($groups, false);
         return $list;
     }
 

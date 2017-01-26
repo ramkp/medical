@@ -3190,6 +3190,17 @@ $(document).ready(function () {
         var url = "/lms/custom/usrgroups/get_groups_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+            $.get('/lms/custom/utils/groups.json', function (data) {
+                $('#group_search_text').typeahead({source: data, items: 240});
+            }, 'json');
+        });
+    }
+
+    function get_deposit_page() {
+        var url = "/lms/custom/deposit/get_deposit_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+
         });
     }
 
@@ -3214,6 +3225,10 @@ $(document).ready(function () {
     $("#groups").click(function (event) {
         update_navigation_status__menu('Groups');
         get_groups_page();
+    });
+    $("#deposit").click(function (event) {
+        update_navigation_status__menu('Deposit');
+        get_deposit_page();
     });
 
     $("#index").click(function (event) {
@@ -5192,6 +5207,22 @@ $(document).ready(function () {
             } // end else
         }
 
+        if (event.target.id == 'search_group_button') {
+            var search = $('#group_search_text').val();
+            if (search != '') {
+                $('#ajax_loader').show();
+                var url = "/lms/custom/usrgroups/search_group_item.php";
+                $.post(url, {item: search}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#groups_container').html(data);
+                    $('#pagination').hide();
+                });
+            }
+        }
+
+        if (event.target.id == 'clear_search_group_button') {
+            get_groups_page();
+        }
 
 
 

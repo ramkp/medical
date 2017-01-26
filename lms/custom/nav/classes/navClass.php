@@ -135,7 +135,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
-                                                                        
+                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li>             
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                 </ul>
                             </li>
@@ -246,7 +246,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
-                                                                        
+                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li>                                    
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                 </ul>
                             </li>
