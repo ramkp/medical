@@ -65,6 +65,7 @@ class Groups extends Util {
 
         if ($toolbar) {
             $list.="<div class='row-fluid'>";
+            $list.="<span class='span1'>Search</span>";
             $list.="<span class='span3'><input type='text' id='group_search_text'></span>";
             $list.="<span class='span2'><button class='btn btn-primary' id='search_group_button'>Search</button></span>";
             $list.="<span calss='span2'><button class='btn btn-primary' id='clear_search_group_button'>Clear</button></span>";
