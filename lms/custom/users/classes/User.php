@@ -156,6 +156,16 @@ class User extends Util {
     function search_user_by_email($email) {
         $list = "";
         $users = array();
+
+        /*         * ***************************************************************
+         * 
+         * Function argument could be email, phone, user firstname and
+         * user lastname, user firstname, middlename and lastname  and
+         * group name - all cases are covered
+         * 
+         * *************************************************************** */
+
+
         $data = explode(' ', $email);
 
         if (count($data) == 1) {
@@ -180,12 +190,11 @@ class User extends Util {
         if (count($data) == 3) {
             $firstname = $data[2];
             $lastname = $data[0];
-            
+
             $query = "select * from mdl_user "
                     . "where deleted=0 "
                     . " and ( firstname like '%$firstname%' and lastname like '%$lastname%') "
                     . " order by lastname ";
-            
         }
 
         //echo "Query: ".$query."<br>";
@@ -199,14 +208,53 @@ class User extends Util {
                 } // end foreach
                 $users[] = $user;
             } // end while
-            $list = $this->create_users_list($users, $num, false, $email);
+            $list.= $this->create_users_list($users, $num, false, $email);
         } // end if $num>0
         else {
-            $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span8'>No users found</span>";
-            $list.="</div>";
+            $users = $this->search_group_users($email);
+            if (count($users) > 0) {
+                $list.= $this->create_users_list($users, count($users), false, $email);
+            } // end if $count($users) > 0 
+            else {
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span8'>No users found</span>";
+                $list.="</div>";
+            } // end else
         }
+
         return $list;
+    }
+
+    function search_group_users($groupname) {
+        $users_arr = array();
+        $users = array();
+        $query = "select * from mdl_groups where name='$groupname'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $groupid = $row['id'];
+        }
+
+        $query = "select * from mdl_groups_members where groupid=$groupid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $users_arr[] = $row['userid'];
+        }
+        $users_list = implode(',', $users_arr);
+
+        $query = "select * from mdl_user where deleted=0 "
+                . "and id in ($users_list) ";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user = new stdClass();
+                foreach ($row as $key => $value) {
+                    $user->$key = $value;
+                } // end foreach
+                $users[] = $user;
+            } // end while
+        } // end if $num > 0
+        return $users;
     }
 
 }

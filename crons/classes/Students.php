@@ -1809,7 +1809,13 @@ class Students {
         return $pass;
     }
 
-    /*     * ************* Code related to typehead json data ***************** */
+    /*  ************** Code related to typehead json data ***************** */
+
+    function is_has_users($groupid) {
+        $query = "select * from mdl_groups_members where groupid=$groupid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
 
     function create_typehead_data() {
         $courses = array();
@@ -1835,7 +1841,16 @@ class Students {
             $phones[] = mb_convert_encoding($row['phone1'], 'UTF-8');
         }
 
-        $data = array_merge($users, $emails, $courses, $phones);
+        $query = "select * from mdl_groups where courseid>0 order by name";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $has_members = $this->is_has_users($row['id']);
+            if ($has_members > 0) {
+                $groupnames[] = mb_convert_encoding($row['name'], 'UTF-8');
+            } // end if $has_members > 0
+        } // end while 
+
+        $data = array_merge($users, $emails, $courses, $phones, $groupnames);
         file_put_contents('/home/cnausa/public_html/lms/custom/utils/data.json', json_encode($data));
         echo "Data are created \n";
     }
@@ -2012,3 +2027,6 @@ class Students {
 }
 
 // end of class
+
+
+    
