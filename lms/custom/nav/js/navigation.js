@@ -8,7 +8,7 @@ $(document).ready(function () {
         win.focus();
     });
 
-  
+
     var domain = 'medical2.com';
     var dialog_loaded;
     console.log("ready!");
@@ -3186,6 +3186,13 @@ $(document).ready(function () {
         });
     }
 
+    function get_groups_page() {
+        var url = "/lms/custom/usrgroups/get_groups_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     /************************************************************************
      * 
      *                   Menu processing items
@@ -3204,6 +3211,11 @@ $(document).ready(function () {
         update_navigation_status__menu('Workshops schedule');
         get_schedule_page();
     });
+    $("#groups").click(function (event) {
+        update_navigation_status__menu('Groups');
+        get_groups_page();
+    });
+
     $("#index").click(function (event) {
         update_navigation_status__menu('Index page');
         get_index_page();
