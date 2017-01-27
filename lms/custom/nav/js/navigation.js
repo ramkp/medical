@@ -3200,7 +3200,8 @@ $(document).ready(function () {
         var url = "/lms/custom/deposit/get_deposit_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-
+            $("#dep_date1").datepicker();
+            $("#dep_date2").datepicker();
         });
     }
 
@@ -4800,7 +4801,7 @@ $(document).ready(function () {
             } // end else 
         }
 
-        console.log('Class element clicked: ' + $(event.target).attr('class'));
+        //console.log('Class element clicked: ' + $(event.target).attr('class'));
 
 
         if (event.target.id.indexOf("hotel_edit_") >= 0) {
@@ -5222,6 +5223,78 @@ $(document).ready(function () {
 
         if (event.target.id == 'clear_search_group_button') {
             get_groups_page();
+        }
+
+        if (event.target.id == 'add_deposit_btn') {
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/deposit/get_add_deposit_dialog.php";
+                            var request = {id: id};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $('#pdate').datepicker();
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+        }
+
+        if (event.target.id == 'search_dep_btn') {
+            var date1 = $('#dep_date1').val();
+            var date2 = $('#dep_date1').val();
+
+            if (date1 != '' && date1 != '') {
+                $('#ajax_loader').show();
+                var url = "/lms/custom/deposit/search_deposit.php";
+                var request = {date1: date1, date2: date2};
+                $.post(url, {date: JSON.stringify(request)}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#deposit_container').html(data);
+                    $('#pagination').hide();
+                });
+            }
+        }
+
+        if (event.target.id == 'clear_search_btn') {
+            get_deposit_page();
+        }
+
+        if (event.target.id == 'add_new_deposit_done') {
+            var banknum = $('#banknum').val();
+            var amount = $('#amount').val();
+            var name = $('#name').val();
+            var date = $('#pdate').val();
+            var userid = $('#userid').val();
+            if (banknum != '' && amount != '' && date != '') {
+                $('#dep_err').html('');
+                var dep = {banknum: banknum,
+                    amount: amount,
+                    name: name,
+                    date: date, userid: userid};
+                var url = "/lms/custom/deposit/add_deposit.php";
+                $.post(url, {dep: JSON.stringify(dep)}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_deposit_page();
+                });
+
+            } // end if
+            else {
+                $('#dep_err').html('Please provide all required fields');
+            }
+
         }
 
 
