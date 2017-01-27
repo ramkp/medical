@@ -37,7 +37,7 @@ $host = $_SERVER['HTTP_HOST'];
         //echo "URL: ".$url."<br>";
         switch ($url) {
             case "/":
-                $title = "Title - Phlebotomy Training Program | Medical2 Career College";
+                $title = "Phlebotomy Training Program | Medical2 Career College";
                 $meta = "Medical2  provides One day 100%  hands-on phlebotomy "
                         . "training & Certification workshops nationwide. "
                         . "We also provide healthcare career courses through "
