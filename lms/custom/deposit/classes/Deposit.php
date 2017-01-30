@@ -133,7 +133,7 @@ class Deposit extends Util {
                 <div class='modal-body' style='width:650px;'>
                    
                 <div class='container-fluid'>
-                <span class='span2'>Bank cheque num*</span>
+                <span class='span2'>Bank cheque num</span>
                 <span class='span2'><input type='text' id='banknum' style=''></span>
                 </div>
                 

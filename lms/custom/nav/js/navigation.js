@@ -5254,7 +5254,7 @@ $(document).ready(function () {
 
         if (event.target.id == 'search_dep_btn') {
             var date1 = $('#dep_date1').val();
-            var date2 = $('#dep_date1').val();
+            var date2 = $('#dep_date2').val();
 
             if (date1 != '' && date1 != '') {
                 $('#ajax_loader').show();
@@ -5278,8 +5278,11 @@ $(document).ready(function () {
             var name = $('#name').val();
             var date = $('#pdate').val();
             var userid = $('#userid').val();
-            if (banknum != '' && amount != '' && date != '') {
+            if (amount != '' && date != '') {
                 $('#dep_err').html('');
+                if (banknum == '') {
+                    banknum = 'N/A';
+                }
                 var dep = {banknum: banknum,
                     amount: amount,
                     name: name,
