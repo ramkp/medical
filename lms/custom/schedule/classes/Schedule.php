@@ -1260,6 +1260,8 @@ class Schedule extends Util {
         $b = new Balance();
         $course_cost = $b->get_item_cost($courseid, $slotid);
         $student_payment = $b->get_student_payments($courseid, $userid);
+        //echo "User ID: ".$userid."<br>";
+        //echo "Student payment: ".$student_payment."<br>";
         $diff = $student_payment - $course_cost;
         if ($diff < 0) {
             $unpaid_amount = abs($diff);

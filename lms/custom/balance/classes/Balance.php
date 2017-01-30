@@ -37,11 +37,15 @@ class Balance {
 
     function get_student_payments($courseid, $userid) {
 
-        $totalpaid = 0;
         // 1. Check credit card payments
         // 2. Check cash payments
         // 3. Check free payments
         // 4. Check invoice payments
+
+        $card_payments = 0;
+        $cash_payments = 0;
+        $free_payments = 0;
+        $invoice_payments = 0;
 
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid "
@@ -51,40 +55,50 @@ class Balance {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $totalpaid = $totalpaid + $row['psum'];
+                $card_payments = $card_payments + $row['psum'];
             }
         }
+
+        // ------------------------------------------------------------- //
 
         $query = "select * from mdl_partial_payments "
                 . "where courseid=$courseid "
                 . "and userid=$userid";
+        $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $totalpaid = $totalpaid + $row['psum'];
+                $cash_payments = $cash_payments + $row['psum'];
             }
         }
+
+        // ------------------------------------------------------------- //
 
         $query = "select * from mdl_free "
                 . "where courseid=$courseid "
                 . "and userid=$userid";
+        $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $totalpaid = $totalpaid + $row['psum'];
+                $free_payments = $free_payments + $row['psum'];
             }
         }
+
+        // ------------------------------------------------------------- //
 
         $query = "select * from mdl_invoice "
                 . "where courseid=$courseid "
                 . "and userid=$userid and i_status=1";
+        $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $totalpaid = $totalpaid + $row['i_sum'];
+                $invoice_payments = $invoice_payments + $row['i_sum'];
             }
         }
 
+        $totalpaid = $card_payments + $cash_payments + $free_payments + $invoice_payments;
         return $totalpaid;
     }
 
