@@ -2356,7 +2356,7 @@ $(document).ready(function () {
                                     $('#coursename').typeahead({source: data, items: 24});
                                 }, 'json');
                                 $.get('/lms/custom/utils/workshops.json', function (data) {
-                                    $('#wsname').typeahead({source: data, items: 24});
+                                    $('#wsname').typeahead({source: data, items: 240});
                                 }, 'json');
                             });
                         })

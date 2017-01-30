@@ -1809,7 +1809,7 @@ class Students {
         return $pass;
     }
 
-    /*  ************** Code related to typehead json data ***************** */
+    /*     * ************* Code related to typehead json data ***************** */
 
     function is_has_users($groupid) {
         $query = "select * from mdl_groups_members where groupid=$groupid";
@@ -1858,8 +1858,7 @@ class Students {
     function create_ws_json_data() {
         $ws = array();
         $now = time();
-        $query = "select * from mdl_scheduler_slots "
-                . "where  starttime>=$now order by starttime";
+        $query = "select * from mdl_scheduler_slots ";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $location = mb_convert_encoding($row['appointmentlocation'], 'UTF-8');

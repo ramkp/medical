@@ -571,8 +571,8 @@ class Schedule extends Util {
         $ws = array();
         $now = time();
         $query = "select * from mdl_scheduler_slots "
-                . "where schedulerid=$schedulerid "
-                . "and  starttime>=$now order by starttime";
+                . "where schedulerid=$schedulerid ";
+               
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $location = mb_convert_encoding($row['appointmentlocation'], 'UTF-8');

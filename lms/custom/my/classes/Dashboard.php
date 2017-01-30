@@ -430,23 +430,27 @@ class Dashboard extends Util {
     function get_course_slots($courseid) {
         $slotids = array();
         $query = "select * from mdl_scheduler where course=$courseid";
-//echo "Query: " . $query . "<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $schedulerid = $row['id'];
         } // end while
-//echo "SchedulerID: " . $schedulerid . "<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $query = "select * from mdl_scheduler_slots "
                     . "where schedulerid=$schedulerid";
-//echo "Query: " . $query . "<br>";
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $slotids[] = $row['id'];
             } // end while
         } // end if $num > 0
         return $slotids;
+    }
+
+    function get_user_course_completion_status($userid, $courseid) {
+        $query = "select * from mdl_course_completions "
+                . "where userid=$userid and course=$courseid";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
     function get_user_card_payments($userid, $courseid) {
@@ -456,12 +460,15 @@ class Dashboard extends Util {
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $coursename = $this->get_course_name($courseid);
+            $status = $this->get_user_course_completion_status($userid, $courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style=''>";
                 $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
-                $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
-                $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                if ($status == 0) {
+                    $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
+                    $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                }
                 $list.="</div>";
             } // end while
         } // end if $num>0
@@ -476,12 +483,15 @@ class Dashboard extends Util {
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $coursename = $this->get_course_name($courseid);
+            $status = $this->get_user_course_completion_status($userid, $courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style=''>";
                 $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_pdate']) . ") &nbsp; $coursename </span>";
-                $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Move</button></span>";
-                $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Refund</button></span>";
+                if ($status == 0) {
+                    $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Move</button></span>";
+                    $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Refund</button></span>";
+                }
                 $list.="</div>";
             } // end while
         } // end if $num>0
@@ -496,12 +506,37 @@ class Dashboard extends Util {
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $coursename = $this->get_course_name($courseid);
+            $status = $this->get_user_course_completion_status($userid, $courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style=''>";
                 $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
-                $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
-                $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Refund</button></span>";
+                if ($status == 0) {
+                    $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
+                    $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Refund</button></span>";
+                }
+                $list.="</div>";
+            } // end while
+        } // end if $num>0
+        return $list;
+    }
+
+    function get_user_free_payments($userid, $courseid) {
+        $list = "";
+        $query = "select * from mdl_free  "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $coursename = $this->get_course_name($courseid);
+            $status = $this->get_user_course_completion_status($userid, $courseid);
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $list.="<div class='container-fluid' style=''>";
+                $list.="<span class='span8'>Free adjustment $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                if ($status == 0) {
+                    $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
+                    $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Refund</button></span>";
+                }
                 $list.="</div>";
             } // end while
         } // end if $num>0
@@ -513,8 +548,9 @@ class Dashboard extends Util {
         $card_payments = $this->get_user_card_payments($userid, $courseid);
         $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
-        if ($card_payments != '' || $invoice_payments != '' || $partial_payments != '') {
-            $list.=$card_payments . "<br>" . $partial_payments . "<br>" . $invoice_payments;
+        $free_payments = $this->get_user_free_payments($userid, $courseid);
+        if ($card_payments != '' || $invoice_payments != '' || $partial_payments != '' || $free_payments != '') {
+            $list.=$card_payments . $partial_payments . $free_payments . $invoice_payments;
         }
         return $list;
     }
@@ -1477,15 +1513,17 @@ class Dashboard extends Util {
             $this->db->query($query);
         }
 
-
-        $userObj = $this->get_user_details($payment->userid);
-        $userObj->courseid = $payment->courseid;
-        $userObj->userid = $payment->userid;
-        $userObj->slotid = $payment->slotid;
-        $userObj->payment_amount = $payment->amount;
-        $userObj->period = 0;
-        $mailer = new Mailer();
-        $mailer->send_partial_payment_confirmation($userObj);
+        // Do not create notice for free adjustment
+        if ($payment->ptype != 'free') {
+            $userObj = $this->get_user_details($payment->userid);
+            $userObj->courseid = $payment->courseid;
+            $userObj->userid = $payment->userid;
+            $userObj->slotid = $payment->slotid;
+            $userObj->payment_amount = $payment->amount;
+            $userObj->period = 0;
+            $mailer = new Mailer();
+            $mailer->send_partial_payment_confirmation($userObj);
+        }
     }
 
     function refund_payment($payment) {
