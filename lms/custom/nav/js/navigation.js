@@ -3184,6 +3184,14 @@ $(document).ready(function () {
         var url = "/lms/custom/instructors/get_instructors_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+
+            $.post('/lms/custom/utils/states.json', {id: 1}, function (data) {
+                $('#instructor_state').typeahead({source: data, items: 240});
+            }, 'json');
+
+            $.post('/lms/custom/utils/cities.json', {id: 1}, function (data) {
+                $('#instructor_city').typeahead({source: data, items: 52000});
+            }, 'json');
         });
     }
 
@@ -4847,6 +4855,25 @@ $(document).ready(function () {
             }
         }
 
+        if (event.target.id == 'search_instuctor') {
+            var state = $('#instructor_state').val();
+            var city = $('#instructor_city').val();
+            if (state != '' || city != '') {
+                $('#ajax_loader').show();
+                var location = {state: state, city: city};
+                var url = "/lms/custom/instructors/search_item.php";
+                $.post(url, {item: JSON.stringify(location)}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#inst_container').html(data);
+                    $('#pagination').hide();
+                });
+            } // end if state!='' || city!=''
+        }
+
+        if (event.target.id == 'reset_instuctor') {
+            get_instructors_page();
+        }
+
 
         if (event.target.id == 'update_hotel_button') {
             var id = $('#id').val();
@@ -5008,8 +5035,16 @@ $(document).ready(function () {
             } // end else
         }
 
+        console.log('Event ID: ' + event.target.id);
+
+        if (event.target.id.indexOf("instructor_") >= 0) {
+            var userid = event.target.id.replace("instructor_", "");
+            console.log('User ID: ' + userid);
+        }
+
+
         if (event.target.id.indexOf("inv_hotel2_edit_") >= 0) {
-            var id = event.target.id.replace("inv_hotel2_edit_", "");
+
             if (dialog_loaded !== true) {
                 console.log('Script is not yet loaded starting loading ...');
                 dialog_loaded = true;

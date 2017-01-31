@@ -9,6 +9,8 @@ require_once ('/home/cnausa/public_html/lms/custom/utils/classes/Util.php');
  */
 class Instructors extends Util {
 
+    public $limit = 3;
+
     function __construct() {
         parent::__construct();
     }
@@ -16,18 +18,24 @@ class Instructors extends Util {
     function get_instructors_page() {
         $list = "";
         $instructors = array();
-        $query = "select * from mdl_role_assignments "
-                . "where roleid=3 group by userid";
-        //echo "Query:" . $query . "<br>";
+        $query = "SELECT u.id, a.userid, a.roleid
+                    FROM mdl_user u, mdl_role_assignments a
+                    WHERE a.roleid =3
+                    AND u.id = a.userid
+                    GROUP BY u.id
+                    LIMIT 0 , $this->limit";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $in = new stdClass();
-                foreach ($row as $key => $value) {
-                    $in->$key = $value;
-                } // end foreach
-                $instructors[] = $in;
+                $not_deleted = $this->is_user_deleted($row['userid']);
+                if ($not_deleted == 0) {
+                    $in = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $in->$key = $value;
+                    } // end foreach
+                    $instructors[] = $in;
+                } // end if $not_deleted == 0
             } // end while
         } // end if $num > 0
         $list.=$this->create_instructors_page($instructors);
@@ -156,28 +164,80 @@ class Instructors extends Util {
         return $list;
     }
 
-    function create_instructors_page($instructors) {
+    function get_total() {
+        $query = "SELECT u.id, a.userid, a.roleid
+                    FROM mdl_user u, mdl_role_assignments a
+                    WHERE a.roleid =3
+                    AND u.id = a.userid GROUP BY u.id";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_instructor_item($page) {
+        $instructors = array();
+        $rec_limit = $this->limit;
+        if ($page == 1) {
+            $offset = 0;
+        } // end if $page==1
+        else {
+            $page = $page - 1;
+            $offset = $rec_limit * $page;
+        }
+        $query = "SELECT u.id, a.userid, a.roleid
+                    FROM mdl_user u, mdl_role_assignments a
+                    WHERE a.roleid =3
+                    AND u.id = a.userid
+                    GROUP BY u.id
+                    LIMIT $offset, $rec_limit";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $in = new stdClass();
+            foreach ($row as $key => $value) {
+                $in->$key = $value;
+            } // end foreach
+            $instructors[] = $in;
+        } // end while
+        $list = $this->create_instructors_page($instructors, false);
+        return $list;
+    }
+
+    function create_instructors_page($instructors, $toolbar = true) {
         $list = "";
 
         if (count($instructors) > 0) {
-            $list.="<div class='row-fluid' style='font-weight:bold;'>";
-            $list.="<span class='span12'>Please be aware all instructors should have Teacher role at the specific course</span>";
-            $list.="</div><br>";
-            $list.="<div class='row-flluid' style='font-weight:bold;'>";
-            $list.="<span class='span6' style='padding-left:20px;'>Instructor name</span>";
-            $list.="<span class='span6'>Instructor's courses</span>";
-            $list.="</div>";
+
+            if ($toolbar) {
+                $list.="<div class='row-fluid' style='font-weight:bold;'>";
+                $list.="<span class='span1'>Search</span>";
+                $list.="<span class='span2'><input type='text' id='instructor_state' placeholder='State' style='width:125px;'></span>";
+                $list.="<span class='span2'><input type='text' id='instructor_city' placeholder='City' style='width:125px;'></span>";
+                $list.="<span class='span2'><button id='search_instuctor'>Search</button></span>";
+                $list.="<span class='span2'><button id='reset_instuctor'>Reset</button></span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+                $list.="<span class='span9'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+                $list.="</div><br>";
+            }
+            $list.="<div id='inst_container'>";
             foreach ($instructors as $in) {
                 $user = $this->get_user_details($in->userid);
                 $courses_block = $this->get_instructor_courses_block($in->userid);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span6'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$in->userid' target='_blank'>$user->firstname $user->lastname $user->email</a></span>";
+                $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$in->userid' target='_blank'>$user->firstname $user->lastname</a></span>";
+                $list.="<span class='span1'><img style='cursor:pointer;' title='Availability' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/theme/image.php/lambda/core/1468523658/t/edit' id='instructor_$in->userid'></span>";
                 $list.="<span class='span6'>$courses_block</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span12'><hr/></span>";
                 $list.="</div>";
             } // end foreach
+            $list.="</div>";
+
+            if ($toolbar) {
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span9'  id='pagination'></span>";
+                $list.="</div>";
+            }
         } // end count($instructors)>0
         else {
             $list.="<div class='container-fluid'>";
@@ -185,6 +245,82 @@ class Instructors extends Util {
             $list.="</div>";
         }
 
+        return $list;
+    }
+
+    function is_user_in_state($userid, $state) {
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $dbstate = $row['state'];
+        }
+        if ($dbstate != '') {
+            $query = "select * from mdl_user where id=$userid and "
+                    . "state like '%$state%'";
+            //echo "Query: " . $query . "<br>";
+            $num = $this->db->numrows($query);
+        } // end if $dbstate != ''
+        else {
+            $num = 0;
+        }
+        return $num;
+    }
+
+    function is_user_in_city($userid, $city) {
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $dbcity = $row['city'];
+        }
+        if ($dbcity != '') {
+            $query = "select * from mdl_user where id=$userid "
+                    . "and city like '%$city%'";
+            //echo "Query: " . $query . "<br>";
+            $num = $this->db->numrows($query);
+        } // end if $dbcity!=''
+        else {
+            $num = 0;
+        }
+        return $num;
+    }
+
+    function search_item($item) {
+        $instructors = array();
+        $query = "SELECT u.id, a.userid, a.roleid
+                    FROM mdl_user u, mdl_role_assignments a
+                    WHERE a.roleid =3
+                    AND u.id = a.userid GROUP BY u.id";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $users[] = $row['userid'];
+            } // end while
+        }
+        if (count($users) > 0) {
+            foreach ($users as $userid) {
+                $not_deleted = $this->is_user_deleted($userid);
+                if ($not_deleted == 0) {
+                    if ($item->city == '') {
+                        $status = $this->is_user_in_state($userid, $item->state);
+                        if ($status > 0) {
+                            $in = new stdClass();
+                            $in->userid = $userid;
+                            $instructors[] = $in;
+                        } // end if $status>0
+                    } // end if $item->city == ''
+                    else {
+                        $status = $this->is_user_in_city($userid, $item->city);
+                        if ($status > 0) {
+                            $in = new stdClass();
+                            $in->userid = $userid;
+                            $instructors[] = $in;
+                        } // end else
+                    } // end else
+                } // end id not_deleted == 0
+            } // end foreach
+        } // end if count($users)>0
+        $list = $this->create_instructors_page($instructors, FALSE);
         return $list;
     }
 
