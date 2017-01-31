@@ -82,7 +82,7 @@ class Hotel extends Util {
             $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
             $list.="<span class='span2'>State/City</span>";
             $list.="<span class='span3'>Address</span>";
-            $list.="<span class='span2'>Phone</span>";
+            $list.="<span class='span2'>Phone/Email</span>";
             $list.="<span class='span2'>Contact</span>";
             $list.="<span class='span1'>Charge</span>";
             $list.="<span class='span1'>Room</span>";
@@ -92,10 +92,11 @@ class Hotel extends Util {
         $list.="<div id='hotels_container'>";
         if (count($hotels) > 0) {
             foreach ($hotels as $h) {
+                $email_block = ($h->email == null) ? "N/A" : "<a href='mailto:$h->email'>$h->email</a>";
                 $list.="<div class='container-fluid' style='text-align:left;'>";
                 $list.="<span class='span2'>" . $h->state . "/" . $h->city . "</span>";
                 $list.="<span class='span3'>" . $h->address . "</span>";
-                $list.="<span class='span2'>" . $h->phone . "</span>";
+                $list.="<span class='span2'>" . $h->phone . "<br>$email_block</span>";
                 $list.="<span class='span2'>" . $h->contact . "</span>";
                 $list.="<span class='span1'>$" . $h->charge . "</span>";
                 $list.="<span class='span1'>" . $h->room . "</span>";
@@ -151,6 +152,11 @@ class Hotel extends Util {
                 <div class='container-fluid'>
                     <span class='span1'>Address*</span>
                     <span class='span1'><input type='text' id='addr'></span>  
+                </div>
+                
+                <div class='container-fluid'>
+                  <span class='span1'>Email*</span>
+                    <span class='span1'><input type='text' id='email'></span> 
                 </div>
                 
                 <div class='container-fluid'>
@@ -224,6 +230,11 @@ class Hotel extends Util {
                 </div>
                 
                 <div class='container-fluid'>
+                  <span class='span1'>Email*</span>
+                    <span class='span1'><input type='text' id='email' value='$hotel->email'></span> 
+                </div>
+                
+                <div class='container-fluid'>
                   <span class='span1'>Phone*</span>
                     <span class='span1'><input type='text' id='phone' value='$hotel->phone'></span> 
                 </div>
@@ -269,14 +280,14 @@ class Hotel extends Util {
                 . "(state,"
                 . "city,"
                 . "address,"
-                . "phone,"
+                . "phone, email,"
                 . "contact,"
                 . "charge,"
                 . "room) "
                 . "values('$hotel->state',"
                 . "'$hotel->city',"
                 . "'$addr',"
-                . "'$hotel->phone',"
+                . "'$hotel->phone', '$hotel->email',"
                 . "'$hotel->contact',"
                 . "'$hotel->charge',"
                 . "'$hotel->room')";
@@ -293,7 +304,7 @@ class Hotel extends Util {
                 . "set state='$hotel->state', "
                 . "city='$hotel->city', "
                 . "address='$addr', "
-                . "phone='$hotel->phone', "
+                . "phone='$hotel->phone', email='$hotel->email', "
                 . "contact='$hotel->contact', "
                 . "charge='$hotel->charge', "
                 . "room='$hotel->room' "

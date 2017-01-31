@@ -123,6 +123,7 @@ class navClass extends Util {
         //}
         $list.="<li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li> 
                                     <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
                                     <li><a href='#' id='refund' title='Refund'>Refund payments</a></li>                                                                      
                                 </ul>
@@ -135,7 +136,6 @@ class navClass extends Util {
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
-                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li>             
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                 </ul>
                             </li>
@@ -222,6 +222,7 @@ class navClass extends Util {
                                     <li><a href='#' id='cash' title='Cash'>Cash payments</a></li>
                                     <li><a href='#' id='cheque' title='Cheque'>Cheque payments</a></li>
                                     -->
+                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li> 
                                     <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
                                     <li><a href='#' id='refund' title='Refund'>Refund payments</a></li>
                                     <li><a href='#' id='refund_pwd_link' title='Refund password'>Refund password</a></li>
@@ -246,7 +247,6 @@ class navClass extends Util {
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
-                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li>                                    
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
                                 </ul>
                             </li>
@@ -314,6 +314,7 @@ class navClass extends Util {
         }
         // Add link to course management part
         //https://medical2.com/lms/course/management.php
+        //$list.="<li><a href='#' title='Schedule' id='sch'>Schedule</a></li>";
         $list.="<li><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/course/management.php' target='_blank'>Courses Management</a></li>";
         $list = $list . "</ul>";
         return $list;

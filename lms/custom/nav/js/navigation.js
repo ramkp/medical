@@ -4771,6 +4771,7 @@ $(document).ready(function () {
             var city = $('#city').val();
             var addr = $('#addr').val();
             var phone = $('#phone').val();
+            var email = $('#email').val();
             var contact = $('#contact').val();
             var charge = $('#charge').val();
             var room = $('#room').val();
@@ -4779,12 +4780,14 @@ $(document).ready(function () {
                     city != '' &&
                     addr != '' &&
                     phone != '' &&
+                    email != '' &&
                     contact != '' &&
                     charge != '' && room != '') {
                 var hotel = {state: state,
                     city: city,
                     addr: addr,
                     phone: phone,
+                    email: email,
                     contact: contact,
                     charge: charge,
                     room: room};
@@ -4846,6 +4849,7 @@ $(document).ready(function () {
             var city = $('#city').val();
             var addr = $('#addr').val();
             var phone = $('#phone').val();
+            var email = $('#email').val();
             var contact = $('#contact').val();
             var charge = $('#charge').val();
             var room = $('#room').val();
@@ -4854,6 +4858,7 @@ $(document).ready(function () {
                     city != '' &&
                     addr != '' &&
                     phone != '' &&
+                    email != '' &&
                     contact != '' &&
                     charge != '' && room != '') {
                 var hotel = {state: state,
@@ -4861,6 +4866,7 @@ $(document).ready(function () {
                     id: id,
                     addr: addr,
                     phone: phone,
+                    email: email,
                     contact: contact,
                     charge: charge,
                     room: room};
