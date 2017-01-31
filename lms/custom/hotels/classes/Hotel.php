@@ -92,7 +92,12 @@ class Hotel extends Util {
         $list.="<div id='hotels_container'>";
         if (count($hotels) > 0) {
             foreach ($hotels as $h) {
-                $email_block = ($h->email == null) ? "N/A" : "<a href='mailto:$h->email'>$h->email</a>";
+                if ($h->email == null || $h->email == 'N/A') {
+                    $email_block = "N/A";
+                } // end if $h->email==null || $h->email=='N/A'
+                else {
+                    $email_block = "<a href='mailto:$h->email'>$h->email</a>";
+                } // end else
                 $list.="<div class='container-fluid' style='text-align:left;'>";
                 $list.="<span class='span2'>" . $h->state . "/" . $h->city . "</span>";
                 $list.="<span class='span3'>" . $h->address . "</span>";
@@ -155,7 +160,7 @@ class Hotel extends Util {
                 </div>
                 
                 <div class='container-fluid'>
-                  <span class='span1'>Email*</span>
+                  <span class='span1'>Email</span>
                     <span class='span1'><input type='text' id='email'></span> 
                 </div>
                 
@@ -230,7 +235,7 @@ class Hotel extends Util {
                 </div>
                 
                 <div class='container-fluid'>
-                  <span class='span1'>Email*</span>
+                  <span class='span1'>Email</span>
                     <span class='span1'><input type='text' id='email' value='$hotel->email'></span> 
                 </div>
                 

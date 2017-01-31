@@ -4777,6 +4777,10 @@ $(document).ready(function () {
             var charge = $('#charge').val();
             var room = $('#room').val();
 
+            if (email == '') {
+                email = 'N/A';
+            }
+
             if (state != '' &&
                     city != '' &&
                     addr != '' &&
@@ -4854,6 +4858,10 @@ $(document).ready(function () {
             var contact = $('#contact').val();
             var charge = $('#charge').val();
             var room = $('#room').val();
+
+            if (email == '') {
+                email = 'N/A';
+            }
 
             if (state != '' &&
                     city != '' &&
