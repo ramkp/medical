@@ -130,7 +130,7 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                   
-                                    <li><a href='#' title='Schedule' id='sch'>Schedule</a></li>
+                                    
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
@@ -241,7 +241,6 @@ class navClass extends Util {
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>
                                     <li><a href='#' title='Moodle Permissions' id='mpermission' onClick='return false;'>Moodle Permissions</a></li>
-                                    <li><a href='#' title='Schedule' id='sch'>Schedule</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
@@ -312,10 +311,8 @@ class navClass extends Util {
         else {
             $list = $list . "<li><a href='' title='There are no price items' >There are no price items</a></li>";
         }
-        // Add link to course management part
-        //https://medical2.com/lms/course/management.php
-        //$list.="<li><a href='#' title='Schedule' id='sch'>Schedule</a></li>";
-        $list.="<li><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/course/management.php' target='_blank'>Courses Management</a></li>";
+        $list.="<li><a href='' title='Schedule' onClick='return false;' id='sch'>Schedule</a></li>";
+        $list.="<li><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/course/management.php' id='course_management' target='_blank'>Courses Management</a></li>";
         $list = $list . "</ul>";
         return $list;
     }

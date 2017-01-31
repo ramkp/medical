@@ -19,18 +19,19 @@ $(document).ready(function () {
 
     function get_price_items_from_category(id) {
         var url = "/lms/custom/prices/list.php";
-        $.post(url, {id: id}).done(function (data) {
-            console.log(data);
-            try {
-                var price_obj = $.parseJSON(data);
-                update_navigation_status__menu(price_obj.item_title);
-                $('#region-main').html(price_obj.item_data);
-            } catch (e) {
-// not json
-                window.location = "https://medical2.com/login";
-            }
-
-        });
+        if (id != 'sch' && id != 'course_management') {
+            $.post(url, {id: id}).done(function (data) {
+                console.log(data);
+                try {
+                    var price_obj = $.parseJSON(data);
+                    update_navigation_status__menu(price_obj.item_title);
+                    $('#region-main').html(price_obj.item_data);
+                } // end try 
+                catch (e) {
+                    window.location = "https://medical2.com/login";
+                }
+            }); // end of post
+        } // end if
     }
 
     function get_faq_edit_page() {
