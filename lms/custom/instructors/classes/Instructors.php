@@ -224,7 +224,7 @@ class Instructors extends Util {
                 $courses_block = $this->get_instructor_courses_block($in->userid);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$in->userid' target='_blank'>$user->firstname $user->lastname</a></span>";
-                $list.="<span class='span1'><img style='cursor:pointer;' title='Availability' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/theme/image.php/lambda/core/1468523658/t/edit' id='instructor_$in->userid'></span>";
+                $list.="<span class='span1'><img style='cursor:pointer;' title='Availability' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/theme/image.php/lambda/core/1468523658/t/edit' id='instructor_dialog_$in->userid'></span>";
                 $list.="<span class='span6'>$courses_block</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
@@ -244,6 +244,35 @@ class Instructors extends Util {
             $list.="<span class='span9'>There are no instructors in the system</span>";
             $list.="</div>";
         }
+
+        return $list;
+    }
+
+    function get_settings_dialog($userid) {
+        $list = "";
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Instructor Settings</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='inst_settings_userid' value='$userid'>
+                <div class='container-fluid' style=''>
+                <span class='span6'>Coming soon ...</span>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='inst_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='update_instructor_settings_button'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
 
         return $list;
     }

@@ -295,8 +295,20 @@ $(document).ready(function () {
         var url = "/lms/custom/promotion/get_promotion_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-        })
 
+            $.post('/lms/custom/utils/workshops.json', {id: 1}, function (data) {
+                $('#camp_ws').typeahead({source: data, items: 240});
+            }, 'json');
+
+            $.post('/lms/custom/utils/states.json', {id: 1}, function (data) {
+                $('#camp_state').typeahead({source: data, items: 240});
+            }, 'json');
+
+            $.post('/lms/custom/utils/cities.json', {id: 1}, function (data) {
+                $('#camp_city').typeahead({source: data, items: 52000});
+            }, 'json');
+
+        });
     }
 
     function refresh_map() {
@@ -4758,14 +4770,14 @@ $(document).ready(function () {
         if (event.target.id == 'create_new_campaign_done') {
             var users = $('#users').val();
             console.log('Users list: ' + users);
-            var text = $('#campaign_text').val();
+            var text = CKEDITOR.instances.campaign_text.getData();
             if (text != '') {
                 $('#campaign_err').html('');
                 if (confirm('Send this message to selected users?')) {
                     var url = "/lms/custom/promotion/add_new_campaign2.php";
                     $.post(url, {text: text, users: users}).done(function (data) {
                         $("[data-dismiss=modal]").trigger({type: "click"});
-                        $('#region-main').html(data);
+                        $('#camp_err').html(data);
                     });
                 } // end if
             } // end if
@@ -5037,9 +5049,31 @@ $(document).ready(function () {
 
         console.log('Event ID: ' + event.target.id);
 
-        if (event.target.id.indexOf("instructor_") >= 0) {
-            var userid = event.target.id.replace("instructor_", "");
-            console.log('User ID: ' + userid);
+        if (event.target.id.indexOf("instructor_dialog") >= 0) {
+            var userid = event.target.id.replace("instructor_dialog", "");
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/instructors/get_settings_dialog.php";
+                            var request = {userid: userid};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
         }
 
 
@@ -5350,6 +5384,73 @@ $(document).ready(function () {
 
         }
 
+        if (event.target.id == 'camp_reset_search') {
+            get_promotion_page();
+        }
+
+
+
+        if (event.target.id == 'select_all_camp') {
+            if ($('#select_all_camp').prop('checked')) {
+                $('.camp_users').prop('checked', true);
+            } // end if
+            else {
+                $('.camp_users').prop('checked', false);
+            } //else  
+        }
+
+        if (event.target.id == 'add_new_campaign_button') {
+            var users = [];
+            $('input:checkbox.camp_users:checked').each(function () {
+                users.push($(this).val());
+            }); // end of each function
+            if (users.length > 0) {
+                var userslist = users.join(',');
+                $('#camp_err').html('');
+                if (dialog_loaded !== true) {
+                    console.log('Script is not yet loaded starting loading ...');
+                    dialog_loaded = true;
+                    var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                    $.getScript(js_url)
+                            .done(function () {
+                                console.log('Script bootstrap.min.js is loaded ...');
+                                var url = "/lms/custom/promotion/get_add_campaign_dialog.php";
+                                var request = {userslist: userslist};
+                                $.post(url, request).done(function (data) {
+                                    $("body").append(data);
+                                    $("#myModal").modal('show');
+                                });
+                            })
+                            .fail(function () {
+                                console.log('Failed to load bootstrap.min.js');
+                            });
+                } // dialog_loaded!=true
+                else {
+                    console.log('Script already loaded');
+                    $("body").append(data);
+                    $("#myModal").modal('show');
+                }
+            } // end if users.length>0
+            else {
+                $('#camp_err').html('Please select users');
+            } // end else
+
+        }
+
+        if (event.target.id == 'camp_search') {
+            var state = $('#camp_state').val();
+            var city = $('#camp_city').val();
+            var workshop = $('#camp_ws').val();
+            if (state != '' || city != '' || workshop != '') {
+                $('#ajax_loader').show();
+                var search = {state: state, city: city, workshop: workshop};
+                var url = "/lms/custom/promotion/search_camp_users.php";
+                $.post(url, {search: JSON.stringify(search)}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#camp_users_container').html(data);
+                });
+            } // end if state!='' || city!='' && workshop!=''
+        }
 
 
     }); // end of body click event

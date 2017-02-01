@@ -98,41 +98,25 @@ class Promotion extends Util {
         $list = "";
 
         if ($this->session->justloggedin == 1) {
-            $new_campaign = $this->get_add_new_campaigner_block();
-            //$campagin_list = $this->get_campaigns_list();
-
-            /*
-              $list.="<div class='container-fluid'  style='text-align:center;'>";
-              $list.="<span class='span8'>";
-              $oFCKeditor = new FCKeditor('editor');
-              $oFCKeditor->BasePath = $this->editor_path;
-              $oFCKeditor->Value = '';
-              $oFCKeditor->Create(false);
-              $list.="</span>";
-              $list.="</div>";
-             */
-
-
-            $list.="<div class='container-fluid' id='new_campaign_container' style='text-align:center;'>";
-            $list.=$new_campaign;
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span2'><input type='text' id='camp_state' style='width:125px' placeholder='State'></span>";
+            $list.="<span class='span2'><input type='text' id='camp_city' style='width:125px' placeholder='City'></span>";
+            $list.="<span class='span2'><input type='text' id='camp_ws' style='width:125px' placeholder='Workshop'></span>";
+            $list.="<span class='span1'><button id='camp_search'>Search</button></span>";
+            $list.="<span class='span1' style='padding-left:15px;'><button id='camp_reset_search'>Clear</button></span>";
+            $list.="<span class='span3' style='padding-left:15px;'><button id='add_new_campaign_button'>Add New Campaign</button></span>";
             $list.="</div>";
 
-            $list.="<div class='container-fluid'  style='text-align:center;'>";
-            $list.="<span class='span12'><hr/></span>";
+            $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+            $list.="<span class='span10'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
             $list.="</div>";
 
-            /*
-              $list.="<div class='container-fluid'  style='text-align:left;'>";
-              $list.="<span class='span6'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$campagin_list</span>";
-              $list.="</div>";
-
-              $list.="<div class='container-fluid' id='campaign_container' style='text-align:left;'>";
-              $list.="";
-              $list.="</div>";
-             */
-
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span9' style='color:red;' id='camp_err'></span>";
             $list.="</div>";
-        } // end if
+
+            $list.="<div id='camp_users_container'></div>";
+        } // end if $this->session->justloggedin == 1
         else {
             $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
         }
@@ -451,6 +435,39 @@ class Promotion extends Util {
         return $list;
     }
 
+    function get_add_campaign_dialog($userslist) {
+        $list = "";
+        $list.="<div id='myModal' class='modal fade' style='width:975px;height:575px;left:35%;'>
+        <div class='modal-dialog'>
+            <div class='modal-content' style='min-height:575px;'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Add New Campaign</h4>
+                </div>
+                <div class='modal-body' style='height:970px;min-height:575px;'>
+                <input type='hidden' id='users' value='$userslist'>
+                    
+                <div class='container-fluid' style='text-align:center;'>
+                 <textarea id='campaign_text' rows='5' style='width:475px;'></textarea>
+                <script>
+                CKEDITOR.replace('campaign_text');
+                </script>
+                </div>
+                
+                <div class='container-fluid' style='text-align:center;'>
+                 <span class='span6' id='campaign_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='create_new_campaign_done'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
     function add_new_campaign2($data, $users) {
         mysql_connect("localhost", "cnausa_lms", "^pH+F8*[AEdT") or
                 die("Could not connect: " . mysql_error());
@@ -493,6 +510,200 @@ class Promotion extends Util {
             } // end foreach
         } // end if count($users)>0
         $list = "New campaign was put into queue and will be processed soon.";
+        return $list;
+    }
+
+    function get_users_by_state($state) {
+        $users = array();
+        $query = "select * from mdl_user "
+                . "where deleted=0 "
+                . "and state<>'' "
+                . "and state='$state'";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $users[] = $row['id'];
+            } // end while
+        } // end if $num > 0
+        return $users;
+    }
+
+    function get_users_by_city($city) {
+        $users = array();
+        $query = "select * from mdl_user "
+                . "where deleted=0 "
+                . "and city<>'' "
+                . "and city='$city'";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $users[] = $row['id'];
+            } // end while
+        } // end if $num > 0
+        return $users;
+    }
+
+    function get_users_slot($ws) {
+        $query = "select * from mdl_scheduler_slots where "
+                . "FROM_UNIXTIME(starttime, '%m-%d-%Y')='$ws->date' "
+                . "and appointmentlocation='$ws->location'";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['id'];
+            } // end while
+        } // end if $num > 0
+        else {
+            $slotid = 0;
+        } // end else
+        return $slotid;
+    }
+
+    function get_slot_desc($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $ws = new stdClass();
+                foreach ($row as $key => $value) {
+                    $ws->$key = $value;
+                } // end foreach
+            } // end while
+        } // end if
+        else {
+            $ws = new stdClass();
+        }
+        return $ws;
+    }
+
+    function get_users_by_workshop($ws) {
+        $users = array();
+        $slotid = $this->get_users_slot($ws);
+        if ($slotid > 0) {
+            $query = "select * from mdl_scheduler_appointment "
+                    . "where slotid=$slotid";
+            //echo "Query: " . $query . "<br>";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $is_deleted = $this->is_user_deleted($row['studentid']);
+                    if ($is_deleted == 0) {
+                        $users[] = $row['studentid'];
+                    } // end if $is_deleted==0
+                } // end while
+            } // end if $num > 0
+        } // end if $slotid>0
+        return $users;
+    }
+
+    function get_promotion_users($s) {
+        $list = "";
+        $state = $s->state;
+        $city = $s->city;
+        $ws = $s->workshop;
+        $ws_data = explode('--', $ws);
+        $ws_date = $ws_data[0];
+        $ws_location = $ws_data[1];
+
+        /*
+          echo "User state: " . $state . "<br>";
+          echo "User city: ". $city . "<br>";
+          echo "Workshop date: " . $ws_date . "<br>";
+          echo "Workhop location: " . $ws_location . "<br>";
+         * 
+         */
+
+
+        if ($ws_date != '') {
+            $workshop = new stdClass();
+            $workshop->date = $ws_date;
+            $workshop->location = $ws_location;
+            $users = $this->get_users_by_workshop($workshop);
+        } // end if $ws_date!=''
+        else {
+            if ($city != '') {
+                $users = $this->get_users_by_city($city);
+            } // end if $city!=''
+            else {
+                $users = $this->get_users_by_state($state);
+            } // end else
+        } // end else
+        $list.=$this->create_users_page($users);
+        return $list;
+    }
+
+    function get_user_workshop($userid) {
+        $list = "";
+        $query = "select * from mdl_scheduler_appointment "
+                . "where studentid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $ws = $this->get_slot_desc($row['slotid']);
+                if ($ws->starttime != '') {
+                    $date = date('m-d-Y', $ws->starttime);
+                    $list.="<div class='row-fluid'>";
+                    $list.="<span class='span12'>$date--$ws->appointmentlocation</span>";
+                    $list.="</div>";
+                } // end if $ws->starttime != ''
+            } // end while
+        } // end if $num > 0
+        else {
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span1'>N/A</span>";
+            $list.="</div>";
+        } // end else
+        return $list;
+    }
+
+    function create_users_page($users) {
+        $list = "";
+
+        if (count($users) > 0) {
+            $list.="<div class='row-fluid' style='font-weight:bold;padding-left:17px;'>";
+            $list.="<span class='span1'><input type='checkbox' id='select_all_camp' value='select_all'></span>";
+            $list.="<span class='span2'>User</span>";
+            $list.="<span class='span2'>State</span>";
+            $list.="<span class='span2'>City</span>";
+            $list.="<span class='span5'>Workshop</span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;text-align:center;'>";
+            $list.="<span class='span11'>Total found: " . count($users) . "</span>";
+            $list.="</span>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span11'><hr/></span>";
+            $list.="</div>";
+
+            foreach ($users as $userid) {
+                $userdata = $this->get_user_details($userid);
+                $ws = $this->get_user_workshop($userid);
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span1'><input type='checkbox' class='camp_users' value='$userid'></span>";
+                $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$userid' target='_blank'>$userdata->firstname $userdata->lastname</a></span>";
+                $list.="<span class='span2'>$userdata->state</span>";
+                $list.="<span class='span2'>$userdata->city</span>";
+                $list.="<span class='span5'>$ws</span>";
+                $list.="</div>";
+
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span11'><hr/></span>";
+                $list.="</div>";
+            } // end foreach
+        } // end if count($users)>0
+        else {
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span6'>No users found</span>";
+            $list.="</div>";
+        }
         return $list;
     }
 
