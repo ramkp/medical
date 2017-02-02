@@ -37,12 +37,13 @@ class Hotel extends Util {
     }
 
     function create_city_data() {
-        $query = "select * from mdl_user_cities order by city";
+        $query = "select distinct(city) from mdl_user_cities order by city";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $location = mb_convert_encoding($row['city'], 'UTF-8');
             $ws[] = $location;
         }
+        array_unique($ws);
         file_put_contents('/home/cnausa/public_html/lms/custom/utils/cities.json', json_encode($ws));
     }
 

@@ -510,11 +510,16 @@ class Util {
     }
 
     function get_course_name($courseid) {
-        $query = "select fullname from mdl_course where id=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $name = $row['fullname'];
-        }
+        if ($courseid > 0) {
+            $query = "select fullname from mdl_course where id=$courseid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $name = $row['fullname'];
+            }
+        } // end if $courseid>0
+        else {
+            $name = 'N/A';
+        } // end else
         return $name;
     }
 

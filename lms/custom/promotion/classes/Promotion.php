@@ -98,13 +98,15 @@ class Promotion extends Util {
         $list = "";
 
         if ($this->session->justloggedin == 1) {
+
             $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span2'><input type='text' id='camp_program' style='width:125px' placeholder='Program'></span>";
             $list.="<span class='span2'><input type='text' id='camp_state' style='width:125px' placeholder='State'></span>";
             $list.="<span class='span2'><input type='text' id='camp_city' style='width:125px' placeholder='City'></span>";
-            $list.="<span class='span2'><input type='text' id='camp_ws' style='width:125px' placeholder='Workshop'></span>";
+            //$list.="<span class='span2'><input type='text' id='camp_ws' style='width:125px' placeholder='Workshop'></span>";
             $list.="<span class='span1'><button id='camp_search'>Search</button></span>";
             $list.="<span class='span1' style='padding-left:15px;'><button id='camp_reset_search'>Clear</button></span>";
-            $list.="<span class='span3' style='padding-left:15px;'><button id='add_new_campaign_button'>Add New Campaign</button></span>";
+            $list.="<span class='span1' style='padding-left:18px;'><button id='add_new_campaign_button'>Add</button></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
@@ -602,40 +604,210 @@ class Promotion extends Util {
         return $users;
     }
 
+    function get_course_id($coursename) {
+        $query = "select * from mdl_course where fullname like '%$coursename%'";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $id = $row['id'];
+            } // end while
+        } // end if $num > 0
+        else {
+            $id = 0;
+        } // end else
+        return $id;
+    }
+
+    function is_match_creteria($userid) {
+        $query = "select * from mdl_user "
+                . "where id=$userid "
+                . "and deleted=0 "
+                . "and state<>'' "
+                . "and city<>''";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_users_by_program($courseid) {
+        $users = array();
+        $contextid = $this->get_course_context($courseid);
+        $query = "select * from mdl_role_assignments "
+                . "where contextid=$contextid "
+                . "and roleid=5";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $is_deleted = $this->is_user_deleted($row['userid']);
+                if ($is_deleted == 0) {
+                    $users[] = $row['userid'];
+                } // end if $is_deleted==0
+            } // end while
+        } // end if $num > 0
+        return $users;
+    }
+
+    function filer_users_by_state($users, $state) {
+        $fusers = array();
+        if (count($users) > 0) {
+            foreach ($users as $userid) {
+                $query = "select * from mdl_user "
+                        . "where id=$userid "
+                        . "and state like '%$state%'";
+                $num = $this->db->numrows($query);
+                if ($num > 0) {
+                    $result = $this->db->query($query);
+                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        $fusers[] = $userid;
+                    } // end while
+                } // end if $num > 0
+            } // end foreach
+        } // end if count($users)>0
+        return $fusers;
+    }
+
+    function filter_users_by_state_city($users, $state, $city) {
+        $fusers = array();
+        if (count($users) > 0) {
+            foreach ($users as $userid) {
+                $query = "select * from mdl_user "
+                        . "where id=$userid "
+                        . "and state like '%$state%' "
+                        . "and city like '%$city%'";
+                $num = $this->db->numrows($query);
+                if ($num > 0) {
+                    $result = $this->db->query($query);
+                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        $fusers[] = $userid;
+                    } // end while
+                } // end if $num > 0
+            } // end foreach
+        } // end if count($users)>0
+        return $fusers;
+    }
+
+    function filer_users_by_state_city_workshop($users, $state, $city, $slotid) {
+        $fusers = array();
+        if (count($users) > 0) {
+            foreach ($users as $userid) {
+                $query = "select * from mdl_user "
+                        . "where id=$userid "
+                        . "and state='$state' "
+                        . "and city='$city'";
+                $num = $this->db->numrows($query);
+                if ($num > 0) {
+                    $result = $this->db->query($query);
+                    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                        $has_ws = $this->is_user_workshop_based($slotid, $userid);
+                        if ($has_ws > 0) {
+                            $fusers[] = $userid;
+                        } // end if $has_ws > 0
+                    } // end while
+                } // end if $num > 0
+            } // end foreach
+        } // end if count($users)>0
+        return $fusers;
+    }
+
+    function is_user_workshop_based($slotid, $userid) {
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid=$slotid "
+                . "and studentid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
     function get_promotion_users($s) {
         $list = "";
-        $state = $s->state;
-        $city = $s->city;
-        $ws = $s->workshop;
+        $users = array();
+        $state = trim($s->state);
+        $city = trim($s->city);
+        $ws = trim($s->workshop);
         $ws_data = explode('--', $ws);
         $ws_date = $ws_data[0];
         $ws_location = $ws_data[1];
+        $coursename = trim($s->coursename);
 
-        /*
-          echo "User state: " . $state . "<br>";
-          echo "User city: ". $city . "<br>";
-          echo "Workshop date: " . $ws_date . "<br>";
-          echo "Workhop location: " . $ws_location . "<br>";
-         * 
-         */
+        if ($coursename != '') {
+            if ($state == '' && $city == '' && $ws_date == '') {
+                $courseid = $this->get_course_id($coursename);
+                if ($courseid > 0) {
+                    $users = $this->get_users_by_program($courseid);
+                } // end if $courseid>0
+            }
 
+            if ($state != '' && $city == '' && $ws_date == '') {
+                $courseid = $this->get_course_id($coursename);
+                if ($courseid > 0) {
+                    $pusers = $this->get_users_by_program($courseid);
+                    $users = $this->filer_users_by_state($pusers, $state);
+                } // end if $courseid>0
+            }
 
-        if ($ws_date != '') {
-            $workshop = new stdClass();
-            $workshop->date = $ws_date;
-            $workshop->location = $ws_location;
-            $users = $this->get_users_by_workshop($workshop);
-        } // end if $ws_date!=''
+            if ($state != '' && $city != '' && $ws_date == '') {
+                $courseid = $this->get_course_id($coursename);
+                if ($courseid > 0) {
+                    $pusers = $this->get_users_by_program($courseid);
+                    $users = $this->filter_users_by_state_city($pusers, $state, $city);
+                } // end if $courseid>0
+            }
+
+            if ($state != '' && $city != '' && $ws_date != '') {
+                $courseid = $this->get_course_id($coursename);
+                if ($courseid > 0) {
+                    $workshop = new stdClass();
+                    $workshop->date = $ws_date;
+                    $workshop->location = $ws_location;
+                    $slotid = $this->get_users_slot($workshop);
+                    if ($slotid > 0) {
+                        $pusers = $this->get_users_by_program($courseid);
+                        $users = $this->filer_users_by_state_city_workshop($pusers, $state, $city, $slotid);
+                    } // end if $slotid>0
+                } // end if $courseid>0
+            }
+        } // end if $coursename != ''
         else {
-            if ($city != '') {
-                $users = $this->get_users_by_city($city);
-            } // end if $city!=''
-            else {
-                $users = $this->get_users_by_state($state);
-            } // end else
-        } // end else
+
+            if ($state != '' && $city == '' && $ws_date == '') {
+                $ausers = $this->get_all_users();
+
+                $users = $this->filer_users_by_state($ausers, $state);
+            }
+
+            if ($state != '' && $city != '' && $ws_date == '') {
+                $ausers = $this->get_all_users();
+                $users = $this->filter_users_by_state_city($ausers, $state, $city);
+            }
+
+            if ($state != '' && $city != '' && $ws_date != '') {
+                $ausers = $this->get_all_users();
+                $workshop = new stdClass();
+                $workshop->date = $ws_date;
+                $workshop->location = $ws_location;
+                $slotid = $this->get_users_slot($workshop);
+                if ($slotid > 0) {
+                    $ausers = $this->get_all_users();
+                    $users = $this->filer_users_by_state_city_workshop($ausers, $state, $city, $slotid);
+                } // end if $slotid > 0
+            }
+        } // end else 
         $list.=$this->create_users_page($users);
         return $list;
+    }
+
+    function get_all_users() {
+        $users = array();
+        $query = "select * from mdl_user where deleted=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $users[] = $row['id'];
+            } // end while
+        } // end if $num > 0
+        return $users;
     }
 
     function get_user_workshop($userid) {
@@ -666,18 +838,21 @@ class Promotion extends Util {
     function create_users_page($users) {
         $list = "";
 
+
         if (count($users) > 0) {
-            $list.="<div class='row-fluid' style='font-weight:bold;padding-left:17px;'>";
-            $list.="<span class='span1'><input type='checkbox' id='select_all_camp' value='select_all'></span>";
-            $list.="<span class='span2'>User</span>";
-            $list.="<span class='span2'>State</span>";
-            $list.="<span class='span2'>City</span>";
-            $list.="<span class='span5'>Workshop</span>";
-            $list.="</div>";
 
             $list.="<div class='row-fluid' style='font-weight:bold;text-align:center;'>";
-            $list.="<span class='span11'>Total found: " . count($users) . "</span>";
-            $list.="</span>";
+            $list.="<span class='span12'>Total Users Found: " . count($users) . "</span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span1'><input type='checkbox' id='select_all_camp' value='select_all'></span>";
+            $list.="<span class='span2'>User</span>";
+            $list.="<span class='span4' style='text-align:left;'>Program(s)</span>";
+            $list.="<span class='span2'>State</span>";
+            $list.="<span class='span2'>City</span>";
+            //$list.="<span class='span3'>Workshop</span>";
+            $list.="</div>";
 
             $list.="<div class='row-fluid'>";
             $list.="<span class='span11'><hr/></span>";
@@ -686,12 +861,14 @@ class Promotion extends Util {
             foreach ($users as $userid) {
                 $userdata = $this->get_user_details($userid);
                 $ws = $this->get_user_workshop($userid);
+                $program = $this->get_user_programs($userid);
                 $list.="<div class='row-fluid'>";
                 $list.="<span class='span1'><input type='checkbox' class='camp_users' value='$userid'></span>";
                 $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$userid' target='_blank'>$userdata->firstname $userdata->lastname</a></span>";
+                $list.="<span class='span4' style='text-align:left;'>$program</span>";
                 $list.="<span class='span2'>$userdata->state</span>";
                 $list.="<span class='span2'>$userdata->city</span>";
-                $list.="<span class='span5'>$ws</span>";
+                //$list.="<span class='span3'>$ws</span>";
                 $list.="</div>";
 
                 $list.="<div class='row-fluid'>";
@@ -702,6 +879,41 @@ class Promotion extends Util {
         else {
             $list.="<div class='row-fluid'>";
             $list.="<span class='span6'>No users found</span>";
+            $list.="</div>";
+        }
+        return $list;
+    }
+
+    function get_courseid_by_contextid($contextid) {
+        $query = "select * from mdl_context "
+                . "where contextlevel=50 "
+                . "and id=$contextid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['instanceid'];
+        }
+        return $courseid;
+    }
+
+    function get_user_programs($userid) {
+        $list = "";
+        $query = "select * from mdl_role_assignments "
+                . "where roleid=5 "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courseid = $this->get_courseid_by_contextid($row['contextid']);
+                $coursename = $this->get_course_name($courseid);
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span12'>$coursename</span>";
+                $list.="</div>";
+            }
+        } // end if $num > 0) {
+        else {
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span1'>N/A</span>";
             $list.="</div>";
         }
         return $list;

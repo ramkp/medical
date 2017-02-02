@@ -308,6 +308,10 @@ $(document).ready(function () {
                 $('#camp_city').typeahead({source: data, items: 52000});
             }, 'json');
 
+            $.post('/lms/custom/utils/programs.json', {id: 1}, function (data) {
+                $('#camp_program').typeahead({source: data, items: 52000});
+            }, 'json');
+
         });
     }
 
@@ -5438,18 +5442,29 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'camp_search') {
+            var coursename = $('#camp_program').val();
             var state = $('#camp_state').val();
             var city = $('#camp_city').val();
-            var workshop = $('#camp_ws').val();
-            if (state != '' || city != '' || workshop != '') {
+            //var workshop = $('#camp_ws').val();
+
+            if (state == '' && city != '') {
+                $('#camp_err').html('Please select state');
+                return;
+            }
+
+            if (state != '') {
+                $('#camp_err').html('');
                 $('#ajax_loader').show();
-                var search = {state: state, city: city, workshop: workshop};
+                var search = {state: state, city: city, workshop: '', coursename: coursename};
                 var url = "/lms/custom/promotion/search_camp_users.php";
                 $.post(url, {search: JSON.stringify(search)}).done(function (data) {
                     $('#ajax_loader').hide();
                     $('#camp_users_container').html(data);
                 });
             } // end if state!='' || city!='' && workshop!=''
+            else {
+                $('#camp_err').html('Please select state or city');
+            }
         }
 
 
