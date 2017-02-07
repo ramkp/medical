@@ -572,7 +572,7 @@ class Schedule extends Util {
         $now = time();
         $query = "select * from mdl_scheduler_slots "
                 . "where schedulerid=$schedulerid ";
-               
+
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $location = mb_convert_encoding($row['appointmentlocation'], 'UTF-8');
@@ -989,8 +989,12 @@ class Schedule extends Util {
     function print_certificate_labels($courseid, $students) {
         $students_arr = explode(',', $students);
         if (count($students_arr) > 0) {
-            $pdf = new PDF_Label('L7163');
+            //$pdf = new PDF_Label('L7163');
+            //$pdf->AddPage();
+
+            $pdf = new PDF_Label('5162');
             $pdf->AddPage();
+
             if (!is_dir($this->labels_path)) {
                 if (!mkdir($dir_path)) {
                     die('Could not write to disk');
@@ -998,7 +1002,9 @@ class Schedule extends Util {
             } // end if !is_dir($dir_path)                
             foreach ($students_arr as $userid) {
                 $user_address = $this->get_user_address_data($userid);
-                $text = sprintf("%s\n%s\n%s %s %s", "$user_address->firstname  $user_address->lastname", "$user_address->address", "$user_address->city ,", "$user_address->state", "$user_address->zip");
+                //$text = sprintf("%s\n%s\n%s %s %s", "$user_address->firstname  $user_address->lastname", "$user_address->address", "$user_address->city ,", "$user_address->state", "$user_address->zip");
+                //$pdf->Add_Label($text);
+                $text = sprintf("%s\n%s\n%s\n%s\n%s\n%s\n%s", "From:", "Medical2 Inc", "1830A North Gloster St \nTupelo, MS 38804", "--------------------------------------------------------", "                       $user_address->firstname $user_address->lastname", "                       $user_address->address", "                       $user_address->city, " . $user_address->state . " $user_address->zip");
                 $pdf->Add_Label($text);
             } // end foreach
             $now = time();

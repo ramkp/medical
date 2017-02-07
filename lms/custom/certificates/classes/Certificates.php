@@ -1269,9 +1269,9 @@ class Certificates extends Util {
         $user_address = $this->get_user_address_data($userid);
         $pdf = new PDF_Label('5162');
         $pdf->AddPage();
-        $text = sprintf("%s\n%s\n%s\n%s\n%s\n%s\n%s", "From:", "Medical2 Inc", "1830A North Gloster St \nTupelo, MS 38804", "--------------------------------------------------------","                       $user_address->firstname $user_address->lastname","                       $user_address->address", "                       $user_address->city, " . $user_address->state . " $user_address->zip");
+        $text = sprintf("%s\n%s\n%s\n%s\n%s\n%s\n%s", "From:", "Medical2 Inc", "1830A North Gloster St \nTupelo, MS 38804", "--------------------------------------------------------", "                       $user_address->firstname $user_address->lastname", "                       $user_address->address", "                       $user_address->city, " . $user_address->state . " $user_address->zip");
         $pdf->Add_Label($text);
-        
+
         $dir_path = $this->cert_path . "/$userid";
         if (!is_dir($dir_path)) {
             if (!mkdir($dir_path)) {
@@ -1280,6 +1280,22 @@ class Certificates extends Util {
         } // end if !is_dir($dir_path)
         $path = $dir_path . "/label.pdf";
         $pdf->Output($path, 'F');
+    }
+
+    function migrate_labels() {
+        $query = "select * from mdl_certificates";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                echo "<br>User id: " . $row['userid'] . "<br>";
+                echo "Course id: " . $row['courseid'] . "<br>";
+                $this->create_label($row['courseid'], $row['userid']);
+                echo "Label has been updated ...<br>";
+                echo "<br>------------------------------------------<br>";
+            } // end while
+            echo "<span style='font-weight:bold'>Total items: $num</span>";
+        } // end if $num > 0
     }
 
     function get_certificate_classes($item) {
