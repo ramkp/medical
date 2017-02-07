@@ -10,6 +10,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/schedule/classes/Schedule.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/register/classes/Register.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 
 use Dompdf\Dompdf;
@@ -947,8 +948,8 @@ class Dashboard extends Util {
         $other = $this->get_other_tab($id);
         $list.="<ul class='nav nav-tabs'>
               <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>
-              <li><a data-toggle='tab' href='#menu1'>Workshops</a></li>
-              <li><a data-toggle='tab' href='#menu2'>Certification</a></li>
+              <li><a data-toggle='tab' href='#menu1'>Courses</a></li>
+              <li><a data-toggle='tab' href='#menu2'>Certificates</a></li>
               <li><a data-toggle='tab' href='#menu3'>Other</a></li>  
               <input type='hidden' id='userid' value='$id'>  
             </ul>
@@ -959,11 +960,11 @@ class Dashboard extends Util {
                 <p>$payments</p>
               </div>
               <div id='menu1' class='tab-pane fade'>
-                <h3>Workshops</h3>
+                <h3>Courses</h3>
                 <p>$workshops</p>
               </div>
               <div id='menu2' class='tab-pane fade'>
-                <h3>Certification</h3>
+                <h3>Certificates</h3>
                 <p>$certficates</p>
               </div>
               <div id='menu3' class='tab-pane fade'>
@@ -1107,7 +1108,7 @@ class Dashboard extends Util {
     function get_user_workshops($id) {
         $list = "";
         $list.="<div class='container-fluid' style=''>";
-        $list.="<span class='span6'><button class='profile_add_to_workshop' style='width:205px;' data-userid='$id'>Add user to workshop</button></span>";
+        $list.="<span class='span6'><button class='profile_add_to_workshop' style='width:205px;' data-userid='$id'>Add course</button></span>";
         $list.="</div><br><br>";
 
         $query = "select * from mdl_scheduler_appointment where studentid=$id";
@@ -1575,36 +1576,29 @@ class Dashboard extends Util {
 
     function get_add_to_workshop_dialog($userid) {
         $list = "";
-
-        $list.="<div id='myModal' class='modal fade'>
+        $r = new Register();
+        $form = $r->get_program_register_form();
+        $list.="<div id='myModal' class='modal fade' style='width:875px;left:40%;'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>
-                    <h4 class='modal-title'>Add student to workshop</h4>
+                    <h4 class='modal-title'>Add course</h4>
                 </div>
                 <div class='modal-body'>
                 <input type='hidden' id='userid' value='$userid'>
                     
-                <div class='container-fluid'>
-                <span class='span1'>Program</span>
-                <span class='span3'><input type='text' id='coursename' style='width:275px;'></span>
-                <br><br>
-                </div>
-                   
-                <div class='container-fluid'>
-                <span class='span1'>Workshop</span>
-                <span class='span3'><input type='text' id='wsname' style='width:275px;'></span>
-                <br><br>
-                </div>
+                <div class='row-fluid' style=''><span class='span12'>$form</span></div>
                 
                 <div class='container-fluid' style=''>
                 <span class='span6' style='color:red;' id='ws_err'></span>
-                </div>
+                </div><br><br>
              
-                <div class='modal-footer' style='text-align:center;'>
-                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
-                    <span align='center'><button type='button' class='btn btn-primary' id='add_to_ws'>OK</button></span>
+                <div class='container-fluid' style='text-align:left;'>
+                    <span class='span1' style='margin-left:0px;'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span class='span1' style='padding-left:25px;'><button type='button' class='btn btn-primary' id='add_to_ws'>OK</button></span>
                 </div>
+
+                
             </div>
         </div>
     </div>";
@@ -1618,31 +1612,19 @@ class Dashboard extends Util {
           echo "<pre>";
           print_r($ws);
           echo "</pre>";
+
+          [courseid] => 45
+          [userid] => 11773
+          [slotid] => 1302
          */
 
-        $course_data = json_decode($this->get_courseid_by_name($ws->coursename));
+        $enroll = new Enroll();
+        $enroll->assign_roles($ws->userid, $ws->courseid);
 
-        /*
-         * 
-          echo "<pre>";
-          print_r($course_data);
-          echo "</pre>";
-         * 
-         */
-
-        $courseid = $course_data->courseid;
-        $schedulerid = $this->get_course_scheduler($courseid);
-        $wsname = $ws->wsname;
-        $sch = new Schedule();
-        $slotid = $sch->get_slotid_by_name($wsname, $schedulerid);
-        //echo "Course id: " . $courseid . "<br>";
-        //echo "Scheduler id: " . $schedulerid . "<br>";
-        //echo "User id: " . $ws->userid . "<br>";
-        //echo "Slot id: " . $slotid . "<br>";
-        if ($slotid > 0) {
+        if ($ws->slotid > 0) {
             $query = "insert into mdl_scheduler_appointment "
                     . "(slotid,studentid,attended) "
-                    . "values($slotid,$ws->userid,0)";
+                    . "values($ws->slotid,$ws->userid,0)";
             $this->db->query($query);
         }
     }

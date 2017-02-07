@@ -53,13 +53,24 @@ class Enroll {
         return $enrolid;
     }
 
+    function already_enrolled($courseid, $userid) {
+        $enrolid = $this->getEnrolId($courseid);
+        $query = "select * from mdl_user_enrolments "
+                . "where enrolid=$enrolid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
     function assign_roles($userid, $courseid) {
         $roleid = $this->student_role;
         $enrolid = $this->getEnrolId($courseid);
         $contextid = $this->getCourseContext($courseid, $roleid);
+        $already_enrolled = $this->already_enrolled($courseid, $userid);
+        if ($already_enrolled == 0) {
 
-        // 1. Insert into mdl_user_enrolments table
-        $query = "insert into mdl_user_enrolments
+            // 1. Insert into mdl_user_enrolments table
+            $query = "insert into mdl_user_enrolments
              (enrolid,
               userid,
               timestart,
@@ -72,11 +83,11 @@ class Enroll {
                         '2',
                          '" . time() . "',
                          '" . time() . "')";
-        //echo "Query: ".$query."<br/>";
-        $this->db->query($query);
+            //echo "Query: ".$query."<br/>";
+            $this->db->query($query);
 
-        // 2. Insert into mdl_role_assignments table
-        $query = "insert into mdl_role_assignments
+            // 2. Insert into mdl_role_assignments table
+            $query = "insert into mdl_role_assignments
                   (roleid,
                    contextid,
                    userid,
@@ -87,8 +98,9 @@ class Enroll {
                            '" . $userid . "',
                            '" . time() . "',
                             '2'         )";
-        // echo "Query: ".$query."<br/>";
-        $this->db->query($query);
+            // echo "Query: ".$query."<br/>";
+            $this->db->query($query);
+        } // end if $already_endrolled==0
     }
 
     function get_country_code($country) {

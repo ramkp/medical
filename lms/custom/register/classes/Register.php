@@ -122,6 +122,27 @@ class Register extends Util {
         return $drop_down;
     }
 
+    function get_program_register_form() {
+        $list = "";
+
+        $cats = $this->get_course_categories();
+        $courses = $this->get_courses_by_category();
+        $states = $this->get_states_list();
+        $countries = $this->get_countries_list();
+        $register_state = $this->get_register_course_states_list();
+        $cities = $this->get_register_course_cities_list();
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'>$cats</span>";
+        $list.="<span class='span2' id='cat_course'>$courses</span>";
+        $list.="<span class='span2' id='register_states_container'>$register_state</span>";
+        $list.="<span class='span2' id='register_cities_container'>$cities</span>";
+        $list.="<span class='span2' id='program_err' style='color:red;'></span>";
+        $list.="</div>"; // end of container-fluid
+
+        return $list;
+    }
+
     function get_register_form() {
 
         $list = "";

@@ -2458,20 +2458,22 @@ $(document).ready(function () {
                                 $("#myModal").modal('show');
 
                                 /*
+                                 
                                  $.get('/lms/custom/utils/workshops.json', function (data) {
                                  console.log(data);
                                  $('#wsname').typeahead({source: data, items: 240});
                                  }, 'json');
+                                 
+                                 $.post('/lms/custom/utils/workshops.json', {id: 1}, function (data) {
+                                 console.log(data);
+                                 $('#wsname').typeahead({source: data, items: 240});
+                                 }, 'json');
+                                 
+                                 $.get('/lms/custom/utils/programs.json', function (data) {
+                                 $('#coursename').typeahead({source: data, items: 24});
+                                 }, 'json');
+                                 
                                  */
-
-                                $.post('/lms/custom/utils/workshops.json', {id: 1}, function (data) {
-                                    console.log(data);
-                                    $('#wsname').typeahead({source: data, items: 240});
-                                }, 'json');
-
-                                $.get('/lms/custom/utils/programs.json', function (data) {
-                                    $('#coursename').typeahead({source: data, items: 24});
-                                }, 'json');
 
                             }); // end of post
                         })
@@ -3073,6 +3075,28 @@ $(document).ready(function () {
 
 
     }); // end of $('#region-main').on('change', 'select',
+
+    $('body').on('change', 'select', function (event) {
+
+        console.log("Body change event ID: " + event.target.id);
+
+        if (event.target.id == 'categories') {
+            var category_id = $('#categories').val();
+            get_category_course(category_id);
+        }
+
+        if (event.target.id == 'register_courses') {
+            get_register_course_states();
+            var id = $('#register_courses').val();
+            get_course_users(id);
+        }
+
+        if (event.target.id == 'register_state') {
+            get_register_course_cities();
+        }
+
+
+    }); // end of $('#body').on('change', 'select', 
 
     function get_contact_page() {
         var url = "/lms/custom/contact/index.php";
@@ -4458,22 +4482,22 @@ $(document).ready(function () {
 
         if (event.target.id == 'add_to_ws') {
             var userid = $('#userid').val();
-            var wsname = $('#wsname').val();
-            var coursename = $('#coursename').val()
-            if (wsname != '' && coursename != '') {
+            var courseid = $('#register_courses').val();
+            var slotid = $('#register_cities').val();
+            if (courseid > 0) {
                 $('#ws_err').html('');
-                if (confirm('Add current user to new workshop?')) {
+                if (confirm('Add current user to new program?')) {
                     var url = "/lms/custom/my/add_user_to_workshop.php";
-                    var ws = {wsname: wsname, userid: userid, coursename: coursename};
+                    var ws = {courseid: courseid, userid: userid, slotid: slotid};
                     $.post(url, {ws: JSON.stringify(ws)}).done(function (data) {
                         console.log(data);
                         $("[data-dismiss=modal]").trigger({type: "click"});
                         document.location.reload();
                     });
                 } // end if
-            } // end if
+            } // end if courseid>0
             else {
-                $('#ws_err').html('Please select program and workshop');
+                $('#ws_err').html('Please select program');
             } // end else 
         }
 
