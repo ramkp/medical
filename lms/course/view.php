@@ -317,5 +317,41 @@ course_view(context_course::instance($course->id), $section);
 
 // Include course AJAX
 include_course_ajax($course, $modnamesused);
+?>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        // Replace original Moodle player with flowplayer for labels
+        var labelurl = '/lms/custom/flowplayer/url.php';
+        $(".activity.modtype_label.label").each(function () {
+            var id = $(this).attr('id').replace('module-', '');
+            $.post(labelurl, {id: id}).done(function (url) {
+
+                var containerid = '#module-' + id + '> div > div > div:nth-child(2) > div > div > div > p > span';
+                var container = $(containerid);
+                container.bind("contextmenu", function (e) {
+                    e.preventDefault();
+                });
+                flowplayer(container, {
+                    share: false,
+                    key: "$599424236128582",
+                    clip: {
+                        sources: [{type: "video/mp4", src: url, engine: "html5"}]
+                    } // end of clip
+                }); // end of player ...
+
+            }); // end of post 
+        }); // end of each
+
+
+    }); // end of document ready
+
+</script>
+
+<?php
 
 echo $OUTPUT->footer();
+

@@ -22,37 +22,49 @@
  * @copyright 2014 redPIthemes
  *
  */
+// ******************** Javasctipt files *************************
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/nav/classes/navClass.php');
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/nav/js/navigation.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/vendor/jquery.ui.widget.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/jquery.iframe-transport.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/jquery.fileupload.js'></script>";
-//echo "<script src='https://cdn.ckeditor.com/4.5.6/standard/ckeditor.js'></script>";
 echo '<script src="//cdn.ckeditor.com/4.5.11/full/ckeditor.js"></script>';
 //echo "<script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>";
+echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
+echo "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.js'></script>";
+echo "<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.js'></script>";
+echo "<script type='text/javascript' src='//releases.flowplayer.org/7.0.1/commercial/flowplayer.min.js'>";
+echo "<script src='https://releases.flowplayer.org/hlsjs/flowplayer.hlsjs.min.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/jquery.simplePagination.js'></script>";
-echo "<link type='text/css' rel='stylesheet' href='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/simplePagination.css'/>";
 echo "<script type = 'text/javascript' src = 'https://www.gstatic.com/charts/loader.js' ></script>";
 echo "<script type = 'text/javascript'>";
 echo "google.charts.load('current', {'packages': ['corechart']})";
 echo "</script>";
 
-//echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
-echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
+// ******************* CSS files *************************
+echo "<link rel='stylesheet' href='//releases.flowplayer.org/7.0.1/commercial/skin/skin.css'>";
 echo"<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
 echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'>";
-echo "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.js'></script>";
-echo "<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.js'></script>";
+echo "<link type='text/css' rel='stylesheet' href='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/simplePagination.css'/>";
 ?>
 
-<script>
+<style>
 
-    /*
-     $(function () {
-     $("#start").datepicker();
-     $("#end").datepicker();
-     });
-     */
+    .flowplayer .fp-color {
+
+    }
+
+    .flowplayer .fp-controls {
+
+    }
+
+    .flowplayer .fp-color-play {
+        fill: #e2a500;
+    }
+
+</style>
+
+<script>
 
     $(document).ready(function () {
 
