@@ -2314,4 +2314,44 @@ class Dashboard extends Util {
         $this->db->query($query);
     }
 
+    function get_program_slots($coursename) {
+
+        // Create clear set first to refresh input
+        $none[0] = "";
+        file_put_contents('/home/cnausa/public_html/lms/custom/utils/none.json', json_encode($none));
+
+        $query = "select * from mdl_course where fullname='$coursename'";
+        $coursenum = $this->db->numrows($query);
+        if ($coursenum > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courseid = $row['id'];
+            }
+
+            $query = "select * from mdl_scheduler where course=$courseid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $schedulerid = $row['id'];
+            }
+
+            $query = "select * from mdl_scheduler_slots "
+                    . "where schedulerid=$schedulerid";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $location = mb_convert_encoding($row['appointmentlocation'], 'UTF-8');
+                    $date = mb_convert_encoding(date('m-d-Y', trim($row['starttime'])), 'UTF-8');
+                    $ws[] = $date . "--" . $location;
+                }
+                unlink('/home/cnausa/public_html/lms/custom/utils/slots.json');
+                file_put_contents('/home/cnausa/public_html/lms/custom/utils/slots.json', json_encode($ws));
+            } // end if $num > 0
+            else {
+                unlink('/home/cnausa/public_html/lms/custom/utils/slots.json');
+            }
+        } // end if $coursenum
+        return $coursenum;
+    }
+
 }
