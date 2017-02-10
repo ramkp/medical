@@ -56,7 +56,7 @@ class Calendar extends Util {
         $list.="<span class='span12'>";
         $list.="<table border='0'>";
         $list.="<tr valign='top'>";
-        $list.="<td width='40%' style='padding:15px'>Please select calendar dates<br><div id='user_calendar' data-userid='$userid'></div></td>";
+        $list.="<td width='40%' style='padding:15px'>Please select availability dates<br><div id='user_calendar' data-userid='$userid'></div></td>";
         //$list.="<td style='padding:15px'></td>";
         $list.="<td style='padding:15px;'>$dates</td>";
         $list.="</tr>";

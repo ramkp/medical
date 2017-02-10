@@ -224,7 +224,7 @@ class Instructors extends Util {
                 $user = $this->get_user_details($in->userid);
                 $courses_block = $this->get_instructor_courses_block($in->userid);
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$in->userid' target='_blank'>$user->firstname $user->lastname</a></span>";
+                $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$in->userid' target='_blank'>$user->firstname $user->lastname<br>$user->city, $user->state $user->zip</a></span>";
                 $list.="<span class='span1'><img style='cursor:pointer;' title='Availability' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/theme/image.php/lambda/core/1468523658/t/edit' id='instructor_dialog_$in->userid'></span>";
                 $list.="<span class='span6'>$courses_block</span>";
                 $list.="</div>";
