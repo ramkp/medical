@@ -8,6 +8,19 @@ $(document).ready(function () {
         win.focus();
     });
 
+    // Monitor all events
+    /*
+     $('body').on("click mousedown mouseup focus blur keydown change mouseup click dblclick mousemove mouseover mouseout mousewheel keydown keyup keypress textInput touchstart touchmove touchend touchcancel resize scroll zoom focus blur select change submit reset", function (e) {
+     console.log(e);
+     });
+     */
+    // Monitor only few events ...
+    /*
+     $('body').on("click change click  blur select change submit reset", function (e) {
+     console.log(e);
+     });
+     */
+
 
     var domain = 'medical2.com';
     var dialog_loaded;
@@ -3081,8 +3094,6 @@ $(document).ready(function () {
 
     $('body').on('change', 'select', function (event) {
 
-        console.log("Body change event ID: " + event.target.id);
-
         if (event.target.id == 'categories') {
             var category_id = $('#categories').val();
             get_category_course(category_id);
@@ -3930,6 +3941,37 @@ $(document).ready(function () {
 
     }); // end of body click function
 
+
+    $('body').on('change', function (event) {
+
+        //console.log('Body change event: ' + event);
+        var elClass = event.target.class;
+        var elID = event.target.id;
+
+        //console.log('Event id: ' + elID);
+        //console.log('Event class: ' + elClass);
+
+
+        if (event.target.id == 'user_calendar') {
+            var date = new Date($('#user_calendar').datepicker("getDate"));
+            var userid = $('#user_calendar').data('userid');
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            var year = date.getFullYear();
+            var humanDate = [month, day, year].join('/');
+            if (confirm('Update calendar?')) {
+                var calendar = {userid: userid, date: humanDate};
+                var url = "/lms/custom/calendar/update_user_calendar.php";
+                $.post(url, {calendar: JSON.stringify(calendar)}).done(function (data) {
+                    console.log(data);
+                    document.location.reload();
+                });
+            } // end if confirm
+        }
+
+
+
+    }); // end of body change event ...
 
     $('body').on('change', 'select', function (event) {
 
@@ -5081,7 +5123,7 @@ $(document).ready(function () {
         console.log('Event ID: ' + event.target.id);
 
         if (event.target.id.indexOf("instructor_dialog") >= 0) {
-            var userid = event.target.id.replace("instructor_dialog", "");
+            var userid = event.target.id.replace("instructor_dialog_", "");
             if (dialog_loaded !== true) {
                 console.log('Script is not yet loaded starting loading ...');
                 dialog_loaded = true;
@@ -5508,6 +5550,9 @@ $(document).ready(function () {
         }
 
 
+
+
+
     }); // end of body click event
 
     $('body').on('typeahead:select', function (event, suggestion) {
@@ -5529,6 +5574,7 @@ $(document).ready(function () {
             });
         } // end if coursename!=''
     }); // end of $('body').on('blur',
+
 
 
 }); // end of $(document).ready(function()

@@ -1,12 +1,13 @@
 <?php
-
 //  Display the course home page.
 
 require_once('../config.php');
 require_once('lib.php');
 require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->dirroot . '/custom/my/classes/Dashboard.php');
+require_once($CFG->dirroot . '/custom/calendar/classes/Calendar.php');
 
+$cal = new Calendar();
 $id = optional_param('id', 0, PARAM_INT);
 $name = optional_param('name', '', PARAM_RAW);
 $edit = optional_param('edit', -1, PARAM_BOOL);
@@ -284,6 +285,19 @@ if ($roleid == 5 && $category == 2 && $completed > 0) {
         die();
     }
 } // end if
+
+
+/* * **********************************************************
+  Code related to instructors calendar
+
+ * ********************************************************** */
+$userid = $cal->user->id;
+$instructor_status = $cal->is_instructor($userid);
+if ($instructor_status) {
+    $calendar = $cal->create_user_calendar();
+    echo $calendar;
+} // end if $status
+// ************************************************************
 // Course wrapper start.
 echo html_writer::start_tag('div', array('class' => 'course-content'));
 
@@ -346,12 +360,25 @@ include_course_ajax($course, $modnamesused);
             }); // end of post 
         }); // end of each
 
+        var calendarurl = '/lms/custom/calendar/get_user_calendar.php';
+        $.post(calendarurl, {userid: <?php echo $userid; ?>}).done(function (dates) {
+            console.log('Returned dates: ' + dates);
+            $('#user_calendar').datepicker({
+                dateFormat: "mm/dd/yy"
+            });
+
+            /*
+             $.each(JSON.parse(dates), function (key, value) {
+             console.log('User date: ' + value);
+             $("#user_calendar").datepicker("setDate", value);
+             }); // end of each
+             */
+        }); // end of post
 
     }); // end of document ready
 
 </script>
 
 <?php
-
 echo $OUTPUT->footer();
 

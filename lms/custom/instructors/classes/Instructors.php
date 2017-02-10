@@ -1,6 +1,7 @@
 <?php
 
 require_once ('/home/cnausa/public_html/lms/custom/utils/classes/Util.php');
+require_once ('/home/cnausa/public_html/lms/custom/calendar/classes/Calendar.php');
 
 /**
  * Description of Instructors
@@ -250,16 +251,20 @@ class Instructors extends Util {
 
     function get_settings_dialog($userid) {
         $list = "";
+
+        $cal = new Calendar();
+        $dates = $cal->get_availabily_dates($userid);
+
         $list.="<div id='myModal' class='modal fade'>
         <div class='modal-dialog'>
             <div class='modal-content'>
                 <div class='modal-header'>
-                    <h4 class='modal-title'>Instructor Settings</h4>
+                    <h4 class='modal-title'>Instructor's Availability</h4>
                 </div>
                 <div class='modal-body'>
                 <input type='hidden' id='inst_settings_userid' value='$userid'>
                 <div class='container-fluid' style=''>
-                <span class='span6'>Coming soon ...</span>
+                <span class='span6'>$dates</span>
                 </div>
                 
                 <div class='container-fluid' style=''>
@@ -267,8 +272,7 @@ class Instructors extends Util {
                 </div>
              
                 <div class='modal-footer' style='text-align:center;'>
-                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
-                    <span align='center'><button type='button' class='btn btn-primary' id='update_instructor_settings_button'>OK</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>OK</button></span>
                 </div>
             </div>
         </div>
