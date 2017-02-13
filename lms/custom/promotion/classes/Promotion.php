@@ -841,7 +841,7 @@ class Promotion extends Util {
             $list.="</div>";
 
             $list.="<div class='row-fluid' style='font-weight:bold;'>";
-            $list.="<span class='span1'><input type='checkbox' id='select_all_camp' value='select_all'></span>";
+            $list.="<span class='span1'><input type='checkbox' id='select_all_camp' value='select_all'>All</span>";
             $list.="<span class='span2'>User</span>";
             $list.="<span class='span4' style='text-align:left;'>Program(s)</span>";
             $list.="<span class='span2'>State</span>";
