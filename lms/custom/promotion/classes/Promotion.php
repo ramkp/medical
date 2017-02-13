@@ -443,13 +443,13 @@ class Promotion extends Util {
         <div class='modal-dialog'>
             <div class='modal-content' style='min-height:575px;'>
                 <div class='modal-header'>
-                    <h4 class='modal-title'>Add New Campaign</h4>
+                    <h4 class='modal-title'>Add New Campaign <span><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span><span><button type='button' class='btn btn-primary' id='create_new_campaign_done'>OK</button></span></h4>
                 </div>
                 <div class='modal-body' style='height:970px;min-height:575px;'>
                 <input type='hidden' id='users' value='$userslist'>
                     
                 <div class='container-fluid' style='text-align:center;'>
-                 <textarea id='campaign_text' rows='5' style='width:475px;'></textarea>
+                 <textarea id='campaign_text' rows='3' style='width:475px;'></textarea>
                 <script>
                 CKEDITOR.replace('campaign_text');
                 </script>
@@ -458,12 +458,7 @@ class Promotion extends Util {
                 <div class='container-fluid' style='text-align:center;'>
                  <span class='span6' id='campaign_err'></span>
                 </div>
-             
-                <div class='modal-footer' style='text-align:center;'>
-                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
-                    <span align='center'><button type='button' class='btn btn-primary' id='create_new_campaign_done'>OK</button></span>
-                </div>
-            </div>
+             </div>
         </div>
     </div>";
 
