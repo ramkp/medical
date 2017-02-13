@@ -2646,6 +2646,22 @@ $(document).ready(function () {
             }
         }
 
+        if ($(event.target).attr('class') == 'add_instructor') {
+            var userid = $(this).data('inst_userid');
+            var elid = '#cws_' + userid;
+            var slot = $(elid).val();
+            if (slot > 0) {
+                if (confirm('Add instructor to selected workshop?')) {
+                    var instructor = {userid: userid, slot: slot};
+                    var url = "/lms/custom/instructors/add_instructor_to_workshop.php";
+                    $.post(url, {instructor: JSON.stringify(instructor)}).done(function (data) {
+                        $('#inst_err').html(data);
+                        //$('#inst_err').html('Instructor has been added to selected workshop');
+                    });
+                } // end if confirm
+            } // end if slot>0
+        }
+
         if ($(event.target).attr('class') == 'profile_send_cert') {
             var userid = $(this).data('userid');
             var courserid = $(this).data('courseid');
