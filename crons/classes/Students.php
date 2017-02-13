@@ -1877,30 +1877,34 @@ class Students {
 
         $list.="<p style='align:left;font-size:23px;font-weight:bold;'>Its Time To Renew your Certification!</p> 
 
-				<p style='align:center;font-size:25px;font-weight:bold;color:red;'>Medical2 Certification Agency</p>
+	                <p style='align:center;font-size:25px;font-weight:bold;color:red;'>Medical2 Certification Agency</p>
  			
     			<p style='font-size:15px;font-wieght:bold;'>Toll-Free: 1-877-741-1996 Fax: 407-233-1192 E-mail: <a href='mailto:help@medical2.com'>help@medical2.com</a></p> 
 
 			<p align='justify' style='font-size:15px;'>
-			You have received this notice because your Certification is about to expire. 
-    	    In order to remain certified, you must renew your certification. To qualify for 
-    	    recertification, you must login to your account and click on recertification tab 
-    		and follow the steps or send in your $50 renewal fee no later than 30 days past 
-    		your expiration date. If you do not meet this deadline, the fee will increase 
-    	    to $75. After 90 days, the fee will be $100. Additionally, if your certification 
-    	    is over 90 days expired, you must submit documentation verifying that you are 
-    	    current in the respective field. If you are not current in the field, then you 
-    	    will be required to retake the Workshop or the Online Exam. For any questions 
-    	    please contact us. 
-    		</p>	
-    		<hr>	
+                        You have received this notice because your Certification is about to expire. 
+                        In order to remain certified, you must renew your certification. 
+                        To qualify for recertification, you must login to your account and click on 
+                        recertification tab and follow the steps or mail in a money order for your $50 
+                        renewal fee no later than 30 days past your expiration date. 
+                        If you do not meet this deadline, the fee will increase to $75. 
+                        After 90 days, the fee will be $100. Additionally, if your certification 
+                        is over 90 days expired, you must submit documentation verifying that you 
+                        are current in the respective field. If you are not current in the field, 
+                        then you will be required to retake the Workshop or the Online Exam. 
+                        For any questions please contact us.  Beginning March 1, 2017 
+                        all recertification fees will increase to $75 plus late fee if applicable.
+                        </p>	
+                    <hr>	
 			<p style='font-weight:bold;font-size:15px;'><span style='color:red;'>Make money orders out to</span> Medical2 Inc.</p> 
 			<hr>
                         <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/50/1' target='_blank'>$50 Recertification Fee </a></p>
 			<p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/75/1' target='_blank'>$75 Recertification Fee (Over 30 Days Expired)</a></p>
                         <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/100/1' target='_blank'>$100 Recertification Fee (Over 90 Days Expired)</a></p>
-
-		    <p style='align:left;font-size:15px;font-weight:bold;color:red;'>Mailing Address: Medical2 Inc.  1830A North Gloster St, Tupelo, MS 38804</p>";
+                        
+                        <p style='align:left;font-size:15px;'>Notice: Your username to login to your account at <a href='https://www.medical2.com' target='_blank'>www.medical2.com</a>
+                        is your email address and if you don't remember your password please use Forgot Password link to retrieve your password.</p>
+		        <p style='align:left;font-size:15px;font-weight:bold;color:red;'>Mailing Address: Medical2 Inc.  1830A North Gloster St, Tupelo, MS 38804</p>";
 
         return $list;
     }
