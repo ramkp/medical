@@ -2657,6 +2657,10 @@ $(document).ready(function () {
             var userid = $(this).data('inst_userid');
             var elid = '#cws_' + userid;
             var slot = $(elid).val();
+            
+            console.log('User id: '+userid);
+            console.log('Slot id: '+slot);
+            
             if (slot > 0) {
                 if (confirm('Add instructor to selected workshop?')) {
                     var instructor = {userid: userid, slot: slot};

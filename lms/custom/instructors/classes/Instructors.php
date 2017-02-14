@@ -216,8 +216,10 @@ class Instructors extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $place_arr = explode('/', $row['appointmentlocation']);
+                $courseid = $this->get_courseid_by_slotid($row['id']);
+                $courename = $this->get_course_name($courseid);
                 if ($place_arr[0] == $state || $place_arr[1] == $city) {
-                    $list.="<option value='" . $row['id'] . "'>" . date('m-d-Y', $row['starttime']) . " $place_arr[1], $place_arr[0]</option>";
+                    $list.="<option value='" . $row['id'] . "'>$courename - " . date('m-d-Y', $row['starttime']) . " $place_arr[1], $place_arr[0]</option>";
                 } // end if $place_arr[0] == $state ...
             } // end while
         } // end if $num>0
@@ -282,14 +284,108 @@ class Instructors extends Util {
         return $list;
     }
 
+    function get_courseid_by_slotid($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $schedulerid = $row['schedulerid'];
+        }
+
+        $query = "select * from mdl_scheduler where id=$schedulerid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['course'];
+        }
+        return $courseid;
+    }
+
+    function get_course_enrollid($courseid) {
+        $query = "select * from mdl_enrol "
+                . "where enrol='manual' "
+                . "and courseid=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
+    }
+
+    function is_already_enrolled($enrolid, $userid) {
+        $query = "select * from mdl_user_enrolments "
+                . "where enrolid=$enrolid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function is_already_course_tutor($contextid, $userid) {
+        $query = "select * from  mdl_role_assignments "
+                . "where contextid=$contextid "
+                . "and userid=$userid "
+                . "and roleid=3";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function is_user_already_at_workshop($slotid, $userid) {
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid=$slotid "
+                . "and studentid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
     function add_instructor_to_workshop($in) {
 
-        echo "<pre>";
-        print_r($in);
-        echo "</pre>";
+        $userid = $in->userid;
+        $slotid = $in->slot;
+        $courseid = $this->get_courseid_by_slotid($slotid);
+        $contextid = $this->get_course_context($courseid);
+        $enrolid = $this->get_course_enrollid($courseid);
 
-        // 1. Enroll into course as teacher if not enrolled
-        // 2. Add user to mdl_scheduler_appointment 
+        $already_enrolled = $this->is_already_enrolled($enrolid, $userid);
+        if ($already_enrolled == 0) {
+            $date = time();
+            $query = "insert into mdl_user_enrolments "
+                    . "(enrolid,"
+                    . "userid,"
+                    . "timestart) "
+                    . "values ($enrolid,"
+                    . "$userid,"
+                    . "'$date')";
+            $this->db->query($query);
+        } // end if $already_enrolled == 0
+
+        $already_tutor = $this->is_already_course_tutor($contextid, $userid);
+        if ($already_tutor == 0) {
+            $date = time();
+            $query = "insert into mdl_role_assignments "
+                    . "(roleid,"
+                    . "contextid,"
+                    . "userid,"
+                    . "timemodified,"
+                    . "modifierid) "
+                    . "values ('3',"
+                    . "'$contextid',"
+                    . "'$userid',"
+                    . "'$date',"
+                    . "'2')";
+            $this->db->query($query);
+        } // end if $already_tutor==0
+
+        $already_at_workshop = $this->is_user_already_at_workshop($slotid, $userid);
+        if ($already_at_workshop == 0) {
+            $query = "insert into mdl_scheduler_appointment "
+                    . "(slotid,"
+                    . "studentid,"
+                    . "attended) "
+                    . "values ($slotid,"
+                    . "$userid,"
+                    . "0)";
+            $this->db->query($query);
+        } // end if $already_at_workshop==0
+
+        return 'Instructor was added to selected workshop';
     }
 
     function get_settings_dialog($userid) {
