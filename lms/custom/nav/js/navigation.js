@@ -1394,6 +1394,7 @@ $(document).ready(function () {
                 console.log('slot ID: ' + slotid);
                 console.log('Sum : ' + sum);
                 console.log('Ptype: ' + ptype);
+
                 if (courseid > 0 && userid > 0 && $.isNumeric(sum) && sum > 0) {
                     $('#partial_err').html('');
                     if (ptype == 'cc') {
@@ -1417,8 +1418,14 @@ $(document).ready(function () {
                 else {
                     $('#partial_err').html('Please select program and user and provide paid amount');
                 } // end else
+
+
             });
+
+
+
         } // end else
+
     }
 
     function search_slots_by_date() {

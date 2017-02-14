@@ -270,31 +270,46 @@ class Util {
         return $status;
     }
 
+    function get_exception_users() {
+        $special_users = array();
+        $special_users['Dimauro, DMD Frank J'] = 13439;
+        // Add here more entries ...
+        return $special_users;
+    }
+
+    function is_exception_user($data) {
+        $e_users = $this->get_exception_users(); // array with associative keys
+        return $e_users[$data];
+    }
+
     function get_userid_by_fio($data) {
-        //echo "Data: " . $data . "<br>";
-        $names_arr = explode(' ', trim($data));
-        //echo "Array <pre>";
-        //print_r($names_arr);
-        //echo "</pre><br>";
-        if (count($names_arr) == 2) {
-            $firstname = $names_arr[1];
-            $lastname = $names_arr[0];
-            $query = "select * from mdl_user "
-                    . "where firstname='$firstname' "
-                    . "and lastname='$lastname'";
-        }
-        if (count($names_arr) == 3) {
-            $firstname = $names_arr[2];
-            $lastname = $names_arr[0];
-            $query = "select * from mdl_user "
-                    . "where firstname like '%$firstname%' "
-                    . "and lastname like '%$lastname%' ";
-        }
-        //echo "Query: " . $query . "<br>";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $id = $row['id'];
-        }
+        $e_userid = trim($this->is_exception_user(trim($data)));
+        if ($e_userid > 0) {
+            $id = $e_userid;
+        } // end if $this->is_exception_user($data)>0
+        else {
+            $names_arr = explode(' ', trim($data));
+
+            if (count($names_arr) == 2) {
+                $firstname = $names_arr[1];
+                $lastname = $names_arr[0];
+                $query = "select * from mdl_user "
+                        . "where firstname='$firstname' "
+                        . "and lastname='$lastname'";
+            }
+            if (count($names_arr) == 3) {
+                $firstname = $names_arr[2];
+                $lastname = $names_arr[0];
+                $query = "select * from mdl_user "
+                        . "where firstname like '%$firstname%' "
+                        . "and lastname like '%$lastname%' ";
+            }
+            //echo "Query: " . $query . "<br>";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $id = $row['id'];
+            }
+        } // end else when provided user is not exception 
         return $id;
     }
 
