@@ -11,6 +11,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/schedule/classes/Schedule.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/register/classes/Register.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/grades/classes/Grades.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 
 use Dompdf\Dompdf;
@@ -938,6 +939,197 @@ class Dashboard extends Util {
         return $num;
     }
 
+    function get_grades_block($courseid, $userid) {
+        $list = "";
+        $gr = new Grades;
+        $grades = $gr->get_student_grades($courseid, $userid);
+        if (count($grades) > 0) {
+            foreach ($grades as $gradeitem) {
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span4'>$gradeitem->name</span>";
+                $list.="<span class='span1'>$gradeitem->grade %</span>";
+                $list.="<span class='span1'>$gradeitem->date</span>";
+                $list.="</div>";
+            } // end foreach
+        } // end if count($grades)>0
+        else {
+            $list.='N/A';
+        } // end else
+        return $list;
+    }
+
+    function get_user_grades($userid) {
+        $list = "";
+        $gr = new Grades;
+        $courses = $gr->get_user_courses($userid);
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $coursename = $this->get_course_name($courseid);
+                $grades = $this->get_grades_block($courseid, $userid);
+                $list.="<div class='row-fluid' style='font-weight:bold;'>";
+                $list.="<span class='span12'>$coursename</span>";
+                $list.="</div>";
+                $list.="<div class='row-fluid' style='font-weight:bold;'>";
+                $list.="<span class='span6'><hr/></span>";
+                $list.="</div>";
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span12'>$grades</span>";
+                $list.="</div>";
+            } // end foreach
+        } // end if count($courses)>0
+        else {
+            $list.='N/A';
+        } // end else
+        return $list;
+    }
+
+    function get_students_status_box() {
+        $list = "";
+        $list.="<select id='students_status'>";
+        $list.="<option value='A'>Absent</p>";
+        $list.="<option value='P'>Present</option>";
+        $list.="<option value='T'>Tardy</option>";
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_presence_modal_dialog($at) {
+        $list = "";
+        $status = $this->get_students_status_box();
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Student attendance</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='at_userid' value='$at->userid'>
+                <input type='hidden' id='at_courseid' value='$at->courseid'>
+                <input type='hidden' id='at_date' value='$at->date'>     
+                   
+                <div class='container-fluid'>
+                <span class='span1'>Status</span>
+                <span class='span3'>$status</span>
+                <br><br>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='update_student_attendance'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function is_at_date_exists($at) {
+        $udate = strtotime($at->date);
+        $query = "select * from mdl_user_attendance "
+                . "where courseid=$at->courseid "
+                . "and userid=$at->userid "
+                . "and adate='$udate'";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function update_student_attendance($at) {
+        $exists = $this->is_at_date_exists($at);
+        $udate = strtotime($at->date);
+        if ($exists == 0) {
+            $query = "insert into mdl_user_attendance "
+                    . "(courseid,"
+                    . "userid,"
+                    . "status,"
+                    . "adate) "
+                    . "values ($at->courseid,"
+                    . "$at->userid,"
+                    . "'$at->status',"
+                    . "'$udate')";
+        } // end if $exists==0
+        else {
+            $query = "delete from mdl_user_attendance "
+                    . "where courseid=$at->courseid and "
+                    . "userid=$at->userid and "
+                    . "adate='$udate'";
+        } // end else
+        $this->db->query($query);
+    }
+
+    function get_student_calendar_dates($courseid, $userid) {
+        $list = "";
+        $query = "select * from mdl_user_attendance "
+                . "where courseid=$courseid "
+                . "and userid=$userid order by adate desc";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $status = $row['status'];
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span3'>" . date('m-d-Y', $row['adate']) . "</span>";
+                $list.="<span class='span1'>$status</span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
+        else {
+            $list.='N/A';
+        }
+        return $list;
+    }
+
+    function student_at_block($courseid, $userid) {
+        $list = "";
+
+        $current_userid = $this->user->id;
+        if ($current_userid == 2 || $current_userid == 234) {
+            $roleid = 3;
+        } // end if
+        else {
+            $roleid = $this->get_user_role($userid);
+        } // end else
+
+        $dates = $this->get_student_calendar_dates($courseid, $userid);
+        $list.="<div class='row-fluid'>";
+        if ($roleid == 3) {
+            $list.="<span class='span3'><div class='at_calendar' data-userid='$userid' data-courseid='$courseid'></div></span>";
+        } // end if $roleid==3
+        $list.="<span class='span5' style='padding-left:35px;'>$dates</span>";
+        $list.="</div>";
+        return $list;
+    }
+
+    function get_student_attendance($userid) {
+        $list = "";
+        $gr = new Grades;
+        $courses = $gr->get_user_courses($userid);
+
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $categoryid = $this->get_course_category($courseid);
+                if ($categoryid == 5) {
+                    // Career College programs
+                    $coursename = $this->get_course_name($courseid);
+                    $at = $this->student_at_block($courseid, $userid);
+                    $list.="<div class='row-fluid' style='font-weight:bold;'>";
+                    $list.="<span class='span9'>$coursename</span>";
+                    $list.="</div>";
+
+                    $list.="<div class='row-fluid'>";
+                    $list.="<span class='span4'><hr/></span>";
+                    $list.="</div>";
+
+                    $list.="<div class='row-fluid'>";
+                    $list.="<span class='span9'>$at</span>";
+                    $list.="</div>";
+                } // end if $categoryid==5
+            } // end foreach
+        } // end if count($courses)>0
+        return $list;
+    }
+
     // ************* Code related to custom profile section  ************** /
 
     function get_user_profile_custom_sections($id) {
@@ -945,11 +1137,16 @@ class Dashboard extends Util {
         $payments = $this->get_user_payments_block($id);
         $workshops = $this->get_user_workshops($id);
         $certficates = $this->get_user_certificates($id);
+        $grades = $this->get_user_grades($id);
+        $attend = $this->get_student_attendance($id);
         $other = $this->get_other_tab($id);
         $list.="<ul class='nav nav-tabs'>
               <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>
               <li><a data-toggle='tab' href='#menu1'>Courses</a></li>
               <li><a data-toggle='tab' href='#menu2'>Certificates</a></li>
+              <li><a data-toggle='tab' href='#grades'>Grades</a></li>
+              <li><a data-toggle='tab' href='#grades'>Grades</a></li>
+              <li><a data-toggle='tab' href='#attend'>Attendance</a></li>
               <li><a data-toggle='tab' href='#menu3'>Other</a></li>  
               <input type='hidden' id='userid' value='$id'>  
             </ul>
@@ -966,6 +1163,14 @@ class Dashboard extends Util {
               <div id='menu2' class='tab-pane fade'>
                 <h3>Certificates</h3>
                 <p>$certficates</p>
+              </div>
+              <div id='grades' class='tab-pane fade'>
+                <h3>Grades</h3>
+                <p>$grades</p>
+              </div>
+             <div id='attend' class='tab-pane fade'>
+                <h3>Attendance</h3>
+                <p>$attend</p>
               </div>
               <div id='menu3' class='tab-pane fade'>
                 <h3>Other</h3>

@@ -6,8 +6,10 @@ require_once('lib.php');
 require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->dirroot . '/custom/my/classes/Dashboard.php');
 require_once($CFG->dirroot . '/custom/calendar/classes/Calendar.php');
+require_once($CFG->dirroot . '/custom/instructors/classes/Instructors.php');
 
 $cal = new Calendar();
+$inst = new Instructors();
 $id = optional_param('id', 0, PARAM_INT);
 $name = optional_param('name', '', PARAM_RAW);
 $edit = optional_param('edit', -1, PARAM_BOOL);
@@ -288,14 +290,18 @@ if ($roleid == 5 && $category == 2 && $completed > 0) {
 
 
 /* * **********************************************************
-  Code related to instructors calendar
+  Code related to instructor's calendar and students attendance
 
  * ********************************************************** */
 $userid = $cal->user->id;
 $instructor_status = $cal->is_instructor($userid);
 if ($instructor_status) {
     $calendar = $cal->create_user_calendar();
+    $attendance = $inst->get_instructor_students_attendance_block();
     echo $calendar;
+    if ($userid == 234) {
+        echo $attendance;
+    }
 } // end if $status
 // ************************************************************
 // Course wrapper start.

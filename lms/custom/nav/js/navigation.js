@@ -2657,10 +2657,10 @@ $(document).ready(function () {
             var userid = $(this).data('inst_userid');
             var elid = '#cws_' + userid;
             var slot = $(elid).val();
-            
-            console.log('User id: '+userid);
-            console.log('Slot id: '+slot);
-            
+
+            console.log('User id: ' + userid);
+            console.log('Slot id: ' + slot);
+
             if (slot > 0) {
                 if (confirm('Add instructor to selected workshop?')) {
                     var instructor = {userid: userid, slot: slot};
@@ -3972,11 +3972,11 @@ $(document).ready(function () {
     $('body').on('change', function (event) {
 
         //console.log('Body change event: ' + event);
-        var elClass = event.target.class;
+        var elClass = $(event.target).attr('class');
         var elID = event.target.id;
 
         //console.log('Event id: ' + elID);
-        //console.log('Event class: ' + elClass);
+        console.log('Event class: ' + elClass);
 
 
         if (event.target.id == 'user_calendar') {
@@ -3996,6 +3996,40 @@ $(document).ready(function () {
             } // end if confirm
         }
 
+        if ($(event.target).attr('class') == 'at_calendar hasDatepicker') {
+            console.log('Attendance calendar clicked ...');
+            var courseid = $('.at_calendar').data('courseid');
+            var userid = $('.at_calendar').data('userid');
+            var date = new Date($('.at_calendar').datepicker("getDate"));
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            var year = date.getFullYear();
+            var hdate = [month, day, year].join('/');
+            var at = {courseid: courseid, userid: userid, date: hdate};
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_presence_modal_dialog.php";
+                            $.post(url, {at: JSON.stringify(at)}).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+
+        }
 
 
     }); // end of body change event ...
@@ -5574,6 +5608,21 @@ $(document).ready(function () {
                     $('#camp_users_container').html(data);
                 });
             } // end else
+        }
+
+        if (event.target.id == 'update_student_attendance') {
+            var courseid = $('#at_courseid').val();
+            var userid = $('#at_userid').val();
+            var date = $('#at_date').val();
+            var status = $('#students_status').val();
+            var at = {courseid: courseid, userid: userid, date: date, status: status};
+            if (confirm('Update current student attendance?')) {
+                var url = "/lms/custom/my/update_stdudent_attendance.php";
+                $.post(url, {at: JSON.stringify(at)}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    document.location.reload();
+                });
+            } // end if confirm
         }
 
 

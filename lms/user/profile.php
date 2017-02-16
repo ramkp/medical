@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,18 +32,17 @@
  * @author     Olav Jordan <olav.jordan@remote-learner.net>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 require_once(dirname(__FILE__) . '/../config.php');
 require_once($CFG->dirroot . '/my/lib.php');
 require_once($CFG->dirroot . '/tag/lib.php');
 require_once($CFG->dirroot . '/user/profile/lib.php');
 require_once($CFG->dirroot . '/user/lib.php');
-require_once($CFG->libdir.'/filelib.php');
+require_once($CFG->libdir . '/filelib.php');
 
 
-$userid         = optional_param('id', 0, PARAM_INT);
-$edit           = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off.
-$reset          = optional_param('reset', null, PARAM_BOOL);
+$userid = optional_param('id', 0, PARAM_INT);
+$edit = optional_param('edit', null, PARAM_BOOL);    // Turn editing on and off.
+$reset = optional_param('reset', null, PARAM_BOOL);
 
 $PAGE->set_url('/user/profile.php', array('id' => $userid));
 
@@ -51,9 +51,7 @@ if (!empty($CFG->forceloginforprofiles)) {
     if (isguestuser()) {
         $PAGE->set_context(context_system::instance());
         echo $OUTPUT->header();
-        echo $OUTPUT->confirm(get_string('guestcantaccessprofiles', 'error'),
-                              get_login_url(),
-                              $CFG->wwwroot);
+        echo $OUTPUT->confirm(get_string('guestcantaccessprofiles', 'error'), get_login_url(), $CFG->wwwroot);
         echo $OUTPUT->footer();
         die;
     }
@@ -118,12 +116,12 @@ $strpublicprofile = get_string('publicprofile');
 
 $PAGE->blocks->add_region('content');
 $PAGE->set_subpage($currentpage->id);
-$PAGE->set_title(fullname($user).": $strpublicprofile");
+$PAGE->set_title(fullname($user) . ": $strpublicprofile");
 $PAGE->set_heading(fullname($user));
 
 if (!$currentuser) {
     $PAGE->navigation->extend_for_user($user);
-    if ($node = $PAGE->settingsnav->get('userviewingsettings'.$user->id)) {
+    if ($node = $PAGE->settingsnav->get('userviewingsettings' . $user->id)) {
         $node->forceopen = true;
     }
 } else if ($node = $PAGE->settingsnav->get('dashboard', navigation_node::TYPE_CONTAINER)) {
@@ -187,7 +185,6 @@ if ($PAGE->user_allowed_editing()) {
     $url = new moodle_url("$CFG->wwwroot/user/profile.php", $params);
     $button = $OUTPUT->single_button($url, $editstring);
     $PAGE->set_button($resetbutton . $button);
-
 } else {
     $USER->editing = $edit = 0;
 }
@@ -204,10 +201,8 @@ if ($user->description && !isset($hiddenfields['description'])) {
     if (!empty($CFG->profilesforenrolledusersonly) && !$currentuser && !$DB->record_exists('role_assignments', array('userid' => $user->id))) {
         echo get_string('profilenotshown', 'moodle');
     } // end if !empty($CFG->profilesforenrolledusersonly)
-    
     else {
-        $user->description = file_rewrite_pluginfile_urls($user->description, 'pluginfile.php', $usercontext->id, 'user',
-                                                          'profile', null);
+        $user->description = file_rewrite_pluginfile_urls($user->description, 'pluginfile.php', $usercontext->id, 'user', 'profile', null);
         echo format_text($user->description, $user->descriptionformat);
     }
     echo '</div>';
@@ -221,5 +216,20 @@ $tree = core_user\output\myprofile\manager::build_tree($user, $currentuser);
 echo $renderer->render($tree);
 
 echo '</div>';  // Userprofile class.
+?>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.at_calendar').datepicker({
+            dateFormat: "mm/dd/yy"
+        });
+
+
+    }); // end of document ready
+
+</script>
+
+<?php
 
 echo $OUTPUT->footer();
