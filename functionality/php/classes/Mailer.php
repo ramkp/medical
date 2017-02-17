@@ -148,7 +148,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -283,7 +283,7 @@ class Mailer {
         </tr>
         
         <tr style='background-color:#F5F5F5;'>
-        <td>Applied Progarm</td><td>$course_name</td>
+        <td>Applied Progarm</td><td>Certification renewal</td>
         </tr> 
         
         <tr>
@@ -657,7 +657,7 @@ class Mailer {
         </tr>
         
         <tr style='background-color:#F5F5F5;'>
-        <td>Applied Progarm</td><td>$course_name</td>
+        <td>Applied Progarm</td><td>Certification renewal</td>
         </tr> 
         
         <tr>
