@@ -4006,29 +4006,41 @@ $(document).ready(function () {
             var year = date.getFullYear();
             var hdate = [month, day, year].join('/');
             var at = {courseid: courseid, userid: userid, date: hdate};
-            if (dialog_loaded !== true) {
-                console.log('Script is not yet loaded starting loading ...');
-                dialog_loaded = true;
-                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
-                $.getScript(js_url)
-                        .done(function () {
-                            console.log('Script bootstrap.min.js is loaded ...');
-                            var url = "/lms/custom/my/get_presence_modal_dialog.php";
-                            $.post(url, {at: JSON.stringify(at)}).done(function (data) {
-                                $("body").append(data);
-                                $("#myModal").modal('show');
-                            });
-                        })
-                        .fail(function () {
-                            console.log('Failed to load bootstrap.min.js');
+            var exurl = "/lms/custom/my/is_calendar_date_exists.php";
+            $.post(exurl, {at: JSON.stringify(at)}).done(function (num) {
+                if (num == 0) {
+                    if (dialog_loaded !== true) {
+                        console.log('Script is not yet loaded starting loading ...');
+                        dialog_loaded = true;
+                        var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                        $.getScript(js_url)
+                                .done(function () {
+                                    console.log('Script bootstrap.min.js is loaded ...');
+                                    var url = "/lms/custom/my/get_presence_modal_dialog.php";
+                                    $.post(url, {at: JSON.stringify(at)}).done(function (data) {
+                                        $("body").append(data);
+                                        $("#myModal").modal('show');
+                                    });
+                                }) // end of done
+                                .fail(function () {
+                                    console.log('Failed to load bootstrap.min.js');
+                                }); // end of fail
+                    } // dialog_loaded!=true
+                    else {
+                        console.log('Script already loaded');
+                        $("body").append(data);
+                        $("#myModal").modal('show');
+                    }
+                } // end if num==0
+                else {
+                    if (confirm('Delete current calendar entry?')) {
+                        var url = "/lms/custom/my/delete_calendar_entry.php"
+                        $.post(url, {at: JSON.stringify(at)}).done(function () {
+                            document.location.reload();
                         });
-            } // dialog_loaded!=true
-            else {
-                console.log('Script already loaded');
-                $("body").append(data);
-                $("#myModal").modal('show');
-            }
-
+                    } // end if confirm
+                } // end else
+            }); // end of post
         }
 
 

@@ -1035,27 +1035,37 @@ class Dashboard extends Util {
         return $num;
     }
 
+    function delete_calendar_entry($at) {
+        $udate = strtotime($at->date);
+        $query = "delete from mdl_user_attendance "
+                . "where courseid=$at->courseid and "
+                . "userid=$at->userid and "
+                . "adate='$udate'";
+        $this->db->query($query);
+    }
+
+    function insert_calendar_entry($at) {
+        $udate = strtotime($at->date);
+        $query = "insert into mdl_user_attendance "
+                . "(courseid,"
+                . "userid,"
+                . "status,"
+                . "adate) "
+                . "values ($at->courseid,"
+                . "$at->userid,"
+                . "'$at->status',"
+                . "'$udate')";
+        $this->db->query($query);
+    }
+
     function update_student_attendance($at) {
         $exists = $this->is_at_date_exists($at);
-        $udate = strtotime($at->date);
         if ($exists == 0) {
-            $query = "insert into mdl_user_attendance "
-                    . "(courseid,"
-                    . "userid,"
-                    . "status,"
-                    . "adate) "
-                    . "values ($at->courseid,"
-                    . "$at->userid,"
-                    . "'$at->status',"
-                    . "'$udate')";
+            $this->insert_calendar_entry($at);
         } // end if $exists==0
         else {
-            $query = "delete from mdl_user_attendance "
-                    . "where courseid=$at->courseid and "
-                    . "userid=$at->userid and "
-                    . "adate='$udate'";
-        } // end else
-        $this->db->query($query);
+            $this->delete_calendar_entry($at);
+        }
     }
 
     function get_student_calendar_dates($courseid, $userid) {
