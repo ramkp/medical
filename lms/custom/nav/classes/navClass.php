@@ -234,7 +234,7 @@ class navClass extends Util {
                                     <li><a href='#' id='user_report' title='Users stats'>Users stats</a></li>
                                     <li><a href='#' id='payments_report' title='Payments log'>Payments log</a></li>                                    
                                     <li><a href='#' id='revenue_reports' title='Revenue report'>Revenue report</a></li>
-                                    
+                                    <li><a href='#' id='survey_reports' title='Survey report'>Survey report</a></li>
                                 </ul>
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>

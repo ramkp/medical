@@ -1102,12 +1102,22 @@ class Dashboard extends Util {
         } // end else
 
         $dates = $this->get_student_calendar_dates($courseid, $userid);
+        
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span8'>Please select calendar dates to add students attendance</span>";
+        $list.="</div>";
+        
         $list.="<div class='row-fluid'>";
         if ($roleid == 3) {
             $list.="<span class='span3'><div class='at_calendar' data-userid='$userid' data-courseid='$courseid'></div></span>";
         } // end if $roleid==3
         $list.="<span class='span5' style='padding-left:35px;'>$dates</span>";
         $list.="</div>";
+        
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span8'><hr/></span>";
+        $list.="</div>";
+        
         return $list;
     }
 
@@ -1123,7 +1133,7 @@ class Dashboard extends Util {
                     // Career College programs
                     $coursename = $this->get_course_name($courseid);
                     $at = $this->student_at_block($courseid, $userid);
-                    $list.="<div class='row-fluid' style='font-weight:bold;'>";
+                    $list.="<br><div class='row-fluid' style='font-weight:bold;'>";
                     $list.="<span class='span9'>$coursename</span>";
                     $list.="</div>";
 
@@ -1154,7 +1164,6 @@ class Dashboard extends Util {
               <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>
               <li><a data-toggle='tab' href='#menu1'>Courses</a></li>
               <li><a data-toggle='tab' href='#menu2'>Certificates</a></li>
-              <li><a data-toggle='tab' href='#grades'>Grades</a></li>
               <li><a data-toggle='tab' href='#grades'>Grades</a></li>
               <li><a data-toggle='tab' href='#attend'>Attendance</a></li>
               <li><a data-toggle='tab' href='#menu3'>Other</a></li>  

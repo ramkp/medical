@@ -3295,6 +3295,13 @@ $(document).ready(function () {
         });
     }
 
+    function get_survey_report() {
+        var url = "/lms/custom/survey/get_survey_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     /************************************************************************
      * 
      *                   Menu processing items
@@ -3441,6 +3448,11 @@ $(document).ready(function () {
     $("#revenue_reports").click(function (event) {
         update_navigation_status__menu('Revenue reports');
         get_revenue_report();
+    });
+
+    $("#survey_reports").click(function (event) {
+        update_navigation_status__menu('Survey reports');
+        get_survey_report();
     });
     $("#workshop_reports").click(function (event) {
         update_navigation_status__menu('Workshop reports');
