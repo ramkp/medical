@@ -1011,9 +1011,13 @@ class Dashboard extends Util {
                 <div class='container-fluid'>
                 <span class='span1'>Status</span>
                 <span class='span3'>$status</span>
-                <br><br>
                 </div>
-             
+                
+                <div class='container-fluid'>
+                <span class='span1'>Notes</span>
+                <span class='span3'><textarea id='at_notes' style='width:365px;'></textarea></span>
+                </div>
+                
                 <div class='modal-footer' style='text-align:center;'>
                     <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
                     <span align='center'><button type='button' class='btn btn-primary' id='update_student_attendance'>OK</button></span>
@@ -1047,11 +1051,12 @@ class Dashboard extends Util {
     function insert_calendar_entry($at) {
         $udate = strtotime($at->date);
         $query = "insert into mdl_user_attendance "
-                . "(courseid,"
+                . "(courseid, notes, "
                 . "userid,"
                 . "status,"
                 . "adate) "
-                . "values ($at->courseid,"
+                . "values ($at->courseid, "
+                . "'$at->notes',"
                 . "$at->userid,"
                 . "'$at->status',"
                 . "'$udate')";
@@ -1079,8 +1084,9 @@ class Dashboard extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $status = $row['status'];
                 $list.="<div class='row-fluid'>";
-                $list.="<span class='span3'>" . date('m-d-Y', $row['adate']) . "</span>";
+                $list.="<span class='span2'>" . date('m-d-Y', $row['adate']) . "</span>";
                 $list.="<span class='span1'>$status</span>";
+                $list.="<span class='span6'>" . $row['notes'] . "</span>";
                 $list.="</div>";
             } // end while
         } // end if $num > 0
@@ -1102,22 +1108,22 @@ class Dashboard extends Util {
         } // end else
 
         $dates = $this->get_student_calendar_dates($courseid, $userid);
-        
+
         $list.="<div class='row-fluid'>";
         $list.="<span class='span8'>Please select calendar dates to add students attendance</span>";
         $list.="</div>";
-        
+
         $list.="<div class='row-fluid'>";
         if ($roleid == 3) {
             $list.="<span class='span3'><div class='at_calendar' data-userid='$userid' data-courseid='$courseid'></div></span>";
         } // end if $roleid==3
-        $list.="<span class='span5' style='padding-left:35px;'>$dates</span>";
+        $list.="<span class='span9' style='padding-left:35px;'>$dates</span>";
         $list.="</div>";
-        
+
         $list.="<div class='row-fluid'>";
         $list.="<span class='span8'><hr/></span>";
         $list.="</div>";
-        
+
         return $list;
     }
 

@@ -34,7 +34,7 @@ class Deposit extends Util {
         return $list;
     }
 
-    function create_deposit_page($deposits, $toolbar = true) {
+    function create_deposit_page($deposits, $toolbar = true, $search = false) {
         $list = "";
 
         if ($toolbar) {
@@ -50,6 +50,17 @@ class Deposit extends Util {
             $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
             $list.="<span class='span9'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
             $list.="</div><br>";
+        }
+
+        if (count($deposits) > 0) {
+
+            $total = $this->get_deposits_grand_total($deposits, $search);
+
+            $list.="<div id='deposit_container'>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;text-align:center;'>";
+            $list.="<span class='span8'>Total Deposits: $$total</span>";
+            $list.="</div>";
 
             $list.="<div class='row-fluid' style='font-weight:bold;'>";
             $list.="<span class='span3'>Bank cheque num</span>";
@@ -61,13 +72,7 @@ class Deposit extends Util {
             $list.="<div class='row-fluid'>";
             $list.="<span class='span9'><hr/></span>";
             $list.="</div>";
-        }
 
-        if (count($deposits) > 0) {
-
-
-
-            $list.="<div id='deposit_container'>";
             foreach ($deposits as $d) {
                 $date = date('m-d-Y', $d->added);
                 $user = $this->get_user_details($d->userid);
@@ -97,6 +102,23 @@ class Deposit extends Util {
         return $list;
     }
 
+    function get_deposits_grand_total($deposits, $search) {
+        $total = 0;
+        if ($search) {
+            foreach ($deposits as $d) {
+                $total = $total + $d->amount;
+            }
+        } // end if $search
+        else {
+            $query = "select sum(amount) as total from mdl_deposit";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $total = $row['total'];
+            }
+        } // end else
+        return $total;
+    }
+
     function search_deposit($d) {
         $list = "";
         $unix_date1 = strtotime($d->date1);
@@ -116,7 +138,7 @@ class Deposit extends Util {
                 $deposits[] = $d;
             } // end while
         } // end if $num>0
-        $list.=$this->create_deposit_page($deposits, false);
+        $list.=$this->create_deposit_page($deposits, false, true);
         return $list;
     }
 

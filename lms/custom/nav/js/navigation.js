@@ -5639,7 +5639,8 @@ $(document).ready(function () {
             var userid = $('#at_userid').val();
             var date = $('#at_date').val();
             var status = $('#students_status').val();
-            var at = {courseid: courseid, userid: userid, date: date, status: status};
+            var notes = $('#at_notes').val();
+            var at = {courseid: courseid, userid: userid, date: date, status: status, notes: notes};
             if (confirm('Update current student attendance?')) {
                 var url = "/lms/custom/my/update_stdudent_attendance.php";
                 $.post(url, {at: JSON.stringify(at)}).done(function () {
