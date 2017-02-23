@@ -657,7 +657,7 @@ class register_model extends CI_Model {
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Card Holder Name*</span>";
-            $list.="<span class='span2'><input type='text' required id='billing_name' name='billing_name' ></span>";
+            $list.="<span class='span2'><input type='text' required id='billing_name' name='billing_name' placeholder='Firstname Lastname' required></span>";
             $list.="<span class='span2'>CVV*</span>";
             $list.="<span class='span2'><input type='text' id='cvv2' name='cvv2'  ></span>";
             $list.="</div>";

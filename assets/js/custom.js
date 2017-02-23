@@ -69,6 +69,11 @@ $(document).ready(function () {
     $('#graduate_date').mask("9999");
     $('#phone1').mask("(999) 999-9999");
     $('#phone2').mask("(999) 999-9999");
+    
+    // .^\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)*\s*$
+    $.mask.definitions['~']='.^\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)*\s*$';
+    //$("#billing_name").mask("?aaaaaaaaaa aaaaaaaaaa");
+
     $('#app_date').datepicker();
 
     var domain = 'medical2.com';

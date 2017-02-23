@@ -1010,7 +1010,15 @@ class Students {
         $list.="<p align='center'>Dear " . ucfirst($detailes->firstname) . "&nbsp;" . ucfirst($detailes->lastname) . "!</p>";
         $list.="<p align='justify'>$content</p>";
         $list.="<p align='justify'>Best regards,</p>";
-        $list.="<p align='justify'>Mediacl2 team.</p>";
+        $list.="<p align='justify'>Medical2 team.</p>";
+        //$list.="</body>";
+        //$list.="</html>";
+        return $list;
+    }
+
+    function get_unsubscribe_block($userid) {
+        $list = "";
+        $list.="<p>If you do not want to receive further emails from us - please click <a href='https://medical2.com/index.php/unsubscribe/index/$userid' target='_blank'>here</a></p>";
         $list.="</body>";
         $list.="</html>";
         return $list;
@@ -1019,8 +1027,11 @@ class Students {
     function send_email($camid, $userid) {
         $content = $this->get_campaign_content($camid);
         $user_details = $this->get_user_data($userid);
-        //$user_details->email = "sirromas@gmail.com"; // temp workaroud 
+        $addressA = 'sirromas@gmail.com';
         $message = $this->get_user_message($user_details, $content);
+        $unsubscribe = $this->get_unsubscribe_block($userid);
+        $message.=$unsubscribe;
+
         $mail = new PHPMailer;
         $mail->isSMTP();
         $mail->Host = $this->mail_smtp_host;
@@ -1030,6 +1041,7 @@ class Students {
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
         $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+        $mail->addAddress($addressA);
         $mail->addAddress($user_details->email);
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
         $mail->isHTML(true);
@@ -1064,7 +1076,11 @@ class Students {
                 $userid = $row['userid'];
             } // end while
             $this->send_email($camid, $userid);
+            echo "Users are found userid: " . $userid . "<br>";
         } // end if $num > 0
+        else {
+            echo "There are no queued users";
+        }
     }
 
     /*     * ************Code related to financial report ******************** */

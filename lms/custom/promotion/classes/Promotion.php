@@ -465,6 +465,12 @@ class Promotion extends Util {
         return $list;
     }
 
+    function get_unsubscribe_block($userid) {
+        $list = "";
+        $list.="<p>If you do not want to receive further emails from us - please click <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/unsubscribe/$userid' target='_blank'>here</a></p>";
+        return $list;
+    }
+
     function add_new_campaign2($data, $users) {
         mysql_connect("localhost", "cnausa_lms", "^pH+F8*[AEdT") or
                 die("Could not connect: " . mysql_error());
@@ -492,22 +498,31 @@ class Promotion extends Util {
         if (count($users_arr) > 0) {
             foreach ($users_arr as $id) {
                 if ($id > 0) {
-                    $query = "insert into mdl_campaign_log "
-                            . "(camid,"
-                            . "userid,"
-                            . "status,"
-                            . "dated) "
-                            . "values ('$camid',"
-                            . "'$id',"
-                            . "'pending',"
-                            . "'" . time() . "')";
-                    //echo "Query: " . $query . "<br>";
-                    mysql_query($query);
+                    $status = $this->is_user_unsubscribed($id);
+                    if ($status == 0) {
+                        $query = "insert into mdl_campaign_log "
+                                . "(camid,"
+                                . "userid,"
+                                . "status,"
+                                . "dated) "
+                                . "values ('$camid',"
+                                . "'$id',"
+                                . "'pending',"
+                                . "'" . time() . "')";
+                        //echo "Query: " . $query . "<br>";
+                        mysql_query($query);
+                    } // end if $status == 0
                 } // end if $id>0
             } // end foreach
         } // end if count($users)>0
         $list = "New campaign was put into queue and will be processed soon.";
         return $list;
+    }
+
+    function is_user_unsubscribed($userid) {
+        $query = "select * from mdl_unsubscribe where userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
     function get_users_by_state($state) {
