@@ -5650,9 +5650,34 @@ $(document).ready(function () {
             } // end if confirm
         }
 
+        if (event.target.id == 'print_grades') {
+            var userid = $('#userid').val();
+            var url = "/lms/custom/my/print_grades.php";
+            $.post(url, {userid: userid}).done(function (filename) {
+                var url2 = "http://medical2.com/lms/custom/grades/" + userid + '/' + filename;
+                var oWindow = window.open(url2, "print");
+            });
+        }
 
+        if (event.target.id == 'print_att') {
+            var userid = $('#userid').val();
+            var url = "/lms/custom/my/print_att.php";
+            $.post(url, {userid: userid}).done(function (filename) {
+                var url2 = "http://medical2.com/lms/custom/my/" + filename;
+                var oWindow = window.open(url2, "print");
+            });
+        }
+        
+        if (event.target.id == 'print_payment') {
+            var userid = $('#userid').val();
+            var url = "/lms/custom/my/print_payment.php";
+            $.post(url, {userid: userid}).done(function (filename) {
+                var url2 = "http://medical2.com/lms/custom/my/" + filename;
+                var oWindow = window.open(url2, "print");
+            });
+        }
 
-
+        
 
     }); // end of body click event
 

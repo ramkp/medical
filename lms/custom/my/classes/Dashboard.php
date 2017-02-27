@@ -12,6 +12,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/schedule/classes/Schedule.
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/register/classes/Register.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/grades/classes/Grades.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 
 use Dompdf\Dompdf;
@@ -987,7 +988,7 @@ class Dashboard extends Util {
         $list = "";
         $list.="<select id='students_status'>";
         $list.="<option value='A'>Absent</p>";
-        $list.="<option value='P'>Present</option>";
+        $list.="<option value='P' selected>Present</option>";
         $list.="<option value='T'>Tardy</option>";
         $list.="</select>";
         return $list;
@@ -1156,6 +1157,124 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_att_report($userid) {
+        $list = "";
+        $gr = new Grades;
+        $courses = $gr->get_user_courses($userid);
+
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $categoryid = $this->get_course_category($courseid);
+                if ($categoryid == 5) {
+                    // Career College programs
+                    $coursename = $this->get_course_name($courseid);
+                    $user = $this->get_user_details($userid);
+
+                    $list.="<br><table align='center'>";
+
+                    $list.="<tr>";
+                    $list.="<td colspan='3' style='padding:15px;text-align:center;font-weight:bold;'>$user->firstname $user->lastname</td>";
+                    $list.="</tr>";
+
+                    $list.="<tr>";
+                    $list.="<td colspan='3' style='padding:15px;text-align:center;font-weight:bold;'>$coursename</td>";
+                    $list.="</tr>";
+
+                    $list.="<tr style='text-align:center;'>";
+                    $list.="<th style='padding:15px'>Date</th>";
+                    $list.="<th style='padding:15px'>Status</th>";
+                    $list.="<th style='padding:15px'>Notes</th>";
+                    $list.="</tr>";
+
+                    $query = "select * from mdl_user_attendance "
+                            . "where courseid=$courseid "
+                            . "and userid=$userid order by adate desc";
+                    $num = $this->db->numrows($query);
+                    if ($num > 0) {
+                        $result = $this->db->query($query);
+                        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                            $date = date('m-d-Y', $row['adate']);
+                            $status = $row['status'];
+                            $notes = $row['notes'];
+                            $list.="<tr style='text-align:center;'>";
+                            $list.="<td style='padding:15px'>$date</td>";
+                            $list.="<td style='padding:15px'>$status</td>";
+                            $list.="<td style='padding:15px'>$notes</td>";
+                            $list.="</tr>";
+                        } // end while
+                    } // end if $num > 0
+                    $list.="</table>";
+                } // end if $categoryid==5
+            } // end foreach
+        } // end if count($courses)>0
+        return $list;
+    }
+
+    function create_attendance_report($userid) {
+        $list = $this->get_att_report($userid);
+        $pdf = new mPDF('utf-8', 'A4-L');
+        $pdf->WriteHTML($list);
+        $filename = "attendance_$userid.pdf";
+        $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/my/$filename";
+        $pdf->Output($path, 'F');
+        return $filename;
+    }
+
+    function get_payment_report($userid) {
+        $list = "";
+        $user = $this->get_user_details($userid);
+
+        $list.="<table align='center'>";
+        $list.="<tr>";
+        $list.="<th colspan='4' style='padding:15px;'>$user->firstname $user->lastname</th>";
+        $list.="</tr>";
+
+        $query = "select * from mdl_card_payments "
+                . "where userid=$userid and refunded=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $coursename = $this->get_course_name($row['courseid']);
+                $date = date('m-d-Y', $row['pdate']);
+                $sum = $row['psum'];
+                $list.="<tr>";
+                $list.="<td style='padding:15px;'>Paid by Card</td>";
+                $list.="<td style='padding:15px;'>$$sum</td>";
+                $list.="<td style='padding:15px;'>$date</td>";
+                $list.="<td style='padding:15px;'>$coursename</td>";
+                $list.="</tr>";
+            } // end while
+        } // end if $num >0
+
+        $query = "select * from mdl_partial_payments "
+                . "where userid=$userid ";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $coursename = $this->get_course_name($row['courseid']);
+                $date = date('m-d-Y', $row['pdate']);
+                $sum = $row['psum'];
+                $list.="<tr>";
+                $list.="<td style='padding:15px;'>Paid by Cash/Cheque</td>";
+                $list.="<td style='padding:15px;'>$$sum</td>";
+                $list.="<td style='padding:15px;'>$date</td>";
+                $list.="<td style='padding:15px;'>$coursename</td>";
+                $list.="</tr>";
+            } // end while
+        } // end if $num >0
+
+        $list.="</table>";
+
+        $pdf = new mPDF('utf-8', 'A4-L');
+        $pdf->WriteHTML($list);
+        $filename = "payment_$userid.pdf";
+        $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/my/$filename";
+        $pdf->Output($path, 'F');
+        return $filename;
+    }
+
     // ************* Code related to custom profile section  ************** /
 
     function get_user_profile_custom_sections($id) {
@@ -1178,7 +1297,7 @@ class Dashboard extends Util {
 
             <div class='tab-content'>
               <div id='home' class='tab-pane fade in active'>
-                <h3>Payments</h3>
+                <h3>Payments &nbsp;&nbsp;<button id='print_payment'>Print</button></h3>
                 <p>$payments</p>
               </div>
               <div id='menu1' class='tab-pane fade'>
@@ -1190,11 +1309,11 @@ class Dashboard extends Util {
                 <p>$certficates</p>
               </div>
               <div id='grades' class='tab-pane fade'>
-                <h3>Grades</h3>
+                <h3>Grades &nbsp;&nbsp;<button id='print_grades'>Print</button></h3>
                 <p>$grades</p>
               </div>
              <div id='attend' class='tab-pane fade'>
-                <h3>Attendance</h3>
+                <h3>Attendance &nbsp;&nbsp;<button id='print_att'>Print</button></h3>
                 <p>$attend</p>
               </div>
               <div id='menu3' class='tab-pane fade'>

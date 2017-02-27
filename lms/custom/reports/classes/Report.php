@@ -28,6 +28,9 @@ class Report extends Util {
     public $invoice_report_csv_file;
     public $full_refund_sum;
     public $partial_refund_sum;
+    public $total_cash = 0;
+    public $total_cheque = 0;
+    public $total_card = 0;
 
     function __construct() {
         parent::__construct();
@@ -333,7 +336,7 @@ class Report extends Util {
         $cheque_payments_detailes = $this->get_other_payment_report_data($courseid, $from, $to, 2);
         $refund_payment_detailes = $this->get_refund_payments_detailes($courseid, $from, $to);
         $invoice_data_details = $this->get_invoice_payments_detailes($courseid, $from, $to);
-        $grand_total = $payments->card + $payments->cash + $payments->cheque + $payments->invoice;
+        $grand_total = $this->total_card + $this->total_cash + $this->total_cheque;
         $list.="<div class='container-fluid'>";
         $list.="<div class='span12'>
 
@@ -357,7 +360,7 @@ class Report extends Util {
 
                         <div class='tab-pane active' id='option1'>
 
-                            <h3>Card payments - $$payments->card - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->card_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
+                            <h3>Card payments - $$this->total_card - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->card_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
 							<h5>Grand total (card payments, cash and cheque payments) - $$grand_total</h5>
                             <p>$card_payments_detailes</p>
 
@@ -365,7 +368,7 @@ class Report extends Util {
 
                         <div class='tab-pane' id='option2'>
 
-                            <h3>Cash payments - $$payments->cash - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->cash_report_scv_file . "' target='_blank'>Export to CSV</a></h3>
+                            <h3>Cash payments - $$this->total_cash - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->cash_report_scv_file . "' target='_blank'>Export to CSV</a></h3>
                             
                             <p>$cash_payments_detailes</p>
 
@@ -740,6 +743,7 @@ class Report extends Util {
         $this->from = $from;
         $this->to = $to;
         $list = "";
+        $total = 0;
 
         if ($from == $to) {
             $timestamp = time();
@@ -788,6 +792,7 @@ class Report extends Util {
 
             foreach ($payments as $payment) {
                 //echo "Inside payments ...<br>";
+                $total = $total + $payment->psum;
                 $date = date('m-d-Y', $payment->pdate);
                 $coursename = $this->get_course_name($payment->courseid);
                 $userdata = $this->get_user_details($payment->userid);
@@ -798,6 +803,7 @@ class Report extends Util {
                 $list.="<span class='span3'>$date</span>";
                 $list.="</div>";
             } // end for
+            $this->total_card = $total;
         } // end if $num > 0
         else {
             $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -1023,6 +1029,7 @@ class Report extends Util {
         $this->from = $from;
         $this->to = $to;
         $list = "";
+        $total = 0;
 
         if ($from == $to) {
             $timestamp = time();
@@ -1074,6 +1081,7 @@ class Report extends Util {
 
             foreach ($payments as $payment) {
                 //echo "Inside payments ...<br>";
+                $total = $total + $payment->psum;
                 $date = date('m-d-Y', $payment->pdate);
                 $coursename = $this->get_course_name($payment->courseid);
                 $userdata = $this->get_user_details($payment->userid);
@@ -1084,6 +1092,12 @@ class Report extends Util {
                 $list.="<span class='span3'>$date</span>";
                 $list.="</div>";
             } // end for
+            if ($type == 1) {
+                $this->total_cash = $total;
+            }
+            if ($type == 2) {
+                $this->total_cheque = $total;
+            }
         } // end if $num > 0
         else {
             $list.="<div class='container-fluid' style='text-align:center;'>";

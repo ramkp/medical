@@ -1,16 +1,15 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
 
-/**
- * Description of Grades
- *
- * @author moyo
- */
 class Grades extends Util {
+
+    public $report_dir;
 
     function __construct() {
         parent::__construct();
+        $this->report_dir = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/grades';
     }
 
     function get_course_grade_items($courseid) {
@@ -96,6 +95,45 @@ class Grades extends Util {
             } // end while
         } // end if $num > 0
         return $courses;
+    }
+
+    function create_pdf_report($userid) {
+        $list = "";
+        $user = $this->get_user_details($userid);
+        $courses = $this->get_user_courses($userid);
+        $list.="<p align='center' style='font-weight:bold;'>$user->firstname $user->lastname</p>";
+        if (count($courses) > 0) {
+            $list.="<table align='center'>";
+            foreach ($courses as $courseid) {
+                $grades = $this->get_student_grades($courseid, $userid);
+                $coursename = $this->get_course_name($courseid);
+                $list.="<tr>";
+                $list.="<th colspan='3'>$coursename</th>";
+                $list.="</tr>";
+                if (count($grades) > 0) {
+                    foreach ($grades as $gr) {
+                        $list.="<tr>";
+                        $list.="<td style='padding:15px;'>$gr->name</td>";
+                        $list.="<td style='padding:15px;'>$gr->grade%</td>";
+                        $list.="<td style='padding:15px;'>$gr->date</td>";
+                        $list.="</tr>";
+                    } // end foreach
+                } // end if count($grades)>0
+            } // end foreach
+            $list.="</table>";
+        } // end if count($courses)>0
+        $dir = $this->report_dir . "/$userid";
+        if (!is_dir($dir)) {
+            if (!mkdir($dir)) {
+                die('Could not write to disk');
+            } // end if !mkdir($dir_path)
+        }
+        $file = "grades_report.pdf";
+        $path = $dir . "/$file";
+        $pdf = new mPDF('utf-8', 'A4-L');
+        $pdf->WriteHTML($list);
+        $pdf->Output($path, 'F');
+        return $file;
     }
 
 }

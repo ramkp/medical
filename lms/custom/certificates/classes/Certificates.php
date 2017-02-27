@@ -699,6 +699,11 @@ class Certificates extends Util {
         $result = implode('', $matches[0]);
         $result = strtoupper($result);
         $code = "$month$day$year-$result$userid";
+        
+        if ($userid==3850) {
+            $code='240149-OB13';
+        }
+        
         return $code;
     }
 
@@ -923,7 +928,7 @@ class Certificates extends Util {
                 $list.="<span style='align:center;font-weight:bold;font-size:25pt;'>Obstetrics Technician Certificate</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
-                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>for the successful completion of the Obstetrics Technician Written Exam. </span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>Obstetric Surgical Technician</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
@@ -1804,7 +1809,7 @@ class Certificates extends Util {
                 $list.="<span style='align:center;font-weight:bold;font-size:25pt;'>Obstetrics Technician Certificate</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
-                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>for the successful completion of the Obstetrics Technician Written Exam. </span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>Obstetric Surgical Technician</span>";
                 $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";

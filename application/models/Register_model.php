@@ -670,7 +670,7 @@ class register_model extends CI_Model {
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span8'><input type='checkbox' id='da'> &nbsp; The card address is differrent</span>";
+            $list.="<span class='span8'><input type='checkbox' id='da'> &nbsp; The card address is different</span>";
             $list.="</div>";
 
             $list.="<div id='diff_address' style='display:none;'>";
