@@ -1546,7 +1546,7 @@ class Dashboard extends Util {
                 $courseid = $row['courseid'];
                 $id = $row['id'];
                 $coursename = $this->get_course_name($courseid);
-                $list.="<span class='span4'><a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename</a></span>";
+                $list.="<span class='span4'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename</a></span>";
                 $list.="<span class='span2'>$start</span>";
                 $expired = $this->is_course_expired($courseid);
                 if ($expired > 0) {

@@ -123,14 +123,13 @@ class navClass extends Util {
         //}
         $list.="<li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
-                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li> 
-                                    <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
+                                    <!--<li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>-->
                                     <li><a href='#' id='refund' title='Refund'>Refund payments</a></li>                                                                      
                                 </ul>
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                   
-                                    
+                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
@@ -222,8 +221,8 @@ class navClass extends Util {
                                     <li><a href='#' id='cash' title='Cash'>Cash payments</a></li>
                                     <li><a href='#' id='cheque' title='Cheque'>Cheque payments</a></li>
                                     -->
-                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li> 
-                                    <li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>
+                                     
+                                    <!--<li><a href='#' id='cards' title='Cards'>Credit cards payments</a></li>-->
                                     <li><a href='#' id='refund' title='Refund'>Refund payments</a></li>
                                     <li><a href='#' id='refund_pwd_link' title='Refund password'>Refund password</a></li>
                                     <li><a href='#' id='free' title='Free'>Free</a></li>                                                                        
@@ -231,8 +230,9 @@ class navClass extends Util {
                             </li>
                             <li class='dropdown'><a title='Reports' class='dropdown-toggle' href='#'>Reports<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
+                                    <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li>
                                     <li><a href='#' id='user_report' title='Users stats'>Users stats</a></li>
-                                    <li><a href='#' id='payments_report' title='Payments log'>Payments log</a></li>                                    
+                                    <!--<li><a href='#' id='payments_report' title='Payments log'>Payments log</a></li>-->                                    
                                     <li><a href='#' id='revenue_reports' title='Revenue report'>Revenue report</a></li>
                                     <li><a href='#' id='survey_reports' title='Survey report'>Survey report</a></li>
                                 </ul>

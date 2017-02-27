@@ -31,6 +31,8 @@ class Report extends Util {
     public $total_cash = 0;
     public $total_cheque = 0;
     public $total_card = 0;
+    public $total_inv = 0;
+    public $total_refund = 0;
 
     function __construct() {
         parent::__construct();
@@ -282,7 +284,6 @@ class Report extends Util {
 
     function get_revenue_report_data($courseid, $from, $to, $status = true, $output = true) {
 
-
         $this->courseid = $courseid;
         $this->from = $from;
         $this->to = $to;
@@ -376,14 +377,14 @@ class Report extends Util {
 
                         <div class='tab-pane' id='option3'>
 
-                            <h3>Cheque payments - $$payments->cheque - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->cheque_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
+                            <h3>Cheque payments - $$this->total_cheque - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->cheque_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
                             <p>$cheque_payments_detailes</p> 
 
                         </div>
                         
 			<div class='tab-pane' id='option5'>
 
-                            <h3>Invoice payments - $$payments->invoice - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->invoice_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
+                            <h3>Invoice payments - $$this->total_inv - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->invoice_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
                             <p>$invoice_data_details</p> 
 
                         </div>
@@ -391,7 +392,7 @@ class Report extends Util {
                         
 			  <div class='tab-pane' id='option4'>
 
-                            <h3>Refund payments - $$this->full_refund_sum - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->refund_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
+                            <h3>Refund payments - $$this->total_refund - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->refund_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
                             <p>$refund_payment_detailes</p> 
 
                         </div>
@@ -821,6 +822,7 @@ class Report extends Util {
         $this->from = $from;
         $this->to = $to;
         $list = "";
+        $total = 0;
 
         if ($from == $to) {
             $timestamp = time();
@@ -902,7 +904,9 @@ class Report extends Util {
                 $list.="<span class='span3'>$$payment->psum</span>";
                 $list.="<span class='span3'>$date</span>";
                 $list.="</div>";
+                $total = $total + $payment->psum;
             } // end for
+            $this->total_refund = $total;
         } // end if $num > 0
         else {
             $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -946,6 +950,7 @@ class Report extends Util {
         $this->from = $from;
         $this->to = $to;
         $list = "";
+        $total = 0;
 
         if ($from == $to) {
             $timestamp = time();
@@ -1012,7 +1017,9 @@ class Report extends Util {
                 $list.="<span class='span3'>$$payment->i_sum</span>";
                 $list.="<span class='span3'>$date</span>";
                 $list.="</div>";
+                $total = $total + $payment->i_sum;
             } // end for
+            $this->total_inv = $total;
         } // end if $num > 0
         else {
             $list.="<div class='container-fluid' style='text-align:center;'>";
