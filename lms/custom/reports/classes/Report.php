@@ -311,13 +311,13 @@ class Report extends Util {
         if ($courseid > 0) {
             $query = "select * from mdl_card_payments "
                     . "where courseid=$courseid and refunded=1 "
-                    . "and pdate between $unix_from and $unix_to "
-                    . "order by pdate desc ";
+                    . "and refund_date between $unix_from and $unix_to "
+                    . "order by refund_date desc ";
         } // end if $courseid>0
         else {
             $query = "select * from mdl_card_payments "
-                    . "where pdate between $unix_from and $unix_to "
-                    . "and refunded=1  order by pdate desc ";
+                    . "where refund_date between $unix_from and $unix_to "
+                    . "and refunded=1  order by refund_date desc ";
         } // end else
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
@@ -330,8 +330,7 @@ class Report extends Util {
                 } // end if $user_status==0
             } // end while
         } // end if $num > 0
-
-        $payments = $this->get_period_payments($courseid, $unix_from, $unix_to);
+        //$payments = $this->get_period_payments($courseid, $unix_from, $unix_to);
         $card_payments_detailes = $this->get_card_payments_detailes($courseid, $from, $to);
         $cash_payments_detailes = $this->get_other_payment_report_data($courseid, $from, $to, 1);
         $cheque_payments_detailes = $this->get_other_payment_report_data($courseid, $from, $to, 2);
@@ -837,14 +836,15 @@ class Report extends Util {
         if ($courseid > 0) {
             $query = "select * from mdl_card_payments "
                     . "where courseid=$courseid and refunded=1 "
-                    . "and pdate between $unix_from and $unix_to "
-                    . "order by pdate desc ";
+                    . "and refund_date between $unix_from and $unix_to "
+                    . "order by refund_date desc ";
         } // end if $courseid>0
         else {
             $query = "select * from mdl_card_payments "
-                    . "where pdate between $unix_from and $unix_to "
-                    . "and refunded=1 order by pdate desc ";
+                    . "where refund_date between $unix_from and $unix_to "
+                    . "and refunded=1 order by refund_date desc ";
         } // end else    
+        //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -880,8 +880,8 @@ class Report extends Util {
                 $partial_payments[] = $payment;
             } // end while
         } // end if $num > 0
-
-        $all_refunds = array_merge($payments, $partial_payments);
+        // $all_refunds = array_merge($payments, $partial_payments); this array is not compatible
+        $all_refunds = $payments;
 
         if (count($all_refunds) > 0) {
 
@@ -895,7 +895,7 @@ class Report extends Util {
 
             foreach ($all_refunds as $payment) {
                 //echo "Inside payments ...<br>";
-                $date = date('m-d-Y', $payment->pdate);
+                $date = date('m-d-Y', $payment->refund_date);
                 $coursename = $this->get_course_name($payment->courseid);
                 $userdata = $this->get_user_details($payment->userid);
                 $list.="<div class='container-fluid' style='text-align:left;'>";

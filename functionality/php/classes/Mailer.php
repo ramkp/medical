@@ -148,7 +148,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -314,7 +314,7 @@ class Mailer {
         $list = "";
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /*  ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -417,7 +417,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -681,9 +681,9 @@ class Mailer {
         $recipient = $payment->bill_email;
         if ($payment->renew == null) {
             $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
-            $subject = "Medical2 - payment confirmation";
-            $message = $this->get_payment_confirmation_message($payment, $group, $free);
-            $this->send_email($subject, $message, $recipient);
+            //$subject = "Medical2 - payment confirmation";
+            //$message = $this->get_payment_confirmation_message($payment, $group, $free);
+            //$this->send_email($subject, $message, $recipient);
         } // end if $payment->sum!=$renew_fee
         else {
             $subject = "Medical2 - Certificate Renew Payment";

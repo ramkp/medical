@@ -546,15 +546,35 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_refund_payments($userid, $courseid) {
+        $list = "";
+        $query = "select * from mdl_card_payments "
+                . "where courseid=$courseid "
+                . "and userid=$userid and refunded=1";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        //echo "Num: " . $num . "<br>";
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $coursename = $this->get_course_name($courseid);
+                $date = date('m-d-Y', $row['refund_date']);
+                $list.="<div class='row-fluid'>";
+                $list.="<span span9>Refund $" . $row['psum'] . " ($date) $coursename</span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
+        return $list;
+    }
+
     function get_user_payments($userid, $courseid) {
         $list = "";
         $card_payments = $this->get_user_card_payments($userid, $courseid);
+        $refund_payments = $this->get_refund_payments($userid, $courseid);
         $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
         $free_payments = $this->get_user_free_payments($userid, $courseid);
-        if ($card_payments != '' || $invoice_payments != '' || $partial_payments != '' || $free_payments != '') {
-            $list.=$card_payments . $partial_payments . $free_payments . $invoice_payments;
-        }
+        $list.=$card_payments . $refund_payments . $partial_payments . $free_payments . $invoice_payments;
         return $list;
     }
 
@@ -1886,7 +1906,7 @@ class Dashboard extends Util {
           die();
          * 
          */
-
+        $now = time();
         $payments_data = explode('_', $payment->id);
         switch ($payments_data[0]) {
             case 'c':
@@ -1904,7 +1924,7 @@ class Dashboard extends Util {
                 $status = $pr->makeRefund($amount, $card_last_four, $exp_date, $trans_id);
                 if ($status) {
                     $query = "update mdl_card_payments "
-                            . "set refunded=1 "
+                            . "set refunded=1, refund_date='$now' "
                             . "where id=$payments_data[1]";
                     $this->db->query($query);
                 }
