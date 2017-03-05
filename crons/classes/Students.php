@@ -1902,7 +1902,7 @@ class Students {
                         In order to remain certified, you must renew your certification. 
                         To qualify for recertification, you must login to your account and click on 
                         recertification tab and follow the steps or mail in a money order for your $75 
-                        renewal fee no later than 30 days past your expiration date. 
+                        renewal fee no later than 10 days past your expiration date. 
                         If you do not meet this deadline, the fee will increase to $100. 
                         After 90 days, the fee will be $125. Additionally, if your certification 
                         is over 90 days expired, you must submit documentation verifying that you 
@@ -1914,7 +1914,7 @@ class Students {
 			<p style='font-weight:bold;font-size:15px;'><span style='color:red;'>Make money orders out to</span> Medical2 Inc.</p> 
 			<hr>
                         <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/75/1' target='_blank'>$75 Recertification Fee </a></p>
-			<p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/100/1' target='_blank'>$100 Recertification Fee (Over 30 Days Expired)</a></p>
+			<p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/100/1' target='_blank'>$100 Recertification Fee (Over 10 Days Expired)</a></p>
                         <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/125/1' target='_blank'>$125 Recertification Fee (Over 90 Days Expired)</a></p>
                         
                         <p style='align:left;font-size:15px;'>Notice: Your username to login to your account at <a href='https://www.medical2.com' target='_blank'>www.medical2.com</a>

@@ -665,15 +665,15 @@ class navClass extends Util {
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>One year prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span></span>";
+        $list.="<span class='span9'>One year prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Two years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span></span>";
+        $list.="<span class='span9'>Two years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Three years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span></span>";
+        $list.="<span class='span9'>Three years prolongation - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span></span>";
 
         $list.="</div>";
 

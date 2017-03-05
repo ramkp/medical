@@ -968,6 +968,308 @@ class Payment {
         return $list;
     }
 
+    function get_payment_section2($group_data, $users, $participants, $installment = null, $from_email = null, $sum = false, $renew = null) {
+
+
+        $list = "";
+        $cost_block = "";
+        $card_year = $this->get_year_drop_box();
+        $card_month = $this->get_month_drop_box();
+        $states = $this->get_states_list();
+        $late = new Late();
+
+        $dashboard = ($from_email == null) ? 0 : 1;
+        $list.="<input type='hidden' id='dashboard' value='$dashboard'>";
+        $list.="<input type='hidden' id='renew' value='$renew'>";
+        if ($from_email != null) {
+            $list.="<br/><div  class='form_div'>";
+        }
+        $list.="<div class='panel panel-default' id='payment_detailes'>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+
+        $list.="</div>";
+
+        if ($renew >= 1) {
+            $course_name = "Certificarion renewal";
+        } // end if $renew==1
+        else {
+            $course_name = $this->get_course_name($users->courseid);
+        } // end else
+
+        if ($group_data == '') {
+
+            if ($sum == false) {
+                // Here we take personal course cost
+                $course_cost = $this->get_personal_course_cost($users->courseid);
+            } // end if $renew == false
+            else {
+                // Predefined cost sent from partial payments module
+                $course_cost = array('cost' => $sum, 'discount' => 0);
+            }
+            $list.= "<input type='hidden' value='' id='user_group' name='user_group' />";
+            $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
+            $list.= "<input type='hidden' value='$users->courseid' id='courseid' name='courseid' />";
+            $list.= "<input type='hidden' value='$users->slotid' id='slotid' name='slotid' />";
+            $tax_status = $this->is_course_taxable($users->courseid);
+            //echo "Tax status: ".$tax_status."<br>";
+            if ($tax_status == 1) {
+                $tax = $this->get_state_taxes($users->state);
+            } // end if $tax_status == 1
+            else {
+                $tax = 0;
+            } // end else
+            if ($users->slotid != '' && $sum == false) {
+                $apply_delay_fee = $late->is_apply_delay_fee($users->courseid, $users->slotid);
+                $late_fee = $late->get_delay_fee($users->courseid);
+            }
+        } // end if $group==''
+        else {
+
+            if ($sum == false) {
+                // Here we take group course cost
+                $course_cost = $this->get_course_group_discount($group_data->courseid, $participants);
+            } // end if $renew == false 
+            else {
+                // Predefined cost sent from partial payments module
+                $course_cost = array('cost' => $sum, 'discount' => 0);
+            } // end else
+
+            $list.= "<input type='hidden' value='$group_data->group_name' id='user_group' name='user_group' />";
+            $list.= "<input type='hidden' value='$users->id' id='userid' name='userid' />";
+            $list.= "<input type='hidden' value='$group_data->courseid' id='courseid' name='courseid' />";
+            $tax_status = $this->is_course_taxable($group_data->courseid);
+            //echo "Tax status: ".$tax_status."<br>";
+            if ($tax_status == 1) {
+                $tax = $this->get_state_taxes($group_data->statename);
+            } // end if $tax_status == 1
+            else {
+                $tax = 0;
+            } // end else
+            if ($group_data->slotid != '' && $sum == false) {
+                $apply_delay_fee = $late->is_apply_delay_fee($group_data->courseid, $group_data->slotid);
+                $late_fee = $late->get_delay_fee($group_data->courseid);
+            }
+        } // end else when group_data are not null
+        // Discount block
+        if ($course_cost['discount'] == 0) {
+            $cost_block.="$" . $course_cost['cost'];
+        } // end if $course_cost['discount']==0
+        else {
+            $cost_block.="$" . $course_cost['cost'] . "&nbsp; (discount is " . $course_cost['discount'] . "%)";
+        }
+
+        if ($apply_delay_fee) {
+            if ($group_data == '') {
+                // Personal delay fee
+                $grand_total = $course_cost['cost'] + $late_fee;
+            } // end if $group_data == ''
+            else {
+                // Group delay fee
+                $grand_total = $course_cost['cost'] + $late_fee * $participants;
+            } // end else 
+        } // end if $apply_delay_fee
+        else {
+            $grand_total = $course_cost['cost'];
+        } // end else when no delay fee applied ...
+        //echo "Tax: " . $tax . "<br>";
+        //echo "Group data: ";
+        //print_r($group_data);
+        //echo "<br>";
+        //echo "Participants: ".$participants."<br>";
+
+        if ($tax == 0) {
+            $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+            $list.="<span class='span2'>Selected program</span>";
+            //$list.="<span class='span2' style='white-space: nowrap;overflow:hidden;'>$course_name</span>";
+            $list.="<span class='span2' style=''>$course_name</span>";
+            $list.="<span class='span2'>Fee</span>";
+            if ($apply_delay_fee) {
+                if ($group_data == '') {
+                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)<br>Total: $grand_total</span>";
+                    // This is personal course cost
+                    $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
+                } // end if $group_data == ''
+                else {
+                    $list.="<span class='span2'>$cost_block+$" . $late_fee * $participants . " (late fee)<br>Total: $grand_total</span>";
+                    // This is group course cost
+                    $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='group_payment_sum' />";
+                } // end else                    
+            } // end if $apply_delay_fee
+            else {
+                if ($group_data == '') {
+                    $list.="<span class='span2'>$cost_block</span>";
+                    // This is personal course cost
+                    $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
+                } // end if $group_data == ''
+                else {
+                    $list.="<span class='span2'>$cost_block</span>";
+                    // This is group course cost
+                    $list.= "<input type='hidden' value='" . $course_cost['cost'] . "' id='group_payment_sum' />";
+                } // end else
+            } // end else when no late fee                
+
+            $list.="</div>";
+        } // end if $tax==0
+        else {
+            // The case when we apply taxes
+            $tax_sum = round(($course_cost['cost'] * $tax) / 100, 2);
+            $grand_total = round(($course_cost['cost'] + $tax_sum), 2);
+
+            if ($apply_delay_fee) {
+                if ($group_data == '') {
+                    $grand_total2 = $grand_total + $late_fee;
+                } // end if $group_data == ''
+                else {
+                    $grand_total2 = $grand_total + $late_fee * $participants;
+                } // end else
+            } // end if $apply_delay_fee
+            else {
+                $grand_total2 = $grand_total;
+            } // end else when no delay fee is applied
+            //$grand_total2 = ($apply_delay_fee == true) ? $grand_total + $late_fee : $grand_total;
+
+            $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+            $list.="<span class='span2'>Selected program</span>";
+            $list.="<span class='span2'>$course_name</span>";
+            $list.="<span class='span2'>Subtotal</span>";
+            if ($apply_delay_fee) {
+                if ($group_data == '') {
+                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)</span>";
+                } // end if $group_data == ''
+                else {
+                    $list.="<span class='span2'>$cost_block+$" . $late_fee * $participants . " (late fee)</span>";
+                } // end else                    
+            } // end if $apply_delay_fee
+            else {
+                $list.="<span class='span2'>$cost_block</span>";
+            }
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+            $list.="<span class='span2'></span>";
+            $list.="<span class='span2'></span>";
+            $list.="<span class='span2'>Tax</span>";
+            $list.="<span class='span2'>$$tax_sum</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+            $list.="<span class='span2'></span>";
+            $list.="<span class='span2'></span>";
+            $list.="<span class='span2'>Total</span>";
+            $list.="<span class='span2'>$$grand_total2</span>";
+            $list.= "<input type='hidden' value='" . $grand_total2 . "' id='payment_sum' />";
+            $list.="</div>";
+        } // end else when tax is not null
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Card Holder Name*</span>";
+        $list.="<span class='span2'><input type='text' id='card_holder' name='card_holder'  ></span>";
+        $list.="<span class='span2'>Card number*</span>";
+        $list.="<span class='span2'><input type='text' id='card_no' name='card_no'  ></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>CVV*</span>";
+        $list.="<span class='span2'><input type='text' id='bill_cvv' name='bill_cvv'  ></span>";
+        $list.="<span class='span2'>Expiration Date*</span>";
+        $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
+        $list.="</div>";
+
+        $country = $this->get_countries_list();
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><input type='checkbox' id='da'>If billing address is different</span>";
+        $list.="</div>";
+
+        $list.="<div id='diff_address' style='display:none;'>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Billing Address*</span>";
+        $list.="<span class='span2'><input type='text' id='addr2' name='addr2'  ></span>";
+        $list.="<span class='span2'>City*</span>";
+        $list.="<span class='span2'><input type='text' id='city2' name='city2'  ></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>State*</span>";
+        $list.="<span class='span2'>$states</span>";
+        $list.="<span class='span2'>Country*</span>";
+        $list.="<span class='span2' id='register_cities_container'>$country</span>";
+
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Zip code*</span>";
+        $list.="<span class='span2'><input type='text' id='zip2' name='zip2'  ></span>";
+        $list.="<span class='span2'>Receipt email*</span>";
+        $list.="<span class='span2'><input type='text' id='email2' name='email2'></span>";
+        $list.="</div>";
+
+        /*
+          $list.="<div class='container-fluid' style='text-align:left;'>";
+          $list.="<span class='span2'>Phone*</span>";
+          $list.="<span class='span2'><input type='text' id='phone2' name='phone2'></span>";
+          $list.="</div>";
+         */
+
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>By clicking the 'I Agree, Submit' button, you confirm you have reviewed and agree to the Pay by Computer Terms & Conditions</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><a href='#' onClick='return false;' id='policy'>(click to view)</a></span>";
+        $list.="</div>";
+
+        /*
+          $list.="<div class='container-fluid' style='text-align:center;'>";
+          $list.="<span class='span8'><input type='checkbox' id='policy_checkbox'> I have read and agree to Terms and Conditions</span>";
+          $list.="</div>";
+         */
+
+        $list.= "<div class='container-fluid' style='text-align:center;'>";
+        $list.= "<span style='color:red;' class='span8' id='personal_payment_err'></span>";
+        $list.= "</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+
+        $list.= "<div class='container-fluid' style='text-align:center;'>";
+        $list.= "<span class='span8'><button class='btn btn-primary' id='make_already_registered_payment'>Submit</button></span>";
+        $list.= "</div>";
+
+        $list.="</div>";
+        $list.="</div>";
+
+        if ($from_email != null) {
+            $list.="</div>"; // form div
+        }
+
+        return $list;
+    }
+
+    function get_countries_list() {
+        $list = "";
+        $list.="<select id='pcountry' style='width:154px;'>";
+        $query = "select * from mdl_countries order by name";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            if ($row['name'] == 'United States') {
+                $list.="<option id='" . $row['id'] . "' selected>" . $row['name'] . "</option>";
+            } // end if 
+            else {
+                $list.="<option id='" . $row['id'] . "'>" . $row['name'] . "</option>";
+            }
+        }
+        $list.="</select>";
+        return $list;
+    }
+
     function get_state_name_by_id($stateid) {
         //echo "State ID: ".$stateid."<br>";
         if (is_numeric($stateid)) {
@@ -1182,6 +1484,124 @@ class Payment {
         return $slotid;
     }
 
+    function make_registered_payment($card) {
+        $list = "";
+        $mailer = new Mailer();
+        $item = substr($this->get_course_name($card->courseid), 0, 27);
+        $user = $this->get_user_payment_credentials($card->userid);
+        $order = new stdClass();
+
+        $names = explode(" ", $card->card_holder);
+        if (count($names) == 2) {
+            $firstname = $names[0];
+            $lastname = $names[1];
+        } //end if 
+        if (count($names) == 3) {
+            $firstname = $names[0] . " " . $names[1];
+            $lastname = $names[2];
+        } // end else
+
+        if (!property_exists($card, 'differ')) {
+
+            // Get data from database
+            $order->cds_name = "$firstname/$lastname";
+            $order->cds_address_1 = $user->address;
+            $order->cds_city = $user->city;
+            $order->cds_state = $user->sate;
+            $order->phone = $user->phone1;
+            $order->cds_zip = $user->zip;
+            $order->cds_email = $user->email;
+            $order->cds_cc_number = $card->card_no;
+            $order->cds_cc_exp_month = $card->card_month;
+            $order->cds_cc_exp_year = $card->card_year;
+            $order->sum = $card->sum;
+            $order->cvv = $card->cvv; // add card cvv code to processor 
+            $order->item = $item;
+            $order->group = 0;
+
+            // Make card object compatible with payment confirmation email
+            $card->signup_first = $firstname;
+            $card->signup_last = $lastname;
+            $card->email = $user->email;
+            $card->phone = $user->phone1;
+            $card->pwd = $user->purepwd;
+            $card->addr = $user->address;
+            $card->city = $user->city;
+            $card->state = $user->state;
+            $card->zip = $user->zip;
+            $card->payment_amount = $card->sum;
+        } // end if
+        else {
+
+            // Payment profile is differ so we get form info
+            $state_code = $this->get_state_code($card->state);
+            $order->cds_name = "$firstname/$lastname";
+            $order->cds_address_1 = $card->addr;
+            $order->cds_city = $card->city;
+            $order->cds_state = $state_code;
+            $order->phone = $user->phone1;
+            $order->cds_zip = $card->zip;
+            $order->cds_email = $card->email;
+            $order->cds_cc_number = $card->card_no;
+            $order->cds_cc_exp_month = $card->card_month;
+            $order->cds_cc_exp_year = $card->card_year;
+            $order->sum = $card->sum;
+            $order->cvv = $card->cvv; // add card cvv code to processor 
+            $order->item = $item;
+            $order->group = 0;
+
+
+            // Make card object compatible with payment confirmation email
+            $card->signup_first = $firstname;
+            $card->signup_last = $lastname;
+            $card->phone = $user->phone1;
+            $card->pwd = $user->purepwd;
+            $card->payment_amount = $card->sum;
+        }
+
+        $pr = new ProcessPayment();
+        $status = $pr->make_transaction($order);
+        if ($status === false) {
+            $list.="<div class='panel panel-default' id='personal_payment_details'>";
+            $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
+            $list.="<div class='panel-body'>";
+            $list.= "<div class='container-fluid' style='text-align:left;'>";
+            $list.= "<span class='span8'>Transaction failed, please contact your bank for details.</span>";
+            $list.="</div>";
+            $list.="</div>";
+            $list.="</div>";
+        } // end if $status === false
+        else {
+            $card->transid = $status['trans_id'];
+            $card->auth_code = $status['auth_code'];
+            $this->confirm_user($card->email);
+            $this->add_payment_to_db($card); // adds payment result to DB
+            $mailer->send_payment_confirmation_message($card);
+            $list.="<div class='panel panel-default' id='personal_payment_details'>";
+            $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
+            $list.="<div class='panel-body'>";
+            $list.= "<div class='container-fluid' style='text-align:center;'>";
+            if ($card->renew > 0) {
+                $cert = new Certificates2();
+                $res = $cert->renew_certificate($card->courseid, $card->userid, $card->renew);
+                if ($res != '') {
+                    $list.= "<span class='span8'>Payment is successful. Thank you! Your certificate has been renewed.</span>";
+                } // end if
+                else {
+                    $list.= "<span class='span8'>Payment is successful, please contact us to get your updated certificate.</span>";
+                } // end else
+            } // end if $card->sum != $renew_fee                    
+            else {
+                $list.= "<span class='span8'>Payment is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user->email.pdf' target='_blank'>here.</a></span>";
+            } // end else
+            $list.="</div>";
+            $list.="</div>";
+            $list.="</div>";
+            $this->enroll->add_user_to_course_schedule($card->userid, $card);
+        }
+        return $list;
+    }
+
     function make_stub_payment($card) {
 
         $list = "";
@@ -1191,7 +1611,7 @@ class Payment {
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
 
-        /* ********************************************************************
+        /*         * *******************************************************************
          *  Please be aware $user_payment_data could be null in case of 
          *  group registration
          * ******************************************************************* */
@@ -1623,18 +2043,100 @@ class Payment {
         return $list;
     }
 
-    function internal_signup($user) {
+    function internal_signup($card) {
         $list = "";
-        $signup_status = $this->enroll->single_signup($user);
+
+        $signup_status = $this->enroll->single_signup($card);
         if ($signup_status === true) {
-            $list.="Registration is successful";
-            // Confirm user account
-            $query = "update mdl_user set confirmed=1 where username='$user->email'";
-            $this->db->query($query);
-        } // end if
+            //$list.="Registration is successful";
+            $userid = $this->get_user_id_by_email($card->email);
+            $mailer = new Mailer();
+            $item = substr($this->get_course_name($card->courseid), 0, 27);
+            $user = $this->get_user_payment_credentials($userid);
+            $order = new stdClass();
+
+            $names = explode(" ", $card->card_holder);
+            if (count($names) == 2) {
+                $firstname = $names[0];
+                $lastname = $names[1];
+            } //end if 
+            if (count($names) == 3) {
+                $firstname = $names[0] . " " . $names[1];
+                $lastname = $names[2];
+            } // end else
+
+            $order->cds_name = "$firstname/$lastname";
+            $order->cds_address_1 = $user->address;
+            $order->cds_city = $user->city;
+            $order->cds_state = $user->state;
+            $order->phone = $user->phone1;
+            $order->cds_zip = $user->zip;
+            $order->cds_email = $user->email;
+            $order->cds_cc_number = $card->card_no;
+            $order->cds_cc_exp_month = $card->card_month;
+            $order->cds_cc_exp_year = $card->card_year;
+            $order->sum = $card->sum;
+            $order->cvv = $card->cvv; // add card cvv code to processor 
+            $order->item = $item;
+            $order->group = 0;
+
+            // Make card object compatible with payment confirmation email
+            $card->signup_first = $user->firstname;
+            $card->signup_last = $user->lastname;
+            $card->email = $user->email;
+            $card->phone = $user->phone1;
+            $card->pwd = $user->purepwd;
+            $card->addr = $user->address;
+            $card->city = $user->city;
+            $card->state = $user->state;
+            $card->zip = $user->zip;
+            $card->payment_amount = $card->sum;
+
+            $pr = new ProcessPayment();
+            $status = $pr->make_transaction($order);
+            if ($status === false) {
+                $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
+                $list.="<div class='panel-body'>";
+                $list.= "<div class='container-fluid' style='text-align:left;'>";
+                $list.= "<span class='span8'>Transaction failed, please contact your bank for details.</span>";
+                $list.="</div>";
+                $list.="</div>";
+                $list.="</div>";
+            } // end if $status === false
+            else {
+                $card->transid = $status['trans_id'];
+                $card->auth_code = $status['auth_code'];
+                $this->confirm_user($card->email);
+                $this->add_payment_to_db($card); // adds payment result to DB
+                $mailer->send_payment_confirmation_message($card);
+                $list.="<div class='panel panel-default' id='personal_payment_details'>";
+                $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment Details</h5></div>";
+                $list.="<div class='panel-body'>";
+                $list.= "<div class='container-fluid' style='text-align:center;'>";
+                if ($card->renew > 0) {
+                    $cert = new Certificates2();
+                    $res = $cert->renew_certificate($card->courseid, $card->userid, $card->renew);
+                    if ($res != '') {
+                        $list.= "<span class='span8'>Payment is successful. Thank you! Your certificate has been renewed.</span>";
+                    } // end if
+                    else {
+                        $list.= "<span class='span8'>Payment is successful, please contact us to get your updated certificate.</span>";
+                    } // end else
+                } // end if $card->sum != $renew_fee                    
+                else {
+                    $list.= "<span class='span8'>Registration is successful. Thank you! You can print your registration data <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$user->email.pdf' target='_blank'>here.</a></span>";
+                } // end else
+                $list.="</div>";
+                $list.="</div>";
+                $list.="</div>";
+                $this->enroll->add_user_to_course_schedule($card->userid, $card);
+            }
+        } // end if $signup_status === true
         else {
             $list.="Registration failed";
         }
+        
         return $list;
     }
 

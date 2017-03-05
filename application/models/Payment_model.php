@@ -13,7 +13,6 @@
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
 
-
 class Payment_model extends CI_Model {
 
     public $payment;
@@ -110,23 +109,23 @@ class Payment_model extends CI_Model {
         return $slotid;
     }
 
-    public function get_payment_section($userid, $courseid, $slotid, $sum, $renew=null) {
-        $list = "";                
+    public function get_payment_section($userid, $courseid, $slotid, $sum, $renew = null) {
+        $list = "";
         //echo "Sum inside model: ".$sum."<br>";
         if ($userid != NULL) {
             $invoice = new Invoice();
-            $user = $this->get_user_data($userid);            
+            $user = $this->get_user_data($userid);
             $user->courseid = $courseid;
             $user->slotid = $slotid;
             $group_status = $this->is_group_member($userid);
-            $installment_status = $invoice->is_installment_user($userid, $courseid);  
-            $installment_status=0; // No installment in manual mode
+            $installment_status = $invoice->is_installment_user($userid, $courseid);
+            $installment_status = 0; // No installment in manual mode
             if ($installment_status == 0) {
                 if ($group_status == 0) {
                     // Personal signup
                     $group_data = '';
                     $participants = 1;
-                    $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, 1,$sum, $renew);
+                    $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, 1, $sum, $renew);
                 } // end if $group_status==0
                 else {
                     // Group member signup
@@ -136,6 +135,59 @@ class Payment_model extends CI_Model {
                     $group_data->courseid = $courseid;
                     $participants = 1;
                     $list.=$this->payment->get_payment_section($group_data, $user, $participants, null, 1, $sum, $renew);
+                } // end else 
+            } // end if $installment_status==0
+            else {
+                $installment_obj = $invoice->get_user_installment_payments($userid, $courseid);
+                $installment = array();
+                $installment['period'] = 28; // days
+                $installment['num_payments'] = $installment_obj->num;
+                if ($group_status == 0) {
+                    // Personal signup
+                    $group_data = '';
+                    $participants = 1;
+                    $list.=$this->payment->get_payment_section($group_data, $user, $participants, $installment, 1);
+                } // end if $group_status==0
+                else {
+                    // Group member signup
+                    $group_name = $this->get_user_group($userid);
+                    $group_data = new stdClass();
+                    $group_data->group_name = $group_name;
+                    $group_data->courseid = $courseid;
+                    $participants = 1;
+                    $list.=$this->payment->get_payment_section($group_data, $user, $participants, $installment, 1);
+                } // end else            
+            } // end else when it is installment user
+        }  // end if $userid != NULL
+        return $list;
+    }
+
+    public function get_payment_section2($userid, $courseid, $slotid, $sum, $renew = null) {
+        $list = "";
+        //echo "Sum inside model: ".$sum."<br>";
+        if ($userid != NULL) {
+            $invoice = new Invoice();
+            $user = $this->get_user_data($userid);
+            $user->courseid = $courseid;
+            $user->slotid = $slotid;
+            $group_status = $this->is_group_member($userid);
+            //$installment_status = $invoice->is_installment_user($userid, $courseid);
+            $installment_status = 0; // No installment in manual mode
+            if ($installment_status == 0) {
+                if ($group_status == 0) {
+                    // Personal signup
+                    $group_data = '';
+                    $participants = 1;
+                    $list.=$this->payment->get_payment_section2($group_data, $user, $participants, null, 1, $sum, $renew);
+                } // end if $group_status==0
+                else {
+                    // Group member signup
+                    $group_name = $this->get_user_group($userid);
+                    $group_data = new stdClass();
+                    $group_data->group_name = $group_name;
+                    $group_data->courseid = $courseid;
+                    $participants = 1;
+                    $list.=$this->payment->get_payment_section2($group_data, $user, $participants, null, 1, $sum, $renew);
                 } // end else 
             } // end if $installment_status==0
             else {

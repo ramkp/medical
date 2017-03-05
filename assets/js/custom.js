@@ -69,9 +69,9 @@ $(document).ready(function () {
     $('#graduate_date').mask("9999");
     $('#phone1').mask("(999) 999-9999");
     $('#phone2').mask("(999) 999-9999");
-    
+
     // .^\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)*\s*$
-    $.mask.definitions['~']='.^\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)*\s*$';
+    $.mask.definitions['~'] = '.^\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)*\s*$';
     //$("#billing_name").mask("?aaaaaaaaaa aaaaaaaaaa");
 
     $('#app_date').datepicker();
@@ -727,6 +727,161 @@ $(document).ready(function () {
 
 
         } // end if card_type != 'Card type' && card_no!='' ...
+    }
+
+    function make_already_registered_payment() {
+        var differ, sum;
+        var user_group = $('#user_group').val();
+        if (user_group != '') {
+            sum = $('#group_payment_sum').val();
+        } // end if
+        else {
+            sum = $('#payment_sum').val();
+        }
+        var userid = $('#userid').val();
+        var courseid = $('#courseid').val();
+        var card_holder = $('#card_holder').val();
+        var card_no = $('#card_no').val();
+        var cvv = $('#bill_cvv').val();
+        var card_month = $('#card_month').val();
+        var card_year = $('#card_year').val();
+        var renew = $('#renew').val();
+        var slotid = $('#slotid').val();
+
+        if (card_holder == '') {
+            $('#personal_payment_err').html('Please provide card holder name');
+            return false;
+        }
+
+        if (card_holder != '') {
+            // Remove double spaces between words
+            var clean_holder = card_holder.replace(/\s\s+/g, ' ');
+            var names_arr = clean_holder.split(" ");
+
+            console.log('names array length: ' + names_arr.length);
+
+            if (names_arr.length == 1) {
+                $('#personal_payment_err').html('Please provide correct card holder name separated by space');
+                return;
+            }
+
+            if (names_arr.length == 2) {
+                console.log('Two names case ....');
+                console.log('Holder name: ' + card_holder);
+                firstname = names_arr[0];
+                lastname = names_arr[1];
+                console.log('Billing firstname: ' + firstname);
+                console.log('Billing lastname: ' + lastname);
+                if (typeof (firstname) === "undefined" || firstname == '' || typeof (lastname) === "undefined" || lastname == '') {
+                    $('#personal_payment_err').html('Please provide correct card holder name separated by space');
+                    return;
+                }
+            } // end if names_arr.length == 2
+
+            if (names_arr.length == 3) {
+                console.log('Three names case ...');
+                console.log('Holder name: ' + card_holder);
+                firstname = names_arr[0] + ' ' + names_arr[1];
+                lastname = names_arr[2];
+                console.log('Billing firstname: ' + firstname);
+                console.log('Billing lastname: ' + lastname);
+                if (typeof (firstname) === "undefined" || firstname == '' || typeof (lastname) === "undefined" || lastname == '') {
+                    $('#personal_payment_err').html('Please provide correct card holder name separated by space');
+                    return;
+                }
+            } // end if names_arr.length == 3
+
+        } // end if card_holder != ''
+
+        if (card_no == '') {
+            $('#personal_payment_err').html('Please provide card number');
+            return false;
+        }
+
+        if (cvv == '') {
+            $('#personal_payment_err').html('Please provide card cvv code');
+            return false;
+        }
+
+        if (card_year == '--') {
+            $('#personal_payment_err').html('Please select card expiration year');
+            return false;
+        }
+
+        if (card_month == '--') {
+            $('#personal_payment_err').html('Please select card expiration month');
+            return false;
+        }
+
+        if ($('#da').prop('checked')) {
+
+            var addr = $('#addr2').val();
+            var city = $('#city2').val();
+            var state = $('#bill_state').val();
+            var country = $('#pcountry').val();
+            var zip = $('#zip2').val();
+            var email = $('#email2').val();
+
+            if (addr == '') {
+                $('#personal_payment_err').html('Please provide billing address');
+                return false;
+            }
+
+            if (city == '') {
+                $('#personal_payment_err').html('Please provide city');
+                return false;
+            }
+
+            if (state == 0) {
+                $('#personal_payment_err').html('Please select state');
+                return false;
+            }
+
+            if (zip == '') {
+                $('#personal_payment_err').html('Please provide zip');
+                return false;
+            }
+
+            if (email == '') {
+                $('#personal_payment_err').html('Please provide contact email');
+                return false;
+            }
+
+            differ = 1;
+
+        } // end if 
+
+        $('#personal_payment_err').html('');
+
+        var card = {userid: userid,
+            courseid: courseid,
+            card_holder: card_holder,
+            card_no: card_no,
+            cvv: cvv,
+            slotid: slotid,
+            renew: renew,
+            card_month: card_month,
+            card_year: card_year,
+            sum: sum,
+            differ: differ,
+            addr: addr,
+            city: city,
+            state: state,
+            zip: zip,
+            country: country,
+            email: email};
+
+        //console.log('Card Object: ' + JSON.stringify(card));
+
+        var url = "/functionality/php/make_registered_payment.php";
+        var request = {card: JSON.stringify(card)};
+        $('#ajax_loading_payment').show();
+        $.post(url, request).done(function (data) {
+            $('#ajax_loading_payment').hide();
+            $('.form_div').html(data);
+        }); // end of post
+
+
     }
 
     function verify_group_payment_section() {
@@ -2022,6 +2177,13 @@ $(document).ready(function () {
 
     $("body").click(function (event) {
         console.log('Element clicked: ' + event.target.id);
+
+
+
+        if (event.target.id == 'make_already_registered_payment') {
+            make_already_registered_payment();
+        }
+
         if (event.target.id == 'ok') {
             $('#policy_checkbox').prop("checked", true);
         }

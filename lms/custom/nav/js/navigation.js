@@ -3944,6 +3944,13 @@ $(document).ready(function () {
             });
         }
 
+        if ($('#da').prop('checked')) {
+            $('#diff_address').show();
+        } // end if
+        else {
+            $('#diff_address').hide();
+        } // end else
+
         if (event.target.id == 'update_refund_pwd') {
             var url = "/lms/custom/payments/get_old_refund_pwd.php";
             var request = {id: 1};
@@ -4194,6 +4201,9 @@ $(document).ready(function () {
             var zip = $('#zip').val();
             var phone = $('#phone').val();
             var email = $('#email').val();
+            var card_holder = $('#billing_name').val();
+            var sum = $('#sum').val();
+
             if (courseid == 0) {
                 $('#personal_err').html('Please select program');
                 return;
@@ -4252,6 +4262,118 @@ $(document).ready(function () {
                 return;
             }
 
+            if (sum == '') {
+                $('#personal_err').html('Please provide payment amount');
+                return false;
+            }
+
+            if (card_holder == '') {
+                $('#personal_err').html('Please provide card holder name');
+                return false;
+            }
+
+            if (card_holder != '') {
+                // Remove double spaces between words
+                var clean_holder = card_holder.replace(/\s\s+/g, ' ');
+                var names_arr = clean_holder.split(" ");
+
+                console.log('names array length: ' + names_arr.length);
+
+                if (names_arr.length == 1) {
+                    $('#personal_err').html('Please provide correct card holder name separated by space');
+                    return;
+                }
+
+                if (names_arr.length == 2) {
+                    console.log('Two names case ....');
+                    console.log('Holder name: ' + card_holder);
+                    var h_firstname = names_arr[0];
+                    var h_lastname = names_arr[1];
+                    console.log('Billing firstname: ' + h_firstname);
+                    console.log('Billing lastname: ' + h_lastname);
+                    if (typeof (h_firstname) === "undefined" || h_firstname == '' || typeof (h_lastname) === "undefined" || h_lastname == '') {
+                        $('#personal_err').html('Please provide correct card holder name separated by space');
+                        return;
+                    }
+                } // end if names_arr.length == 2
+
+                if (names_arr.length == 3) {
+                    console.log('Three names case ...');
+                    console.log('Holder name: ' + card_holder);
+                    h_firstname = names_arr[0] + ' ' + names_arr[1];
+                    h_lastname = names_arr[2];
+                    console.log('Billing firstname: ' + h_firstname);
+                    console.log('Billing lastname: ' + h_lastname);
+                    if (typeof (h_firstname) === "undefined" || h_firstname == '' || typeof (h_lastname) === "undefined" || h_lastname == '') {
+                        $('#personal_err').html('Please provide correct card holder name separated by space');
+                        return;
+                    }
+                } // end if names_arr.length == 3
+
+            } // end if card_holder != ''
+
+            var cvv = $('#cvv2').val();
+            if (cvv == '') {
+                $('#personal_err').html('Please provide CVV code');
+                return;
+            }
+
+            var card_no = $('#card_no2').val();
+            if (card_no == '') {
+                $('#personal_err').html('Please provide card number');
+                return;
+            }
+
+            var card_month = $('#card_m').val();
+            if (card_month == 0) {
+                $('#personal_err').html('Please select card expiration month');
+                return;
+            }
+
+            var card_year = $('#card_y').val();
+            if (card_year == 0) {
+                $('#personal_err').html('Please select card expiration year');
+                return;
+            }
+
+            if ($('#da').prop('checked')) {
+                var bill_addr = $('#addr2').val();
+                if (bill_addr == '') {
+                    $('#personal_err').html('Please provide billing address');
+                    return;
+                }
+
+
+                var bill_city = $('#city2').val();
+                if (bill_city == '') {
+                    $('#personal_err').html('Please provide city');
+                    return;
+                }
+
+                var bill_state = $('#state2').val();
+                if (bill_state == 0) {
+                    $('#personal_err').html('Please select state');
+                    return;
+                }
+
+                var bill_zip = $('#zip2').val();
+                if (bill_zip == '') {
+                    $('#personal_err').html('Please provide zip');
+                    return;
+                }
+
+                var bill_email = $('#email2').val();
+                if (bill_email == '') {
+                    $('#personal_err').html('Please provide email');
+                    return;
+                }
+                var bill_phone = $('#phone2').val();
+                if (bill_phone == '') {
+                    $('#personal_err').html('Please provide phone');
+                    return;
+                }
+            }
+
             $('#personal_err').html('');
             var url = "/functionality/php/is_email_exists.php";
             var request = {email: email};
@@ -4274,15 +4396,29 @@ $(document).ready(function () {
                         email: email,
                         courseid: courseid,
                         slotid: slotid,
+                        sum: sum,
+                        card_holder: card_holder,
+                        cvv: cvv,
+                        card_no: card_no,
+                        card_month: card_month,
+                        card_year: card_year,
+                        bill_addr: bill_addr,
+                        bill_city: bill_city,
+                        bill_state: bill_state,
+                        bill_zip: bill_zip,
+                        bill_email: bill_email,
+                        bill_phone: bill_phone
                     };
                     $('#ajax_loading_payment').show();
                     personal_registration_obj = JSON.stringify(user);
+                    //console.log('User object: ' + personal_registration_obj);
                     var signup_url = "/functionality/php/internal_signup.php";
                     var signup_request = {user: JSON.stringify(user)};
                     $.post(signup_url, signup_request).done(function (data) {
                         $('#ajax_loading_payment').hide();
                         $('#personal_err').html("<span style='color:black'>" + data + "</span>");
                     });
+
                 } // end else
             }); // end of post
         }
@@ -4548,7 +4684,7 @@ $(document).ready(function () {
                         if (ptype == 'card') {
                             var url = "/lms/custom/my/enroll_user.php";
                             $.post(url, {userid: userid, courseid: program.courseid}).done(function () {
-                                var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
+                                var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
                                 window.open(url, '_blank');
                             });
                         } // end if ptype == 'card'
@@ -5667,7 +5803,7 @@ $(document).ready(function () {
                 var oWindow = window.open(url2, "print");
             });
         }
-        
+
         if (event.target.id == 'print_payment') {
             var userid = $('#userid').val();
             var url = "/lms/custom/my/print_payment.php";
@@ -5677,7 +5813,7 @@ $(document).ready(function () {
             });
         }
 
-        
+
 
     }); // end of body click event
 

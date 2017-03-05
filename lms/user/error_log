@@ -1,0 +1,23 @@
+[19-May-2016 22:52:35 Pacific/Wallis] PHP Fatal error:  Call to a member function fetch() on a non-object in /home/cnausa/public_html/lms/custom/my/classes/Dashboard.php on line 368
+[19-May-2016 22:54:19 Pacific/Wallis] PHP Fatal error:  Call to a member function fetch() on a non-object in /home/cnausa/public_html/lms/custom/my/classes/Dashboard.php on line 370
+[19-May-2016 22:55:45 Pacific/Wallis] PHP Fatal error:  Call to a member function fetch() on a non-object in /home/cnausa/public_html/lms/custom/my/classes/Dashboard.php on line 373
+[28-Oct-2016 10:03:53 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[17-Nov-2016 13:30:57 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[17-Nov-2016 13:30:58 America/New_York] Default exception handler: Coding error detected, it must be fixed by a programmer: PHP catchable fatal error Debug: Object of class stdClass could not be converted to string
+Error code: codingerror
+* line 418 of /lib/setuplib.php: coding_exception thrown
+* line 1028 of /custom/my/classes/Dashboard.php: call to default_error_handler()
+* line 880 of /custom/my/classes/Dashboard.php: call to Dashboard->get_user_workshops()
+* line 70 of /user/classes/output/myprofile/renderer.php: call to Dashboard->get_user_profile_custom_sections()
+* line 315 of /lib/outputrenderers.php: call to core_user\output\myprofile\renderer->render_tree()
+* line 221 of /user/profile.php: call to plugin_renderer_base->render()
+
+[17-Nov-2016 13:32:24 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[23-Nov-2016 14:17:23 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[23-Nov-2016 14:17:36 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[23-Nov-2016 14:25:36 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[23-Nov-2016 14:26:02 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[23-Nov-2016 14:26:38 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[24-Nov-2016 14:59:30 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[24-Nov-2016 15:00:06 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
+[24-Jan-2017 12:20:00 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8

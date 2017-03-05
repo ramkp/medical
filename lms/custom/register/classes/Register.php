@@ -143,10 +143,37 @@ class Register extends Util {
         return $list;
     }
 
+    function get_card_month() {
+        $list = "";
+        $list.="<select id='card_m'>";
+        $list.="<option value='0' selected>Month</option>";
+        for ($i = 1; $i <= 12; $i++) {
+            $name = ($i < 10) ? '0' . $i : $i;
+            $list.="<option value='$i'>$name</option>";
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_card_year() {
+        $list = "";
+        $list.="<select id='card_y'>";
+        $list.="<option value='0' selected>Year</option>";
+        for ($i = 2017; $i <= 2024; $i++) {
+            $list.="<option value='$i'>$i</option>";
+        }
+        $list.="</select>";
+        return $list;
+    }
+
     function get_register_form() {
 
         $list = "";
-
+        $card_month2 = $this->get_card_month();
+        $card_year2 = $this->get_card_year();
+        $states2=$this->get_states_list(true);
+        $countries2=$this->get_countries_list(true);
+        
         $cats = $this->get_course_categories();
         $courses = $this->get_courses_by_category();
         $states = $this->get_states_list();
@@ -211,12 +238,87 @@ class Register extends Util {
         $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
         $list.="</div>";
 
+        // ********************  Payment section ********************
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span6'><hr/></span>";
+        $list.="</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Amount*</span>";
+        $list.="<span class='span2'><input type='text' required id='sum' name='sum' required></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Card Holder Name*</span>";
+        $list.="<span class='span2'><input type='text' required id='billing_name' name='billing_name' placeholder='Firstname Lastname' required></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>CVV*</span>";
+        $list.="<span class='span2'><input type='text' id='cvv2' name='cvv2'  ></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Card number*</span>";
+        $list.="<span class='span2'><input type='text' id='card_no2' name='card_no2'  ></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Expiration Date*</span>";
+        $list.="<span class='span3'>" . $card_month2 . "&nbsp;&nbsp;&nbsp;" . $card_year2 . "</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><input type='checkbox' id='da'> &nbsp; If billing address is different</span>";
+        $list.="</div>";
+
+        $list.="<div id='diff_address' style='display:none;'>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Billing Address*</span>";
+        $list.="<span class='span2'><input type='text' id='addr2' name='addr2'  ></span>";
+        $list.="</div>";
+
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>City*</span>";
+        $list.="<span class='span2'><input type='text' id='city2' name='city2'  ></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>State*</span>";
+        $list.="<span class='span2'>$states2</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Country*</span>";
+        $list.="<span class='span2' id='register_cities_container'>$countries2</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Zip code*</span>";
+        $list.="<span class='span2'><input type='text' id='zip2' name='zip2'  ></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Receipt email*</span>";
+        $list.="<span class='span2'><input type='text' id='email2' name='email2'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Phone*</span>";
+        $list.="<span class='span2'><input type='text' id='phone2' name='phone2'></span>";
+        $list.="</div>";
+
+        $list.="</div>";
+        
         $list.="<div class='container-fluid' id='ajax_loading_payment' style='text-align:center;display:none;'>";
         $list.="<span class='span4'><img src='https://medical2.com/assets/img/ajax.gif'></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span4' id='personal_err' style='color:red;'></span>";
+        $list.="<span class='span9' id='personal_err' style='color:red;'></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -231,5 +333,8 @@ class Register extends Util {
 
         return $list;
     }
+
+    
+    
 
 }
