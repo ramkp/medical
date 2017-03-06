@@ -560,7 +560,7 @@ class Dashboard extends Util {
                 $coursename = $this->get_course_name($courseid);
                 $date = date('m-d-Y', $row['refund_date']);
                 $list.="<div class='row-fluid'>";
-                $list.="<span span9>Refund $" . $row['psum'] . " ($date) $coursename</span>";
+                $list.="<span span9>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
                 $list.="</div>";
             } // end while
         } // end if $num > 0
@@ -2143,11 +2143,26 @@ class Dashboard extends Util {
         $m->send_email($subject, $list, $cert->email, $path, 1);
     }
 
+    function pass_user_at_the_course($user) {
+        $date = time();
+        $query = "insert into mdl_course_completions "
+                . "(userid,"
+                . "course,"
+                . "timeenrolled,"
+                . "timecompleted) "
+                . "values ($user->userid,"
+                . "$user->courseid,"
+                . "'$date'"
+                . ",$date)";
+        $this->db->query($query);
+    }
+
     function create_user_certificate($certificate) {
         $start_arr = explode('/', $certificate->date1);
         $end_arr = explode('/', $certificate->date2);
         $start_date = $start_arr[2] . "-" . $start_arr[0] . "-" . $start_arr[1];
         $end_date = $end_arr[2] . "-" . $end_arr[0] . "-" . $end_arr[1];
+        $this->pass_user_at_the_course($certificate);
         $cert = new Certificates();
         $cert->create_certificate($certificate->courseid, $certificate->userid, $start_date, $end_date);
     }

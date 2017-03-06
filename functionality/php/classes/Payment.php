@@ -993,7 +993,7 @@ class Payment {
         $list.="</div>";
 
         if ($renew >= 1) {
-            $course_name = "Certificarion renewal";
+            $course_name = "Certification renewal";
         } // end if $renew==1
         else {
             $course_name = $this->get_course_name($users->courseid);

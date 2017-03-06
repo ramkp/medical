@@ -1399,10 +1399,10 @@ $(document).ready(function () {
                     $('#partial_err').html('');
                     if (ptype == 'cc') {
                         if (period == 0) {
-                            var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum;
+                            var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + courseid + "/" + slotid + "/" + sum;
                         } // end if
                         else {
-                            var url = "https://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + sum + "/" + period;
+                            var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + courseid + "/" + slotid + "/" + sum + "/" + period;
                         }
                         window.open(url, '_blank');
                     } // end if ptype=='cc'

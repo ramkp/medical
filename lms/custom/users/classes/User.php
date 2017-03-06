@@ -59,7 +59,7 @@ class User extends Util {
             $list.="<span class='span2'>Lastname</span>";
             $list.="<span class='span2'>Phone</span>";
             $list.="<span class='span4'>Username</span>";
-            $list.="<span class='span2'>Passsword</span>";
+            $list.="<span class='span2'>Password</span>";
             $list.="</div>";
             $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
             $list.="<span class='span12'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
