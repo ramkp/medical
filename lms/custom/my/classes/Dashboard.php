@@ -550,7 +550,7 @@ class Dashboard extends Util {
         $list = "";
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid "
-                . "and userid=$userid and refunded=1";
+                . "and userid=$userid and refunded=1 and refund_date<>''";
         //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
         //echo "Num: " . $num . "<br>";
