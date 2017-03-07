@@ -154,20 +154,20 @@ class Certificates2 {
                     $list.="</head>";
                     $list.="<body>";
                     $list.="<div class='cert'>";
-                    $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
-                    $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy Workshop certification the $day th of $month $year To:</span>";
-                    $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
-                    $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of hands-on clinical exam and written certification exam.
-                        Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture, 
-                        patient bill of rights, order of draws, needle/syringe, winged infusion (butterfly), 
-                        lancet, evacuated tube system, and corrective techniques.
-                        </span>";
-                    $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                    $list.="<br><br><br><br><p><span style='align:center;font-weight:bold;font-size:35pt;'>$title</span><br>";
+                    $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy certification the $day of $month $year To:</span>";
+                    $list.="<br><br><span style='align:center;font-size:20pt;'>$firstname $lastname</span><br>";
+                    $list.="<br><span style='width:675px;align:center;padding-left:35px;padding-right:35px;font-size:15pt;'>
+                For the successful completion of hands-on workshop & exam.
+                Medical2 Certification Agency's workshop covered topics: basic anatomy of the arm, 
+                needle/syringe, lancet, winged infusion (butterfly), routine venipuncture, evacuated tube
+                system, order of the draw, safety and corrective techniques</span>";
+                    $list.="<br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                     if ($renew_status == true) {
                         $list.="EXPIRATION DATE $expiration_date</p>";
                     } // end if $renew_status == true                                 
                     // President signature
-                    $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                    $list.="<br><br><br><div align='left'><table border='0' width='675px;'><tr><td align='left' style='font-family:king;border-bottom:thick;font-size:10pt;'>&nbsp;&nbsp;&nbsp;&nbsp;Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;President</span></td></tr></table></div>";
                     $list.="</div>";
 
                     $list.="</body>";
@@ -183,19 +183,21 @@ class Certificates2 {
                     $list.="</head>";
                     $list.="<body>";
                     $list.="<div class='cert'>";
-                    $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
-                    $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy with EKG certification the $day th of $month $year To:</span>";
-                    $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
-                    $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For the successful completion of hands-on clinical exam and written certification exam.<br>"
-                            . "Medical2 Career College hands-on workshop covered topics; basic anatomy of arm, safety techniques with routine venipuncture,<br> "
-                            . "Patient bill of rights, order of draws, needle/syringe, winged infusion (butterfly), lancet, evacuated tube system, and corrective techniques.<br><br>"
-                            . "The workshop also discusses procedures to preform an Electrocardiogram.</span>";
-                    $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                    $list.="<br><br><br><br><p><span style='align:center;font-weight:bold;font-size:35pt;'>$title</span><br>";
+                    $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this Phlebotomy with EKG certification the $day of $month $year To:</span>";
+                    $list.="<br><br><span style='align:center;font-size:20pt;'>$firstname $lastname</span><br>";
+                    $list.="<br><span style='width:675px;align:center;padding-left:35px;padding-right:35px;font-size:15pt;'>
+                For the successful completion of hands-on workshop & exam.
+                Medical2 Certification Agency's workshop covered topics: basic anatomy of the arm, 
+                needle/syringe, lancet, winged infusion (butterfly), routine venipuncture, evacuated tube
+                system, order of the draw, safety and corrective techniques.<br><br>"
+                            . "The workshop also discusses procedures to perform an Electrocardiogram.</span>";
+                    $list.="<br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                     if ($renew_status == true) {
                         $list.="EXPIRATION DATE $expiration_date</p>";
                     } // end if $renew_status == true                                 
                     // President signature
-                    $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                    $list.="<br><br><br><div align='left'><table border='0' width='675px;'><tr><td align='left' style='font-family:king;border-bottom:thick;font-size:10pt;'>&nbsp;&nbsp;&nbsp;&nbsp;Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;President</span></td></tr></table></div>";
                     $list.="</div>";
 
                     $list.="</body>";

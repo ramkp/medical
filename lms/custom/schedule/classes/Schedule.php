@@ -461,14 +461,17 @@ class Schedule extends Util {
         $students_arr = explode(",", $students);
         if (count($students_arr) > 0) {
             $now = time();
-            $cert = new Certificates();
+            //$cert = new Certificates();
             foreach ($students_arr as $studentid) {
                 //echo "Course id: ".$courseid."<br>";
                 //echo "Student id: ".$studentid."<br>";
-                $cert->send_certificate($courseid, $studentid, $now, false);
+                //$cert->send_certificate($courseid, $studentid, $now, false);
                 //$pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/certificate.pdf";
+
                 $pdf_file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$studentid/$courseid/certificate.pdf";
-                $certs[] = $pdf_file;
+                if (file_exists($pdf_file)) {
+                    $certs[] = $pdf_file;
+                }
             }
             //print_r($certs);
             $datadir = $_SERVER['DOCUMENT_ROOT'] . "/print/";
