@@ -877,16 +877,16 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<br><br><br><br><p style='align:center;font-weight:bold;font-size:35pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
-                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                $list.="<br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='left' style='font-family:king;border-bottom:thick;font-size:10pt;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;President</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
@@ -902,7 +902,7 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<p style='align:center;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
@@ -926,17 +926,17 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
+                $list.="<br><br><br><br><br><p><span style='align:center;font-weight:bold;font-size:35pt;'>$title</span><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:25pt;'>Obstetrics Technician Certificate</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>Obstetric Surgical Technician</span>";
-                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                $list.="<br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><br><br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -953,7 +953,7 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<p style='align:center;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
@@ -1033,20 +1033,19 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
-                $list.="<br><span style='align:center;font-weight:bold;font-size:25pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Phlebotomy Technician Certificate<br><br><br>";
+                $list.="<br><br><br><br><p style='align:center;font-weight:bold;font-size:35pt;'>$title ";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:25pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Phlebotomy Technician Certificate<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
-                $list.="<br><br><br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam. </span>";
-                $list.="<br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                $list.="<br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</td></tr></table></div>";
+                $list.="<br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
-
                 break;
 
             default:
@@ -1759,16 +1758,16 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<br><br><br><br><p style='align:center;font-weight:bold;font-size:35pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully meeting all requirements to hold this certification.</span>";
-                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                $list.="<br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
-                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
+                $list.="<div align='left'><table border='0' width='675px;'><tr><td align='left' style='font-family:king;border-bottom:thick;font-size:10pt;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;President</span></td></tr></table></div>";
                 $list.="</div>";
                 $list.="</body>";
                 $list.="</html>";
@@ -1784,7 +1783,7 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<p style='align:center;font-weight:bold;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
@@ -1808,17 +1807,17 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p><span style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title</span><br>";
+                $list.="<br><br><br><br><br><p><span style='align:center;font-weight:bold;font-size:35pt;'>$title</span><br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:25pt;'>Obstetrics Technician Certificate</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
                 $list.="<br><br><span style='align:center;font-weight:bold;font-size:20pt;'>$firstname $lastname</span><br>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>Obstetric Surgical Technician</span>";
-                $list.="<br><br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                $list.="<br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><br><br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
+                $list.="<br><br><br><br><div align='left'><table border='0' width='675px;'><tr><td align='center' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Shahid Malik<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>President</span></td></tr></table></div>";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -1835,7 +1834,7 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<p style='align:center;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
@@ -1915,12 +1914,12 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
-                $list.="<br><span style='align:center;font-weight:bold;font-size:25pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Phlebotomy Technician Certificate<br><br><br>";
+                $list.="<br><br><br><br><p style='align:center;font-weight:bold;font-size:35pt;'>$title ";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:25pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>Phlebotomy Technician Certificate<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presented this the $day of $month $year To:</span>";
-                $list.="<br><br><br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
+                $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:15pt;'>For successfully completing the Phlebotomy Technician Certification Exam. </span>";
-                $list.="<br><br><br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
+                $list.="<br><p style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'>CERTIFICATION # $code<br>";
                 if ($renew_status == true) {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 }
@@ -1939,7 +1938,7 @@ class Certificates extends Util {
                 $list.="</head>";
                 $list.="<body>";
                 $list.="<div class='cert'>";
-                $list.="<p style='align:center;font-family:king;font-weight:bolder;font-size:25pt;'>$title ";
+                $list.="<p style='align:center;font-weight:bolder;font-size:25pt;'>$title ";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;font-family: Geneva, Arial, Helvetica, sans-serif;'>$coursename<br>";
                 $list.="<span style='align:center;font-weight:bold;font-size:15pt;'>Presents this certificate this the $day of $month $year To:</span>";
                 $list.="<br><span style='align:center;font-weight:bold;font-size:35pt;'>$firstname $lastname</span>";
