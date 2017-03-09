@@ -447,7 +447,8 @@ class Partial extends Util {
         $userObj->payment_amount = $sum;
         $userObj->period = $period;
         $mailer = new Mailer();
-        $mailer->send_partial_payment_confirmation($userObj);
+        //$mailer->send_partial_payment_confirmation($userObj);
+        $mailer->send_partial_payment_confirmation2($userObj);
 
         $list = "Partial payment successfully added. Please reload the page";
         return $list;

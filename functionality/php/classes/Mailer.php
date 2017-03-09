@@ -143,12 +143,227 @@ class Mailer {
         return $catid;
     }
 
+    function send_partial_payment_confirmation2($user) {
+        $list = "";
+        $course_name = $this->get_course_name($user);
+        $class_info = $this->get_classs_info($user);
+        $course_cost = $this->get_course_cost($user);
+        $userdata = $this->get_user_details($user->userid);
+        /* ******************************************************************
+         *  Apply workaround if slot is not selected - use course cost
+         * ****************************************************************** */
+        if ($user->slotid > 0) {
+            $ws_cost = $this->get_workshop_cost($user->slotid);
+        } // end if $user->slotid>0
+        else {
+            $ws_cost = 0;
+        } // end else
+        $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
+        $catid = $this->get_course_category($user);
+        $p = new Payment();
+        $state = $p->get_state_name_by_id($user->state);
+
+        if ($user->period == 0) {
+
+            $list.= "<!DOCTYPE HTML><html><head><title>Payment Confirmation</title>";
+            $list.="</head>";
+            $list.="<body><br/><br/><br/><br/>";
+            $list.="<div class='datagrid'>            
+        <table style='table-layout: fixed;' width='360'>
+        <thead>";
+
+            if ($catid == 5) {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
+                $list.="</tr>";
+            } // end if
+            else {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+                $list.="</tr>";
+            } // end else
+
+            $list.="</thead>
+        <tbody>
+        
+        <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
+        <td colspan='2'>Registration data</td>
+        </tr>
+
+        <tr style=''>
+        <td>First name</td><td>$userdata->firstname</td>
+        </tr>
+        
+        <tr>
+        <td>Last name</td><td>$userdata->lastname</td>
+        </tr>
+        
+        <tr>
+        <td>Username</td><td>$userdata->email</td>
+        </tr>
+        
+        <tr>
+        <td>Password</td><td>$userdata->purepwd</td>
+        </tr>
+        
+        <tr>
+        <td>Phone</td><td>$userdata->phone1</td>
+        </tr>
+        
+        <tr>
+        <td>Address</td><td>$userdata->address</td>
+        </tr>
+        
+        <tr>
+        <td>City</td><td>$userdata->city</td>
+        </tr>
+        
+        <tr>
+        <td>State</td><td>$userdata->state</td>
+        </tr>
+        
+        <tr>
+        <td>Zip</td><td>$userdata->zip</td>
+        </tr>
+        
+        </table>
+        
+        <br><table style='table-layout: fixed;' width='375'>
+        
+        <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
+        <td colspan='2'>Billing data<br></td>
+        </tr>";
+            
+        $list.="<tr>
+        <td>Billing Name</td><td>$user->firstname $user->lastname</td>
+        </tr>";    
+
+        if ($user->receipt_email != 'n/a' && $user->receipt_email!='') {
+            $list.="<tr style=''>
+            <td>Email</td><td>$user->receipt_email</td>
+            </tr>";
+        } // end if
+        else {
+            $list.="<tr style=''>
+            <td>Email</td><td>$userdata->email</td>
+            </tr>";
+        }
+
+        $list.="<tr>
+        <td>Phone</td><td>$user->phone1</td>
+        </tr>
+       
+        <tr style=''>
+        <td>Address</td><td>$user->address</td>
+        </tr>
+        <tr >
+        <td>City</td><td>$user->city</td>
+        </tr>        
+        <tr style=''>
+        <td>State</td><td>$state</td>
+        </tr>
+        <tr >
+        <td>Zip</td><td>$user->zip</td>
+        </tr>
+        
+        <tr style=''>
+        <td>Progarm</td><td>$course_name</td>
+        </tr>
+        
+        <tr >
+        <td>Program Fee</td><td>$$cost</td>
+        </tr>";
+
+        if (property_exists($user, 'payment_amount')) {
+            date_default_timezone_set("America/New_York");
+            $date = date('m-d-Y h:i:s', time());
+
+            $list.="<tr style=''>
+            <td>Payment: </td><td>Paid by cash/cheque: $$user->payment_amount</td>
+            </tr>";
+
+            $list.="<tr style=''>";
+            $list.="<td>Date Order:</td><td>$date</td>";
+            $list.="</tr>";
+        } // end if $payment_amount != null
+
+        $list.="<tr style=''>
+        <td>Class info</td><td>$class_info</td>
+        </tr>";
+
+        if ($catid == 2) {
+            $list.="<tr style=''>";
+            $list.="<td colspan='2'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
+            $list.="</tr>";
+        }
+
+        $list.="</tbody>
+        </table>
+        </div>";
+        $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
+        $list.="</body></html>";
+        $subject = 'Medical2 - Payment Confirmation';
+        }// end if $user->period==0
+        else {
+            $list.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
+            $list.="</head>";
+            $list.="<body><br/><br/><br/><br/>";
+            $list.="<div class='datagrid'>            
+        <table style='table-layout: fixed;' width='360'>
+        <thead>";
+
+            $list.="<tr>";
+            $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+            $list.="</tr>";
+
+            $list.="</thead>
+        <tbody>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>First name</td><td>$user->firstname</td>
+        </tr>
+        
+        <tr>
+        <td>Last name</td><td>$user->lastname</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Email</td><td>$user->email</td>
+        </tr>
+        
+        <tr>
+        <td>Phone</td><td>$user->phone1</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Applied Program</td><td>Certification renewal</td>
+        </tr> 
+        
+        <tr>
+        <td>Amount paid</td><td>$$user->payment_amount</td>
+        </tr> 
+        
+        <tr>
+        <td colspan='2' align='left'>&nbsp;</td>
+        </tr> 
+        
+        <tr>
+        <td colspan='2' align='left'>This certification has been renewed</td>
+        </tr> 
+        
+        </table></body></html>";
+            $subject = 'Medical2 - Certificate Renew Payment';
+        } // end else
+
+        $this->send_common_message($subject, $list, $user->email);
+    }
+
     function send_partial_payment_confirmation($user) {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -283,7 +498,7 @@ class Mailer {
         </tr>
         
         <tr style='background-color:#F5F5F5;'>
-        <td>Applied Progarm</td><td>Certification renewal</td>
+        <td>Applied Program</td><td>Certification renewal</td>
         </tr> 
         
         <tr>
@@ -412,12 +627,199 @@ class Mailer {
         $this->send_signup_confirmation_email($subject, $list, $recipient, $payment_amount);
     }
 
-    function get_account_confirmation_message($user, $printed_data = null) {
+    function get_user_details($id) {
+        $query = "select * from mdl_user where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $user = new stdClass();
+            foreach ($row as $key => $value) {
+                $user->$key = $value;
+            } // end if $row['firstname'] != '' && $row['lastname'] != ''
+        } // end while
+        return $user;
+    }
+
+    function get_account_confirmation_message2($user, $printed_data = null) {
+        
+        /*
+         * 
+        echo "<pre>";
+        print_r($user);
+        echo "</pre>";
+         * 
+         */
+
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
         /* ******************************************************************
+         *  Apply workaround if slot is not selected - use course cost
+         * ****************************************************************** */
+        if ($user->slotid > 0) {
+            $ws_cost = $this->get_workshop_cost($user->slotid);
+        } // end if $user->slotid>0
+        else {
+            $ws_cost = 0;
+        } // end else
+        $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
+        $catid = $this->get_course_category($user);
+        $p = new Payment();
+        $state = $p->get_state_name_by_id($user->state);
+        $userdata = $this->get_user_details($user->userid);
+        $list.= "<!DOCTYPE HTML><html><head><title>Account Confirmation</title>";
+        $list.="</head>";
+        $list.="<body><br/><br/><br/><br/>";
+        $list.="<div class='datagrid'>            
+        <table style='table-layout: fixed;' width='375'>
+        <thead>";
+
+        if ($printed_data == NULL) {
+            if ($catid == 5) {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
+                $list.="</tr>";
+            } // end if
+            else {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+                $list.="</tr>";
+            } // end else
+        } // end if $printed_data == NULL
+
+
+        $list.="</thead>
+        <tbody>
+
+        <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
+        <td colspan='2'>Registration data</td>
+        </tr>
+
+        <tr style=''>
+        <td>First name</td><td>$userdata->firstname</td>
+        </tr>
+        
+        <tr>
+        <td>Last name</td><td>$userdata->lastname</td>
+        </tr>
+        
+        <tr>
+        <td>Username</td><td>$userdata->email</td>
+        </tr>
+        
+        <tr>
+        <td>Password</td><td>$userdata->purepwd</td>
+        </tr>
+        
+        <tr>
+        <td>Phone</td><td>$userdata->phone1</td>
+        </tr>
+        
+        <tr>
+        <td>Address</td><td>$userdata->address</td>
+        </tr>
+        
+        <tr>
+        <td>City</td><td>$userdata->city</td>
+        </tr>
+        
+        <tr>
+        <td>State</td><td>$userdata->state</td>
+        </tr>
+        
+        <tr>
+        <td>Zip</td><td>$userdata->zip</td>
+        </tr>
+        
+        </table>
+        
+        <br><table style='table-layout: fixed;' width='375'>
+        
+        <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
+        <td colspan='2'>Billing data<br></td>
+        </tr>";
+        
+        $list.="<tr>
+        <td>Billing Name</td><td>$user->billing_name</td>
+        </tr>";
+
+        if ($user->receipt_email != 'n/a' && $user->receipt_email!='') {
+            $list.="<tr style=''>
+            <td>Email</td><td>$user->receipt_email</td>
+            </tr>";
+        } // end if
+        else {
+            $list.="<tr style=''>
+            <td>Email</td><td>$userdata->email</td>
+            </tr>";
+        }
+
+        $list.="<tr>
+        <td>Phone</td><td>$user->phone</td>
+        </tr>
+       
+        <tr style=''>
+        <td>Address</td><td>$user->addr</td>
+        </tr>
+        <tr >
+        <td>City</td><td>$user->city</td>
+        </tr>        
+        <tr style=''>
+        <td>State</td><td>$state</td>
+        </tr>
+        <tr >
+        <td>Zip</td><td>$user->zip</td>
+        </tr>
+        
+        <tr style=''>
+        <td>Program</td><td>$course_name</td>
+        </tr>
+        
+        <tr >
+        <td>Program Fee</td><td>$$cost</td>
+        </tr>";
+
+        if (property_exists($user, 'payment_amount')) {
+            date_default_timezone_set("America/New_York");
+            $date = date('m-d-Y h:i:s', time());
+
+            $list.="<tr style=''>
+            <td>Payment: </td><td>Paid by card: $$user->payment_amount</td>
+            </tr>";
+
+            $list.="<tr style=''>";
+            $list.="<td>Date Order:</td><td>$date</td>";
+            $list.="</tr>";
+        } // end if $payment_amount != null
+
+        $list.="<tr style=''>
+        <td>Class info</td><td>$class_info</td>
+        </tr>";
+
+        if ($catid == 2) {
+            $list.="<tr style=''>";
+            $list.="<td colspan='2'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
+            $list.="</tr>";
+        }
+
+        $list.="</tbody>
+        </table>
+        </div>";
+        $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
+        $list.="</body></html>";
+
+        $subject = 'Medical2 - registration confirmation';
+        //$this->send_test_message($subject, $list);
+
+        return $list;
+    }
+
+    function get_account_confirmation_message($user, $printed_data = null) {
+        $list = "";
+        $course_name = $this->get_course_name($user);
+        $class_info = $this->get_classs_info($user);
+        $course_cost = $this->get_course_cost($user);
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -537,7 +939,8 @@ class Mailer {
 
     function send_account_confirmation_message($user) {
         $subject = "Medical2 - registration confirmation";
-        $message = $this->get_account_confirmation_message($user);
+        //$message = $this->get_account_confirmation_message($user);
+        $message = $this->get_account_confirmation_message2($user);
         $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
         $recipient = ($user->receipt_email != 'n/a') ? $user->receipt_email : $user->email;
         $this->send_signup_confirmation_email($subject, $message, $recipient, $payment_amount);
@@ -912,6 +1315,45 @@ class Mailer {
         } // end if !$mail->send()
         else {
             //echo 'Message has been sent to ' . $recipient;
+        }
+    }
+
+    function send_test_message($subject, $message, $recipient = null) {
+        $mail = new PHPMailer;
+        $addressA = 'info@medical2.com';
+        $addressB = 'help@medical2.com';
+        $addressC = 'sirromas@gmail.com';
+
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        //$mail->addAddress($addressA);
+        //$mail->addAddress($addressB);
+        $mail->addAddress($addressC);
+
+        if ($recipient != null) {
+            $mail->addAddress($recipient);
+        }
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $message;
+
+        if (!$mail->send()) {
+            //echo 'Message could not be sent.';
+            //echo 'Mailer Error: ' . $mail->ErrorInfo;
+            return false;
+        } // end if !$mail->send()
+        else {
+            echo 'Message has been sent to ' . $addressC;
+            return true;
         }
     }
 

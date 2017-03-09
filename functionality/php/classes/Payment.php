@@ -633,11 +633,11 @@ class Payment {
         return $drop_down;
     }
 
-    function get_renew_fee() {
-        $query = "select * from mdl_renew_fee";
+    function get_renew_fee($courseid) {
+        $query = "select * from mdl_renew_amount where courseid=$courseid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $fee = $row['fee_sum'];
+            $fee = $row['amount'];
         } // end while
         return $fee;
     }
@@ -1998,7 +1998,7 @@ class Payment {
             } // end if $status === false
             else {
                 $mailer = new Mailer();
-                $renew_fee = $this->get_renew_fee();
+                $renew_fee = $this->get_renew_fee($user->courseid);
                 // Create compatible object fields
                 $userid = $this->get_user_id_by_email($user->email);
                 //echo "User id: ".$userid."<br>";
@@ -2136,7 +2136,7 @@ class Payment {
         else {
             $list.="Registration failed";
         }
-        
+
         return $list;
     }
 

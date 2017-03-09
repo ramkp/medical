@@ -1892,7 +1892,9 @@ class Dashboard extends Util {
             $userObj->payment_amount = $payment->amount;
             $userObj->period = 0;
             $mailer = new Mailer();
-            $mailer->send_partial_payment_confirmation($userObj);
+            //$mailer->send_partial_payment_confirmation($userObj);
+            $mailer->send_partial_payment_confirmation2($userObj);
+            
         }
     }
 
