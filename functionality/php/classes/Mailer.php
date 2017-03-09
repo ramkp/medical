@@ -187,7 +187,7 @@ class Mailer {
         <tbody>
         
         <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-        <td colspan='2'>Registration data</td>
+        <td colspan='2'>Registration</td>
         </tr>
 
         <tr style=''>
@@ -231,7 +231,7 @@ class Mailer {
         <br><table style='table-layout: fixed;' width='375'>
         
         <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-        <td colspan='2'>Billing data<br></td>
+        <td colspan='2'>Billing<br></td>
         </tr>";
             
         $list.="<tr>
@@ -692,7 +692,7 @@ class Mailer {
         <tbody>
 
         <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-        <td colspan='2'>Registration data</td>
+        <td colspan='2'>Registration</td>
         </tr>
 
         <tr style=''>
@@ -736,7 +736,7 @@ class Mailer {
         <br><table style='table-layout: fixed;' width='375'>
         
         <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-        <td colspan='2'>Billing data<br></td>
+        <td colspan='2'>Billing<br></td>
         </tr>";
         
         $list.="<tr>

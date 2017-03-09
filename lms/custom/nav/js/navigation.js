@@ -4711,7 +4711,6 @@ $(document).ready(function () {
             } // end else 
         }
 
-
         if (event.target.id == 'move_profile_payment') {
             var userid = $('#userid').val();
             var coursename = $('#coursename').val();
@@ -5342,6 +5341,140 @@ $(document).ready(function () {
         }
 
         console.log('Event ID: ' + event.target.id);
+
+        if (event.target.id == 'register_payment_proceed') {
+            var type;
+            if ($('#r_card').prop('checked')) {
+                type = 'card';
+                $('#register_card_payments').show();
+                $('#register_cash_payments').hide();
+            }
+
+            if ($('#r_cash').prop('checked')) {
+                type = 1;
+                $('#register_cash_payments').show();
+                $('#register_card_payments').hide();
+            }
+
+            if ($('#r_cheque').prop('checked')) {
+                type = 2;
+                $('#register_cash_payments').show();
+                $('#register_card_payments').hide();
+            }
+        }
+
+        if (event.target.id == 'add_register_cash_payment') {
+            var type;
+            var courseid = $('#register_courses').val();
+            var slotid = $('#register_cities').val();
+            var firstname = $('#first_name').val();
+            var lastname = $('#last_name').val();
+            var addr = $('#addr').val();
+            var city = $('#city').val();
+            var state = $('#state').val();
+            var country = $('#country').val();
+            var zip = $('#zip').val();
+            var phone = $('#phone').val();
+            var email = $('#email').val();
+            var sum = $('#register_cash_payments_amount').val();
+
+            if (courseid == 0) {
+                $('#register_cash_error').html('Please select program');
+                return;
+            }
+
+            if (firstname == '') {
+                $('#register_cash_error').html('Please provide firstname');
+                return;
+            }
+
+            if (lastname == '') {
+                $('#register_cash_error').html('Please provide lastname');
+                return;
+            }
+
+            if (addr == '') {
+                $('#register_cash_error').html('Please provide mailing address');
+                return;
+            }
+
+            if (city == '') {
+                $('register_cash_error').html('Please provide city');
+                return;
+            }
+
+            if (state == 0) {
+                $('#register_cash_error').html('Please select state');
+                return;
+            }
+
+            if (country == 0) {
+                $('#register_cash_error').html('Please provide country');
+                return;
+            }
+
+            if (zip == '') {
+                $('#register_cash_error').html('Please provide zip');
+                return;
+            }
+
+            if (zip != '') {
+                if (!$.isNumeric(zip) || zip.length < 4) {
+                    $('#register_cash_error').html('Please provide valid zip');
+                    return;
+                } // end if
+            } // end if
+
+            if (phone == '') {
+                $('#register_cash_error').html('Please provide phone');
+                return;
+            }
+
+            if (email == '') {
+                $('#register_cash_error').html('Please provide email');
+                return;
+            }
+
+            if (sum == '') {
+                $('#register_cash_error').html('Please provide fee amount');
+                return;
+            }
+
+            if ($('#r_cash').prop('checked')) {
+                type = 'cash';
+            }
+
+            if ($('#r_cheque').prop('checked')) {
+                type = 'cheque';
+            }
+
+            $('#register_cash_error').html('');
+            var user = {
+                first_name: firstname,
+                last_name: lastname,
+                addr: addr,
+                city: city,
+                state: state,
+                country: country,
+                zip: zip,
+                inst: 'n/a',
+                phone: phone,
+                email: email,
+                courseid: courseid,
+                slotid: slotid,
+                sum: sum,
+                type: type
+            };
+            //console.log('User object: ' + JSON.stringify(user));
+            var url = "/lms/custom/register/add_register_cash_payment.php";
+            $.post(url, {user: JSON.stringify(user)}).done(function (data) {
+                $('#register_cash_error').html("<span style='color:black'>" + data + "</span>");
+            });
+        }
+
+
+
+
 
         if (event.target.id.indexOf("instructor_dialog") >= 0) {
             var userid = event.target.id.replace("instructor_dialog_", "");

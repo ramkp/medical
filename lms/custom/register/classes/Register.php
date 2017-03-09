@@ -1,6 +1,8 @@
 <?php
 
 require_once ('/home/cnausa/public_html/lms/custom/utils/classes/Util.php');
+require_once ('/home/cnausa/public_html/lms/custom/partial/classes/Partial.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Enroll.php';
 
 class Register extends Util {
 
@@ -171,9 +173,9 @@ class Register extends Util {
         $list = "";
         $card_month2 = $this->get_card_month();
         $card_year2 = $this->get_card_year();
-        $states2=$this->get_states_list(true);
-        $countries2=$this->get_countries_list(true);
-        
+        $states2 = $this->get_states_list(true);
+        $countries2 = $this->get_countries_list(true);
+
         $cats = $this->get_course_categories();
         $courses = $this->get_courses_by_category();
         $states = $this->get_states_list();
@@ -238,12 +240,33 @@ class Register extends Util {
         $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
         $list.="</div>";
 
-        // ********************  Payment section ********************
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span12' style='color:red;' id='register_cash_error'></span>";
+        $list.="</div>";
 
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span3'><input type='radio' name='r_payments' id='r_card' value='r_card'  checked>Pay by card</span>";
+        $list.="<span class='span3'><input type='radio' name='r_payments' id='r_cash' value='r_cash'>Pay by cash</span>";
+        $list.="<span class='span3'><input type='radio' name='r_payments' id='r_cheque' value='r_cheque'>Pay by cheque</span>";
+        $list.="<span class='span3'><button class='btn btn-primary' id='register_payment_proceed'>Proceed</button></span>";
+        $list.="<span class='span3'></span>";
+        $list.="</div>";
+
+        // ********************  Cash payment section ********************
+        $list.="<div id='register_cash_payments' style='display:none;'>";
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span1'>Amount*</span>";
+        $list.="<span class='span3'><input type='text' id='register_cash_payments_amount'></span>";
+        $list.="<span class='span1'><button class='btn btn-primary' id='add_register_cash_payment'>Submit</button></span>";
+        $list.="</div>";
+        $list.="</div>";
+
+        // ********************  Card payment section ********************
+        $list.="<div id='register_card_payments' style='display:none;'>";
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span6'><hr/></span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Amount*</span>";
         $list.="<span class='span2'><input type='text' required id='sum' name='sum' required></span>";
@@ -312,7 +335,7 @@ class Register extends Util {
         $list.="</div>";
 
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' id='ajax_loading_payment' style='text-align:center;display:none;'>";
         $list.="<span class='span4'><img src='https://medical2.com/assets/img/ajax.gif'></span>";
         $list.="</div>";
@@ -326,6 +349,7 @@ class Register extends Util {
         $list.="<span class='span2'><button class='btn btn-primary' id='internal_register_submit'>Submit</button></span>";
         $list.="</div>";
 
+        $list.="</div>";
 
         $list.="</div>"; // end of panel-body
         $list.="</div>"; // end of panel panel-default
@@ -334,7 +358,30 @@ class Register extends Util {
         return $list;
     }
 
-    
-    
+    function get_user_id_by_email($email) {
+        $query = "select id, username from mdl_user where username='$email'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
+    }
+
+    function add_register_cash_payment($user) {
+        $list = "";
+        $en = new Enroll();
+        $pa = new Partial();
+        $user->inst = 'n/a';
+        $response = $en->single_signup($user);
+        if ($response !== false) {
+            $userid = $this->get_user_id_by_email($user->email);
+            $pa->add_partial_payment($user->courseid, $userid, $user->sum, $user->type, $user->slotid, 0);
+            $list.="Registration is successfull";
+        } // end if
+        else {
+            $list.="Signup error happened";
+        } // end else
+        return $list;
+    }
 
 }
