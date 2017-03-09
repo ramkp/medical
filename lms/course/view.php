@@ -351,7 +351,9 @@ include_course_ajax($course, $modnamesused);
             $.post(labelurl, {id: id}).done(function (url) {
 
                 var containerid = '#module-' + id + '> div > div > div:nth-child(2) > div > div > div > p > span';
+                console.log('Container id: '+containerid);
                 var container = $(containerid);
+                container.empty();
                 container.bind("contextmenu", function (e) {
                     e.preventDefault();
                 });
