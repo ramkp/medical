@@ -5513,14 +5513,10 @@ $(document).ready(function () {
                 type: type
             };
             //console.log('User object: ' + JSON.stringify(user));
-            var url = "/lms/custom/register/add_register_cash_payment.php";
             $.post(url, {user: JSON.stringify(user)}).done(function (data) {
                 $('#register_cash_error').html("<span style='color:black'>" + data + "</span>");
             });
         }
-
-
-
 
 
         if (event.target.id.indexOf("instructor_dialog") >= 0) {

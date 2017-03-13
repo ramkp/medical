@@ -149,7 +149,7 @@ class Mailer {
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
         $userdata = $this->get_user_details($user->userid);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -233,23 +233,23 @@ class Mailer {
         <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
         <td colspan='2'>Billing<br></td>
         </tr>";
-            
-        $list.="<tr>
-        <td>Billing Name</td><td>$user->firstname $user->lastname</td>
-        </tr>";    
 
-        if ($user->receipt_email != 'n/a' && $user->receipt_email!='') {
-            $list.="<tr style=''>
+            $list.="<tr>
+        <td>Billing Name</td><td>$user->firstname $user->lastname</td>
+        </tr>";
+
+            if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
+                $list.="<tr style=''>
             <td>Email</td><td>$user->receipt_email</td>
             </tr>";
-        } // end if
-        else {
-            $list.="<tr style=''>
+            } // end if
+            else {
+                $list.="<tr style=''>
             <td>Email</td><td>$userdata->email</td>
             </tr>";
-        }
+            }
 
-        $list.="<tr>
+            $list.="<tr>
         <td>Phone</td><td>$user->phone1</td>
         </tr>
        
@@ -274,35 +274,35 @@ class Mailer {
         <td>Program Fee</td><td>$$cost</td>
         </tr>";
 
-        if (property_exists($user, 'payment_amount')) {
-            date_default_timezone_set("America/New_York");
-            $date = date('m-d-Y h:i:s', time());
+            if (property_exists($user, 'payment_amount')) {
+                date_default_timezone_set("America/New_York");
+                $date = date('m-d-Y h:i:s', time());
 
-            $list.="<tr style=''>
+                $list.="<tr style=''>
             <td>Payment: </td><td>Paid by cash/cheque: $$user->payment_amount</td>
             </tr>";
 
-            $list.="<tr style=''>";
-            $list.="<td>Date Order:</td><td>$date</td>";
-            $list.="</tr>";
-        } // end if $payment_amount != null
+                $list.="<tr style=''>";
+                $list.="<td>Date Order:</td><td>$date</td>";
+                $list.="</tr>";
+            } // end if $payment_amount != null
 
-        $list.="<tr style=''>
+            $list.="<tr style=''>
         <td>Class info</td><td>$class_info</td>
         </tr>";
 
-        if ($catid == 2) {
-            $list.="<tr style=''>";
-            $list.="<td colspan='2'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
-            $list.="</tr>";
-        }
+            if ($catid == 2) {
+                $list.="<tr style=''>";
+                $list.="<td colspan='2'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
+                $list.="</tr>";
+            }
 
-        $list.="</tbody>
+            $list.="</tbody>
         </table>
         </div>";
-        $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
-        $list.="</body></html>";
-        $subject = 'Medical2 - Payment Confirmation';
+            $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
+            $list.="</body></html>";
+            $subject = 'Medical2 - Payment Confirmation';
         }// end if $user->period==0
         else {
             $list.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
@@ -363,7 +363,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -640,12 +640,12 @@ class Mailer {
     }
 
     function get_account_confirmation_message2($user, $printed_data = null) {
-        
+
         /*
          * 
-        echo "<pre>";
-        print_r($user);
-        echo "</pre>";
+          echo "<pre>";
+          print_r($user);
+          echo "</pre>";
          * 
          */
 
@@ -738,12 +738,12 @@ class Mailer {
         <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
         <td colspan='2'>Billing<br></td>
         </tr>";
-        
+
         $list.="<tr>
         <td>Billing Name</td><td>$user->billing_name</td>
         </tr>";
 
-        if ($user->receipt_email != 'n/a' && $user->receipt_email!='') {
+        if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
             $list.="<tr style=''>
             <td>Email</td><td>$user->receipt_email</td>
             </tr>";
@@ -942,7 +942,13 @@ class Mailer {
         //$message = $this->get_account_confirmation_message($user);
         $message = $this->get_account_confirmation_message2($user);
         $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
-        $recipient = ($user->receipt_email != 'n/a') ? $user->receipt_email : $user->email;
+        if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
+            $recipient = $user->receipt_email;
+        } // end if
+        else {
+            $recipient = $user->email;
+        } // end else
+        //$recipient = ($user->receipt_email != 'n/a') ? $user->receipt_email : $user->email;
         $this->send_signup_confirmation_email($subject, $message, $recipient, $payment_amount);
         $this->create_registration_data_details($user);
     }

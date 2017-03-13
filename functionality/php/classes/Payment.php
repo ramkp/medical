@@ -1529,6 +1529,7 @@ class Payment {
             $card->city = $user->city;
             $card->state = $user->state;
             $card->zip = $user->zip;
+            $card->billing_name = $firstname . " " . $lastname;
             $card->payment_amount = $card->sum;
         } // end if
         else {
@@ -1550,12 +1551,12 @@ class Payment {
             $order->item = $item;
             $order->group = 0;
 
-
             // Make card object compatible with payment confirmation email
             $card->signup_first = $firstname;
             $card->signup_last = $lastname;
             $card->phone = $user->phone1;
             $card->pwd = $user->purepwd;
+            $card->billing_name = $firstname . " " . $lastname;
             $card->payment_amount = $card->sum;
         }
 
