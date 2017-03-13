@@ -5342,6 +5342,53 @@ $(document).ready(function () {
 
         console.log('Event ID: ' + event.target.id);
 
+        if (event.target.id.indexOf('edit_deposit_') >= 0) {
+            var id = event.target.id.replace("edit_deposit_", "");
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/deposit/edit_deposit.php";
+                            var request = {id: id};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $('#pdate').datepicker();
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+        }
+
+        if (event.target.id == 'update_deposit') {
+            var id = $('#dp_id').val();
+            var amount = $('#amount').val();
+            var date = $('#pdate').val();
+            var deposit = {id: id, amount: amount, date: date};
+            console.log('Deposit: ' + JSON.stringify(deposit));
+            if (amount > 0 && date != '') {
+                $('#dep_err').html('');
+                var url = "/lms/custom/deposit/update_deposit.php";
+                $.post(url, {deposit: JSON.stringify(deposit)}).done(function () {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    get_deposit_page();
+                });
+            } // end if
+            else {
+                $('#dep_err').html('Please provide amount and deposit date');
+            } //end else
+        }
+
         if (event.target.id == 'register_payment_proceed') {
             var type;
             if ($('#r_card').prop('checked')) {

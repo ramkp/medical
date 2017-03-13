@@ -18,7 +18,14 @@ class Deposit extends Util {
     function get_deposit_page() {
         $list = "";
         $deposits = array();
-        $query = "select * from mdl_deposit order by added desc limit 0, $this->limit";
+        $userid = $this->user->id;
+        if ($userid == 2) {
+            $query = "select * from mdl_deposit order by added desc limit 0, $this->limit";
+        } // end if
+        else {
+            $query = "select * from mdl_deposit order by added desc limit 0,1";
+        } // end else
+
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -36,14 +43,17 @@ class Deposit extends Util {
 
     function create_deposit_page($deposits, $toolbar = true, $search = false) {
         $list = "";
-
+        $userid = $this->user->id;
         if ($toolbar) {
+
             $list.="<div class='row-fluid' style='font-weight:bold;'>";
-            $list.="<span class='span2'>Search by date</span>";
-            $list.="<span class='span2'><input type='text' id='dep_date1' style='width:75px;'></span>";
-            $list.="<span class='span2'><input type='text' id='dep_date2' style='width:75px;'></span>";
-            $list.="<span class='span1'><button id='search_dep_btn' class='btn btn-primary'>Go</button></span>";
-            $list.="<span class='span2'><button id='clear_search_btn' class='btn btn-primary'>Clear</button></span>";
+            if ($userid == 2) {
+                $list.="<span class='span2'>Search by date</span>";
+                $list.="<span class='span2'><input type='text' id='dep_date1' style='width:75px;'></span>";
+                $list.="<span class='span2'><input type='text' id='dep_date2' style='width:75px;'></span>";
+                $list.="<span class='span1'><button id='search_dep_btn' class='btn btn-primary'>Go</button></span>";
+                $list.="<span class='span2'><button id='clear_search_btn' class='btn btn-primary'>Clear</button></span>";
+            } // end if $userid
             $list.="<span class='span1'><button id='add_deposit_btn' class='btn btn-primary'>Add</button></span>";
             $list.="</div>";
 
@@ -58,15 +68,20 @@ class Deposit extends Util {
 
             $list.="<div id='deposit_container'>";
 
-            $list.="<div class='row-fluid' style='font-weight:bold;text-align:center;'>";
-            $list.="<span class='span8'>Total Deposits: $$total</span>";
-            $list.="</div>";
+            if ($userid == 2) {
+                $list.="<div class='row-fluid' style='font-weight:bold;text-align:center;'>";
+                $list.="<span class='span8'>Total Deposits: $$total</span>";
+                $list.="</div>";
+            }
 
             $list.="<div class='row-fluid' style='font-weight:bold;'>";
             $list.="<span class='span3'>Bank cheque num</span>";
             $list.="<span class='span1'>Amount</span>";
             $list.="<span class='span2'>Manager name</span>";
             $list.="<span class='span2'>Date</span>";
+            if ($userid == 2) {
+                $list.="<span class='span2'>Ops</span>";
+            }
             $list.="</div>";
 
             $list.="<div class='row-fluid'>";
@@ -81,13 +96,16 @@ class Deposit extends Util {
                 $list.="<span class='span1'>$$d->amount</span>";
                 $list.="<span class='span2'>$user->firstname $user->lastname</span>";
                 $list.="<span class='span2'>$date</span>";
+                if ($userid == 2) {
+                    $list.="<span class='span2' style='cursor:pointer;' data-id='$d->id' id='edit_deposit_$d->id'>Edit</span>";
+                }
                 $list.="</div>";
                 $list.="<div class='row-fluid'>";
                 $list.="<span class='span9'><hr/></span>";
                 $list.="</div>";
             } // end foreach
             $list.="</div>";
-            if ($toolbar) {
+            if ($toolbar && $userid == 2) {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span9'  id='pagination'></span>";
                 $list.="</div>";
@@ -233,6 +251,59 @@ class Deposit extends Util {
         $query = "select * from mdl_deposit";
         $num = $this->db->numrows($query);
         return $num;
+    }
+
+    function edit_deposit($id) {
+        $query = "select * from mdl_deposit where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $amount = $row['amount'];
+            $added = date('m/d/y', $row['added']);
+        }
+
+        $list = "";
+        $list.="<div id='myModal' class='modal fade' style='width:675px;'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Edit Deposit</h4>
+                </div>
+                <div class='modal-body' style='width:650px;'>
+                <input type='hidden' id='dp_id' value='$id'>
+                
+                <div class='container-fluid'>
+                <span class='span2'>Amount ($)*</span>
+                <span class='span2'><input type='text' id='amount' value='$amount' style=''></span>
+                </div>
+               
+                
+                <div class='container-fluid'>
+                <span class='span2'>Date*</span>
+                <span class='span2'><input type='text' id='pdate' value='$added' style=''></span>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='dep_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='update_deposit'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function update_deposit($d) {
+        $date = strtotime($d->date);
+        $query = "update mdl_deposit "
+                . "set amount='$d->amount', "
+                . "added='$date' "
+                . "where id='$d->id'";
+        $this->db->query($query);
     }
 
 }
