@@ -613,14 +613,43 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_user_roles($userid) {
+        $prohibit = 0;
+        $query = "select * from mdl_role_assignments where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                if ($row['roleid'] < 5) {
+                    $prohibit = 1;
+                }
+            } // end while
+        } // end if $num > 0
+        return $prohibit;
+    }
+
     function get_address_block($userid) {
         $list = "";
-        $user_detailes = $this->get_user_details($userid);
-        $list.="$user_detailes->firstname $user_detailes->lastname<br>";
-        $list.="Phone: $user_detailes->phone1<br>";
-        $list.="Email: $user_detailes->email<br>";
-        $list.="$user_detailes->address<br>";
-        $list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
+        $currentuser = $this->user->id;
+        if ($currentuser != 2 && $userid != $currentuser) {
+            $prohibit = $this->get_user_roles($userid);
+            if ($prohibit == 0) {
+                $user_detailes = $this->get_user_details($userid);
+                $list.="$user_detailes->firstname $user_detailes->lastname<br>";
+                $list.="Phone: $user_detailes->phone1<br>";
+                $list.="Email: $user_detailes->email<br>";
+                $list.="$user_detailes->address<br>";
+                $list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
+            } // end if $prohibit == 0
+        } // end if $currentuser != 2 && $userid != $currentuser
+        else {
+            $user_detailes = $this->get_user_details($userid);
+            $list.="$user_detailes->firstname $user_detailes->lastname<br>";
+            $list.="Phone: $user_detailes->phone1<br>";
+            $list.="Email: $user_detailes->email<br>";
+            $list.="$user_detailes->address<br>";
+            $list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
+        }
         return $list;
     }
 
@@ -1894,7 +1923,6 @@ class Dashboard extends Util {
             $mailer = new Mailer();
             //$mailer->send_partial_payment_confirmation($userObj);
             $mailer->send_partial_payment_confirmation2($userObj);
-            
         }
     }
 
