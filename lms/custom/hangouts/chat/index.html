@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <form id='loginForm'>
+      <input id='username' placeholder='Pick a username!' />
+      <input type='submit' value='Log In'>
+  </form>
+
+  <form id='callForm'>
+    <input id='number' placeholder='Enter user to dial!' />
+    <input type='submit' value='Call'/>
+  </form>
+
+  <form id='hangupForm'>
+      <input type='submit' value='Hangup'>
+  </form>
+
+  <div id='vid-box'></div>
+
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src='https://cdn.pubnub.com/pubnub.js'></script>
+  <script src='https://stephenlb.github.io/webrtc-sdk/js/webrtc.js'></script>
+  <script>(function(){
+    var phone    = null;
+    var vidbox = $('#vid-box');
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    // Form Login
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    $('#loginForm').submit( event => {
+        if (phone) phone.hangup();
+        else phone = PHONE({
+            number        : $('#username').val() || 'Anonymous'
+        ,   ssl           : true
+        ,   publish_key   : 'pub-c-655853ec-bdb3-434f-9b37-8a2557301b1c'
+        ,   subscribe_key : 'sub-c-197667e6-e806-11e6-a5f4-02ee2ddab7fe'
+        });
+        phone.debug( info => { console.log(info) } );
+        phone.unable( error => { alert('unable to connect') } );
+        phone.ready( session => {
+            $('#username').css( 'background', '#55ff5b' );
+        } );
+        phone.receive(function(session){
+            session.ended( session => { vidbox.html('') } );
+            session.connected( session => {
+                vidbox.append(session.video);
+            });
+        });
+        return false;
+    } );
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    // Form Call
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    $('#callForm').submit( event => {
+       console.log('Number: '+$('#number').val()); 
+       //if (!window.phone) alert('Login First!');
+        phone.dial($('#number').val());
+        return false;
+    } );
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    // Form Hangup
+    // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    $('#hangupForm').submit( event => {
+        if (phone) phone.hangup();
+        return false;
+    } );
+  })();</script>
+
+</html>

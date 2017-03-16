@@ -322,11 +322,12 @@ class Schedule extends Util {
 
                 if ($roleid <= 3) {
                     $balance_block = $this->get_workshop_balance($slotid);
+                    $teacher = $this->get_workshop_teacher($slotid);
                     if ($has_students > 0) {
-                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;" . $balance_block . "<br> $slot->notes</h5></div>";
+                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp; $teacher &nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;" . $balance_block . "<br> $slot->notes</h5></div>";
                     } // end if $has_students>0
                     else {
-                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;<a href='#' onClick='return false;'><img id='del_slot_$slotid' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete'></a>&nbsp;" . $balance_block . "<br> $slot->notes</h5></div>";
+                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp; $teacher &nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;<a href='#' onClick='return false;'><img id='del_slot_$slotid' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete'></a>&nbsp;" . $balance_block . "<br> $slot->notes</h5></div>";
                     } // end else 
                 } // end if $roleid <= 3
                 else {
@@ -385,6 +386,24 @@ class Schedule extends Util {
             $list.="</div>";
         }
         return $list;
+    }
+
+    function get_workshop_teacher($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $teacherid = $row['teacherid'];
+        }
+        if ($teacherid > 0) {
+            $userdata = $this->get_user_address_data($teacherid);
+            $user = $userdata->firstname . " " . $userdata->lastname;
+            $link = "<a href='https://medical2.com/lms/user/profile.php?id=$teacherid' target='_blank'>$user</a>";
+        } // end if $teacherid>0
+        else {
+            $user = 'N/A';
+            $link = $user;
+        } // end else
+        return $link;
     }
 
     function is_slot_has_has_students($slotid) {
