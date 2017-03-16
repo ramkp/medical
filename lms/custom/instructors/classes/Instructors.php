@@ -232,6 +232,41 @@ class Instructors extends Util {
         return $list;
     }
 
+    function get_workshop_course_name($schedulerid) {
+        $query = "select * from mdl_scheduler where id=$schedulerid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['course'];
+        }
+        $coursename = $this->get_course_name($courseid);
+        return $coursename;
+    }
+
+    function get_instructor_workshop($teacherid) {
+        $list = "";
+        $now = time();
+        $query = "select * from mdl_scheduler_slots "
+                . "where teacherid=$teacherid "
+                . "and starttime>='$now'";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $coursename = $this->get_workshop_course_name($row['schedulerid']);
+                $date = date('m-d-Y', $row['starttime']);
+                $locations = explode('/', $row['appointmentlocation']);
+                $location = $locations[1] . " , " . $locations[0];
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span6'>$coursename</span>";
+                $list.="</div>";
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span6'>$location <br>$date</span>";
+                $list.="</div><br>";
+            } // end while
+        } // end if $num > 0
+        return $list;
+    }
+
     function create_instructors_page($instructors, $toolbar = true) {
         $list = "";
 
@@ -255,13 +290,13 @@ class Instructors extends Util {
             $list.="<div id='inst_container'>";
             foreach ($instructors as $in) {
                 $user = $this->get_user_details($in->userid);
-                $wsblock = $this->get_closest_workshops($user);
+                $wsblock = $this->get_instructor_workshop($in->userid);
                 $courses_block = $this->get_instructor_courses_block($in->userid);
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$in->userid' target='_blank'>$user->firstname $user->lastname<br>$user->city, $user->state $user->zip</a></span>";
                 $list.="<span class='span1'><img style='cursor:pointer;' title='Availability' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/theme/image.php/lambda/core/1468523658/t/edit' id='instructor_dialog_$in->userid'></span>";
-                $list.="<span class='span5'>$courses_block</span>";
-                $list.="<span class='span4'>$wsblock</span>";
+                $list.="<span class='span4'>$courses_block</span>";
+                $list.="<span class='span5'>$wsblock</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span12'><hr/></span>";
