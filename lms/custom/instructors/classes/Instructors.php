@@ -14,6 +14,24 @@ class Instructors extends Util {
 
     function __construct() {
         parent::__construct();
+        $this->create_instructors_data();
+    }
+
+    function create_instructors_data() {
+        $users = array();
+        $query = "SELECT u.id, u.firstname, u.lastname, a.userid, a.roleid
+                    FROM mdl_user u, mdl_role_assignments a
+                    WHERE a.roleid =3
+                    AND u.id = a.userid
+                    GROUP BY u.id";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $users[] = mb_convert_encoding($row['firstname'], 'UTF-8') . " " . mb_convert_encoding($row['lastname'], 'UTF-8');
+            } // end while
+            file_put_contents('/home/cnausa/public_html/lms/custom/utils/users.json', json_encode($users));
+        } // end if $num > 0
     }
 
     function get_instructors_page() {
@@ -275,10 +293,11 @@ class Instructors extends Util {
             if ($toolbar) {
                 $list.="<div class='row-fluid' style='font-weight:bold;'>";
                 $list.="<span class='span1'>Search</span>";
+                $list.="<span class='span2'><input type='text' id='instructor_fio' placeholder='Name' style='width:125px;'></span>";
                 $list.="<span class='span2'><input type='text' id='instructor_state' placeholder='State' style='width:125px;'></span>";
                 $list.="<span class='span2'><input type='text' id='instructor_city' placeholder='City' style='width:125px;'></span>";
-                $list.="<span class='span2'><button id='search_instuctor'>Search</button></span>";
-                $list.="<span class='span2'><button id='reset_instuctor'>Reset</button></span>";
+                $list.="<span class='span1'><button id='search_instuctor'>Search</button></span>";
+                $list.="<span class='span1' style='padding-left:15px;'><button id='reset_instuctor'>Reset</button></span>";
                 $list.="</div>";
                 $list.="<div class='row-fluid'>";
                 $list.="<span class='span9' id='inst_err'></span>";
@@ -491,6 +510,19 @@ class Instructors extends Util {
         return $num;
     }
 
+    function is_user_has_specific_name($names, $firstname, $lastname) {
+        $names_arr = explode(' ', $names);
+        $n_firstname = trim($names_arr[0]);
+        $n_lastname = trim($names_arr[1]);
+        if ($n_firstname == $firstname && $n_lastname == $lastname) {
+            $status = 1;
+        } // end if
+        else {
+            $status = 0;
+        } // end else
+        return $status;
+    }
+
     function search_item($item) {
         $instructors = array();
         $query = "SELECT u.id, a.userid, a.roleid
@@ -508,20 +540,31 @@ class Instructors extends Util {
             foreach ($users as $userid) {
                 $not_deleted = $this->is_user_deleted($userid);
                 if ($not_deleted == 0) {
-                    if ($item->city == '') {
-                        $status = $this->is_user_in_state($userid, $item->state);
+                    if ($item->fio != '') {
+                        $userdata = $this->get_user_details($userid);
+                        $status = $this->is_user_has_specific_name($item->fio, $userdata->firstname, $userdata->lastname);
                         if ($status > 0) {
                             $in = new stdClass();
                             $in->userid = $userid;
                             $instructors[] = $in;
                         } // end if $status>0
-                    } // end if $item->city == ''
+                    } // end if $item->fio!=''
                     else {
-                        $status = $this->is_user_in_city($userid, $item->city);
-                        if ($status > 0) {
-                            $in = new stdClass();
-                            $in->userid = $userid;
-                            $instructors[] = $in;
+                        if ($item->city == '') {
+                            $status = $this->is_user_in_state($userid, $item->state);
+                            if ($status > 0) {
+                                $in = new stdClass();
+                                $in->userid = $userid;
+                                $instructors[] = $in;
+                            } // end if $status>0
+                        } // end if $item->city == ''
+                        else {
+                            $status = $this->is_user_in_city($userid, $item->city);
+                            if ($status > 0) {
+                                $in = new stdClass();
+                                $in->userid = $userid;
+                                $instructors[] = $in;
+                            } // end else
                         } // end else
                     } // end else
                 } // end id not_deleted == 0

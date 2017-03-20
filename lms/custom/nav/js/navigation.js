@@ -3273,6 +3273,10 @@ $(document).ready(function () {
             $.post('/lms/custom/utils/cities.json', {id: 1}, function (data) {
                 $('#instructor_city').typeahead({source: data, items: 52000});
             }, 'json');
+
+            $.post('/lms/custom/utils/users.json', {id: 1}, function (data) {
+                $('#instructor_fio').typeahead({source: data, items: 52000});
+            }, 'json');
         });
     }
 
@@ -5161,11 +5165,12 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'search_instuctor') {
+            var fio = $('#instructor_fio').val();
             var state = $('#instructor_state').val();
             var city = $('#instructor_city').val();
-            if (state != '' || city != '') {
+            if (state != '' || city != '' || fio != '') {
                 $('#ajax_loader').show();
-                var location = {state: state, city: city};
+                var location = {state: state, city: city, fio: fio};
                 var url = "/lms/custom/instructors/search_item.php";
                 $.post(url, {item: JSON.stringify(location)}).done(function (data) {
                     $('#ajax_loader').hide();
