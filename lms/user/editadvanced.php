@@ -324,10 +324,14 @@ if ($usernew = $userform->get_data()) {
         }
     } else {
         \core\session\manager::gc(); // Remove stale sessions.
-        // Always stay on user's profile which was edited
-        $returnurl = new moodle_url('/user/profile.php', array('id' => $user->id));
-        redirect($returnurl);
-        //redirect("$CFG->wwwroot/$CFG->admin/user.php");
+
+        if ($user->id > 0) {
+            $returnurl = new moodle_url('/user/profile.php', array('id' => $user->id));
+            redirect($returnurl);
+        } // end if
+        else {
+            redirect("$CFG->wwwroot/$CFG->admin/user.php");
+        } // end else
     }
     // Never reached..
 } // end if $usernew = $userform->get_data()
