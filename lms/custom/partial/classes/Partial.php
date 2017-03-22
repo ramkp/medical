@@ -21,26 +21,75 @@ class Partial extends Util {
         $this->db = new pdo_db();
     }
 
-    function get_partial_payments_total() {
+    function update_grand_table() {
+        $cc_payments = $this->get_partial_cc_payments();
+        $of_payments = $this->get_partial_offline_payments();
 
-        $query = "select * from mdl_card_payments "
-                . "where pdate>1464074847 order by pdate desc";
+        foreach ($cc_payments as $item) {
 
-        $counter = 0;
+            /*
+              echo "CC payments <pre>";
+              print_r($item);
+              echo "</pre><br>";
+             */
+
+
+            $status = $this->is_item_exists($item);
+            if ($status == 0) {
+                $this->insert_grand_table_item($item);
+            } // end if $status == 0
+        } // end foreach
+
+        foreach ($of_payments as $item) {
+            /*
+              echo "OF payments <pre>";
+              print_r($item);
+              echo "</pre>M<br>";
+             */
+
+
+            $status = $this->is_item_exists($item);
+            if ($status == 0) {
+                $this->insert_grand_table_item($item);
+            } // end if $status == 0
+        } // end foreach
+    }
+
+    function is_item_exists($item) {
+        $query = "select * from mdl_grand_partial "
+                . "where userid=$item->userid "
+                . "and courseid=$item->courseid "
+                . "and psum='$item->payment' "
+                . "and  cost='$item->cost' "
+                . "and pdate='$item->pdate'";
+        //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $course_cost_array = $this->payment->get_personal_course_cost($row['courseid']);
-                $user_payment = $row['psum'];
-                $course_cost = $course_cost_array['cost'];
-                if ($user_payment < $course_cost) {
-                    $counter++;
-                } // end if $user_payment!=$course_cost
-            } // end while
-        } // end if $num>0
-        //echo "Couner: ".$counter."<br>";
-        return $counter;
+        return $num;
+    }
+
+    function insert_grand_table_item($item) {
+        $query = "insert into mdl_grand_partial "
+                . "(userid,"
+                . "courseid,"
+                . "psum,"
+                . "cost,"
+                . "pdate) "
+                . "values($item->userid,"
+                . "$item->courseid,"
+                . "'$item->payment',"
+                . "'$item->cost',"
+                . "'$item->pdate')";
+        //echo "Query: " . $query . "<br>";
+        $this->db->query($query);
+    }
+
+    function get_partial_payments_total() {
+        $query = "select count(id) as total from mdl_grand_partial ";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $total = $row['total'];
+        } // end while
+        return $total;
     }
 
     function get_renew_fee() {
@@ -127,21 +176,18 @@ class Partial extends Util {
 
     function get_partial_payments_list() {
         $list = "";
-
         if ($this->session->justloggedin == 1) {
-            $partials = array();
-            $cc_partials = $this->get_partial_cc_payments();
-            $of_partials = $this->get_partial_offline_payments();
-            $partials = array_merge($cc_partials, $of_partials);
-
-            /*
-              foreach ($partials_arr as $p) {
-              $slotid=$this->get_user_slot($p->courseid, $p->userid);
-              $wsdate=$this->get_workshop_date($slotid);
-              $partials[$wsdate]=$p;
-              }
-              ksort($partials);
-             */
+            $this->update_grand_table();
+            $query = "select * from mdl_grand_partial "
+                    . "order by pdate desc limit 0,$this->limit";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $p = new stdClass();
+                foreach ($row as $key => $value) {
+                    $p->$key = $value;
+                }  // end foreach
+                $partials[] = $p;
+            } // end while
             $list.=$this->create_partial_payments_list($partials);
         } // end if 
         else {
@@ -170,8 +216,7 @@ class Partial extends Util {
         }
     }
 
-    function create_partial_payments_list($partials, $toolbar = true) {
-
+    function create_partial_payments_list($partials, $toolbar = true, $search = false) {
         $list = "";
         if ($toolbar == true) {
             $add_payment_block = $this->get_add_partial_payment_page();
@@ -201,9 +246,15 @@ class Partial extends Util {
         } // end if $toolbar==true
 
         if (count($partials) > 0) {
+            $total = $this->get_partial_payments_total();
             $list.="<div class='container-fluid' style='text-align:center;' id='partial_container'>";
             $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span12' style='font-weight:bold;'>Total items: " . count($partials) . "</span>";
+            if ($search == false) {
+                $list.="<span class='span12' style='font-weight:bold;'>Total items: " . $total . "</span>";
+            } // end if
+            else {
+                $list.="<span class='span12' style='font-weight:bold;'>Total items: " . count($partials) . "</span>";
+            }
             $list.="</div>";
 
             foreach ($partials as $partial) {
@@ -217,7 +268,7 @@ class Partial extends Util {
 
                 $list.="<div class='container-fluid' style='text-align:left;'>";
                 $list.="<span class='span2'>Applied program</span>";
-                $list.="<span class='span4'>$coursename</span>";
+                $list.="<span class='span6'>$coursename</span>";
                 $list.="</div>";
 
                 $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -227,7 +278,7 @@ class Partial extends Util {
 
                 $list.="<div class='container-fluid' style='text-align:left;'>";
                 $list.="<span class='span2'>User paid</span>";
-                $list.="<span class='span2'>$$partial->payment</span>";
+                $list.="<span class='span2'>$$partial->psum</span>";
                 $list.="</div>";
 
                 $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -341,7 +392,7 @@ class Partial extends Util {
             $page = $page - 1;
             $offset = $rec_limit * $page;
         }
-        $query = "select * from mdl_card_payments where pdate>1464074847 "
+        $query = "select * from mdl_grand_partial "
                 . "order by pdate desc LIMIT $offset, $rec_limit";
         //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
@@ -590,7 +641,7 @@ class Partial extends Util {
         } // end if $num > 0
 
         if (count($partials) > 0) {
-            $list.=$this->create_partial_payments_list($partials, FALSE);
+            $list.=$this->create_partial_payments_list($partials, FALSE, TRUE);
         } // end if count($partials)>0        
         else {
             $list.="<div class='container-fluid' style='text-align:center;'>";
