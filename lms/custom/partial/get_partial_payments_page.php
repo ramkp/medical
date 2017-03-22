@@ -2,12 +2,12 @@
 require_once './classes/Partial.php';
 $partial = new Partial();
 $total = $partial->get_partial_payments_total();
-//echo "Total: ".$total."<br>";
+echo "Total: ".$total."<br>";
 $list = $partial->get_partial_payments_list();
 echo $list;
 ?>
 
-<!--
+
 <script type="text/javascript">
 
     $(document).ready(function () {
@@ -32,4 +32,4 @@ echo $list;
     });
 
 </script>
--->
+

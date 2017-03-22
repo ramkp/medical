@@ -913,6 +913,7 @@ $(document).ready(function () {
             $.post(url, {item: item}).done(function (data) {
                 $('#ajax_loader').hide();
                 $('#partial_container').html(data);
+                $('#pagination').hide();
             });
         } // end if item!=''
     }
