@@ -1180,11 +1180,16 @@ class Report extends Util {
         return $list;
     }
 
-    function get_renew_fee() {
-        $query = "select * from mdl_renew_fee";
+    function get_renew_fee($courseid = null) {
+        if ($courseid == null) {
+            $query = "select * from mdl_renew_amount";
+        } // end if
+        else {
+            $query = "select * from mdl_renew_amount where courseid=$courseid";
+        } // end else
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $fee = $row['fee_sum'];
+            $fee = $row['amount'];
         } // end while
         return $fee;
     }
