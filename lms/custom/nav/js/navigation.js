@@ -3227,7 +3227,7 @@ $(document).ready(function () {
         var url = "/lms/custom/partial/get_partial_payments_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-            $.get('/lms/custom/utils/data.json', function (data) {
+            $.get('/lms/custom/utils/partial.json', function (data) {
                 $("#search_partial").typeahead({source: data, items: 24});
             }, 'json');
         });

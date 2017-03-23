@@ -21,19 +21,30 @@ class Partial extends Util {
         $this->db = new pdo_db();
     }
 
+    function create_partial_payment_users() {
+        $query = "select * from mdl_grand_partial order by pdate desc";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $ids[] = $row['userid'];
+        }
+        if (count($ids) > 0) {
+            foreach ($ids as $id) {
+                $query = "select * from  mdl_user where id=$id";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $users[] = mb_convert_encoding($row['lastname'], 'UTF-8') . " " . mb_convert_encoding($row['firstname'], 'UTF-8');
+                } // end while
+                array_unique($users);
+            } // end foreach
+            file_put_contents('/home/cnausa/public_html/lms/custom/utils/partial.json', json_encode($users));
+        } // end if
+    }
+
     function update_grand_table() {
         $cc_payments = $this->get_partial_cc_payments();
         $of_payments = $this->get_partial_offline_payments();
 
         foreach ($cc_payments as $item) {
-
-            /*
-              echo "CC payments <pre>";
-              print_r($item);
-              echo "</pre><br>";
-             */
-
-
             $status = $this->is_item_exists($item);
             if ($status == 0) {
                 $this->insert_grand_table_item($item);
@@ -41,13 +52,6 @@ class Partial extends Util {
         } // end foreach
 
         foreach ($of_payments as $item) {
-            /*
-              echo "OF payments <pre>";
-              print_r($item);
-              echo "</pre>M<br>";
-             */
-
-
             $status = $this->is_item_exists($item);
             if ($status == 0) {
                 $this->insert_grand_table_item($item);
@@ -178,6 +182,7 @@ class Partial extends Util {
         $list = "";
         if ($this->session->justloggedin == 1) {
             $this->update_grand_table();
+            $this->create_partial_payment_users();
             $query = "select * from mdl_grand_partial "
                     . "order by pdate desc limit 0,$this->limit";
             $result = $this->db->query($query);
@@ -599,7 +604,7 @@ class Partial extends Util {
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
                     $partial->courseid = $row['courseid'];
-                    $partial->payment = $row['psum'];
+                    $partial->psum = $row['psum'];
                     $partial->cost = $course_cost;
                     $partial->pdate = $row['pdate'];
                     $partials[] = $partial;
@@ -632,7 +637,7 @@ class Partial extends Util {
                     $partial = new stdClass();
                     $partial->userid = $row['userid'];
                     $partial->courseid = $row['courseid'];
-                    $partial->payment = $row['psum'];
+                    $partial->psum = $row['psum'];
                     $partial->cost = $course_cost;
                     $partial->pdate = $row['pdate'];
                     $partials[] = $partial;
