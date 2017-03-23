@@ -90,47 +90,11 @@ class Mailer {
     }
 
     function get_course_cost($user) {
-
-        /*
-         * 
-          $payment = new Payment();
-          $late = new Late();
-          $group_status = $this->is_group_user($user);
-          if ($group_status == 0) {
-          $course_cost_array = $payment->get_personal_course_cost($user->courseid);
-          $course_cost = $course_cost_array['cost'];
-          } // end if $group_status==0
-          else {
-          $participants = $this->get_group_user_num($user);
-          $course_cost_array = $payment->get_course_group_discount($user->courseid, $participants);
-          $course_cost = $course_cost_array['cost'];
-          }
-          $tax_status = $payment->is_course_taxable($user->courseid);
-          if ($tax_status == 1) {
-          $tax = $payment->get_state_taxes($user->state);
-          } // end if $tax_status == 1
-          else {
-          $tax = 0;
-          } // end else
-          if ($user->slotid > 0) {
-          $apply_delay_fee = $late->is_apply_delay_fee($user->courseid, $user->slotid);
-          $late_fee = $late->get_delay_fee($user->courseid);
-          }
-          $grand_total = $course_cost;
-          if ($tax_status == 1) {
-          $grand_total = $grand_total + round(($course_cost * $tax) / 100);
-          }
-          if ($apply_delay_fee) {
-          $grand_total = $grand_total + $late_fee;
-          }
-         * 
-         */
         $query = "select * from mdl_course where id=$user->courseid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $cost = $row['cost'];
         }
-
         return $cost;
     }
 
@@ -149,7 +113,7 @@ class Mailer {
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
         $userdata = $this->get_user_details($user->userid);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -169,8 +133,8 @@ class Mailer {
             $list.="</head>";
             $list.="<body><br/><br/><br/><br/>";
             $list.="<div class='datagrid'>            
-        <table style='table-layout: fixed;' width='360'>
-        <thead>";
+            <table style='table-layout: fixed;' width='360'>
+            <thead>";
 
             if ($catid == 5) {
                 $list.="<tr>";
@@ -184,59 +148,66 @@ class Mailer {
             } // end else
 
             $list.="</thead>
-        <tbody>
-        
-        <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-        <td colspan='2'>Registration</td>
-        </tr>
+            <tbody>
 
-        <tr style=''>
-        <td>First name</td><td>$userdata->firstname</td>
-        </tr>
-        
-        <tr>
-        <td>Last name</td><td>$userdata->lastname</td>
-        </tr>
-        
-        <tr>
-        <td>Username</td><td>$userdata->email</td>
-        </tr>
-        
-        <tr>
-        <td>Password</td><td>$userdata->purepwd</td>
-        </tr>
-        
-        <tr>
-        <td>Phone</td><td>$userdata->phone1</td>
-        </tr>
-        
-        <tr>
-        <td>Address</td><td>$userdata->address</td>
-        </tr>
-        
-        <tr>
-        <td>City</td><td>$userdata->city</td>
-        </tr>
-        
-        <tr>
-        <td>State</td><td>$userdata->state</td>
-        </tr>
-        
-        <tr>
-        <td>Zip</td><td>$userdata->zip</td>
-        </tr>
-        
-        </table>
-        
-        <br><table style='table-layout: fixed;' width='375'>
-        
-        <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-        <td colspan='2'>Billing<br></td>
-        </tr>";
+            <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
+            <td colspan='2'>Registration</td>
+            </tr>
 
-            $list.="<tr>
-        <td>Billing Name</td><td>$user->firstname $user->lastname</td>
-        </tr>";
+            <tr style=''>
+            <td>First name</td><td>$userdata->firstname</td>
+            </tr>
+
+            <tr>
+            <td>Last name</td><td>$userdata->lastname</td>
+            </tr>
+
+            <tr>
+            <td>Username</td><td>$userdata->email</td>
+            </tr>
+
+            <tr>
+            <td>Password</td><td>$userdata->purepwd</td>
+            </tr>
+
+            <tr>
+            <td>Phone</td><td>$userdata->phone1</td>
+            </tr>
+
+            <tr>
+            <td>Address</td><td>$userdata->address</td>
+            </tr>
+
+            <tr>
+            <td>City</td><td>$userdata->city</td>
+            </tr>
+
+            <tr>
+            <td>State</td><td>$userdata->state</td>
+            </tr>
+
+            <tr>
+            <td>Zip</td><td>$userdata->zip</td>
+            </tr>
+
+            </table>
+        
+            <br><table style='table-layout: fixed;' width='375'>
+
+            <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
+            <td colspan='2'>Billing<br></td>
+            </tr>";
+
+            if ($user->firstname != '' && $user->lastname != '') {
+                $list.="<tr>
+                <td>Billing Name</td><td>$user->firstname $user->lastname</td>
+                </tr>";
+            } // end if
+            else {
+                $list.="<tr>
+                <td>Billing Name</td><td>$userdata->firstname $userdata->lastname</td>
+                </tr>";
+            } // end else
 
             if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
                 $list.="<tr style=''>
@@ -250,37 +221,37 @@ class Mailer {
             }
 
             $list.="<tr>
-        <td>Phone</td><td>$user->phone1</td>
-        </tr>
-       
-        <tr style=''>
-        <td>Address</td><td>$user->address</td>
-        </tr>
-        <tr >
-        <td>City</td><td>$user->city</td>
-        </tr>        
-        <tr style=''>
-        <td>State</td><td>$state</td>
-        </tr>
-        <tr >
-        <td>Zip</td><td>$user->zip</td>
-        </tr>
-        
-        <tr style=''>
-        <td>Progarm</td><td>$course_name</td>
-        </tr>
-        
-        <tr >
-        <td>Program Fee</td><td>$$cost</td>
-        </tr>";
+            <td>Phone</td><td>$user->phone1</td>
+            </tr>
+
+            <tr style=''>
+            <td>Address</td><td>$user->address</td>
+            </tr>
+            <tr >
+            <td>City</td><td>$user->city</td>
+            </tr>        
+            <tr style=''>
+            <td>State</td><td>$state</td>
+            </tr>
+            <tr >
+            <td>Zip</td><td>$user->zip</td>
+            </tr>
+
+            <tr style=''>
+            <td>Progarm</td><td>$course_name</td>
+            </tr>
+
+            <tr>
+            <td>Program Fee</td><td>$$cost</td>
+            </tr>";
 
             if (property_exists($user, 'payment_amount')) {
                 date_default_timezone_set("America/New_York");
                 $date = date('m-d-Y h:i:s', time());
 
                 $list.="<tr style=''>
-            <td>Payment: </td><td>Paid by cash/cheque: $$user->payment_amount</td>
-            </tr>";
+                <td>Payment: </td><td>Paid by cash/cheque: $$user->payment_amount</td>
+                </tr>";
 
                 $list.="<tr style=''>";
                 $list.="<td>Date Order:</td><td>$date</td>";
@@ -288,8 +259,8 @@ class Mailer {
             } // end if $payment_amount != null
 
             $list.="<tr style=''>
-        <td>Class info</td><td>$class_info</td>
-        </tr>";
+            <td>Class info</td><td>$class_info</td>
+            </tr>";
 
             if ($catid == 2) {
                 $list.="<tr style=''>";
@@ -298,8 +269,8 @@ class Mailer {
             }
 
             $list.="</tbody>
-        </table>
-        </div>";
+            </table>
+            </div>";
             $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
             $list.="</body></html>";
             $subject = 'Medical2 - Payment Confirmation';
@@ -309,51 +280,51 @@ class Mailer {
             $list.="</head>";
             $list.="<body><br/><br/><br/><br/>";
             $list.="<div class='datagrid'>            
-        <table style='table-layout: fixed;' width='360'>
-        <thead>";
+            <table style='table-layout: fixed;' width='360'>
+            <thead>";
 
             $list.="<tr>";
             $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
             $list.="</tr>";
 
             $list.="</thead>
-        <tbody>
+            <tbody>
         
-        <tr style='background-color:#F5F5F5;'>
-        <td>First name</td><td>$user->firstname</td>
-        </tr>
-        
-        <tr>
-        <td>Last name</td><td>$user->lastname</td>
-        </tr>
-        
-        <tr style='background-color:#F5F5F5;'>
-        <td>Email</td><td>$user->email</td>
-        </tr>
-        
-        <tr>
-        <td>Phone</td><td>$user->phone1</td>
-        </tr>
-        
-        <tr style='background-color:#F5F5F5;'>
-        <td>Applied Program</td><td>Certification renewal</td>
-        </tr> 
-        
-        <tr>
-        <td>Amount paid</td><td>$$user->payment_amount</td>
-        </tr> 
-        
-        <tr>
-        <td colspan='2' align='left'>&nbsp;</td>
-        </tr> 
-        
-        <tr>
-        <td colspan='2' align='left'>This certification has been renewed</td>
-        </tr> 
-        
-        </table></body></html>";
-            $subject = 'Medical2 - Certificate Renew Payment';
-        } // end else
+            <tr style='background-color:#F5F5F5;'>
+            <td>First name</td><td>$user->firstname</td>
+            </tr>
+
+            <tr>
+            <td>Last name</td><td>$user->lastname</td>
+            </tr>
+
+            <tr style='background-color:#F5F5F5;'>
+            <td>Email</td><td>$user->email</td>
+            </tr>
+
+            <tr>
+            <td>Phone</td><td>$user->phone1</td>
+            </tr>
+
+            <tr style='background-color:#F5F5F5;'>
+            <td>Applied Program</td><td>Certification renewal</td>
+            </tr> 
+
+            <tr>
+            <td>Amount paid</td><td>$$user->payment_amount</td>
+            </tr> 
+
+            <tr>
+            <td colspan='2' align='left'>&nbsp;</td>
+            </tr> 
+
+            <tr>
+            <td colspan='2' align='left'>This certification has been renewed</td>
+            </tr> 
+
+            </table></body></html>";
+                $subject = 'Medical2 - Certificate Renew Payment';
+            } // end else
 
         $this->send_common_message($subject, $list, $user->email);
     }
@@ -363,7 +334,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -383,8 +354,8 @@ class Mailer {
             $list.="</head>";
             $list.="<body><br/><br/><br/><br/>";
             $list.="<div class='datagrid'>            
-        <table style='table-layout: fixed;' width='360'>
-        <thead>";
+            <table style='table-layout: fixed;' width='360'>
+            <thead>";
 
             if ($catid == 5) {
                 $list.="<tr>";
@@ -398,51 +369,51 @@ class Mailer {
             } // end else
 
             $list.="</thead>
-        <tbody>
-        <tr style='background-color:#F5F5F5;'>
-        <td>First name</td><td>$user->firstname</td>
-        </tr>
-        <tr>
-        <td>Last name</td><td>$user->lastname</td>
-        </tr>
-        <tr style='background-color:#F5F5F5;'>
-        <td>Email</td><td>$user->email</td>
-        </tr>
-        <tr>
-        <td>Phone</td><td>$user->phone1</td>
-        </tr>
-        <tr style='background-color:#F5F5F5;'>
-        <td>Username</td><td>$user->email</td>
-        </tr>
-        <tr >
-        <td>Password</td><td>$user->purepwd</td>
-        </tr>
-        <tr style='background-color:#F5F5F5;'>
-        <td>Address</td><td>$user->address</td>
-        </tr>
-        <tr >
-        <td>City</td><td>$user->city</td>
-        </tr>        
-        <tr style='background-color:#F5F5F5;'>
-        <td>State</td><td>$state</td>
-        </tr>
-        <tr >
-        <td>Zip</td><td>$user->zip</td>
-        </tr>
-        <tr style='background-color:#F5F5F5;'>
-        <td>Applied Progarm</td><td>$course_name</td>
-        </tr>
-        <tr >
-        <td>Program fee</td><td>$$cost</td>
-        </tr>";
+            <tbody>
+            <tr style='background-color:#F5F5F5;'>
+            <td>First name</td><td>$user->firstname</td>
+            </tr>
+            <tr>
+            <td>Last name</td><td>$user->lastname</td>
+            </tr>
+            <tr style='background-color:#F5F5F5;'>
+            <td>Email</td><td>$user->email</td>
+            </tr>
+            <tr>
+            <td>Phone</td><td>$user->phone1</td>
+            </tr>
+            <tr style='background-color:#F5F5F5;'>
+            <td>Username</td><td>$user->email</td>
+            </tr>
+            <tr >
+            <td>Password</td><td>$user->purepwd</td>
+            </tr>
+            <tr style='background-color:#F5F5F5;'>
+            <td>Address</td><td>$user->address</td>
+            </tr>
+            <tr >
+            <td>City</td><td>$user->city</td>
+            </tr>        
+            <tr style='background-color:#F5F5F5;'>
+            <td>State</td><td>$state</td>
+            </tr>
+            <tr >
+            <td>Zip</td><td>$user->zip</td>
+            </tr>
+            <tr style='background-color:#F5F5F5;'>
+            <td>Applied Progarm</td><td>$course_name</td>
+            </tr>
+            <tr >
+            <td>Program fee</td><td>$$cost</td>
+            </tr>";
 
             if (property_exists($user, 'payment_amount')) {
                 date_default_timezone_set("America/New_York");
                 $date = date('m-d-Y h:i:s', time());
 
                 $list.="<tr style='background-color:#F5F5F5;'>
-            <td>Payment status: </td><td>Paid by cash/cheque: $$user->payment_amount</td>
-            </tr>";
+                <td>Payment status: </td><td>Paid by cash/cheque: $$user->payment_amount</td>
+                </tr>";
 
                 $list.="<tr style='background-color:#F5F5F5;'>";
                 $list.="<td>Order Date:</td><td>$date</td>";
@@ -450,8 +421,8 @@ class Mailer {
             } // end if $payment_amount != null
 
             $list.="<tr style='background-color:#F5F5F5;'>
-        <td>Class info</td><td>$class_info</td>
-        </tr>";
+            <td>Class info</td><td>$class_info</td>
+            </tr>";
 
             if ($catid == 2) {
                 $list.="<tr style=''>";
@@ -460,8 +431,8 @@ class Mailer {
             }
 
             $list.="</tbody>
-        </table>
-        </div>";
+            </table>
+            </div>";
             $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
             $list.="</body></html>";
             $subject = 'Medical2 - Payment Confirmation';
@@ -471,51 +442,51 @@ class Mailer {
             $list.="</head>";
             $list.="<body><br/><br/><br/><br/>";
             $list.="<div class='datagrid'>            
-        <table style='table-layout: fixed;' width='360'>
-        <thead>";
+            <table style='table-layout: fixed;' width='360'>
+            <thead>";
 
             $list.="<tr>";
             $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
             $list.="</tr>";
 
             $list.="</thead>
-        <tbody>
-        
-        <tr style='background-color:#F5F5F5;'>
-        <td>First name</td><td>$user->firstname</td>
-        </tr>
-        
-        <tr>
-        <td>Last name</td><td>$user->lastname</td>
-        </tr>
-        
-        <tr style='background-color:#F5F5F5;'>
-        <td>Email</td><td>$user->email</td>
-        </tr>
-        
-        <tr>
-        <td>Phone</td><td>$user->phone1</td>
-        </tr>
-        
-        <tr style='background-color:#F5F5F5;'>
-        <td>Applied Program</td><td>Certification renewal</td>
-        </tr> 
-        
-        <tr>
-        <td>Amount paid</td><td>$$user->payment_amount</td>
-        </tr> 
-        
-        <tr>
-        <td colspan='2' align='left'>&nbsp;</td>
-        </tr> 
-        
-        <tr>
-        <td colspan='2' align='left'>This certification has been renewed</td>
-        </tr> 
-        
-        </table></body></html>";
-            $subject = 'Medical2 - Certificate Renew Payment';
-        } // end else
+            <tbody>
+
+            <tr style='background-color:#F5F5F5;'>
+            <td>First name</td><td>$user->firstname</td>
+            </tr>
+
+            <tr>
+            <td>Last name</td><td>$user->lastname</td>
+            </tr>
+
+            <tr style='background-color:#F5F5F5;'>
+            <td>Email</td><td>$user->email</td>
+            </tr>
+
+            <tr>
+            <td>Phone</td><td>$user->phone1</td>
+            </tr>
+
+            <tr style='background-color:#F5F5F5;'>
+            <td>Applied Program</td><td>Certification renewal</td>
+            </tr> 
+
+            <tr>
+            <td>Amount paid</td><td>$$user->payment_amount</td>
+            </tr> 
+
+            <tr>
+            <td colspan='2' align='left'>&nbsp;</td>
+            </tr> 
+
+            <tr>
+            <td colspan='2' align='left'>This certification has been renewed</td>
+            </tr> 
+
+            </table></body></html>";
+                $subject = 'Medical2 - Certificate Renew Payment';
+            } // end else
 
         $this->send_common_message($subject, $list, $user->email);
     }
@@ -525,11 +496,56 @@ class Mailer {
         return $num;
     }
 
+    function get_group_students($groupname) {
+        $list = "";
+        $query = "select * from mdl_groups where name='$groupname'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $groupid = $row['id'];
+        }
+
+        $query = "select * from mdl_groups_members where groupid=$groupid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $users[] = $row['userid'];
+        }
+
+        if (count($users) > 0) {
+            foreach ($users as $userid) {
+                $user = new stdClass();
+                $user->userid = $userid;
+                $userdata = $this->get_user_data($user);
+
+                $list.="<tr>";
+                $list.="<td>First name</td><td>$userdata->firstname</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Last name</td><td>$userdata->lastname</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Email</td><td>$userdata->email</td>";
+                $list.="</tr>";
+
+                $list.="<tr>";
+                $list.="<td>Phone</td><td>$userdata->phone1</td>";
+                $list.="</tr>";
+                
+            } // end foreach
+        } // end if count($users)>0
+
+        return $list;
+    }
+
     function send_group_payment_message($user, $printed_data = null) {
         $list = "";
+        $venue = $this->get_classs_info($user);
+        $groupname = $user->groupname;
+        $students = $this->get_group_students($groupname);
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -543,11 +559,14 @@ class Mailer {
         $catid = $this->get_course_category($user);
         $p = new Payment();
         $state = $p->get_state_name_by_id($user->state);
+
+        // **************** Presentation level ***********************
         $list.= "<!DOCTYPE HTML><html><head><title>Account Confirmation</title>";
         $list.="</head>";
         $list.="<body><br/><br/><br/><br/>";
-        $list.="<div class='datagrid'>            
-        <table style='table-layout: fixed;' width='360'>
+        $list.="<div class='datagrid'>";
+
+        $list.="<table style='table-layout: fixed;' width='360'>
         <thead>";
 
         if ($printed_data == NULL) {
@@ -565,35 +584,51 @@ class Mailer {
 
 
         $list.="</thead>
-        <tbody>
-        <tr>
+        <tbody>";
+
+        $list.=$students;
+
+        $list.="<tr style='background-color:#F5F5F5;'>
         <td>Total students</td><td>$students_num</td>
         </tr>
+        
+        <tr style=''>
+        <td colspan='2'><br>Billing info</td>
+        </tr>
+        
         <tr style='background-color:#F5F5F5;'>
         <td>First name</td><td>$user->first_name</td>
         </tr>
+        
         <tr>
         <td>Last name</td><td>$user->last_name</td>
         </tr>
+        
         <tr style='background-color:#F5F5F5;'>
         <td>Email</td><td>$user->bill_email</td>
         </tr>
+        
         <tr style='background-color:#F5F5F5;'>
         <td>Address</td><td>$user->bill_addr</td>
         </tr>
-        <tr >
+        
+        <tr>
         <td>City</td><td>$user->bill_city</td>
-        </tr>        
+        </tr>
+        
         <tr style='background-color:#F5F5F5;'>
         <td>State</td><td>$state</td>
         </tr>
-        <tr >
+        
+        <tr>
         <td>Zip</td><td>$user->bill_zip</td>
         </tr>
+        
         <tr style='background-color:#F5F5F5;'>
         <td>Applied Progarm</td><td>$course_name</td>
         </tr>
-        <tr >
+        
+        <tr>
         <td>Program fee</td><td>$$cost</td>
         </tr>";
 
@@ -609,6 +644,10 @@ class Mailer {
             $list.="<td>Order Date:</td><td>$date</td>";
             $list.="</tr>";
         } // end if $payment_amount != null
+
+        $list.="<tr>";
+        $list.="<td>Class info</td><td>$venue</td>";
+        $list.="</tr>";
 
         if ($catid == 2) {
             $list.="<tr style=''>";
@@ -640,15 +679,6 @@ class Mailer {
     }
 
     function get_account_confirmation_message2($user, $printed_data = null) {
-
-        /*
-         * 
-          echo "<pre>";
-          print_r($user);
-          echo "</pre>";
-         * 
-         */
-
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
@@ -739,9 +769,14 @@ class Mailer {
         <td colspan='2'>Billing<br></td>
         </tr>";
 
-        $list.="<tr>
-        <td>Billing Name</td><td>$user->billing_name</td>
-        </tr>";
+        $list.="<tr>";
+        if ($user->billing_name != '') {
+            $list.="<td>Billing Name</td><td>$user->billing_name</td>";
+        } // end if
+        else {
+            $list.="<td>Billing Name</td><td>$userdata->firstname $userdata->lastname</td>";
+        } // end else
+        $list.="</tr>";
 
         if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
             $list.="<tr style=''>
@@ -808,9 +843,6 @@ class Mailer {
         $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
         $list.="</body></html>";
 
-        $subject = 'Medical2 - registration confirmation';
-        //$this->send_test_message($subject, $list);
-
         return $list;
     }
 
@@ -819,7 +851,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -939,7 +971,6 @@ class Mailer {
 
     function send_account_confirmation_message($user) {
         $subject = "Medical2 - registration confirmation";
-        //$message = $this->get_account_confirmation_message($user);
         $message = $this->get_account_confirmation_message2($user);
         $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
         if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
@@ -1090,9 +1121,6 @@ class Mailer {
         $recipient = $payment->bill_email;
         if ($payment->renew == null) {
             $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
-            //$subject = "Medical2 - payment confirmation";
-            //$message = $this->get_payment_confirmation_message($payment, $group, $free);
-            //$this->send_email($subject, $message, $recipient);
         } // end if $payment->sum!=$renew_fee
         else {
             $subject = "Medical2 - Certificate Renew Payment";
@@ -1157,11 +1185,6 @@ class Mailer {
     }
 
     function send_certificate($user) {
-        /*
-          echo "<pre>";
-          print_r($user);
-          echo "<pre>";
-         */
         $subject = "Medical2 - Certificate";
         $list = "";
         $list.="<html><body>";
@@ -1413,19 +1436,7 @@ class Mailer {
         $mail->Password = $this->mail_smtp_pwd;
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
-
-        /*
-         * 
-          echo "Norify message: <pre>";
-          print_r($recipients);
-          echo "</pre>";
-          die();
-         * 
-         */
-
-
         $mail->setFrom($this->mail_smtp_user, 'Medical2');
-
 
         foreach ($recipients as $recipient) {
             $mail->addAddress($recipient);

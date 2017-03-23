@@ -1612,7 +1612,7 @@ class Payment {
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
 
-        /*         * *******************************************************************
+        /* ********************************************************************
          *  Please be aware $user_payment_data could be null in case of 
          *  group registration
          * ******************************************************************* */
@@ -1765,8 +1765,16 @@ class Payment {
         } // end if $user_group!='' && $userid!=''
         // ***************** Group online payment ********************
         if ($user_group != '' && $userid == '') {
-
+            
+            // Set card slotid fo future usage in confirmattion message
+            $card->groupname = $user_group;
             $group_users = $this->get_group_users($user_group);
+            if (count($group_users > 0)) {
+                foreach ($group_users as $userid) {
+                    $slotid = $this->get_group_users_slot($userid);
+                    $card->slotid = $slotid;
+                } // end foreach
+            } // end if
 
             $group_sum = $card->sum;
             $state_code = $this->get_state_code($card->state);
@@ -1810,11 +1818,6 @@ class Payment {
                 $list.="</div>";
                 $list.="</div>";
 
-                /*
-                  echo "<br>-----Group users:----------------<br>";
-                  print_r($group_users);
-                  echo "<br>---------------------------------<br>";
-                 */
                 $mailer->send_group_payment_message($card);
                 if (count($group_users > 0)) {
                     foreach ($group_users as $userid) {
