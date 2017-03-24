@@ -527,11 +527,11 @@ class Mailer {
                 $list.="<tr>";
                 $list.="<td>Email</td><td>$userdata->email</td>";
                 $list.="</tr>";
-
-                $list.="<tr>";
-                $list.="<td>Phone</td><td>$userdata->phone1</td>";
-                $list.="</tr>";
                 
+                $list.="<tr>";
+                $list.="<td colspan='2'><br></td>";
+                $list.="</tr>";
+
             } // end foreach
         } // end if count($users)>0
 
@@ -593,7 +593,7 @@ class Mailer {
         </tr>
         
         <tr style=''>
-        <td colspan='2'><br>Billing info</td>
+        <td colspan='2' style='font-weight:bold;'><br>Billing info</td>
         </tr>
         
         <tr style='background-color:#F5F5F5;'>
