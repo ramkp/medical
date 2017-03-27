@@ -45,11 +45,15 @@ class Dashboard extends Util {
 
         $contextid = $this->get_course_context($courseid);
         $roleid = $this->get_user_role($userid, $contextid);
-        //echo "User role: " . $roleid;
+
         if ($roleid <= 3) {
             return 1;
         } // end if
         else {
+            $categoryid = $this->get_course_category($courseid);
+            if ($categoryid >= 5) {
+                return 1;
+            } // end if 
             $invoice = new Invoice();
             $installment_status = $invoice->is_installment_user($userid, $courseid);
             //echo "Installment status: ".$installment_status."<br>";
