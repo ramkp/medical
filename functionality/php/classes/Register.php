@@ -294,7 +294,7 @@ class Register {
     function get_group_manual_registration_form($tot_participants) {
         $list = "";
         $list.="<div class='panel panel-default' id='participants_details'>";
-        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Participants Detailes</h5></div>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Participants Details</h5></div>";
         $list.="<div class='panel-body'>";
         for ($i = 1; $i <= $tot_participants; $i++) {
 
