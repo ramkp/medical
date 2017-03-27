@@ -250,6 +250,25 @@ class Schedule extends Util {
         return $modid;
     }
 
+    function get_appointment_notes($slotid, $userid) {
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid=$slotid and studentid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $notes = $row['appointmentnote'];
+        }
+        return $notes;
+    }
+
+    function get_slot_notes($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $notes = $row['appointmentnote'];
+        }
+        return $notes;
+    }
+
     function create_slots_page($slots, $tools = true) {
         global $COURSE, $USER;
         $courseid = $COURSE->id;
@@ -312,6 +331,7 @@ class Schedule extends Util {
             foreach ($slots as $slot) {
                 $slotid = $slot->id;
                 $has_students = $this->is_has_students($slotid);
+                $slot_notes = $this->get_slot_notes($slotid);
                 $modid = $this->get_scheduler_module_id($this->course->id);
                 //echo "Module id: ".$modid."<br>";
                 $editactionurl = "https://medical2.com/lms/mod/scheduler/view.php?id=" . $modid . "&what=updateslot&subpage=myappointments&offset=-1&sesskey=" . sesskey() . "&slotid=" . $slotid . "";
@@ -324,10 +344,10 @@ class Schedule extends Util {
                     $balance_block = $this->get_workshop_balance($slotid);
                     $teacher = $this->get_workshop_teacher($slotid);
                     if ($has_students > 0) {
-                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp; $teacher &nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;" . $balance_block . "<br> $slot->notes</h5></div>";
+                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp; $teacher &nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;" . $balance_block . "<br> $slot->notes &nbsp; Notes: &nbsp; <textarea id='slot_notes_$slotid' style='width:375px;'>$slot_notes</textarea></h5></div>";
                     } // end if $has_students>0
                     else {
-                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp; $teacher &nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;<a href='#' onClick='return false;'><img id='del_slot_$slotid' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete'></a>&nbsp;" . $balance_block . "<br> $slot->notes</h5></div>";
+                        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$addr_block, " . date('m-d-Y h:i:s', $slot->starttime) . "&nbsp; $teacher &nbsp;<a href='$editactionurl'><img src='https://medical2.com/lms/theme/image.php/lambda/core/1464336624/t/edit' title='Edit'></a>&nbsp;<a href='#' onClick='return false;'><img id='del_slot_$slotid' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete'></a>&nbsp;" . $balance_block . "<br> $slot->notes &nbsp; Notes: &nbsp; <textarea id='slot_notes_$slotid' style='width:375px;'>$slot_notes</textarea></h5></div>";
                     } // end else 
                 } // end if $roleid <= 3
                 else {
@@ -345,8 +365,9 @@ class Schedule extends Util {
                 if (count($slot_students) > 0) {
                     $list.= "<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
                     $list.="<span class='span1'></span>";
-                    $list.="<span class='span5'>Student</span>";
-                    $list.="<span class='span4'>Course completion status</span>";
+                    $list.="<span class='span4'>Student</span>";
+                    $list.="<span class='span1'>Status</span>";
+                    $list.="<span class='span4'>Notes</span>";
                     $list.="</div>";
                     $list.= "<div class='container-fluid' style='text-align:left;'>";
                     $list.="<span class='span1'><input type='checkbox' name='studentid' id='slot_students_$slotid' value=''></span>";
@@ -354,8 +375,8 @@ class Schedule extends Util {
                     $list.="</div>";
                     foreach ($slot_students as $student) {
                         $user_data = $this->get_user_details($student->studentid);
+                        $notes = $this->get_appointment_notes($slot->id, $student->studentid);
                         $completion_arr = $this->get_student_course_completion_status($courseid, $student->studentid);
-                        //print_r($completion_arr);
                         if ($completion_arr['passed'] == 1) {
                             $status = "Passed " . date('m-d-Y', completed) . "";
                         } // end if $completion_arr['passed']==1
@@ -365,8 +386,9 @@ class Schedule extends Util {
                         $student_balance = $this->get_student_balance($courseid, $student->studentid, $slot->id);
                         $list.= "<div class='container-fluid' style='text-align:left;'>";
                         $list.="<span class='span1'><input type='checkbox' class='students' name='studentid' value='$student->studentid'></span>";
-                        $list.="<span class='span5'><a href='https://medical2.com/lms/user/profile.php?id=$student->studentid'  target='_blank'>$user_data->firstname $user_data->lastname $user_data->phone1&nbsp; $user_data->email</a>&nbsp; $student_balance</span>";
-                        $list.="<span class='span4'>$status</span>";
+                        $list.="<span class='span4'><a href='https://medical2.com/lms/user/profile.php?id=$student->studentid'  target='_blank'>$user_data->firstname $user_data->lastname $user_data->phone1&nbsp; $user_data->email</a>&nbsp; $student_balance</span>";
+                        $list.="<span class='span1'>$status</span>";
+                        $list.="<span class='span4'>$notes</span>";
                         $list.="</div>";
                     } // end foreach                                    
                 } // end if count($slot_students)>0
@@ -1380,6 +1402,13 @@ class Schedule extends Util {
 
 
         return $list;
+    }
+
+    function update_slot_notes($item) {
+        $query = "update mdl_scheduler_slots "
+                . "set appointmentnote='$item->notes' "
+                . "where id=$item->id";
+        $this->db->query($query);
     }
 
 }

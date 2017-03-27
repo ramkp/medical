@@ -6019,7 +6019,20 @@ $(document).ready(function () {
         } // end if coursename!=''
     }); // end of $('body').on('blur',
 
+    $('body').on('blur', 'textarea', function (event) {
 
+        if (event.target.id.indexOf("slot_notes_") >= 0) {
+            var id = event.target.id.replace("slot_notes_", "");
+            var elid = '#' + event.target.id;
+            var notes = $(elid).val();
+            var slot_notes = {id: id, notes: notes};
+            var url = "/lms/custom/schedule/update_slot_notes.php";
+            $.post(url, {notes: JSON.stringify(slot_notes)}).done(function (data) {
+                console.log(data);
+            });
+        }
+
+    }); // end of end of $('body').on('blur',
 
 }); // end of $(document).ready(function()
 
