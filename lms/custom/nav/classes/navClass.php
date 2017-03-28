@@ -133,6 +133,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
+                                    <li><a href='#' title='Promotion codes' id='code'>Promotion codes</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 
@@ -244,6 +245,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
+                                    <li><a href='#' title='Promotion codes' id='code'>Promotion codes</a></li>
                                     <li><a href='#' title='Campus' id='campus'>Campus locations</a></li>
                                     <li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li>                                    
                                     <li><a href='#' title='Taxes' id='taxes'>State Taxes</a></li> 

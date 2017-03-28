@@ -1020,9 +1020,19 @@ class register_model extends CI_Model {
         return $list;
     }
 
+    function get_school_app_policy() {
+        $list = "";
+        $query = "select * from mdl_terms_school where id=1";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $list.=$row->content;
+        }
+        return $list;
+    }
+
     function get_scholl_app_form() {
         $list = "";
-
+        $policy=$this->get_school_app_policy();
         $programs = $this->get_college_programs();
         $states = $this->get_state_list2();
         $pc = $this->get_pc_box();
@@ -1101,20 +1111,24 @@ class register_model extends CI_Model {
         $list.="<span class='span8'><textarea id='reason' style='width:740px;' rows='5' required></textarea></span>";
         $list.="</div>"; // end of container-fluid
 
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>&nbsp;</span>";
-        $list.="<span class='span8'>Medical 2 Career College and the State of Mississippi requires that all students validate no history of the following according to Mississippi Code of 1972, Section 43-11-13.</span>";
-        $list.="</div>"; // end of container-fluid
+        /*
+          $list.="<div class='container-fluid' style='text-align:left;'>";
+          $list.="<span class='span2'>&nbsp;</span>";
+          $list.="<span class='span8'>Medical 2 Career College and the State of Mississippi requires that all students validate no history of the following according to Mississippi Code of 1972, Section 43-11-13.</span>";
+          $list.="</div>"; // end of container-fluid
 
-        $list.="<br><div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>&nbsp;</span>";
-        $list.="<span class='span8'>By signing below, I attest I have not been convicted of or pleaded guilty or nolo contendere to a felony of possession or sale of drugs, murder, manslaughter, armed robbery, rape, sexual battery, any gratification of lust, aggravated assault, or felonious abuse and/or battery of a vulnerable adult. I have not been convicted of or pleaded guilty or nolo contendere to other crimes which his/her employer has and/or would determine to be disqualifying for employment. By signing below, I give Medical 2 Career College permission to conduct a background check in accordance with the Mississippi State Law with the Department of Health Nurse Registry to provide a clean medical abuse record with the State of Mississippi and permission to conduct a background with the Mississippi Department of Public Safety. </span>";
-        $list.="</div>"; // end of container-fluid
+          $list.="<br><div class='container-fluid' style='text-align:left;'>";
+          $list.="<span class='span2'>&nbsp;</span>";
+          $list.="<span class='span8'>By signing below, I attest I have not been convicted of or pleaded guilty or nolo contendere to a felony of possession or sale of drugs, murder, manslaughter, armed robbery, rape, sexual battery, any gratification of lust, aggravated assault, or felonious abuse and/or battery of a vulnerable adult. I have not been convicted of or pleaded guilty or nolo contendere to other crimes which his/her employer has and/or would determine to be disqualifying for employment. By signing below, I give Medical 2 Career College permission to conduct a background check in accordance with the Mississippi State Law with the Department of Health Nurse Registry to provide a clean medical abuse record with the State of Mississippi and permission to conduct a background with the Mississippi Department of Public Safety. </span>";
+          $list.="</div>"; // end of container-fluid
 
-        $list.="<br><div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>&nbsp;</span>";
-        $list.="<span class='span8'>I am applying for admittance as a student at Medical 2 Career College in a healthcare program. Falsification of information on any application is reason for dismissal and loss of all payments made.  </span>";
-        $list.="</div>"; // end of container-fluid
+          $list.="<br><div class='container-fluid' style='text-align:left;'>";
+          $list.="<span class='span2'>&nbsp;</span>";
+          $list.="<span class='span8'>I am applying for admittance as a student at Medical 2 Career College in a healthcare program. Falsification of information on any application is reason for dismissal and loss of all payments made.  </span>";
+          $list.="</div>"; // end of container-fluid
+         * 
+         */
+        $list.=$policy;
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span10' style='text-align:center;display:none;' id='ajax_loading'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
@@ -1170,7 +1184,7 @@ class register_model extends CI_Model {
 
     function get_map_data() {
         $list = "";
-        $locations =$this->get_location_dropdown();
+        $locations = $this->get_location_dropdown();
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span4'><img src='https://medical2.com/assets/img/m2.jpg' class='img-rounded' width='100%' height='100%'></span>";
         $list.="</div><br>";
@@ -1195,7 +1209,7 @@ class register_model extends CI_Model {
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span4' style='padding-left:6px;'>$locations</span>";
         $list.="</div>";
-        
+
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span4' style='padding-left:4px;color:red;' id='map_err'></span>";
         $list.="</div>";

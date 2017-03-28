@@ -89,6 +89,13 @@ $(document).ready(function () {
         });
     }
 
+    function update_school_terms_page(data) {
+        var url = "/lms/custom/terms/update_school_terms.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully saved. </p>");
+        });
+    }
+
     function get_terms_page() {
         var url = "/lms/custom/terms/get_page.php";
         $.post(url, {id: 1}).done(function (data) {
@@ -1881,6 +1888,12 @@ $(document).ready(function () {
             update_terms_page(data);
         }
 
+        if (event.target.id.indexOf("school_terms") >= 0) {
+            var oEditor = FCKeditorAPI.GetInstance('editor2');
+            var data = oEditor.GetHTML();
+            update_school_terms_page(data);
+        }
+
         if (event.target.id.indexOf("_test") >= 0) {
             var oEditor = FCKeditorAPI.GetInstance('editor');
             var data = oEditor.GetHTML();
@@ -3307,6 +3320,20 @@ $(document).ready(function () {
         });
     }
 
+    function get_promotion_codes_page() {
+        var url = "/lms/custom/codes/list.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function get_policy_page() {
+        var url = "/lms/custom/policy/list.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
     /************************************************************************
      * 
      *                   Menu processing items
@@ -3320,6 +3347,14 @@ $(document).ready(function () {
     $("#campus").click(function (event) {
         update_navigation_status__menu('Campus Locations');
         get_campus_page(event.target.id);
+    });
+    $("#code").click(function (event) {
+        update_navigation_status__menu('Promotion codes');
+        get_promotion_codes_page();
+    });
+    $("#policy").click(function (event) {
+        update_navigation_status__menu('Policy');
+        get_policy_page();
     });
     $("#sch").click(function (event) {
         update_navigation_status__menu('Workshops schedule');
