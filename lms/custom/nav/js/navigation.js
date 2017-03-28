@@ -3324,6 +3324,14 @@ $(document).ready(function () {
         var url = "/lms/custom/codes/list.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+            $("#promo_date1").datepicker();
+            $("#promo_date2").datepicker();
+            $.post('/lms/custom/utils/courses.json', {id: 1}, function (data) {
+                $('#promo_program').typeahead({source: data, items: 240});
+            }, 'json');
+            $.post('/lms/custom/utils/promo_users.json', {id: 1}, function (data) {
+                $('#promo_user').typeahead({source: data, items: 52000});
+            }, 'json');
         });
     }
 
@@ -5382,6 +5390,10 @@ $(document).ready(function () {
         }
 
         console.log('Event ID: ' + event.target.id);
+
+        if (event.target.id == 'promo_reset_search') {
+            get_promotion_codes_page();
+        }
 
         if (event.target.id.indexOf('edit_deposit_') >= 0) {
             var id = event.target.id.replace("edit_deposit_", "");
