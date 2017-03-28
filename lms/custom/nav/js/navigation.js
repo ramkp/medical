@@ -5395,6 +5395,19 @@ $(document).ready(function () {
             get_promotion_codes_page();
         }
 
+        if (event.target.id == 'back_to_promo_page') {
+            get_promotion_codes_page();
+        }
+
+        if (event.target.id == 'add_new_promo_code') {
+            var url = "/lms/custom/codes/get_add_promo_code_page.php";
+            $.post(url, {id: 1}).done(function (data) {
+                $('#promo_page_container').html(data);
+            });
+        }
+
+
+
         if (event.target.id.indexOf('edit_deposit_') >= 0) {
             var id = event.target.id.replace("edit_deposit_", "");
             if (dialog_loaded !== true) {
