@@ -13,6 +13,8 @@ class Enroll {
     public $db;
     public $student_role = 5;
     public $signup_url;
+    public $cat_ma = 8;
+    public $cat_maa = 6;
 
     function __construct() {
         $this->db = new pdo_db();
@@ -231,13 +233,62 @@ class Enroll {
         $this->db->query($query);
     }
 
+    function get_ma_courses() {
+        $ids = array();
+        $cat_arr = array($this->cat_ma, $this->cat_maa);
+        $cat_list = implode(',', $cat_arr);
+        $query = "select * from mdl_course where visible=1 "
+                . "and category in ($cat_list)";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $ids[] = $row['id'];
+            } // ed while
+        } // end if $num > 0
+        return $ids;
+    }
+
+    function get_maaa_courses() {
+        $ids = array();
+        $query = "select * from mdl_course where visible=1 "
+                . "and category=$this->cat_maa";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $ids[] = $row['id'];
+            } // ed while
+        } // end if $num > 0
+        return $ids;
+    }
+
+    function enroll_user_to_ma_programs($user) {
+        if ($user->courseid == 56) {
+            // MAA program
+            $courses = $this->get_maaa_courses();
+        } // end if $user->courseid==56
+        if ($user->courseid == 55) {
+            // MA program
+            $courses = $this->get_ma_courses();
+        }
+        $userid = $user->userid;
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $this->assign_roles($userid, $courseid);
+            } // end foreach
+        } // end if $courses)>0
+    }
+
     function enroll_user_to_course($user) {
         $userid = $this->getUserId($user->email);
         $this->assign_roles($userid, $user->courseid);
         $this->update_user_data($userid, $user);
-        //$this->add_user_to_course_schedule($userid, $user);
         $this->update_slots_table($user->courseid, $userid, $user->slotid);
         $user->userid = $userid;
+        if ($user->courseid == 56 || $user->courseid == 55) {
+            $this->enroll_user_to_ma_programs($user);
+        } // end if $user->courseid==56 || $user->courseid==55
         $this->send_confirmation_email($user);
     }
 
