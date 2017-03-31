@@ -2772,4 +2772,10 @@ class Dashboard extends Util {
         return $coursenum;
     }
 
+    function is_user_has_survey_applicagtion($userid) {
+        $query = "select * from mdl_ws_survey where userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
 }

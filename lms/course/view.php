@@ -279,7 +279,8 @@ if ($roleid == 5 && $USER->username != 'manager' && $USER->username != 'admin') 
 $roleid = $ds->get_user_role($USER->id);
 $category = $ds->get_course_category($COURSE->id);
 $completed = $ds->is_course_completed($COURSE->id, $USER->id);
-if ($roleid == 5 && $category == 2 && $completed > 0) {
+$has_application=$ds->is_user_has_survey_applicagtion($USER->id);
+if ($roleid == 5 && $category == 2 && $completed > 0 && $has_application>0) {
     $status = $ds->is_ws_survey_was_completed($COURSE->id, $USER->id);
     if ($status == 0) {
         $survey = $ds->get_workshop_survey($COURSE->id, $USER->id);
