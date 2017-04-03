@@ -1918,7 +1918,7 @@ class Students {
                         <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/payments/index/$user_data->id/$user_data->courseid/0/125/1' target='_blank'>$125 Recertification Fee (Over 90 Days Expired)</a></p>
                         
                         <p style='align:left;font-size:15px;'>Notice: Your username to login to your account at <a href='https://www.medical2.com' target='_blank'>www.medical2.com</a>
-                        is your email address and if you don't remember your password please use Forgot Password link to retrieve your password.</p>
+                        is your email address and if you don't remember your password please use Recover Password link to retrieve your password.</p>
 		        <p style='align:left;font-size:15px;font-weight:bold;color:red;'>Mailing Address: Medical2 Inc.  1830A North Gloster St, Tupelo, MS 38804</p>";
 
         return $list;

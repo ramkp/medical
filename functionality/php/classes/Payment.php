@@ -1119,7 +1119,7 @@ class Payment {
             $list.="<span class='span2'>Fee</span>";
             if ($apply_delay_fee) {
                 if ($group_data == '') {
-                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)<br>Total: $grand_total</span>";
+                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)<br>Total: $grand_total ".$discountbox." </span>";
                     // This is personal course cost
                     $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
                 } // end if $group_data == ''
@@ -1131,7 +1131,7 @@ class Payment {
             } // end if $apply_delay_fee
             else {
                 if ($group_data == '') {
-                    $list.="<span class='span2'>$cost_block</span>";
+                    $list.="<span class='span2'>$cost_block.$discountbox</span>";
                     // This is personal course cost
                     $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
                 } // end if $group_data == ''
@@ -1909,7 +1909,7 @@ class Payment {
 
     function get_register_discount_box() {
         $list = "";
-        $list.="<br>Promo Code: &nbsp;&nbsp;<input type='text' id='register_promo_code' style='width:50px;'>";
+        $list.="<br>Promo Code? &nbsp;&nbsp;<input type='text' id='register_promo_code' style='width:50px;'>";
         return $list;
     }
 
@@ -1982,7 +1982,7 @@ class Payment {
                 . "where username='" . strtolower($email) . "'";
         $this->db->query($query);
     }
-    
+
     function get_code_courseid($codeid) {
         $query = "select * from mdl_code2course where codeid=$codeid";
         $result = $this->db->query($query);
