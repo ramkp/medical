@@ -332,6 +332,20 @@ $(document).ready(function () {
                 $('#camp_program').typeahead({source: data, items: 52000});
             }, 'json');
 
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url).done(function () {
+                    $('[data-toggle="tooltip"]').tooltip();
+                });
+            } // end if dialog_loaded !== true
+            else {
+                $('[data-toggle="tooltip"]').tooltip();
+            } // end else
+
+
+
         });
     }
 
@@ -2335,7 +2349,6 @@ $(document).ready(function () {
 
         console.log('Class element clicked: ' + $(event.target).attr('class'));
 
-
         if ($(event.target).attr('class') == 'profile_user_suspend') {
             var userid = $(this).data('userid');
             var state = $(this).data('status');
@@ -3915,7 +3928,7 @@ $(document).ready(function () {
             var paymentid = $('#course_payments').val();
             var amount = $('#refund_amount').val();
             console.log('Payment ID: ' + paymentid);
-            if (paymentid > 0 && amount != '' && $.isNumeric(amount)) {
+            if (paymentid != '' && amount != '' && $.isNumeric(amount)) {
                 $('#refund_err').html('');
                 if (confirm('Make refund for current payment?')) {
                     var url = "/lms/custom/payments/make_refund.php";
@@ -4198,9 +4211,12 @@ $(document).ready(function () {
             console.log('Course id: ' + courseid);
             if (courseid > 0) {
                 var url = "/lms/custom/payments/get_course_payments.php";
-                $.post(url, {id: courseid}).done(function (data) {
-                    console.log('Server response: ' + data);
-                    $('#course_payments_span').html(data);
+                $.post(url, {id: courseid}).done(function () {
+                    //console.log('Server response: ' + data);
+                    //$('#course_payments_span').html(data);
+                    $.post('/lms/custom/utils/payments.json', {id: 1}, function (data) {
+                        $('#course_payments').typeahead({source: data, items: 240});
+                    }, 'json');
                 }); // end if $.post
 
             } // end if course_payment_id>0
@@ -5410,6 +5426,10 @@ $(document).ready(function () {
                     $('#promo_program').typeahead({source: data, items: 240});
                 }, 'json');
 
+                $.post('/lms/custom/utils/users.json', {id: 1}, function (data) {
+                    $('#program_users').typeahead({source: data, items: 240});
+                }, 'json');
+
                 $('#promo_date1').datepicker();
                 $('#promo_date2').datepicker();
 
@@ -6080,26 +6100,61 @@ $(document).ready(function () {
 
         if (event.target.id == 'add_new_codes') {
             var program = $('#promo_program').val();
-            var user = $('#program_users').val();
             var type = $("input:radio[name ='discount']:checked").val();
             var amount = $('#amount').val();
             var date1 = $('#promo_date1').val();
             var date2 = $('#promo_date2').val();
-            var code = {program: program, type: type, amount: amount, date1: date1, date2: date2, user: user};
-            if (program != '' && amount > 0 && date1 != '' && date2 != '') {
-                $('#promo_err').html('');
-                var url = "/lms/custom/codes/add_promo_codes.php";
-                $.post(url, {code: JSON.stringify(code)}).done(function (data) {
-                    console.log(data);
-                    get_promotion_codes_page();
-                });
-            } // end if program!='' && amount>0
+            var total = $('#code_total').val();
+            var users;
+            if (program == '') {
+                var users = 'n/a';
+                var code = {program: program, type: type, amount: amount, date1: date1, date2: date2, total: total, users: users};
+            } // end if program == ''
             else {
-                $('#promo_err').html('Please select program, code dates and discount amount');
+                var users = [];
+                $('input[type=checkbox]:checked').each(function () {
+                    users.push($(this).data('userid'));
+                });
+                var userslist = users.toString();
+                var code = {program: program, type: type, amount: amount, date1: date1, date2: date2, total: total, users: userslist};
+            } // end else
+            if (amount > 0 && date1 != '' && date2 != '') {
+                $('#promo_err').html('');
+                if (program != '') {
+                    $('#promo_err').html('');
+                    if (confirm('Add promotion code(s)?')) {
+                        var url = "/lms/custom/codes/add_promo_codes.php";
+                        $.post(url, {code: JSON.stringify(code)}).done(function (data) {
+                            //console.log(data);
+                            get_promotion_codes_page();
+                        }); // end of post
+                    } // end if confirm
+                } // end if program!=''
+                else {
+                    $('#promo_err').html('');
+                    if (confirm('Add promotion code(s)?')) {
+                        var url = "/lms/custom/codes/add_promo_codes.php";
+                        $.post(url, {code: JSON.stringify(code)}).done(function (data) {
+                            //console.log(data);
+                            get_promotion_codes_page();
+                        }); // end of post
+                    } // end if confirm
+                } // end else
+            } // amount > 0 && date1 != '' && date2 != ''
+            else {
+                $('#promo_err').html('Please provide code dates and discount amount');
             } // end else
         }
 
-
+        if (event.target.id.indexOf("del_code_") >= 0) {
+            var id = event.target.id.replace("del_code_", "");
+            if (confirm('Delete current promo code?')) {
+                var url = "/lms/custom/codes/del_code.php";
+                $.post(url, {id: id}).done(function () {
+                    get_promotion_codes_page();
+                });
+            } // end if confirm
+        }
 
     }); // end of body click event
 
@@ -6147,10 +6202,12 @@ $(document).ready(function () {
                 $.post(url, {name: program}).done(function (id) {
                     if (id > 0) {
                         console.log('Course id: ' + id);
-                        var json_file = "/lms/custom/utils/" + id + ".json";
-                        $.post(json_file, {id: 1}, function (data) {
-                            $('#program_users').typeahead({source: data, items: 240});
-                        }, 'json');
+                        $('#ajax_loader').show();
+                        var url = "/lms/custom/codes/get_program_users.php";
+                        $.post(url, {id: id}).done(function (data) {
+                            $('#ajax_loader').hide();
+                            $('#promo_course_users').html(data);
+                        });
                     } // end if id>0
                 }); // end of post
             } // end if program!=''

@@ -734,11 +734,7 @@ class Payments extends Util {
     }
 
     function get_course_payments($courseid = null) {
-        $list = "";
         $users = array();
-        
-        $list.="<select id='course_payments' style='width:375px;'>";
-        $list.="<option value='0' selected>Payments</option>";
         if ($courseid != null) {
             $query = "select * from mdl_card_payments "
                     . "where courseid=$courseid "
@@ -756,22 +752,19 @@ class Payments extends Util {
                     $user->lastname = $userdata->lastname;
                     $user->amount = $row['psum'];
                     $user->date = $date;
-                    $users[$userdata->firstname] = $user;
+                    $item = mb_convert_encoding($user->firstname, 'UTF-8') . " " . mb_convert_encoding($user->lastname, 'UTF-8') . " " . mb_convert_encoding('$' . $user->amount, 'UTF-8') . " " . mb_convert_encoding($user->date, 'UTF-8');
+                    $users[] = $item;
                 } // end while
-                ksort($users);
-                foreach ($users as $user) {
-                    $list.="<option value='" . $user->id . "'>$user->firstname $user->lastname $" . $user->amount . " $user->date</option>";
-                } // end foreach
+
+                file_put_contents('/home/cnausa/public_html/lms/custom/utils/payments.json', json_encode($users));
             } // end if $num > 0
         } // end if $courseid != null
-        $list.="</select>";
-        return $list;
     }
 
     function get_refund_modal_dialog() {
         $list = "";
         $courses = $this->get_refund_courses();
-        $payments = $this->get_course_payments();
+        $this->get_course_payments();
         $list.="<div id='myModal' class='modal fade'>
         <div class='modal-dialog'>
         <div class='modal-content'>
@@ -785,7 +778,7 @@ class Payments extends Util {
                 </div>            
                 
                 <div class='container-fluid' style='text-align:left;'>
-                <span class='span5' id='course_payments_span'>$payments</span>                    
+                <span class='span5' id='course_payments_span'><input type='text' id='course_payments' style='width:365px;'></span>                    
                 </div>       
                 
                 <div class='container-fluid' style='text-align:left;'>
@@ -810,14 +803,26 @@ class Payments extends Util {
         return $list;
     }
 
-    function make_refund($paymentid, $amount) {
-        $query = "select * from mdl_card_payments where id=$paymentid";
+    function make_refund($payment, $amount) {
+        $payment_arr = explode(" ", $payment);
+        $firstname = $payment_arr[0];
+        $lastname = $payment_arr[1];
+        $data = $lastname . " " . $firstname;
+        $userid = $this->get_userid_by_fio($data);
+        $fullamount = str_replace('$', '', $payment_arr[2]);
+        $date = $payment_arr[3];
+        $query = "select * from mdl_card_payments "
+                . "where userid=$userid "
+                . "and psum='$fullamount' "
+                . "and FROM_UNIXTIME(pdate, '%m-%d-%Y')='$date'";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $paymentid = $row['id'];
             $card_last_four = $row['card_last_four'];
             $exp_date = $row['exp_date'];
             $db_amount = $row['psum'];
             $trans_id = $row['trans_id'];
+            $courseid = $row['courseid'];
         } // ebd while
         $pr = new ProcessPayment();
         $status = $pr->makeRefund($amount, $card_last_four, $exp_date, $trans_id);
@@ -836,18 +841,15 @@ class Payments extends Util {
                         . "where id=$paymentid";
                 $this->db->query($query);
                 // Add data to partial refunds table
-                $query = "INSERT INTO mdl_partial_refund_payments "
-                        . "SELECT * FROM mdl_card_payments "
-                        . "where id=$paymentid";
-                //echo "Query1: ".$query."<br>";
-                $this->db->query($query);
-                // Update partial refund date 
                 $date = time();
-                $query = "update mdl_partial_refund_payments "
-                        . "set psum='$amount', pdate='$date' where id=$paymentid";
-                //echo "Query2: ".$query."<br>";
+                $query = "INSERT INTO mdl_partial_refund_payments "
+                        . "(userid,"
+                        . "courseid,"
+                        . "psum,"
+                        . "refund_date) "
+                        . "values ($userid,$courseid,'$amount','$date')";
+                $this->db->query($query);
             } // end else when it was partial refund
-
             return true;
         } // end if $status==true
         else {
