@@ -3,7 +3,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
 
 
-$time='03/14/2017';
+$time='04/03/2017';
 $unix_time=  strtotime($time); 
 
 echo "Human time: ".$time."<br>";

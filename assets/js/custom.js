@@ -32,6 +32,7 @@ function browser() {
 
 $(document).ready(function () {
 
+    var codeused = 0;
 
     /* ---------- Add class .active to current link ---------- */
     $('ul.main-menu li a').each(function () {
@@ -2009,6 +2010,7 @@ $(document).ready(function () {
     });
 
     $('.form_div').on('change', function (event) {
+        //$('body').on('change', function (event) {    
         // alert(event.target.id);
         if (event.target.id == 'categories') {
             var category_id = $('#categories').val();
@@ -2022,8 +2024,9 @@ $(document).ready(function () {
             var request = {courseid: courseid, slotid: slotid};
             $.post(url, request).done(function (data) {
                 var course = jQuery.parseJSON(data);
+                var coursedata = "<span id='visible_amount'>" + course.cost + "</span> " + course.box;
                 $('#dyn_course_name').html(course.name);
-                $('#dyn_course_fee').html(course.cost);
+                $('#dyn_course_fee').html(coursedata);
 
                 $('#payment_sum').remove();
                 $("#dyn_course_fee").append("<input type='hidden' id='payment_sum' value='" + course.raw_cost + "'>");
@@ -2080,8 +2083,9 @@ $(document).ready(function () {
             var url = '/functionality/php/get_course_data.php';
             $.post(url, request).done(function (data) {
                 var course = jQuery.parseJSON(data);
+                var coursedata = "<span id='visible_amount'>" + course.cost + "</span> " + course.box;
                 $('#dyn_course_name').html(course.name);
-                $('#dyn_course_fee').html(course.cost);
+                $('#dyn_course_fee').html(coursedata);
 
                 $('#payment_sum').remove();
                 $("#dyn_course_fee").append("<input type='hidden' id='payment_sum' value='" + course.raw_cost + "'>");
@@ -2214,7 +2218,7 @@ $(document).ready(function () {
             var courseid = $('#selected_course').val();
             var slotid = $('#selected_slot').val();
             var amount = $('#payment_sum').val();
-
+            var promo_code = $('#register_promo_code').val();
             if (typeof (courseid) === "undefined") {
                 $('#personal_err').html('Please select program');
             } // end if
@@ -2421,6 +2425,7 @@ $(document).ready(function () {
                             come_from: from,
                             courseid: courseid,
                             slotid: slotid,
+                            promo_code: promo_code,
                             amount: amount
                         };
                         $('#ajax_loading_payment').show();
@@ -2549,7 +2554,33 @@ $(document).ready(function () {
 
     });
 
+    $('body').on('blur', "input", function (event) {
 
+        if (event.target.id == 'register_promo_code') {
+            var c = $('#register_promo_code').val();
+            var courseid = $('#selected_course').val();
+            var amount = $('#payment_sum').val();
+            var slotid = $('#selected_slot').val();
+            var code = {courseid: courseid, slotid: slotid, amount: amount, code: c};
+            console.log('Code: ' + JSON.stringify(code));
+            if (c != '' && codeused == 0) {
+                var url = "/lms/custom/codes/update_registration_price.php";
+                $.post(url, {code: JSON.stringify(code)}).done(function (data) {
+                    console.log('Server response: ' + data);
+                    if (data != 0) {
+                        $('#visible_amount').html('$' + data);
+                        $('#payment_sum').remove();
+                        $("#dyn_course_fee").append("<input type='hidden' id='payment_sum' value='" + data + "'>");
+                        var newprice = $('#payment_sum').val();
+                        console.log('New price:' + newprice);
+                        codeused = 1;
+                    } // end if data != 0
+                }); // end of post
+            } // end if c!=''
+
+        } // end if $('body').on('blur', "input"
+
+    });
 
 
 

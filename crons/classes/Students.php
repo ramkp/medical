@@ -1109,7 +1109,7 @@ class Students {
         //$adjusted_start=$start-50000;
         $partial_payments = array();
         $query = "select * from mdl_card_payments "
-                . "where refunded=1 and pdate between $start and $end";
+                . "where refunded=1 and refund_date between $start and $end";
         //echo "CC Refund Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -1124,7 +1124,7 @@ class Students {
         } // end if $num > 0
 
         $query = "select * from mdl_partial_refund_payments "
-                . "where pdate between $start and $end";
+                . "where refund_date between $start and $end";
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -1277,7 +1277,7 @@ class Students {
             foreach ($refund_payments as $payment) {
                 $coursename = $this->get_course_name($payment->courseid);
                 $renew_fee = $this->get_renew_fee($payment->courseid);
-                $date = date('m-d-Y h:i:s', ($payment->pdate - 86400));
+                $date = date('m-d-Y h:i:s', ($payment->refund_date - 86400));
                 $userdata = $this->get_user_data($payment->userid);
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;

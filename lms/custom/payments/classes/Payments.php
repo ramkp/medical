@@ -314,7 +314,7 @@ class Payments extends Util {
 
             $query = "select * "
                     . "from mdl_card_payments where refunded=1 "
-                    . "order by pdate desc ";
+                    . "order by refund_date desc ";
             $num = $this->db->numrows($query);
             if ($num > 0) {
                 $result = $this->db->query($query);
@@ -323,13 +323,13 @@ class Payments extends Util {
                     foreach ($row as $key => $value) {
                         $payment->$key = $value;
                     } // end foreach      
-                    $payments1[$row['pdate']] = $payment;
+                    $payments1[] = $payment;
                 } // end while
             } // end if $num>0
 
             $query = "select * "
                     . "from mdl_partial_refund_payments "
-                    . "order by pdate desc ";
+                    . "order by refund_date desc ";
             $num = $this->db->numrows($query);
             if ($num > 0) {
                 $result = $this->db->query($query);
@@ -338,11 +338,11 @@ class Payments extends Util {
                     foreach ($row as $key => $value) {
                         $payment->$key = $value;
                     } // end foreach      
-                    $payments2[$row['pdate']] = $payment;
+                    $payments2[] = $payment;
                 } // end while
             } // end if $num>0
             $payments = array_merge($payments2, $payments1);
-            ksort($payments);
+            //ksort($payments);
             $list.= $this->create_refunded_payments_page($payments);
         } // end if 
         else {
@@ -392,7 +392,7 @@ class Payments extends Util {
             foreach ($payments as $payment) {
                 $user = $this->get_user_details($payment->userid);
                 $course = $this->get_course_name($payment->courseid);
-                $date = date('Y-m-d', $payment->pdate);
+                $date = date('Y-m-d', $payment->refund_date);
                 $user_payments = $this->get_user_address_block($payment->userid);
                 $list.="<div class='container-fluid' style=''>";
                 $list.="<span class='span2'>User</span><span class='span3'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname ($user->email)</a></span>";
@@ -539,7 +539,7 @@ class Payments extends Util {
             $offset = $rec_limit * $page;
         }
         $query = "select * from mdl_card_payments where refunded=1 "
-                . "order by pdate desc "
+                . "order by refund_date desc "
                 . "LIMIT $offset, $rec_limit";
         //echo "Query: ".$query ."<br>";
         $result = $this->db->query($query);
@@ -765,13 +765,13 @@ class Payments extends Util {
         $list = "";
         $courses = $this->get_refund_courses();
         $this->get_course_payments();
-        $list.="<div id='myModal' class='modal fade'>
+        $list.="<div id='myModal' class='modal fade' style='height:375px;'>
         <div class='modal-dialog'>
         <div class='modal-content'>
             <div class='modal-header'>                
                 <h4 class='modal-title'>Make refund</h4>
                 </div>                
-                <div class='modal-body'>                                
+                <div class='modal-body' style='height:275px;'>                                
                 
                 <div class='container-fluid' style='text-align:left;'>
                 <span class='span5'>$courses</span>    

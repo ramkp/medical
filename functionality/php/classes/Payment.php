@@ -27,6 +27,37 @@ class Payment {
         $this->host = $_SERVER['SERVER_NAME'];
     }
 
+    function is_code_exists($courseid, $code) {
+        //echo "User course: " . $courseid . "<br>";
+        $now = time();
+        $query = "select * from mdl_code "
+                . "where code='$code' "
+                . "and used=0 and $now between date1 and date2";
+        $num = $this->db->numrows($query);
+        //echo "Num: " . $num . "<br>";
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $id = $row['id'];
+            } // end while
+            $codecourseid = $this->get_code_courseid($id);
+            if ($codecourseid == 0) {
+                $status = 1;
+            } // end if $codecourseid==0
+            else {
+                $query = "select * from mdl_code2course "
+                        . "where courseid=$courseid and codeid=$id";
+                //echo "Query: " . $query . "<br>";
+                $coursenum = $this->db->numrows($query);
+                $status = ($coursenum > 0) ? 1 : 0;
+            }
+        } // end if $num>0
+        else {
+            $status = 0;
+        }
+        return $status;
+    }
+
     function get_payment_options($courseid, $group = null) {
         $query = "select installment, num_payments "
                 . "from mdl_course "
@@ -977,7 +1008,7 @@ class Payment {
         $card_month = $this->get_month_drop_box();
         $states = $this->get_states_list();
         $late = new Late();
-
+        $discountbox = $this->get_register_discount_box();
         $dashboard = ($from_email == null) ? 0 : 1;
         $list.="<input type='hidden' id='dashboard' value='$dashboard'>";
         $list.="<input type='hidden' id='renew' value='$renew'>";
@@ -1370,28 +1401,51 @@ class Payment {
         return $user;
     }
 
+    function disable_promo_code($code) {
+        $query = "update mdl_code set used=1 where code='$code'";
+        $this->db->query($query);
+    }
+
     function add_payment_to_db($card) {
         $card_last_four = substr($card->card_no, -4);
-
+        $promo_status = $this->is_code_exists($card->courseid, $card->promo_code);
         //echo "<pre> add_payment_to_db";
         //print_r($card);
         //echo "</pre>--------------------<br>";
 
 
         $exp_date = $card->card_month . $card->card_year;
-        $query = "insert into mdl_card_payments "
-                . "(userid,"
-                . "courseid, card_last_four, exp_date, "
-                . "psum, "
-                . "trans_id, "
-                . "auth_code, "
-                . "pdate) "
-                . "values('" . $card->userid . "',"
-                . "'" . $card->courseid . "', '" . base64_encode($card_last_four) . "', '$exp_date', "
-                . "'" . $card->sum . "', "
-                . "'$card->transid', "
-                . "'$card->auth_code', "
-                . "'" . time() . "')";
+        if ($promo_status == 0) {
+            $query = "insert into mdl_card_payments "
+                    . "(userid,"
+                    . "courseid, card_last_four, exp_date, "
+                    . "psum, "
+                    . "trans_id, "
+                    . "auth_code, "
+                    . "pdate) "
+                    . "values('" . $card->userid . "',"
+                    . "'" . $card->courseid . "', '" . base64_encode($card_last_four) . "', '$exp_date', "
+                    . "'" . $card->sum . "', "
+                    . "'$card->transid', "
+                    . "'$card->auth_code', "
+                    . "'" . time() . "')";
+        } // end if $promo_status==0
+        else {
+            $this->disable_promo_code($card->promo_code);
+            $query = "insert into mdl_card_payments "
+                    . "(userid,"
+                    . "courseid, card_last_four, exp_date, "
+                    . "psum, promo_code, "
+                    . "trans_id, "
+                    . "auth_code, "
+                    . "pdate) "
+                    . "values('" . $card->userid . "',"
+                    . "'" . $card->courseid . "', '" . base64_encode($card_last_four) . "', '$exp_date', "
+                    . "'" . $card->sum . "', '$card->promo_code', "
+                    . "'$card->transid', "
+                    . "'$card->auth_code', "
+                    . "'" . time() . "')";
+        } // end else 
         //echo "Query: ".$query."<br>";
         $this->db->query($query);
     }
@@ -1612,7 +1666,7 @@ class Payment {
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
 
-        /* ********************************************************************
+        /*         * *******************************************************************
          *  Please be aware $user_payment_data could be null in case of 
          *  group registration
          * ******************************************************************* */
@@ -1765,7 +1819,7 @@ class Payment {
         } // end if $user_group!='' && $userid!=''
         // ***************** Group online payment ********************
         if ($user_group != '' && $userid == '') {
-            
+
             // Set card slotid fo future usage in confirmattion message
             $card->groupname = $user_group;
             $group_users = $this->get_group_users($user_group);
@@ -1853,6 +1907,12 @@ class Payment {
         return $cost;
     }
 
+    function get_register_discount_box() {
+        $list = "";
+        $list.="<br>Promo Code: &nbsp;&nbsp;<input type='text' id='register_promo_code' style='width:50px;'>";
+        return $list;
+    }
+
     function get_course_data($courseid, $slotid) {
         $query = "select * from mdl_course where id=$courseid";
         $result = $this->db->query($query);
@@ -1865,6 +1925,7 @@ class Payment {
 
         $wscost = $this->get_workshop_overrided_cost($slotid);
         $cost = ($wscost > 0) ? $wscost : $coursecost;
+        $discountbox = $this->get_register_discount_box();
 
         if ($discount_size > 0) {
             $initial_amount = $cost - (($cost * $discount_size) / 100);
@@ -1909,6 +1970,7 @@ class Payment {
         } // end else
         $course = new stdClass();
         $course->name = $name;
+        $course->box = $discountbox;
         $course->cost = "$" . $full_amount;
         $course->raw_cost = $raw_full_amount;
 
@@ -1919,6 +1981,15 @@ class Payment {
         $query = "delete from mdl_user "
                 . "where username='" . strtolower($email) . "'";
         $this->db->query($query);
+    }
+    
+    function get_code_courseid($codeid) {
+        $query = "select * from mdl_code2course where codeid=$codeid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['courseid'];
+        }
+        return $courseid;
     }
 
     function enroll_user2($user) {

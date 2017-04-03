@@ -6,6 +6,7 @@
  * @author sirromas
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
+//require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/codes/classes/Codes.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/mailer/vendor/PHPMailerAutoload.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
@@ -113,7 +114,7 @@ class Mailer {
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
         $userdata = $this->get_user_details($user->userid);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -323,8 +324,8 @@ class Mailer {
             </tr> 
 
             </table></body></html>";
-                $subject = 'Medical2 - Certificate Renew Payment';
-            } // end else
+            $subject = 'Medical2 - Certificate Renew Payment';
+        } // end else
 
         $this->send_common_message($subject, $list, $user->email);
     }
@@ -334,7 +335,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ****************************************************************
+        /*         * ***************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -485,8 +486,8 @@ class Mailer {
             </tr> 
 
             </table></body></html>";
-                $subject = 'Medical2 - Certificate Renew Payment';
-            } // end else
+            $subject = 'Medical2 - Certificate Renew Payment';
+        } // end else
 
         $this->send_common_message($subject, $list, $user->email);
     }
@@ -527,11 +528,10 @@ class Mailer {
                 $list.="<tr>";
                 $list.="<td>Email</td><td>$userdata->email</td>";
                 $list.="</tr>";
-                
+
                 $list.="<tr>";
                 $list.="<td colspan='2'><br></td>";
                 $list.="</tr>";
-
             } // end foreach
         } // end if count($users)>0
 
@@ -545,7 +545,7 @@ class Mailer {
         $students = $this->get_group_students($groupname);
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -678,6 +678,92 @@ class Mailer {
         return $user;
     }
 
+    function verify_used_code($code) {
+        $query = "select * from mdl_code "
+                . "where code='$code' "
+                . "and used=1";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function is_code_exists($courseid, $code, $used = false) {
+        if ($used) {
+            $status = $this->verify_used_code($code);
+        } // end if $used
+        else {
+            $now = time();
+            $query = "select * from mdl_code "
+                    . "where code='$code' "
+                    . "and used=0 and $now between date1 and date2";
+            $num = $this->db->numrows($query);
+            //echo "Num: " . $num . "<br>";
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $id = $row['id'];
+                } // end while
+                $codecourseid = $this->get_code_courseid($id);
+                if ($codecourseid == 0) {
+                    $status = 1;
+                } // end if $codecourseid==0
+                else {
+                    $query = "select * from mdl_code2course "
+                            . "where courseid=$courseid and codeid=$id";
+                    //echo "Query: " . $query . "<br>";
+                    $coursenum = $this->db->numrows($query);
+                    $status = ($coursenum > 0) ? 1 : 0;
+                }
+            } // end if $num>0
+            else {
+                $status = 0;
+            }
+        } // end else
+        return $status;
+    }
+
+    function get_code_details($code) {
+        $query = "select * from mdl_code where code='$code'";
+        //echo "Query: ".$query."<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $item = new stdClass();
+            foreach ($row as $key => $value) {
+                $item->$key = $value;
+            } // end foreach
+        } // end while
+        return $item;
+    }
+
+    function get_code_courseid($codeid) {
+        $query = "select * from mdl_code2course where codeid=$codeid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['courseid'];
+        }
+        return $courseid;
+    }
+
+    function get_course_fee_block($oldprice, $user) {
+        $code = $user->promo_code;
+        $courseid = $user->courseid;
+        $status = $this->is_code_exists($courseid, $code, TRUE);
+        if ($status > 0) {
+            $codedata = $this->get_code_details($code);
+            if ($codedata->type == 'amount') {
+                $newprice = (int) $oldprice - (int) $codedata->amount;
+                $list = round($newprice) . " Discount applied: $$codedata->amount off";
+            } // end if
+            else {
+                $newprice = (int) $oldprice - (int) ($oldprice * $codedata->amount) / 100;
+                $list = round($newprice) . " Discount applied: $codedata->amount%";
+            } // end else
+        } // end if $status>0
+        else {
+            $list = $oldprice;
+        } // end else
+        return $list;
+    }
+
     function get_account_confirmation_message2($user, $printed_data = null) {
         $list = "";
         $course_name = $this->get_course_name($user);
@@ -692,7 +778,9 @@ class Mailer {
         else {
             $ws_cost = 0;
         } // end else
-        $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
+        $init_cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
+        $cost = $this->get_course_fee_block($init_cost, $user);
+        //$cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $catid = $this->get_course_category($user);
         $p = new Payment();
         $state = $p->get_state_name_by_id($user->state);
@@ -851,7 +939,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -957,7 +1045,7 @@ class Mailer {
 
     function create_registration_data_details($user) {
         $dompdf = new Dompdf();
-        $message = $this->get_account_confirmation_message($user, true);
+        $message = $this->get_account_confirmation_message2($user, true);
         $dompdf->loadHtml($message);
 
         $dompdf->setPaper('A4', 'portrait');

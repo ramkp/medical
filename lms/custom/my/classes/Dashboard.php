@@ -552,6 +552,8 @@ class Dashboard extends Util {
 
     function get_refund_payments($userid, $courseid) {
         $list = "";
+
+        // 1. Get full refunds
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid "
                 . "and userid=$userid and refunded=1 and refund_date<>''";
@@ -568,6 +570,22 @@ class Dashboard extends Util {
                 $list.="</div>";
             } // end while
         } // end if $num > 0
+        // 2. Get partial refunds
+        $query = "select * from mdl_partial_refund_payments "
+                . "where courseid=$courseid and userid=$userid";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $coursename = $this->get_course_name($courseid);
+                $date = date('m-d-Y', $row['refund_date']);
+                $list.="<div class='row-fluid'>";
+                $list.="<span span9>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
+
         return $list;
     }
 
@@ -1560,7 +1578,15 @@ class Dashboard extends Util {
             } // end foreach 
         } // end if $num > 0
         else {
-            $list.="N/A";
+            $courses = $this->get_user_courses($id);
+            if (count($courses)>0) {
+                foreach($courses as $courseid) {
+                    $coursename=$this->get_course_name($courseid);
+                    $list.="<div class='container-fluid' style=''>";
+                    $list.="<span class='span9'>$coursename</span>";
+                    $list.="</div>";
+                } // end foreach
+            } // end if count($courses)>0
         }
 
         return $list;
@@ -2776,6 +2802,57 @@ class Dashboard extends Util {
         $query = "select * from mdl_ws_survey where userid=$userid";
         $num = $this->db->numrows($query);
         return $num;
+    }
+
+    function has_completion_status($courseid, $userid) {
+        $query = "select * from mdl_course_completions "
+                . "where course=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function make_user_passed($courseid, $userid) {
+        $date = time();
+        $query = "insert into mdl_course_completions "
+                . "(userid,"
+                . "course,"
+                . "timeenrolled,"
+                . "timecompleted) "
+                . "values($userid,"
+                . "$courseid,"
+                . "'$date',"
+                . "'$date')";
+        $this->db->query($query);
+    }
+
+    function complete_users() {
+        $cert_users = array();
+        $query = "select * from mdl_certificates";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $item = new stdClass();
+            foreach ($row as $key => $value) {
+                $item->$key = $value;
+            }
+            $cert_users[] = $item;
+        }
+
+        $i = 0;
+        foreach ($cert_users as $item) {
+            $user = $this->get_user_details($item->userid);
+            $st = $this->has_completion_status($item->courseid, $item->userid);
+            if ($st > 0) {
+                $status = 'Completed';
+            } // end if $st
+            else {
+                $status = "Not completed";
+                $this->make_user_passed($item->courseid, $item->userid);
+                $i++;
+            } // end else
+            echo "User: $user->firstname $user->lastname has $status  ";
+            echo "<br>----------------------------------------------------<br>";
+        } // end foreach
+        echo "Total non-completed users: $i";
     }
 
 }

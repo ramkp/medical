@@ -7,6 +7,7 @@
  */
 ini_set('memory_limit', '1024M'); // or you could use 1G
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/codes/classes/Codes.php');
 
 class Report extends Util {
 
@@ -737,7 +738,6 @@ class Report extends Util {
     }
 
     function get_card_payments_detailes($courseid, $from, $to) {
-
         $payments = array();
         $this->courseid = $courseid;
         $this->from = $from;
@@ -793,13 +793,14 @@ class Report extends Util {
             foreach ($payments as $payment) {
                 //echo "Inside payments ...<br>";
                 $total = $total + $payment->psum;
+                $amount = $this->get_cards_payment_block($payment);
                 $date = date('m-d-Y', $payment->pdate);
                 $coursename = $this->get_course_name($payment->courseid);
                 $userdata = $this->get_user_details($payment->userid);
                 $list.="<div class='container-fluid' style='text-align:left;'>";
                 $list.="<span class='span3'><a href='https://medical2.com/lms/user/profile.php?id=$payment->userid' target='_blank'>$userdata->firstname $userdata->lastname</a></span>";
                 $list.="<span class='span3'>$coursename</span>";
-                $list.="<span class='span3'>$$payment->psum</span>";
+                $list.="<span class='span3'>$amount</span>";
                 $list.="<span class='span3'>$date</span>";
                 $list.="</div>";
             } // end for
@@ -810,6 +811,32 @@ class Report extends Util {
             $list.="<span class='span12'>No data found</span>";
             $list.="</div>";
         }
+        return $list;
+    }
+
+    function get_promo_description($code) {
+        $c = new Codes();
+        $codedata = $c->get_code_details($code);
+        if ($codedata->type == 'amount') {
+            $tip = "Discount: $" . $codedata->amount . " off";
+        } // end if
+        else {
+            $tip = "Discount: " . $codedata->amount . "%";
+        } // end else
+        return $tip;
+    }
+
+    function get_cards_payment_block($p) {
+        $list = "";
+        $c = new Codes();
+        $status = $c->is_code_exists($p->courseid, $p->promo_code, true);
+        if ($status > 0) {
+            $promo = $this->get_promo_description($p->promo_code);
+            $list.="$" . $p->psum . " " . $promo;
+        } // end if $status>0
+        else {
+            $list.="$" . $p->psum;
+        } // end else
         return $list;
     }
 
@@ -867,8 +894,9 @@ class Report extends Util {
         } // end if $courseid > 0
         else {
             $query = "select * from mdl_partial_refund_payments "
-                    . "where pdate between $unix_from and $unix_to";
+                    . "where refund_date between $unix_from and $unix_to";
         } // end else 
+        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -880,8 +908,8 @@ class Report extends Util {
                 $partial_payments[] = $payment;
             } // end while
         } // end if $num > 0
-        // $all_refunds = array_merge($payments, $partial_payments); this array is not compatible
-        $all_refunds = $payments;
+        $all_refunds = array_merge($payments, $partial_payments); //this array is not compatible
+        //$all_refunds = $payments;
 
         if (count($all_refunds) > 0) {
 
