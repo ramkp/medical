@@ -2109,7 +2109,7 @@ class Students {
         $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
         //$mail->addAddress($email);
         $mail->addAddress($addressA);
-        $mail->addAddress($addressB);
+        //$mail->addAddress($addressB);
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
 
         $mail->isHTML(true);

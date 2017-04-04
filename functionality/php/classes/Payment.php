@@ -1119,7 +1119,7 @@ class Payment {
             $list.="<span class='span2'>Fee</span>";
             if ($apply_delay_fee) {
                 if ($group_data == '') {
-                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)<br>Total: $grand_total ".$discountbox." </span>";
+                    $list.="<span class='span2'>$cost_block+$$late_fee (late fee)<br>Total: $grand_total " . $discountbox . " </span>";
                     // This is personal course cost
                     $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
                 } // end if $group_data == ''
@@ -1131,7 +1131,7 @@ class Payment {
             } // end if $apply_delay_fee
             else {
                 if ($group_data == '') {
-                    $list.="<span class='span2'>$cost_block.$discountbox</span>";
+                    $list.="<span class='span2'>" . $cost_block . $discountbox . "</span>";
                     // This is personal course cost
                     $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
                 } // end if $group_data == ''
@@ -1666,7 +1666,7 @@ class Payment {
         $item = substr($this->get_course_name($card->courseid), 0, 27);
         $cart_type_num = $this->get_card_type($card->card_type);
 
-        /* ********************************************************************
+        /*         * *******************************************************************
          *  Please be aware $user_payment_data could be null in case of 
          *  group registration
          * ******************************************************************* */
