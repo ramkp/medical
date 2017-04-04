@@ -1140,11 +1140,11 @@ class Schedule extends Util {
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $b = New Balance();
-            $course_cost = $b->get_item_cost($courseid, $slotid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $status = $this->is_user_deleted($row['studentid']);
                 if ($status == 0) {
+                    $course_cost = $b->get_item_cost($courseid, $row['studentid'], $slotid);
                     $student_payment = $b->get_student_payments($courseid, $row['studentid']);
                     $paid_amount = $paid_amount + $student_payment;
                     $diff = $student_payment - $course_cost;
@@ -1308,7 +1308,7 @@ class Schedule extends Util {
     function get_student_balance($courseid, $userid, $slotid) {
         $list = "";
         $b = new Balance();
-        $course_cost = $b->get_item_cost($courseid, $slotid);
+        $course_cost = $b->get_item_cost($courseid, $userid, $slotid);
         $student_payment = $b->get_student_payments($courseid, $userid);
         //echo "User ID: ".$userid."<br>";
         //echo "Student payment: ".$student_payment."<br>";
@@ -1319,11 +1319,13 @@ class Schedule extends Util {
         else {
             $unpaid_amount = 0;
         } // end else
+        $promo_code_block = $b->get_user_promo_code_discount($courseid, $userid);
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Paid:</span>";
         $list.="<span class='span2'>$$student_payment</span>";
         $list.="<span class='span2'>Owe: </span>";
         $list.="<span class='span2'>$$unpaid_amount</span>";
+        $list.="<span class='span4'>$promo_code_block</span>";
         $list.="</div>";
         return $list;
     }
