@@ -2042,6 +2042,90 @@ class Students {
         echo "$date backup is created \n";
     }
 
+    //************************ Promo code send ****************************/
+
+    function get_campaign_message($campid, $code, $userid) {
+        $query = "select * from mdl_code_campaign where id=$campid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $text = base64_decode($row['content']);
+            $subject = base64_decode($row['title']);
+        } // end while
+        $msg = str_replace("{code}", "<span style='font-weight:bold;'>$code</span>", $text);
+
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $email = $row['email'];
+        }
+
+        $message = new stdClass();
+        $message->subject = $subject;
+        $message->msg = $msg;
+        $message->email = $email;
+
+        return $message;
+    }
+
+    function make_promo_code_sent($codeid) {
+        $query = "update mdl_code set sent=1 where id=$codeid";
+        $this->db->query($query);
+    }
+
+    function send_promo_code_items() {
+        $query = "select c.id, c.code, c.used, c.campid, c.sent, co.courseid, "
+                . "co.userid, co.codeid "
+                . "from mdl_code c, mdl_code2course co "
+                . "where c.used=0 and c.sent=0 and c.campid>0 "
+                . "and c.id=co.codeid limit 0,1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $item = $this->get_campaign_message($row['campid'], $row['code'], $row['userid']);
+                $this->send_promo_code_message($item);
+                $this->make_promo_code_sent($row['codeid']);
+            } // end while
+        } // end if $num > 0
+        else {
+            echo "There are no promo code items to be sent...\n";
+        }
+    }
+
+    function send_promo_code_message($item) {
+        $mail = new PHPMailer;
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $email = $item->email;
+        $addressA = 'sirromas@gmail.com';
+        $addressB = 'info@medical2.com';
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
+        //$mail->addAddress($email);
+        $mail->addAddress($addressA);
+        $mail->addAddress($addressB);
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
+
+        $mail->isHTML(true);
+
+        $mail->Subject = $item->subject;
+        $mail->Body = $item->msg;
+
+        if (!$mail->send()) {
+            echo "Message could not be sent to $email \n";
+            echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
+        } // end if !$mail->send()        
+        else {
+            echo "Message has been sent to ' . $addressA \n";
+        }
+    }
+
 }
 
 // end of class

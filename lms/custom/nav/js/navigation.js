@@ -3347,7 +3347,10 @@ $(document).ready(function () {
             $.post('/lms/custom/utils/promo_users.json', {id: 1}, function (data) {
                 $('#promo_user').typeahead({source: data, items: 52000});
             }, 'json');
-        });
+
+
+
+        }); // end of post
     }
 
     function get_policy_page() {
@@ -5433,7 +5436,23 @@ $(document).ready(function () {
                 $('#promo_date1').datepicker();
                 $('#promo_date2').datepicker();
 
-            });
+                $.post('/lms/custom/utils/workshops.json', {id: 1}, function (data) {
+                    $('#camp_ws').typeahead({source: data, items: 240});
+                }, 'json');
+
+                $.post('/lms/custom/utils/states.json', {id: 1}, function (data) {
+                    $('#camp_state').typeahead({source: data, items: 240});
+                }, 'json');
+
+                $.post('/lms/custom/utils/cities.json', {id: 1}, function (data) {
+                    $('#camp_city').typeahead({source: data, items: 52000});
+                }, 'json');
+
+                $.post('/lms/custom/utils/programs.json', {id: 1}, function (data) {
+                    $('#camp_program').typeahead({source: data, items: 52000});
+                }, 'json');
+
+            }); // end of post
         }
 
         if (event.target.id.indexOf('edit_deposit_') >= 0) {
@@ -5462,6 +5481,11 @@ $(document).ready(function () {
                 $("body").append(data);
                 $("#myModal").modal('show');
             }
+        }
+
+
+        if (event.target.id == 'clear_code_search') {
+            $('#camp_users_container').html('');
         }
 
         if (event.target.id == 'update_deposit') {
@@ -5971,29 +5995,31 @@ $(document).ready(function () {
             if (users.length > 0) {
                 var userslist = users.join(',');
                 $('#camp_err').html('');
-                if (dialog_loaded !== true) {
-                    console.log('Script is not yet loaded starting loading ...');
-                    dialog_loaded = true;
-                    var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
-                    $.getScript(js_url)
-                            .done(function () {
-                                console.log('Script bootstrap.min.js is loaded ...');
-                                var url = "/lms/custom/promotion/get_add_campaign_dialog.php";
-                                var request = {userslist: userslist};
-                                $.post(url, request).done(function (data) {
-                                    $("body").append(data);
-                                    $("#myModal").modal('show');
-                                });
-                            })
-                            .fail(function () {
-                                console.log('Failed to load bootstrap.min.js');
+                //if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/promotion/get_add_campaign_dialog.php";
+                            var request = {userslist: userslist};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
                             });
-                } // dialog_loaded!=true
-                else {
-                    console.log('Script already loaded');
-                    $("body").append(data);
-                    $("#myModal").modal('show');
-                }
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+                //} // dialog_loaded!=true
+                /*
+                 else {
+                 console.log('Script already loaded');
+                 //$("body").append(data);
+                 $("#myModal").modal('show');
+                 }
+                 */
             } // end if users.length>0
             else {
                 $('#camp_err').html('Please select users');
@@ -6098,8 +6124,73 @@ $(document).ready(function () {
             }
         }
 
+        if (event.target.id == 'send_new_codes') {
+            var program = $('#camp_program').val();
+            var amount = $('#amount').val();
+            var date1 = $('#promo_date1').val();
+            var date2 = $('#promo_date2').val();
+            if (amount > 0 && date1 != '' && date2 != '') {
+                var users = [];
+                $('input[type=checkbox]:checked').each(function () {
+                    users.push($(this).val());
+                });
+                var userslist = users.toString();
+                if (userslist != '') {
+                    $('#promo_err').html('');
+                    dialog_loaded = true;
+                    var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                    $.getScript(js_url)
+                            .done(function () {
+                                console.log('Script bootstrap.min.js is loaded ...');
+                                var url = "/lms/custom/codes/get_add_campaign_dialog.php";
+                                var request = {userslist: userslist, program: program};
+                                $.post(url, request).done(function (data) {
+                                    $("body").append(data);
+                                    $("#myModal").modal('show');
+                                });
+                            })
+                            .fail(function () {
+                                console.log('Failed to load bootstrap.min.js');
+                            });
+                } // end if userslist!
+                else {
+                    $('#promo_err').html('Please select users for promotion codes');
+                } // end else
+            }// end if amount>0 && date1!='' && date2!=''
+            else {
+                $('#promo_err').html('Please provide code dates and discount amount');
+            } // end else
+        }
+
+
+        if (event.target.id == 'add_new_promo_code_campaign') {
+            var text = CKEDITOR.instances.campaign_text.getData();
+            var title = $('#campaign_title').val();
+            var program = $('#camp_program').val();
+            var type = $("input:radio[name ='discount']:checked").val();
+            var amount = $('#amount').val();
+            var date1 = $('#promo_date1').val();
+            var date2 = $('#promo_date2').val();
+            var total = $('#code_total').val();
+            var users = $('#users').val();
+            var camp = {text: text, program: program, users: users, type: type, amount: amount, date1: date1, date2: date2, total: total, title: title};
+            if (text != '' && title != '') {
+                if (confirm('Create new promo code campaign?')) {
+                    $('#campaign_err').html('');
+                    var url = "/lms/custom/codes/add_promo_codes_for_send.php";
+                    $.post(url, {camp: JSON.stringify(camp)}).done(function () {
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        get_promotion_codes_page();
+                    });
+                } // end if confirm
+            } // end if text!=''
+            else {
+                $('#campaign_err').html('Please provide message title and text');
+            }
+        }
+
         if (event.target.id == 'add_new_codes') {
-            var program = $('#promo_program').val();
+            var program = $('#camp_program').val();
             var type = $("input:radio[name ='discount']:checked").val();
             var amount = $('#amount').val();
             var date1 = $('#promo_date1').val();
@@ -6108,15 +6199,15 @@ $(document).ready(function () {
             var users;
             if (program == '') {
                 var users = 'n/a';
-                var code = {program: program, type: type, amount: amount, date1: date1, date2: date2, total: total, users: users};
+                var code = {program: program, type: type, amount: amount, date1: date1, date2: date2, total: total, users: users, campid: 0};
             } // end if program == ''
             else {
                 var users = [];
                 $('input[type=checkbox]:checked').each(function () {
-                    users.push($(this).data('userid'));
+                    users.push($(this).val());
                 });
                 var userslist = users.toString();
-                var code = {program: program, type: type, amount: amount, date1: date1, date2: date2, total: total, users: userslist};
+                var code = {program: program, type: type, amount: amount, date1: date1, date2: date2, total: total, users: userslist, campid: 0};
             } // end else
             if (amount > 0 && date1 != '' && date2 != '') {
                 $('#promo_err').html('');

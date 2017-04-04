@@ -64,9 +64,12 @@ Class Codes extends Util {
             $type = $row['type'];
             $amount = $row['amount'];
             $code = $row['code'];
+            $date1 = date('m-d-Y', $row['date1']);
+            $date2 = date('m-d-Y', $row['date2']);
         }
+        $period = $date1 . "<br>" . $date2;
         $prefix = ($type == 'amount') ? 'Discount: $' . $amount . ' off' : 'Discount: ' . $amount . ' %';
-        $list.=$code . "<br>" . $prefix;
+        $list.=$code . "<br>" . $prefix . "<br>" . $period;
         return $list;
     }
 
@@ -219,12 +222,51 @@ Class Codes extends Util {
 
     function get_code_numbers_dropdown() {
         $list = "";
-        $list.="<select id='code_total'>";
+        $list.="<select id='code_total' style='width:55px;'>";
         $list.="<option value='1' slelected>1</option>";
         for ($i = 2; $i <= 100; $i++) {
             $list.="<option value='$i'>$i</option>";
         }
         $list.="</select>";
+        return $list;
+    }
+
+    function get_add_campaign_dialog($userslist, $program) {
+        $list = "";
+        $list.="<div id='myModal' class='modal fade' style='width:975px;height:575px;left:35%;'>
+        <div class='modal-dialog'>
+            <div class='modal-content' style='min-height:575px;'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Add New Campaign</h4>
+                </div>
+                <div class='modal-body' style='height:970px;min-height:575px;'>
+                
+                <input type='hidden' id='users' value='$userslist'>
+                <input type='hidden' id='program' value='$program'>    
+                    
+                <div class='container-fluid' style='text-align:center;'>
+                <span class='span6' ><input type='text' id='campaign_title' style='width:860px' placeholder='Title'></span>
+                </div>
+                
+                <div class='container-fluid' style='text-align:center;'>
+                <textarea id='campaign_text' rows='3' style='width:475px;'></textarea>
+                <script>
+                CKEDITOR.replace('campaign_text');
+                </script>
+                </div>
+               
+                <div class='container-fluid' style='text-align:center;'>
+                 <span class='span6' id='campaign_err'></span>
+                </div>
+                
+                <div class='row-fliud'>
+                <span style='padding-left:15px;'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                <span><button type='button' class='btn btn-primary' id='add_new_promo_code_campaign'>OK</button></span>
+                </div>
+             </div>
+        </div>
+    </div>";
+
         return $list;
     }
 
@@ -241,25 +283,41 @@ Class Codes extends Util {
         $list.="</div>";
 
         // ******************* Toolbar *******************
+
         $list.="<div class='row-fluid' style='display:block;' id='course_promotions'>";
-        $list.="<span class='span3'><input type='text' id='promo_program' style='width:200px' placeholder='All Programs'></span>";
+        //$list.="<span class='span3'><input type='text' id='promo_program' style='width:200px' placeholder='All Programs'></span>";
         $list.="<span class='span1'><input type='text' id='promo_date1' style='width:45px' placeholder='Date1'></span>";
         $list.="<span class='span1'><input type='text' id='promo_date2' style='width:45px' placeholder='Date2'></span>";
-        $list.="<span class='span3'>Discount: &nbsp;";
-        $list.="<input type='radio' name='discount' value='amount' checked>$ &nbsp;&nbsp; <input type='radio' name='discount' value='percent'>% &nbsp;";
-        $list.="<input type='text' id='amount' style='width:50px;'></span>";
-        $list.="<span class='span1'>$total</span>";
-        $list.="<span class='span1'><button id='add_new_codes'>Add</button></span>";
+        $list.="<span class='span2' style='text-align:left;'>Discount: &nbsp;";
+        $list.="<input type='radio' name='discount' value='amount' checked>$ &nbsp;<input type='radio' name='discount' value='percent'>% </span>";
+        $list.="<span class='span2'><input type='text' id='amount' style='width:50px;'>&nbsp;&nbsp; $total</span>";
+        $list.="<span class='span6'>When creating message please do not forget to include {code} snipplet</span>";
+        //$list.="<span class='span1'><button id='add_new_codes'>Add</button></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='font-weight:bold;'>";
+        $list.="<span class='span2'><input type='text' id='camp_program' style='width:125px' placeholder='Program'></span>";
+        $list.="<span class='span2'><input type='text' id='camp_state' style='width:125px' placeholder='State'></span>";
+        $list.="<span class='span2'><input type='text' id='camp_city' style='width:125px' placeholder='City'></span>";
+        $list.="<span class='span1'><button id='camp_search'>Search</button></span>";
+        $list.="<span class='span1' style='padding-left:15px;'><button id='clear_code_search'>Clear</button></span>";
+        //$list.="<span class='span1' style='padding-left:18px;'><button id='add_new_codes'>Add</button></span>";
+        $list.="<span class='span1' style='padding-left:18px;'><button id='send_new_codes'>Send</button></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
-        $list.="<span class='span9'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="<span class='span10'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
         $list.="</div>";
 
         $list.="<div class='row-fluid'>";
         $list.="<span class='span9' id='promo_err'></span>";
         $list.="</div>";
 
+        $list.="<div id='camp_users_container'></div>";
+
+        $list.="<div class='container-fluid' style='display:none;text-align:center;' id='ajax_loader'>";
+        $list.="<span class='span9'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
 
         // ******************* Users container *******************
         $list.="<div class='row-fluid'>";
@@ -276,6 +334,65 @@ Class Codes extends Util {
             $id = $row['id'];
         }
         return $id;
+    }
+
+    function add_new_campaign($title, $text) {
+        $date = time();
+        $clear_title = base64_encode($title);
+        $clear_text = base64_encode($text);
+        $query = "insert into mdl_code_campaign "
+                . "(title,content,added) "
+                . "values ('$clear_title','$clear_text','$date') ";
+        $this->db->query($query);
+        $stmt = $this->db->query("SELECT LAST_INSERT_ID()");
+        $lastid_arr = $stmt->fetch(PDO::FETCH_NUM);
+        $campid = $lastid_arr[0];
+        return $campid;
+    }
+
+    function add_promo_codes_for_send($c) {
+        $courseid = $this->get_program_id($c->program);
+        if ($courseid > 0) {
+            $users = explode(',', $c->users);
+            if (count($users) > 0) {
+                $campid = $this->add_new_campaign($c->title, $c->text);
+                foreach ($users as $userid) {
+                    if ($userid != 'select_all') {
+                        $date = time();
+                        $d1u = strtotime($c->date1);
+                        $d2u = strtotime($c->date2);
+                        $code = $this->generateRandomString(6);
+                        $query = "insert into mdl_code "
+                                . "(code,"
+                                . "type,"
+                                . "amount,"
+                                . "date1,"
+                                . "date2,"
+                                . "campid,"
+                                . "added) "
+                                . "values ('$code',"
+                                . "'$c->type',"
+                                . "'$c->amount',"
+                                . "'$d1u',"
+                                . "'$d2u',"
+                                . "'$campid',"
+                                . "'$date')";
+                        $this->db->query($query);
+                        $stmt = $this->db->query("SELECT LAST_INSERT_ID()");
+                        $lastid_arr = $stmt->fetch(PDO::FETCH_NUM);
+                        $codeid = $lastid_arr[0];
+
+                        $query = "insert into mdl_code2course "
+                                . "(courseid,"
+                                . "slotid,"
+                                . "userid,"
+                                . "codeid,"
+                                . "added) values ($courseid,'0',$userid,$codeid,'$date')";
+                        $this->db->query($query);
+                    } // end if $userid!='select_all'
+                } // end foreach
+            } // end if count($users)>0
+        } // end if $courseid>0
     }
 
     function generateRandomString($length = 25) {
@@ -305,12 +422,10 @@ Class Codes extends Util {
     function add_promo_codes($c) {
 
         /*
-         *  
           echo "<pre>";
           print_r($c);
           echo "</pre>";
-          //die();
-         * 
+          die();
          */
 
         /*
@@ -340,7 +455,7 @@ Class Codes extends Util {
 
         if ($c->program == '') {
             //echo "Inside when no users selected ...";
-            for ($i = 1; $i <= $c->total; $i++) {
+            for ($i = 1; $i <= $total; $i++) {
                 $code = $this->generateRandomString(6);
                 $courseid = 0;
                 $userid = 0;
@@ -395,7 +510,7 @@ Class Codes extends Util {
             } // end if $users!=''
             else {
                 //echo "Inside when no users selected ...";
-                for ($i = 1; $i <= $c->total; $i++) {
+                for ($i = 1; $i <= $total; $i++) {
                     $code = $this->generateRandomString(6);
                     $userid = 0;
                     $query = "insert into mdl_code "
