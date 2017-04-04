@@ -1624,10 +1624,15 @@ class Mailer {
 
         $message.="<html>";
         $message.="<body>";
-        $message.="<p>Dear $userdata->firstname $userdata->lastname!</p>";
-        $message.="<p>Your certificate has been renewed. You can download it using this one <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>link</a>.</p>";
+        $message.="<p>Dear $userdata->firstname $userdata->lastname,</p>";
+        $message.="<p>Your certificate is now renewed, you can download and print your certificate using this <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>link</a>.</p>";
+        $message.="<p>Note: You have the option to log in to your account to download and print your certificate "
+                . "if the link above does not work. Your email address is your “login user name” and if you don’t "
+                . "remember your password please use the recover password link located on the  log in page to recover "
+                . "your password.</p>";
+        $message.="Please do not reply to this email as it is auto generated and replies are not monitored.";
         $message.="<br>";
-        $message.="<p>Best regards, <br> Medical2 Team.</p>";
+        $message.="<p>Regards, <br> Medical2 Support.</p>";
         $message.="</body>";
         $message.="</html>";
 
@@ -1644,7 +1649,7 @@ class Mailer {
         $mail->setFrom($this->mail_smtp_user, 'Medical2');
 
         $mail->AddAddress($addressA);
-        //$mail->AddAddress($addressC);
+        $mail->AddAddress($addressC);
 
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
         $mail->isHTML(true);
