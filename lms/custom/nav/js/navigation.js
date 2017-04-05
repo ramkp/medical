@@ -6162,6 +6162,35 @@ $(document).ready(function () {
             } // end else
         }
 
+        if (event.target.id == 'send_bulk_email') {
+            var users = [];
+            $('input.students:checkbox:checked').each(function () {
+                users.push($(this).val());
+            });
+            var userslist = users.toString();
+            if (userslist != '') {
+                $('#sch_err').html('');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/schedule/get_send_schedule_email_dialog.php";
+                            var request = {userslist: userslist};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // end if userslist!=''
+            else {
+                $('#sch_err').html('Please select users before send email');
+            } // end else
+
+        }
 
         if (event.target.id == 'add_new_promo_code_campaign') {
             var text = CKEDITOR.instances.campaign_text.getData();
@@ -6187,6 +6216,26 @@ $(document).ready(function () {
             else {
                 $('#campaign_err').html('Please provide message title and text');
             }
+        }
+
+        if (event.target.id == 'send_schedule_bulk_email') {
+            var text = CKEDITOR.instances.campaign_text.getData();
+            var title = $('#campaign_title').val();
+            var users = $('#users').val();
+            if (text != '' && title != '') {
+                $('#campaign_err').html('');
+                var msg = {title: title, users: users, text: text};
+                var url = "/lms/custom/schedule/send_schedule_bulk_email.php";
+                //$('#message_wait').show();
+                $.post(url, {msg: JSON.stringify(msg)}).done(function (data) {
+                    console.log(data);
+                    //$('#message_wait').hide();
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                });
+            } // end if text!='' && title!=''
+            else {
+                $('#campaign_err').html('Please provide message subject and text');
+            } // end else
         }
 
         if (event.target.id == 'add_new_codes') {

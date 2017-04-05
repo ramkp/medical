@@ -769,7 +769,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1685,6 +1685,32 @@ class Mailer {
         $mail->isHTML(true);
         $mail->Subject = 'Medical2 - Workshop students list';
         $mail->Body = $message;
+        if (!$mail->send()) {
+            return false;
+        } // end if !$mail->send()
+        else {
+            return true;
+        }
+    }
+
+    function send_schedule_bulk_email($item) {
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        $mail->isHTML(true);
+        $mail->Subject = $item->title;
+        $mail->Body = $item->text;
+        $email = $item->email;
+        $addrA = 'sirromas@gmail.com';
+        $mail->AddAddress($email);
+        $mail->addCC($addrA);
         if (!$mail->send()) {
             return false;
         } // end if !$mail->send()

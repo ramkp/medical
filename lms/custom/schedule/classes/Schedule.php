@@ -317,6 +317,7 @@ class Schedule extends Util {
             $list.="<span class='span2'><a href='#' id='labels' onClick='return false;'>Print labels</a></span>";
             $list.="<span class='span2'><a href='#' id='send' onClick='return false;'>Send certificates</a></span>";
             $list.="<span class='span2'><a href='#' id='add_students' onClick='return false;'>Add students</a></span>";
+            $list.="<span class='span2'><a href='#' id='send_bulk_email' onClick='return false;'>Send email</a></span>";
             $list.="</div>";
             $list.= "<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span12' id='sch_err' style='color:red;'></span>";
@@ -1411,6 +1412,64 @@ class Schedule extends Util {
                 . "set appointmentnote='$item->notes' "
                 . "where id=$item->id";
         $this->db->query($query);
+    }
+
+    function get_send_schedule_email_dialog($userslist) {
+        $list = "";
+        $list.="<div id='myModal' class='modal fade' style='width:975px;height:575px;left:35%;'>
+        <div class='modal-dialog'>
+            <div class='modal-content' style='min-height:575px;'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Send Email</h4>
+                </div>
+                <div class='modal-body' style='height:970px;min-height:575px;'>
+                
+                <input type='hidden' id='users' value='$userslist'>
+                    
+                <div class='container-fluid' style='text-align:center;'>
+                <span class='span6' ><input type='text' id='campaign_title' style='width:860px' placeholder='Title'></span>
+                </div>
+                
+                <div class='container-fluid' style='text-align:center;'>
+                <textarea id='campaign_text' rows='3' style='width:475px;'></textarea>
+                <script>
+                CKEDITOR.replace('campaign_text');
+                </script>
+                </div>
+               
+                <div class='container-fluid' style='text-align:center;'>
+                 <span class='span6' id='campaign_err'></span>
+                </div>
+                
+                <div class='container-fluid' style='text-align:center;display:none;' id='message_wait'>
+                <span class='span6' ><img src='https://medical2.com/assets/img/ajax.gif' /></span>
+                </div>
+                
+                <div class='row-fliud'>
+                <span style='padding-left:15px;'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                <span><button type='button' class='btn btn-primary' id='send_schedule_bulk_email'>OK</button></span>
+                </div>
+             </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function send_schedule_bulk_email($msg) {
+        $mailer = new Mailer();
+        $users_arr = explode(',', $msg->users);
+        if (count($users_arr) > 0) {
+            foreach ($users_arr as $userid) {
+                $userdata = $this->get_user_address_data($userid);
+                $email = $userdata->email;
+                $item = new stdClass();
+                $item->title = $msg->title;
+                $item->text = $msg->text;
+                $item->email = $email;
+                $mailer->send_schedule_bulk_email($item);
+            } // end foreach
+        } // end if count($users_arr)>0
     }
 
 }
