@@ -2107,8 +2107,8 @@ class Students {
         $addressB = 'info@medical2.com';
 
         $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
-        //$mail->addAddress($email);
-        $mail->addAddress($addressA);
+        $mail->addAddress($email);
+        //$mail->addAddress($addressA);
         //$mail->addAddress($addressB);
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
 
@@ -2122,7 +2122,7 @@ class Students {
             echo 'Mailer Error: ' . $mail->ErrorInfo . "\n";
         } // end if !$mail->send()        
         else {
-            echo "Message has been sent to ' . $addressA \n";
+            echo "Message has been sent to ' . $email \n";
         }
     }
 
