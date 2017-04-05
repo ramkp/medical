@@ -301,7 +301,7 @@ Class Codes extends Util {
         $list.="<span class='span2'><input type='text' id='camp_city' style='width:125px' placeholder='City'></span>";
         $list.="<span class='span1'><button id='camp_search'>Search</button></span>";
         $list.="<span class='span1' style='padding-left:15px;'><button id='clear_code_search'>Clear</button></span>";
-        //$list.="<span class='span1' style='padding-left:18px;'><button id='add_new_codes'>Add</button></span>";
+        $list.="<span class='span1' style='padding-left:18px;'><button id='add_new_codes'>Add</button></span>";
         $list.="<span class='span1' style='padding-left:18px;'><button id='send_new_codes'>Send</button></span>";
         $list.="</div>";
 
@@ -454,87 +454,32 @@ Class Codes extends Util {
         $total = $c->total;
 
         if ($c->program == '') {
-            //echo "Inside when no users selected ...";
-            for ($i = 1; $i <= $total; $i++) {
-                $code = $this->generateRandomString(6);
-                $courseid = 0;
-                $userid = 0;
-                $query = "insert into mdl_code "
-                        . "(code, type, amount, "
-                        . "date1,"
-                        . "date2,"
-                        . "added) "
-                        . "values ('$code','$c->type', '$c->amount','$d1u','$d2u', '$date')";
-                $this->db->query($query);
-                $stmt = $this->db->query("SELECT LAST_INSERT_ID()");
-                $lastid_arr = $stmt->fetch(PDO::FETCH_NUM);
-                $codeid = $lastid_arr[0];
-                $query = "insert into mdl_code2course "
-                        . "(courseid,"
-                        . "slotid,"
-                        . "userid,"
-                        . "codeid,"
-                        . "added) values ($courseid,'0',$userid,$codeid,'$date')";
-                $this->db->query($query);
-            } // end for
-        } // end if $c->program==''
+            $courseid = 0;
+        } // end if
         else {
-            //echo "Inside when program selected ...";
             $courseid = $this->get_program_id($c->program);
-            $users = $c->users;
-            if ($users != '') {
-                //echo "Inside when users selected ....";
-                $users_arr = explode(',', $users);
-                foreach ($users_arr as $userid) {
-                    $code = $this->generateRandomString(6);
-                    $query = "insert into mdl_code "
-                            . "(code, type, amount, "
-                            . "date1,"
-                            . "date2,"
-                            . "added) "
-                            . "values ('$code','$c->type', '$c->amount','$d1u','$d2u', '$date')";
-                    //echo "Query: ".$query."<br>";
-                    $this->db->query($query);
-                    $stmt = $this->db->query("SELECT LAST_INSERT_ID()");
-                    $lastid_arr = $stmt->fetch(PDO::FETCH_NUM);
-                    $codeid = $lastid_arr[0];
-                    $query = "insert into mdl_code2course "
-                            . "(courseid,"
-                            . "slotid,"
-                            . "userid,"
-                            . "codeid,"
-                            . "added) values ($courseid,'0',$userid,$codeid,'$date')";
-                    //echo "Query: ".$query."<br>";
-                    $this->db->query($query);
-                } // end foreach
-            } // end if $users!=''
-            else {
-                //echo "Inside when no users selected ...";
-                for ($i = 1; $i <= $total; $i++) {
-                    $code = $this->generateRandomString(6);
-                    $userid = 0;
-                    $query = "insert into mdl_code "
-                            . "(code, type, amount, "
-                            . "date1,"
-                            . "date2,"
-                            . "added) "
-                            . "values ('$code','$c->type', '$c->amount','$d1u','$d2u', '$date')";
-                    //echo "Query: ".$query."<br>";
-                    $this->db->query($query);
-                    $stmt = $this->db->query("SELECT LAST_INSERT_ID()");
-                    $lastid_arr = $stmt->fetch(PDO::FETCH_NUM);
-                    $codeid = $lastid_arr[0];
-                    $query = "insert into mdl_code2course "
-                            . "(courseid,"
-                            . "slotid,"
-                            . "userid,"
-                            . "codeid,"
-                            . "added) values ($courseid,'0',$userid,$codeid,'$date')";
-                    //echo "Query: ".$query."<br>";
-                    $this->db->query($query);
-                } // end for
-            } // end else when no users selected
-        } // end else when name is not empty
+        }
+        $userid = 0;
+        for ($i = 1; $i <= $total; $i++) {
+            $code = $this->generateRandomString(6);
+            $query = "insert into mdl_code "
+                    . "(code, type, amount, "
+                    . "date1,"
+                    . "date2,"
+                    . "added) "
+                    . "values ('$code','$c->type', '$c->amount','$d1u','$d2u', '$date')";
+            $this->db->query($query);
+            $stmt = $this->db->query("SELECT LAST_INSERT_ID()");
+            $lastid_arr = $stmt->fetch(PDO::FETCH_NUM);
+            $codeid = $lastid_arr[0];
+            $query = "insert into mdl_code2course "
+                    . "(courseid,"
+                    . "slotid,"
+                    . "userid,"
+                    . "codeid,"
+                    . "added) values ($courseid,'0',$userid,$codeid,'$date')";
+            $this->db->query($query);
+        } // end for
     }
 
     function get_user_details($id) {
@@ -596,39 +541,37 @@ Class Codes extends Util {
             $status = $this->verify_used_code($code);
         } // end if $used
         else {
-            $now = time();
             $query = "select * from mdl_code "
                     . "where code='$code' "
-                    . "and used=0 and $now between date1 and date2";
+                    . "and used=0";
             $num = $this->db->numrows($query);
-            //echo "Num: " . $num . "<br>";
             if ($num > 0) {
-                $result = $this->db->query($query);
-                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $id = $row['id'];
-                } // end while
-                $codecourseid = $this->get_code_courseid($id);
+                $now = time();
+                $codedata = $this->get_code_details($code);
+                $date1 = $codedata->date1;
+                $date2 = $codedata->date2 + 86400; // we add date ahead ...
+                $codecourseid = $this->get_code_courseid($codedata->id);
                 if ($codecourseid == 0) {
                     $status = 1;
                 } // end if $codecourseid==0
                 else {
-                    $query = "select * from mdl_code2course "
-                            . "where courseid=$courseid and codeid=$id";
-                    //echo "Query: " . $query . "<br>";
-                    $coursenum = $this->db->numrows($query);
-                    $status = ($coursenum > 0) ? 1 : 0;
-                }
+                    if ($now >= $date1 and $now <= $date2) {
+                        $status = 1;
+                    } // end if $now >= $date1 and $now <= $date2
+                    else {
+                        $status = 0;
+                    } // end else
+                } // end else
             } // end if $num>0
             else {
                 $status = 0;
-            }
+            } // end else
         } // end else
         return $status;
     }
 
     function get_code_details($code) {
         $query = "select * from mdl_code where code='$code'";
-        //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $item = new stdClass();
@@ -640,9 +583,6 @@ Class Codes extends Util {
     }
 
     function update_registration_code($c) {
-        $newprice = 0;
-        $code = trim($c->code);
-        $status = $this->is_code_exists($c->courseid, $code);
 
         /*
           echo "<pre>";
@@ -650,6 +590,10 @@ Class Codes extends Util {
           echo "</pre>";
          */
 
+        $newprice = 0;
+        $code = trim($c->code);
+        $status = $this->is_code_exists($c->courseid, $code);
+        //echo "Status: " . $status . "<br>";
         if ($status > 0) {
             $codedata = $this->get_code_details($code);
             if ($codedata->type == 'amount') {
@@ -659,7 +603,7 @@ Class Codes extends Util {
                 $newprice = (int) $c->amount - (int) ($c->amount * $codedata->amount) / 100;
             } // end else
         } // end if $status>0
-        //echo "New price: ".$newprice;
+        //echo "New price: " . $newprice;
 
         return round($newprice);
     }

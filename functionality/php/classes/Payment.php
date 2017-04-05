@@ -1131,7 +1131,7 @@ class Payment {
             } // end if $apply_delay_fee
             else {
                 if ($group_data == '') {
-                    $list.="<span class='span2'>" . $cost_block . $discountbox . "</span>";
+                    $list.="<span class='span2'>" . $cost_block . "</span>";
                     // This is personal course cost
                     $list.= "<input type='hidden' value='" . $grand_total . "' id='payment_sum' />";
                 } // end if $group_data == ''
