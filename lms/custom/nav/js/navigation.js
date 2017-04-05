@@ -4952,7 +4952,7 @@ $(document).ready(function () {
             $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
                 var fullcert = $.parseJSON(data);
                 $("[data-dismiss=modal]").trigger({type: "click"});
-                var url = "http://medical2.com/index.php/payments/index/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
+                var url = "http://medical2.com/index.php/payments/payment/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
                 var oWindow = window.open(url, "renew");
             });
 
