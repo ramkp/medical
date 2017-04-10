@@ -437,6 +437,7 @@ class Register {
         $list.="</div>
             <div class='modal-footer' style='text-align:center;'>
                 <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>OK</button></span>
+                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
             </div>
         </div>
     </div>
