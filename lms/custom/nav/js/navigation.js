@@ -5534,7 +5534,7 @@ $(document).ready(function () {
             var slotid = $('#register_cities').val();
             var firstname = $('#first_name').val();
             var lastname = $('#last_name').val();
-            var addr = $('#addr').val();
+            var addr = $('#r_addr').val();
             var city = $('#city').val();
             var state = $('#state').val();
             var country = $('#country').val();
@@ -5631,6 +5631,7 @@ $(document).ready(function () {
                 type: type
             };
             //console.log('User object: ' + JSON.stringify(user));
+            var url = "/lms/custom/register/add_register_cash_payment.php";
             $.post(url, {user: JSON.stringify(user)}).done(function (data) {
                 $('#register_cash_error').html("<span style='color:black'>" + data + "</span>");
             });
