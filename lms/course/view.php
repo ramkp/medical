@@ -279,8 +279,8 @@ if ($roleid == 5 && $USER->username != 'manager' && $USER->username != 'admin') 
 $roleid = $ds->get_user_role($USER->id);
 $category = $ds->get_course_category($COURSE->id);
 $completed = $ds->is_course_completed($COURSE->id, $USER->id);
-$has_application=$ds->is_user_has_survey_applicagtion($USER->id);
-if ($roleid == 5 && $category == 2 && $completed > 0 && $has_application>0) {
+$has_application = $ds->is_user_has_survey_applicagtion($USER->id);
+if ($roleid == 5 && $category == 2 && $completed > 0 && $has_application > 0) {
     $status = $ds->is_ws_survey_was_completed($COURSE->id, $USER->id);
     if ($status == 0) {
         $survey = $ds->get_workshop_survey($COURSE->id, $USER->id);
@@ -304,7 +304,24 @@ if ($instructor_status) {
         echo $attendance;
     }
 } // end if $status
+
+/* * **********************************************************
+  Code related to skype for business meeting
+
+ * ********************************************************** */
+
+if ($COURSE->id == 71) {
+
+    // We do everything inside test course
+    
+    echo "<div class='row-fluid'>";
+    echo "<span class='span12'>This is meeting block ...</span>";
+    echo "</div>";
+    
+} // end if $COURSE->id==71
+
 // ************************************************************
+
 // Course wrapper start.
 echo html_writer::start_tag('div', array('class' => 'course-content'));
 
@@ -352,7 +369,7 @@ include_course_ajax($course, $modnamesused);
             $.post(labelurl, {id: id}).done(function (url) {
 
                 var containerid = '#module-' + id + '> div > div > div:nth-child(2) > div > div > div > p > span';
-                console.log('Container id: '+containerid);
+                console.log('Container id: ' + containerid);
                 var container = $(containerid);
                 container.empty();
                 container.bind("contextmenu", function (e) {

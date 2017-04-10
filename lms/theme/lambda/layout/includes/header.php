@@ -29,7 +29,12 @@ echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . 
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/jquery.iframe-transport.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/uploader/js/jquery.fileupload.js'></script>";
 echo '<script src="//cdn.ckeditor.com/4.5.11/full/ckeditor.js"></script>';
-//echo "<script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>";
+
+// ******************* Skype meeting block ******************* //
+echo "<script type='text/javascript' src='https://swx.cdn.skype.com/shared/v/1.2.15/SkypeBootstrap.min.js'></script>";
+echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/nav/js/skype.js'></script>";
+
+
 echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
 echo "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.js'></script>";
 echo "<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.js'></script>";
@@ -37,6 +42,7 @@ echo "<script type='text/javascript' src='//releases.flowplayer.org/7.0.1/commer
 echo "<script src='https://releases.flowplayer.org/hlsjs/flowplayer.hlsjs.min.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/jquery.simplePagination.js'></script>";
 echo "<script type = 'text/javascript' src = 'https://www.gstatic.com/charts/loader.js' ></script>";
+
 echo "<script type = 'text/javascript'>";
 echo "google.charts.load('current', {'packages': ['corechart']})";
 echo "</script>";
