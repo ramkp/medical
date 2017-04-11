@@ -207,7 +207,7 @@ class Register extends Util {
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>Mailing Address*</span>";
-        $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
+        $list.="<span class='span2'><input type='text' id='r_addr' name='r_addr' ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
