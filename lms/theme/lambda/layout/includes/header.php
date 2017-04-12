@@ -32,10 +32,10 @@ echo '<script src="//cdn.ckeditor.com/4.5.11/full/ckeditor.js"></script>';
 
 // ******************* Skype meeting block ******************* //
 echo "<script type='text/javascript' src='https://swx.cdn.skype.com/shared/v/1.2.15/SkypeBootstrap.min.js'></script>";
-echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/nav/js/skype.js'></script>";
+//echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/nav/js/skype.js'></script>";
 
 
-echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
+//echo "<script src='//code.jquery.com/ui/1.11.4/jquery-ui.js'></script>";
 echo "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.js'></script>";
 echo "<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.js'></script>";
 echo "<script type='text/javascript' src='//releases.flowplayer.org/7.0.1/commercial/flowplayer.min.js'>";

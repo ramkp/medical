@@ -1579,9 +1579,9 @@ class Dashboard extends Util {
         } // end if $num > 0
         else {
             $courses = $this->get_user_courses($id);
-            if (count($courses)>0) {
-                foreach($courses as $courseid) {
-                    $coursename=$this->get_course_name($courseid);
+            if (count($courses) > 0) {
+                foreach ($courses as $courseid) {
+                    $coursename = $this->get_course_name($courseid);
                     $list.="<div class='container-fluid' style=''>";
                     $list.="<span class='span9'>$coursename</span>";
                     $list.="</div>";
@@ -2853,6 +2853,239 @@ class Dashboard extends Util {
             echo "<br>----------------------------------------------------<br>";
         } // end foreach
         echo "Total non-completed users: $i";
+    }
+
+    // ***************** Skype Meeting Integration ************************
+
+    function get_meeting_block($courseid, $roleid) {
+        $list = "";
+        $items = array();
+        $now = time();
+        $query = "select * from mdl_meeting where courseid=$courseid "
+                . "and mdate>$now order by mdate";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $item = new stdClass();
+                foreach ($row as $key => $value) {
+                    $item->$key = $value;
+                } // end foreach
+                $items[] = $item;
+            } // end while
+        } // end if $num>0
+        $list.=$this->create_meetings_block($items);
+        return $list;
+    }
+
+    function get_meeting_toolbar() {
+        $list = "";
+        $courseid = $this->course->id;
+        $list.="<div class='row-fluid' style='padding-left:12px;'>";
+        $list.="<span class='span4'><button style='width:175px;' id='meeting_add' data-courseid='$courseid'>Add Webinar</button></span>";
+        $list.="<span class='span4'><button style='width:175px;' id='meeting_start' data-courseid='$courseid'>Start Meeting</button></span>";
+        $list.="</div>";
+        return $list;
+    }
+
+    function create_meetings_block($items) {
+        $list = "";
+        $userid = $this->user->id;
+        $courseid = $this->course->id;
+        $contextid = $this->get_course_context($courseid);
+        $roleid = $this->get_user_role($userid, $contextid);
+        if ($roleid == '' || $roleid < 5) {
+            $list.=$this->get_meeting_toolbar();
+        } // end if
+
+        if (count($items) > 0) {
+            $list.="<div class='row-fluid' style='padding-left:12px;font-weight:bold;'>";
+            $list.="<span class='span4'>Title</span>";
+            $list.="<span class='span3'>Date</span>";
+            $list.="<span class='span2' style='text-align:left;'>Ops</span>";
+            $list.="</div>";
+            foreach ($items as $item) {
+                $date = date('m-d-Y', $item->mdate) . " " . $item->mh . ":" . $item->mm;
+                $list.="<div class='row-fluid' style='padding-left:12px;'>";
+                $list.="<span class='span4'>$item->title</span>";
+                $list.="<span class='span3'>$date</span>";
+                if ($roleid == '' || $roleid < 5) {
+                    $list.="<span class='span1'><a href='#' onClick='return false;' id='wedit_$item->id'>Edit</a></span>";
+                }
+                $list.="<span class='span1'><a href='#' onClick='return false;'>Join</a></span>";
+                $list.="</div>";
+                $list.="<div class='row-fluid' style='padding-left:12px;'>";
+                if ($roleid == '' || $roleid < 5) {
+                    $list.="<span class='span9'><hr/></span>";
+                } // end if
+                else {
+                    $list.="<span class='span8'><hr/></span>";
+                }
+                $list.="</div>";
+            } // end foreach
+        } // end if count($items)>0 
+        else {
+            $list.="<div clas='row-fluid' style='padding-left:12px;'>";
+            $list.="<span class='span8'>There are no any meetings/webinars scheduled</span>";
+            $list.="</div><br><br>";
+        } // end else
+
+        return $list;
+    }
+
+    function get_webinar_hours_block($selected) {
+        $list = "";
+        $list.="<select id='wh'>";
+        for ($i = 0; $i <= 23; $i++) {
+            $index = ($i < 10) ? '0' . $i : $i;
+            if ($index == $selected) {
+                $list.="<option value='$index' selected>$index</option>";
+            } // end if
+            else {
+                $list.="<option value='$index'>$index</option>";
+            }
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_webinar_minutes_block($selected) {
+        $list = "";
+        $list.="<select id='wm'>";
+        for ($i = 0; $i <= 55; $i+=5) {
+            $index = ($i < 10) ? '0' . $i : $i;
+            if ($index == $selected) {
+                $list.="<option value='$index' selected>$index</option>";
+            } // end if
+            else {
+                $list.="<option value='$index'>$index</option>";
+            }
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_add_webinar($courseid) {
+        $list = "";
+        $wh = $this->get_webinar_hours_block();
+        $wm = $this->get_webinar_minutes_block();
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Add webinar</h4>
+                </div>
+                <div class='modal-body' style='text-align:center;'>
+                <input type='hidden' id='meeting_courseid' value='$courseid'>
+                    
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span1'>Title:</span>
+                <span class='span2'><input type='text' id='webinar_title'></span>
+                </div>
+                
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span1'>Date</span>
+                 <span class='span2'><input type='text' id='webinar_date'></span>
+                 </div>
+                 
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span1'>Time</span>
+                 <span class='span2'>$wh &nbsp; $wm</span>
+                 </div>
+
+                <div class='container-fluid' style=''>
+                <span class='span3' style='color:red;' id='meeting_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='add_new_webinar_btn'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function get_edit_webinar_dialog($id) {
+        $list = "";
+        $query = "select * from mdl_meeting where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $item = new stdClass();
+            foreach ($row as $key => $value) {
+                $item->$key = $value;
+            } // end foreach
+        } // end while
+        $wh = $this->get_webinar_hours_block($item->mh);
+        $wm = $this->get_webinar_minutes_block($item->mm);
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Add webinar</h4>
+                </div>
+                <div class='modal-body' style='text-align:center;'>
+                <input type='hidden' id='meeting_courseid' value='$item->courseid'>
+                <input type='hidden' id='meeting_id' value='$id'>    
+                    
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span1'>Title:</span>
+                <span class='span2'><input type='text' id='webinar_title' value='$item->title'></span>
+                </div>
+                
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span1'>Date</span>
+                 <span class='span2'><input type='text' id='webinar_date' value='" . date('m/d/y', $item->mdate) . "'></span>
+                 </div>
+                 
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span1'>Time</span>
+                 <span class='span2'>$wh &nbsp; $wm</span>
+                 </div>
+
+                <div class='container-fluid' style=''>
+                <span class='span3' style='color:red;' id='meeting_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='update_webinar_btn'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function add_new_webinar($w) {
+        $date = strtotime($w->date);
+        $query = "insert into mdl_meeting "
+                . "(courseid,"
+                . "title,"
+                . "mdate,"
+                . "mh,"
+                . "mm) "
+                . "values ($w->courseid,"
+                . "'$w->title',"
+                . "'$date',"
+                . "'$w->hour',"
+                . "'$w->min')";
+        $this->db->query($query);
+    }
+
+    function update_webinar($w) {
+        $date = strtotime($w->date);
+        $query = "update mdl_meeting "
+                . "set courseid=$w->courseid, "
+                . "title='$w->title', "
+                . "mdate='$date', "
+                . "mh='$w->hour', "
+                . "mm='$w->min' where id='$w->id'";
+        echo "Query: " . $query . "<br>";
+        $this->db->query($query);
     }
 
 }

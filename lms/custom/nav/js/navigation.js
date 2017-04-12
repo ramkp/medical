@@ -6297,6 +6297,99 @@ $(document).ready(function () {
             } // end if confirm
         }
 
+        if (event.target.id == 'meeting_add') {
+            var courseid = $('#meeting_add').data('courseid');
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "/lms/custom/my/get_add_webinar_dialog.php";
+                        var request = {courseid: courseid};
+                        $.post(url, request).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                            $('#webinar_date').datepicker();
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
+        }
+
+        if (event.target.id == 'meeting_start') {
+            var courseid = $('#meeting_start').data('courseid');
+
+        }
+
+        if (event.target.id == 'add_new_webinar_btn') {
+            var title = $('#webinar_title').val();
+            var date = $('#webinar_date').val();
+            var hour = $('#wh').val();
+            var min = $('#wm').val();
+            var courseid = $('#meeting_courseid').val();
+            if (title != '' && date != '') {
+                $('#meeting_err').html('');
+                if (confirm('Add new webinar?')) {
+                    var w = {courseid: courseid, title: title, date: date, hour: hour, min: min};
+                    var url = "/lms/custom/my/add_new_webinar.php";
+                    $.post(url, {w: JSON.stringify(w)}).done(function (data) {
+                        console.log(data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        document.location.reload();
+                    });
+                } // end if confirm
+            } // end if title!='' && date!=''
+            else {
+                $('#meeting_err').html('Please provide webinar date and title');
+            } // end else
+        }
+
+
+        if (event.target.id == 'update_webinar_btn') {
+            var id = $('#meeting_id').val();
+            var title = $('#webinar_title').val();
+            var date = $('#webinar_date').val();
+            var hour = $('#wh').val();
+            var min = $('#wm').val();
+            var courseid = $('#meeting_courseid').val();
+            if (title != '' && date != '') {
+                $('#meeting_err').html('');
+                if (confirm('Update current webinar?')) {
+                    var w = {courseid: courseid, title: title, date: date, hour: hour, min: min, id: id};
+                    var url = "/lms/custom/my/update_webinar.php";
+                    $.post(url, {w: JSON.stringify(w)}).done(function (data) {
+                        console.log(data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        document.location.reload();
+                    });
+                } // end if confirm
+            } // end if title!='' && date!=''
+            else {
+                $('#meeting_err').html('Please provide webinar date and title');
+            } // end else
+        }
+
+        if (event.target.id.indexOf("wedit_") >= 0) {
+            var id = event.target.id.replace("wedit_", "");
+            console.log('ID: ' + id);
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "/lms/custom/my/get_edit_webinar_dialog.php";
+                        $.post(url, {id: id}).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                            $('#webinar_date').datepicker();
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
+
+        }
+
+
     }); // end of body click event
 
     $('body').on('typeahead:select', function (event, suggestion) {
@@ -6354,7 +6447,7 @@ $(document).ready(function () {
             } // end if program!=''
         }
 
-    });
+    }); // end of body input blur
 
 
 

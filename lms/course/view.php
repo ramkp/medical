@@ -276,7 +276,6 @@ if ($roleid == 5 && $USER->username != 'manager' && $USER->username != 'admin') 
 }
 
 /* Workshop survey */
-$roleid = $ds->get_user_role($USER->id);
 $category = $ds->get_course_category($COURSE->id);
 $completed = $ds->is_course_completed($COURSE->id, $USER->id);
 $has_application = $ds->is_user_has_survey_applicagtion($USER->id);
@@ -291,7 +290,8 @@ if ($roleid == 5 && $category == 2 && $completed > 0 && $has_application > 0) {
 
 
 /* * **********************************************************
-  Code related to instructor's calendar and students attendance
+
+ * Code related to instructor's calendar and students attendance
 
  * ********************************************************** */
 $userid = $cal->user->id;
@@ -313,15 +313,11 @@ if ($instructor_status) {
 if ($COURSE->id == 71) {
 
     // We do everything inside test course
-    
-    echo "<div class='row-fluid'>";
-    echo "<span class='span12'>This is meeting block ...</span>";
-    echo "</div>";
-    
+    $meeting = $ds->get_meeting_block($COURSE->id);
+    echo $meeting;
 } // end if $COURSE->id==71
 
 // ************************************************************
-
 // Course wrapper start.
 echo html_writer::start_tag('div', array('class' => 'course-content'));
 
@@ -400,6 +396,35 @@ include_course_ajax($course, $modnamesused);
              }); // end of each
              */
         }); // end of post
+
+        // ******************* Skype meeting block *******************
+<?php
+if ($COURSE->id == 71) {
+    ?>
+            var client_id = '7061f110-40c4-4336-8945-6441429282ef';
+            var request_url = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=token' +
+                    '&redirect_uri=' + 'https://medical2.com/lms/custom/skype/hangout.php?id=16' +
+                    '&client_id=' + client_id +
+                    '&resource=https://webdir.online.lync.com';
+            // window.open(request_url, "print");
+
+
+            var config = {
+                apiKey: 'a42fcebd-5b43-4b89-a065-74450fb91255', // SDK
+                apiKeyCC: '9c967f6b-a846-4df2-b43d-5167e47d81e1' // SDK+UI
+            };
+
+
+            Skype.initialize({apiKey: config.apiKey}, function (api) {
+
+            }, function (err) {
+                console.log(err);
+                alert('Cannot load the SDK.');
+            });
+    <?php
+} // end if course id=71
+?>
+
 
     }); // end of document ready
 
