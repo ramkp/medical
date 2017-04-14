@@ -541,7 +541,7 @@ class ProcessPayment {
                 $post_order->card_last_four_digits = $card_last_four;
                 $post_order->card_expiration_date = $exp_date;
                 $post_order->original_transaction_id = $trans_id;
-                $this->save_log($tresponse, $post_order);
+                //$this->save_log($tresponse, $post_order);
                 return FALSE;
             }
         } // end if $response != null 
