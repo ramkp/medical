@@ -11,7 +11,10 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/schedule/classes/Schedule.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/register/classes/Register.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates2.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/partial/classes/Partial.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/grades/classes/Grades.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 
@@ -2285,13 +2288,26 @@ class Dashboard extends Util {
                     <h4 class='modal-title'>Renew user certificate</h4>
                 </div>
                 <div class='modal-body' style='text-align:center;'>
+                
                 <input type='hidden' id='id' value='$certificate->id'>
-                    
-                <div class='container-fluid' style='text-align:center;'>
-                <span class='span3'>Renew period:</span>
+                
+                <div class='container-fluid' style='text-align:left;'>
+                
+                 <span class='span1'>
+                 <input type='radio' name='renew_payment_type' class='ptype' value='0' checked>Card
+                 </span>
+                 
+                  <span class='span1'>
+                  <input type='radio' name='renew_payment_type' class='ptype' value='1'>Cash
+                  </span>
+                 
+                  <span class='span2'>
+                  <input type='radio' name='renew_payment_type' class='ptype' value='2'>Cheque
+                  </span>
+              
                 </div>
                 
-                 <div class='container-fluid' style='text-align:center;'>
+                 <div class='container-fluid' style='text-align:left;'>
                  
                  <span class='span1'>
                  <input type='radio' name='period' class='period' value='1' checked>1 Year
@@ -2301,7 +2317,7 @@ class Dashboard extends Util {
                   <input type='radio' name='period' class='period' value='2'>2 Year
                   </span>
                  
-                  <span class='span1'>
+                  <span class='span2'>
                   <input type='radio' name='period' class='period' value='3'>3 Year
                   </span>
                 
@@ -2368,6 +2384,35 @@ class Dashboard extends Util {
         );
 
         return json_encode($outcert);
+    }
+
+    function renew_user_certificate_manager_cash($cert) {
+        $c = json_decode($this->renew_user_certificate_manager($cert));
+        $cert2 = new Certificates2();
+        $date = time();
+        $query = "insert into mdl_partial_payments "
+                . "(userid,"
+                . "courseid,"
+                . "slotid,"
+                . "ptype,"
+                . "psum,"
+                . "pdate) "
+                . "values ($c->userid,"
+                . "$c->courseid,"
+                . "$c->slot,"
+                . "$cert->ptype,"
+                . "'$c->amount',"
+                . "'$date')";
+        $this->db->query($query);
+        $cert2->renew_certificate($c->courseid, $c->userid, $c->period);
+        $userObj = $this->get_user_details($c->userid);
+        $userObj->courseid = $c->courseid;
+        $userObj->userid = $c->userid;
+        $userObj->slotid = $c->slot;
+        $userObj->payment_amount = $c->amount;
+        $userObj->period = $c->period;
+        $mailer = new Mailer();
+        $mailer->send_partial_payment_confirmation2($userObj);
     }
 
     // ******************* Code related to students survey ********************
@@ -2878,13 +2923,42 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function createRandomString($length = 25) {
+        return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
+    }
+
+    function get_start_meeting_button($courseid) {
+        $list = "";
+        $roomid = $this->createRandomString();
+        $userid = $this->user->id;
+        $list.="<form id='start_meeting_$courseid' method='post' target='_blank' action='https://medical2.com/lms/custom/hangouts/meeting.php'>";
+        $list.="<input type='hidden' name='courseid' value='$courseid'>";
+        $list.="<input type='hidden' name='roomid' value='$roomid'>";
+        $list.="<input type='hidden' name='userid' value='$userid'>";
+        $list.="<button style='width:175px;' id='meeting_start' data-courseid='$courseid'>Start Meeting</button>";
+        $list.="</form>";
+        return $list;
+    }
+
     function get_meeting_toolbar() {
         $list = "";
         $courseid = $this->course->id;
+        $meeting_btn = $this->get_start_meeting_button($courseid);
         $list.="<div class='row-fluid' style='padding-left:12px;'>";
         $list.="<span class='span4'><button style='width:175px;' id='meeting_add' data-courseid='$courseid'>Add Webinar</button></span>";
-        $list.="<span class='span4'><button style='width:175px;' id='meeting_start' data-courseid='$courseid'>Start Meeting</button></span>";
+        $list.="<span class='span4'>$meeting_btn</span>";
         $list.="</div>";
+        return $list;
+    }
+
+    function get_join_button($id) {
+        $list = "";
+        $userid = $this->user->id;
+        $list.="<form id='join_webinar_$id' action='https://medical2.com/lms/custom/hangouts/webinar.php' method='post' target='_blank'>";
+        $list.="<input type='hidden' name='webinarid' value='$id'>";
+        $list.="<input type='hidden' name='userid' value='$userid'>";
+        $list.="<a href='#' onClick='return false;' id='wjoin_$id'>Join</a>";
+        $list.="</form>";
         return $list;
     }
 
@@ -2906,13 +2980,14 @@ class Dashboard extends Util {
             $list.="</div>";
             foreach ($items as $item) {
                 $date = date('m-d-Y', $item->mdate) . " " . $item->mh . ":" . $item->mm;
+                $joinbtn = $this->get_join_button($item->id);
                 $list.="<div class='row-fluid' style='padding-left:12px;'>";
                 $list.="<span class='span4'>$item->title</span>";
                 $list.="<span class='span3'>$date</span>";
                 if ($roleid == '' || $roleid < 5) {
                     $list.="<span class='span1'><a href='#' onClick='return false;' id='wedit_$item->id'>Edit</a></span>";
                 }
-                $list.="<span class='span1'><a href='#' onClick='return false;'>Join</a></span>";
+                $list.="<span class='span1'>$joinbtn</span>";
                 $list.="</div>";
                 $list.="<div class='row-fluid' style='padding-left:12px;'>";
                 if ($roleid == '' || $roleid < 5) {

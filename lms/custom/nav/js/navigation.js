@@ -1,6 +1,17 @@
 
 $(document).ready(function () {
 
+    // *************** Skype meeting configs  *******************
+    var client_id = '7061f110-40c4-4336-8945-6441429282ef';
+    var meeting_request_url = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=token' +
+            '&redirect_uri=' + 'https://medical2.com/lms/custom/skype/hangout.php?id=16' +
+            '&client_id=' + client_id +
+            '&resource=https://webdir.online.lync.com';
+    var config = {
+        apiKey: 'a42fcebd-5b43-4b89-a065-74450fb91255', // SDK
+        apiKeyCC: '9c967f6b-a846-4df2-b43d-5167e47d81e1' // SDK+UI
+    };
+
     $('#mpermission').click(function () {
         var url = 'https://medical2.com/lms/admin/roles/manage.php';
         //window.open = url;
@@ -4947,14 +4958,32 @@ $(document).ready(function () {
             console.log('Clicked ... ');
             var id = $('#id').val();
             var period = $("input[name='period']:checked").val();
+            var ptype = $("input[name='renew_payment_type']:checked").val();
             var url = "/lms/custom/my/renew_user_certificate_manager.php";
-            var cert = {id: id, period: period};
+            var cert = {id: id, period: period, ptype: ptype};
+            console.log('Certificate object: ' + JSON.stringify(cert));
+
             $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                console.log('Server response step1: ' + data);
                 var fullcert = $.parseJSON(data);
-                $("[data-dismiss=modal]").trigger({type: "click"});
-                var url = "http://medical2.com/index.php/payments/payment/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
-                var oWindow = window.open(url, "renew");
-            });
+                if (ptype == 0) {
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    var url = "http://medical2.com/index.php/payments/payment/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
+                    var oWindow = window.open(url, "renew");
+                } // end if ptype == 0
+                else {
+                    if (confirm('Renew user certificate?')) {
+                        var url2 = "/lms/custom/my/renew_user_certificate_manager_cash.php";
+                        $.post(url2, {cert: JSON.stringify(cert)}).done(function (data) {
+                            $("[data-dismiss=modal]").trigger({type: "click"});
+                            console.log(data);
+                            document.location.reload();
+                        }); // end of post
+                    } // end if confirm
+                } // end else
+
+            }); // end of post
+
 
         }
 
@@ -6387,6 +6416,19 @@ $(document).ready(function () {
                         console.log('Failed to load bootstrap.min.js');
                     });
 
+        }
+
+        if (event.target.id.indexOf("wjoin_") >= 0) {
+            var id = event.target.id.replace("wjoin_", "");
+            var formid = '#join_webinar_' + id;
+            $(formid).submit();
+        }
+
+        if (event.target.id == 'meeting_start') {
+            var courseid = $('#meeting_add').data('courseid');
+            var formid = '#start_meeting_' + courseid;
+            console.log('Form id: ' + formid);
+            $(formid).submit();
         }
 
 
