@@ -44,6 +44,7 @@ class User extends Util {
 
     function create_users_list($users, $total, $toolbar = true, $search_criteria = null) {
         $list = "";
+        $current_user_id = $this->user->id;
         if ($toolbar == true) {
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span2'>Search</span>";
@@ -74,19 +75,35 @@ class User extends Util {
         if ($total <= $this->limit && $search_criteria == null) {
             $total = $this->get_users_total();
         }
-        $list.="<span class='span8' style=''>Total users found: " . $total . "</span>";
         $list.="</div>";
         foreach ($users as $user) {
-            $list.="<div class='container-fluid'>";
-            $list.="<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'><span class='span2'>$user->firstname</a></span>";
-            $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'>$user->lastname</a></span>";
-            $list.="<span class='span2'>$user->phone1</span>";
-            $list.="<span class='span4'>$user->email</span>";
-            $list.="<span class='span2'>$user->purepwd</span>";
-            $list.="</div>";
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span12'><hr/></span>";
-            $list.="</div>";
+            if ($current_user_id == 2) {
+                $list.="<div class='container-fluid'>";
+                $list.="<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'><span class='span2'>$user->firstname</a></span>";
+                $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'>$user->lastname</a></span>";
+                $list.="<span class='span2'>$user->phone1</span>";
+                $list.="<span class='span4'>$user->email</span>";
+                $list.="<span class='span2'>$user->purepwd</span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span12'><hr/></span>";
+                $list.="</div>";
+            } // end if $current_user_id==2
+            else {
+                if ($user->firstname == 'admin' || $user->email == 'info@medical2.com') {
+                    continue;
+                } // end if $user->firstname!='admin' && $user->email!='info@medical2@.com'
+                $list.="<div class='container-fluid'>";
+                $list.="<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'><span class='span2'>$user->firstname</a></span>";
+                $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'>$user->lastname</a></span>";
+                $list.="<span class='span2'>$user->phone1</span>";
+                $list.="<span class='span4'>$user->email</span>";
+                $list.="<span class='span2'>$user->purepwd</span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span12'><hr/></span>";
+                $list.="</div>";
+            } // end else when current user is not admin
         } // end foreach
         $list.="</div>";
         if ($toolbar == true) {
