@@ -466,6 +466,7 @@ class Dashboard extends Util {
 
     function get_user_card_payments($userid, $courseid) {
         $list = "";
+        $renew_amount = $this->get_renew_fee($courseid);
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid and userid=$userid and refunded=0";
         $num = $this->db->numrows($query);
@@ -475,10 +476,18 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
-                $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                if ($row['psum'] != $renew_amount) {
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                } // end if $row['psum']!=$renew_amount
+                else {
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                } // end else
                 if ($status == 0) {
-                    $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
-                    $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                    $prohibit = $this->get_user_roles($userid);
+                    if ($prohibit == 0) {
+                        $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
+                        $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                    }
                 }
                 $list.="</div>";
             } // end while
@@ -512,6 +521,7 @@ class Dashboard extends Util {
 
     function get_user_partial_payments($userid, $courseid) {
         $list = "";
+        $renew_amount = $this->get_renew_fee($courseid);
         $query = "select * from mdl_partial_payments  "
                 . "where courseid=$courseid and userid=$userid";
         $num = $this->db->numrows($query);
@@ -521,7 +531,12 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
-                $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                if ($row['psum'] != $renew_amount) {
+                    $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                } // end if 
+                else {
+                    $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                } // end else
                 if ($status == 0) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
                     $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Refund</button></span>";
@@ -596,11 +611,11 @@ class Dashboard extends Util {
     function get_user_payments($userid, $courseid) {
         $list = "";
         $card_payments = $this->get_user_card_payments($userid, $courseid);
-        $refund_payments = $this->get_refund_payments($userid, $courseid);
+        //$refund_payments = $this->get_refund_payments($userid, $courseid);
         $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
         $free_payments = $this->get_user_free_payments($userid, $courseid);
-        $list.=$card_payments . $refund_payments . $partial_payments . $free_payments . $invoice_payments;
+        $list.=$card_payments . $partial_payments . $free_payments . $invoice_payments;
         return $list;
     }
 
@@ -1416,23 +1431,27 @@ class Dashboard extends Util {
 
     function get_user_profile_custom_sections($id) {
         $list = "";
+        $current_user_id = $this->user->id;
         $payments = $this->get_user_payments_block($id);
         $workshops = $this->get_user_workshops($id);
         $certficates = $this->get_user_certificates($id);
         $grades = $this->get_user_grades($id);
         $attend = $this->get_student_attendance($id);
         $other = $this->get_other_tab($id);
-        $list.="<ul class='nav nav-tabs'>
-              <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>
-              <li><a data-toggle='tab' href='#menu1'>Courses</a></li>
+
+        if ($current_user_id == 2 || $current_user_id == 234) {
+            $list.="<ul class='nav nav-tabs'>
+                <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>";
+            $list.="<li><a data-toggle='tab' href='#menu1'>Courses</a></li>
               <li><a data-toggle='tab' href='#menu2'>Certificates</a></li>
               <li><a data-toggle='tab' href='#grades'>Grades</a></li>
               <li><a data-toggle='tab' href='#attend'>Attendance</a></li>
-              <li><a data-toggle='tab' href='#menu3'>Other</a></li>  
-              <input type='hidden' id='userid' value='$id'>  
-            </ul>
+              <li><a data-toggle='tab' href='#menu3'>Other</a></li>";
 
-            <div class='tab-content'>
+            $list.="<input type='hidden' id='userid' value='$id'>  
+            </ul>";
+
+            $list.="<div class='tab-content'>
               <div id='home' class='tab-pane fade in active'>
                 <h3>Payments &nbsp;&nbsp;<button id='print_payment'>Print</button></h3>
                 <p>$payments</p>
@@ -1458,6 +1477,20 @@ class Dashboard extends Util {
                 <p>$other</p>
               </div> 
             </div>";
+        } // end if
+        else {
+            $list.="<ul class='nav nav-tabs'>
+                <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>";
+            $list.="<input type='hidden' id='userid' value='$id'>  
+            </ul>";
+
+            $list.="<div class='tab-content'>
+              <div id='home' class='tab-pane fade in active'>
+                <h3>Payments &nbsp;&nbsp;<button id='print_payment'>Print</button></h3>
+                <p>$payments</p>
+              </div>
+             </div>";
+        } // end else
 
         return $list;
     }
@@ -1591,15 +1624,22 @@ class Dashboard extends Util {
             foreach ($courses as $courseid) {
                 $payments = $this->get_user_payments($id, $courseid);
                 $balance = $this->get_user_course_balance($id, $courseid);
+                $refund_payments = $this->get_refund_payments($id, $courseid);
                 if ($payments != '') {
                     $list.="<div class='container-fluid' style=''>";
                     $list.="<span class='span12'>$payments</span>";
                     $list.="</div>";
                     $list.="<div class='container-fluid' style=''>";
+                    $list.="<span class='span6'><hr/></span>";
+                    $list.="</div>";
+                    $list.="<div class='container-fluid' style=''>";
                     $list.="<span class='span12'>$balance</span>";
                     $list.="</div>";
                     $list.="<div class='container-fluid' style=''>";
-                    $list.="<span class='span6'><hr/></span>";
+                    $list.="<span class='span12'>$refund_payments</span>";
+                    $list.="</div>";
+                    $list.="<div class='container-fluid' style=''>";
+                    $list.="<span class='span6'><br></span>";
                     $list.="</div>";
                 } // end if
             } // end foreach

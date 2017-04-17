@@ -3709,7 +3709,8 @@ $(document).ready(function () {
         var amount = $('#amount').val();
         if (amount != '' && $.isNumeric(amount)) {
             $('#partial_err').html('');
-            var url = "http://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + amount;
+            //var url = "http://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + amount;
+            var url = "http://medical2.com/index.php/payments/payment/" + userid + "/" + courseid + "/" + slotid + "/" + amount;
             window.open(url, "Payment");
         } // end if amount!='' &&  $.isNumeric(amount)
         else {
