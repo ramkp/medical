@@ -769,7 +769,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -857,7 +857,7 @@ class Mailer {
         <td colspan='2'>Billing<br></td>
         </tr>";
 
-        $list.="<tr>";
+        $list.="<tr>";        
         if ($user->billing_name != '') {
             $list.="<td>Billing Name</td><td>$user->billing_name</td>";
         } // end if
@@ -865,7 +865,7 @@ class Mailer {
             $list.="<td>Billing Name</td><td>$userdata->firstname $userdata->lastname</td>";
         } // end else
         $list.="</tr>";
-
+        
         if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
             $list.="<tr style=''>
             <td>Email</td><td>$user->receipt_email</td>

@@ -3950,6 +3950,7 @@ $(document).ready(function () {
                     $.post(url, request).done(function (data) {
                         console.log('Server response: ' + data);
                         $("[data-dismiss=modal]").trigger({type: "click"});
+                        get_refund_page();
                     });
                 } // end if confirm
             } // end if paymentid>0
@@ -4274,15 +4275,17 @@ $(document).ready(function () {
             var slotid = $('#register_cities').val();
             var firstname = $('#first_name').val();
             var lastname = $('#last_name').val();
-            var addr = $('#addr').val();
+            var addr = $('#r_addr').val();
             var city = $('#city').val();
             var state = $('#state').val();
             var country = $('#country').val();
             var zip = $('#zip').val();
             var phone = $('#phone').val();
             var email = $('#email').val();
-            var card_holder = $('#billing_name').val();
+            //var card_holder = $('#billing_name').val();
             var sum = $('#sum').val();
+            var b_fname = $('#b_fname').val();
+            var b_lname = $('#b_lname').val();
 
             if (courseid == 0) {
                 $('#personal_err').html('Please select program');
@@ -4347,50 +4350,63 @@ $(document).ready(function () {
                 return false;
             }
 
-            if (card_holder == '') {
-                $('#personal_err').html('Please provide card holder name');
-                return false;
+            /*
+             if (card_holder == '') {
+             $('#personal_err').html('Please provide card holder name');
+             return false;
+             }
+             
+             if (card_holder != '') {
+             // Remove double spaces between words
+             var clean_holder = card_holder.replace(/\s\s+/g, ' ');
+             var names_arr = clean_holder.split(" ");
+             
+             console.log('names array length: ' + names_arr.length);
+             
+             if (names_arr.length == 1) {
+             $('#personal_err').html('Please provide correct card holder name separated by space');
+             return;
+             }
+             
+             if (names_arr.length == 2) {
+             console.log('Two names case ....');
+             console.log('Holder name: ' + card_holder);
+             var h_firstname = names_arr[0];
+             var h_lastname = names_arr[1];
+             console.log('Billing firstname: ' + h_firstname);
+             console.log('Billing lastname: ' + h_lastname);
+             if (typeof (h_firstname) === "undefined" || h_firstname == '' || typeof (h_lastname) === "undefined" || h_lastname == '') {
+             $('#personal_err').html('Please provide correct card holder name separated by space');
+             return;
+             }
+             } // end if names_arr.length == 2
+             
+             if (names_arr.length == 3) {
+             console.log('Three names case ...');
+             console.log('Holder name: ' + card_holder);
+             h_firstname = names_arr[0] + ' ' + names_arr[1];
+             h_lastname = names_arr[2];
+             console.log('Billing firstname: ' + h_firstname);
+             console.log('Billing lastname: ' + h_lastname);
+             if (typeof (h_firstname) === "undefined" || h_firstname == '' || typeof (h_lastname) === "undefined" || h_lastname == '') {
+             $('#personal_err').html('Please provide correct card holder name separated by space');
+             return;
+             }
+             } // end if names_arr.length == 3
+             
+             } // end if card_holder != ''
+             */
+
+            if (b_fname == '') {
+                $('#personal_err').html('Please provide card holder firstname');
+                return;
             }
 
-            if (card_holder != '') {
-                // Remove double spaces between words
-                var clean_holder = card_holder.replace(/\s\s+/g, ' ');
-                var names_arr = clean_holder.split(" ");
+            if (b_lname == '') {
+                $('#personal_err').html('Please provide card holder lastname');
+                return;
+            }
 
-                console.log('names array length: ' + names_arr.length);
-
-                if (names_arr.length == 1) {
-                    $('#personal_err').html('Please provide correct card holder name separated by space');
-                    return;
-                }
-
-                if (names_arr.length == 2) {
-                    console.log('Two names case ....');
-                    console.log('Holder name: ' + card_holder);
-                    var h_firstname = names_arr[0];
-                    var h_lastname = names_arr[1];
-                    console.log('Billing firstname: ' + h_firstname);
-                    console.log('Billing lastname: ' + h_lastname);
-                    if (typeof (h_firstname) === "undefined" || h_firstname == '' || typeof (h_lastname) === "undefined" || h_lastname == '') {
-                        $('#personal_err').html('Please provide correct card holder name separated by space');
-                        return;
-                    }
-                } // end if names_arr.length == 2
-
-                if (names_arr.length == 3) {
-                    console.log('Three names case ...');
-                    console.log('Holder name: ' + card_holder);
-                    h_firstname = names_arr[0] + ' ' + names_arr[1];
-                    h_lastname = names_arr[2];
-                    console.log('Billing firstname: ' + h_firstname);
-                    console.log('Billing lastname: ' + h_lastname);
-                    if (typeof (h_firstname) === "undefined" || h_firstname == '' || typeof (h_lastname) === "undefined" || h_lastname == '') {
-                        $('#personal_err').html('Please provide correct card holder name separated by space');
-                        return;
-                    }
-                } // end if names_arr.length == 3
-
-            } // end if card_holder != ''
 
             var cvv = $('#cvv2').val();
             if (cvv == '') {
@@ -4477,7 +4493,8 @@ $(document).ready(function () {
                         courseid: courseid,
                         slotid: slotid,
                         sum: sum,
-                        card_holder: card_holder,
+                        b_fname: b_fname,
+                        b_lname: b_lname,
                         cvv: cvv,
                         card_no: card_no,
                         card_month: card_month,

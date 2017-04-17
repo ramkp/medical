@@ -273,10 +273,15 @@ class Register extends Util {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>Card Holder Name*</span>";
-        $list.="<span class='span2'><input type='text' required id='billing_name' name='billing_name' placeholder='Firstname Lastname' required></span>";
+        $list.="<span class='span2'>Holder First name*</span>";
+        $list.="<span class='span2'><input type='text' required id='b_fname' name='b_fname' placeholder='Firstname' required></span>";
         $list.="</div>";
-
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Holder Last name*</span>";
+        $list.="<span class='span2'><input type='text' required id='b_lname' name='b_lname' placeholder='Lastname' required></span>";
+        $list.="</div>";
+      
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span2'>CVV*</span>";
         $list.="<span class='span2'><input type='text' id='cvv2' name='cvv2'  ></span>";

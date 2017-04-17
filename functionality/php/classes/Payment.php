@@ -1196,15 +1196,22 @@ class Payment {
         } // end else when tax is not null
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span2'>Card Holder Name*</span>";
-        $list.="<span class='span2'><input type='text' id='card_holder' name='card_holder'  ></span>";
-        $list.="<span class='span2'>Card number*</span>";
-        $list.="<span class='span2'><input type='text' id='card_no' name='card_no'  ></span>";
+        $list.="<span class='span2'>Card Holder First name*</span>";
+        $list.="<span class='span2'><input type='text' id='b_fname' name='b_fname'  ></span>";
+        $list.="<span class='span2'>Card Holder Last name*</span>";
+        $list.="<span class='span2'><input type='text' id='b_lname' name='b_lname'  ></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Card number*</span>";
+        $list.="<span class='span2'><input type='text' id='card_no' name='card_no'  ></span>";
         $list.="<span class='span2'>CVV*</span>";
         $list.="<span class='span2'><input type='text' id='bill_cvv' name='bill_cvv'  ></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>&nbsp</span>";
+        $list.="<span class='span2'>&nbsp</span>";
         $list.="<span class='span2'>Expiration Date*</span>";
         $list.="<span class='span2'>" . $card_month . "&nbsp;&nbsp;&nbsp;" . $card_year . "</span>";
         $list.="</div>";
@@ -1545,15 +1552,20 @@ class Payment {
         $user = $this->get_user_payment_credentials($card->userid);
         $order = new stdClass();
 
-        $names = explode(" ", $card->card_holder);
-        if (count($names) == 2) {
-            $firstname = $names[0];
-            $lastname = $names[1];
-        } //end if 
-        if (count($names) == 3) {
-            $firstname = $names[0] . " " . $names[1];
-            $lastname = $names[2];
-        } // end else
+        /*
+          $names = explode(" ", $card->card_holder);
+          if (count($names) == 2) {
+          $firstname = $names[0];
+          $lastname = $names[1];
+          } //end if
+          if (count($names) == 3) {
+          $firstname = $names[0] . " " . $names[1];
+          $lastname = $names[2];
+          } // end else
+         */
+
+        $firstname = $card->b_fname;
+        $lastname = $card->b_lname;
 
         if (!property_exists($card, 'differ')) {
 
@@ -2029,16 +2041,24 @@ class Payment {
 
         if ($signup_status === true) {
 
-            $names = explode(" ", $user->billing_name);
-            if (count($names) == 2) {
-                $fisrtname = $names[0];
-                $lastname = $names[1];
-            } // end if
+            /*
+              $names = explode(" ", $user->billing_name);
+              if (count($names) == 2) {
+              $fisrtname = $names[0];
+              $lastname = $names[1];
+              } // end if
 
-            if (count($names) == 3) {
-                $fisrtname = $names[0] . " " . $names[1];
-                $lastname = $names[2];
-            } // end if
+              if (count($names) == 3) {
+              $fisrtname = $names[0] . " " . $names[1];
+              $lastname = $names[2];
+              } // end if
+             */
+
+
+            // New separate name boxes approach:
+            $fisrtname = $user->b_fname;
+            $lastname = $user->b_lname;
+            $user->billing_name = $user->b_fname . " " . $user->b_lname;
 
             $item = substr($this->get_course_name($user->courseid), 0, 30);
 
@@ -2130,15 +2150,21 @@ class Payment {
             $user = $this->get_user_payment_credentials($userid);
             $order = new stdClass();
 
-            $names = explode(" ", $card->card_holder);
-            if (count($names) == 2) {
-                $firstname = $names[0];
-                $lastname = $names[1];
-            } //end if 
-            if (count($names) == 3) {
-                $firstname = $names[0] . " " . $names[1];
-                $lastname = $names[2];
-            } // end else
+            /*
+              $names = explode(" ", $card->card_holder);
+              if (count($names) == 2) {
+              $firstname = $names[0];
+              $lastname = $names[1];
+              } //end if
+              if (count($names) == 3) {
+              $firstname = $names[0] . " " . $names[1];
+              $lastname = $names[2];
+              } // end else
+             */
+
+            $firstname = $card->b_fname;
+            $lastname = $card->b_lname;
+            $card->billing_name = $firstname . " " . $lastname;
 
             $order->cds_name = "$firstname/$lastname";
             $order->cds_address_1 = $user->address;
