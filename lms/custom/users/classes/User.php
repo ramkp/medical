@@ -83,7 +83,12 @@ class User extends Util {
                 $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'>$user->lastname</a></span>";
                 $list.="<span class='span2'>$user->phone1</span>";
                 $list.="<span class='span4'>$user->email</span>";
-                $list.="<span class='span2'>$user->purepwd</span>";
+                if ($user->email != 'info@medical2.com') {
+                    $list.="<span class='span2'>$user->purepwd</span>";
+                } // end if
+                else {
+                    $list.="<span class='span2'>**********</span>";
+                } // end else
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span12'><hr/></span>";
