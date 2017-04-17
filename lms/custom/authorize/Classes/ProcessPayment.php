@@ -16,10 +16,12 @@ class ProcessPayment {
     private $TRANSACTION_KEY = '23P447taH34H26h5'; // production data
     public $period = 28; // 28 days of installment 
     public $log_file_path;
+    public $transaction_log_path;
 
     function __construct() {
         $this->AUTHORIZENET_LOG_FILE = 'phplog';
         $this->log_file_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/failed_transactions.log';
+        $this->transaction_log_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/transactions.log';
     }
 
     function get_failed_transaction_report($respone_object, $order_object) {
@@ -107,6 +109,14 @@ class ProcessPayment {
         return $name;
     }
 
+    function save_transaction_log($data) {
+        $fp = fopen($this->transaction_log_path, 'a');
+        $date = date('m-d-Y h:i:s', time());
+        fwrite($fp, $date . "\n");
+        fwrite($fp, print_r($data, TRUE));
+        fclose($fp);
+    }
+
     function save_log($data, $order) {
         $fp = fopen($this->log_file_path, 'a');
         $date = date('m-d-Y h:i:s', time());
@@ -133,7 +143,7 @@ class ProcessPayment {
         return $merchantAuthentication;
     }
 
-    function prepare_order($order) {
+    function prepare_order($order) {   
         $exp_date = $order->cds_cc_exp_year . '-' . $order->cds_cc_exp_month;
         $creditCard = new AnetAPI\CreditCardType();
         $creditCard->setCardNumber($order->cds_cc_number);
@@ -524,32 +534,20 @@ class ProcessPayment {
         $controller = new AnetController\CreateTransactionController($request);
         //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
         $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+        $this->save_transaction_log($response);
         if ($response != null) {
             $tresponse = $response->getTransactionResponse();
-
-            //echo "Response: <pre>";
-            //print_r($tresponse);
-            //echo "</pre>";
-
+            $this->save_transaction_log($tresponse);
             if (($tresponse != null) && ($tresponse->getResponseCode() == "1" )) {
-                //echo "it is ok ....";
                 return TRUE;
             } // end if ($tresponse != null) && ($tresponse->getResponseCode() == \SampleCode\Constants::RESPONSE_OK)            
             else {
-                $post_order = new stdClass();
-                $post_order->refund_amount = $amount;
-                $post_order->card_last_four_digits = $card_last_four;
-                $post_order->card_expiration_date = $exp_date;
-                $post_order->original_transaction_id = $trans_id;
-                //$this->save_log($tresponse, $post_order);
                 return FALSE;
             }
         } // end if $response != null 
         else {
-            //echo "Null resposnse .. ...";
             return FALSE;
         }
-        return $response;
     }
 
     function getCustomerProfileIds() {
