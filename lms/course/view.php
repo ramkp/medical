@@ -282,9 +282,9 @@ $has_application = $ds->is_user_has_survey_applicagtion($USER->id);
 if ($roleid == 5 && $category == 2 && $completed > 0 && $has_application > 0) {
     $status = $ds->is_ws_survey_was_completed($COURSE->id, $USER->id);
     if ($status == 0) {
-        $survey = $ds->get_workshop_survey($COURSE->id, $USER->id);
-        echo $survey;
-        die();
+        //$survey = $ds->get_workshop_survey($COURSE->id, $USER->id);
+        //echo $survey;
+        //die();
     }
 } // end if
 
@@ -401,26 +401,7 @@ include_course_ajax($course, $modnamesused);
 <?php
 if ($COURSE->id == 71) {
     ?>
-            var client_id = '7061f110-40c4-4336-8945-6441429282ef';
-            var request_url = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=token' +
-                    '&redirect_uri=' + 'https://medical2.com/lms/custom/skype/hangout.php?id=16' +
-                    '&client_id=' + client_id +
-                    '&resource=https://webdir.online.lync.com';
-            // window.open(request_url, "print");
-
-
-            var config = {
-                apiKey: 'a42fcebd-5b43-4b89-a065-74450fb91255', // SDK
-                apiKeyCC: '9c967f6b-a846-4df2-b43d-5167e47d81e1' // SDK+UI
-            };
-
-
-            Skype.initialize({apiKey: config.apiKey}, function (api) {
-
-            }, function (err) {
-                console.log(err);
-                alert('Cannot load the SDK.');
-            });
+           
     <?php
 } // end if course id=71
 ?>
