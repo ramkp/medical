@@ -907,4 +907,29 @@ class Payments extends Util {
         return $pwd;
     }
 
+    function verify_payments() {
+        $i = 0;
+        $query = "select * from mdl_card_payments "
+                . "where exp_date is not null "
+                . "and exp_date<>'' "
+                . "and refunded=0";
+        echo "Query: " . $query . "<br>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            //echo "Exp date: " . $row['exp_date'] . "<br>";
+            $len = strlen($row['exp_date']) . "<br>";
+            //echo "Date length: " . $len . "<br>";
+            if (strlen($row['exp_date']) == 5) {
+                $coursename = $this->get_course_name($row['courseid']);
+                $userdata = $this->get_user_details($row['userid']);
+                $date = date('m-d-Y', $row['pdate']);
+                echo "<br>-------------------------------------------------------<br>";
+                echo "User: " . $userdata->firstname . " " . $userdata->lastname . " " . $coursename . " $" . $row['psum'] . " " . $date . " " . $row['exp_date'];
+                echo "<br>-------------------------------------------------------<br>";
+                $i++;
+            } // end if
+        } // end while
+        echo "Total users found: " . $i;
+    }
+
 }

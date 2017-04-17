@@ -6,3 +6,7 @@
 *.csv
 
 *.dmg
+
+*.log
+
+*.sql
