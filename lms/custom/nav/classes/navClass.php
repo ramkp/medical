@@ -388,7 +388,7 @@ class navClass extends Util {
                         $cert->create_certificate2($courseid, $this->user->id, $start, $end);
                     } // end if $exists==0                    
                     $userid = $this->user->id;
-                    $list.="<li><a title='Print Certificate' a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename - Print Certificate</a></li>";
+                    $list.="<li><a title='Print Certificate' a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename - Print Certificate</a></li>";
                     if ($courseid != 41) {
                         $list.="<li><a title='Renew Certificate' class='ren_cert' data-courseid='$courseid' data-userid='$userid' href='#'>$coursename - Renew Certificate</a></li>";
                     }
