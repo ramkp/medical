@@ -2608,7 +2608,7 @@ class Dashboard extends Util {
         $m = new Mailer();
         $recipients = explode(',', $inv->parts);
         $message = $inv->text;
-        $message.="<p style='font-weight:bold;'>Meeting joon url: $inv->join_url</p>";
+        $message.="<p style='font-weight:bold;'>Meeting join url: $inv->join_url</p>";
         if (count($recipients) > 0) {
             foreach ($recipients as $recipient) {
                 echo "Currenr recipient: " . $recipient . "<br>";

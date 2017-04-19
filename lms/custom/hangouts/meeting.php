@@ -77,7 +77,7 @@ else {
                     <?php
                     if ($roleid != 5) {
                         // Only teachers could send invitations or share screen
-                        echo "<br><button id='capture-screen' class='btn btn-success'>Share Screen</button><br>";
+                        //echo "<br><button id='capture-screen' class='btn btn-success'>Share Screen</button><br>";
                         echo "<span id='room-urls' style='width:80%;font-weight: bold; text-align: center;margin: auto;font-size: 16px;border:1px;'></span>
                         <span><br/><button id='show_dialog' class='btn btn-success'>Invite participants</button></span>
                         <br/><br/>";
