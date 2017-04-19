@@ -484,7 +484,7 @@ class Dashboard extends Util {
                 $owe = ($diff < 0) ? '-$' . abs($diff) : '$' . $diff;
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if ($row['psum'] != $renew_amount) {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename &nbsp; Balance : $owe</span>";
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename &nbsp; Balance : <span style='font-weight:bold;color:red;'>$owe</span></span>";
                 } // end if $row['psum']!=$renew_amount
                 else {
                     $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
@@ -546,7 +546,7 @@ class Dashboard extends Util {
                 $owe = ($diff < 0) ? '-$' . abs($diff) : '$' . $diff;
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if ($row['psum'] != $renew_amount) {
-                    $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename &nbsp; Balance: $owe</span>";
+                    $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename &nbsp; Balance: <span style='font-weight:bold;color:red;'>$owe</span></span>";
                 } // end if 
                 else {
                     $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
@@ -1541,20 +1541,41 @@ class Dashboard extends Util {
             </div>";
         } // end if
         else {
-            $list.="<ul class='nav nav-tabs'>
+            $status = $this->is_student_only_career_college($id);
+            if ($status == 1) {
+                $list.="<ul class='nav nav-tabs'>
                 <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>";
-            $list.="<input type='hidden' id='userid' value='$id'>  
+                $list.="<input type='hidden' id='userid' value='$id'>  
             </ul>";
 
-            $list.="<div class='tab-content'>
+                $list.="<div class='tab-content'>
               <div id='home' class='tab-pane fade in active'>
                 <h3>Payments &nbsp;&nbsp;<button id='print_payment'>Print</button></h3>
                 <p>$payments</p>
               </div>
              </div>";
+            } // end if $status == 1
         } // end else
 
         return $list;
+    }
+
+    function is_student_only_career_college($userid) {
+        $status = 1;
+        $courses = $this->get_user_courses($userid);
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $categoryid = $this->get_course_category($courseid);
+                if ($categoryid != 5) {
+                    $status = 0;
+                    break;
+                }
+            } // end foreach
+        } // end if count($courses)>0
+        else {
+            $status = 0;
+        } // end else 
+        return $status;
     }
 
     function is_user_suspended($userid) {
@@ -1666,7 +1687,7 @@ class Dashboard extends Util {
             $list.="<div class='row-fluid' style='font-weight:bold;'>";
             $list.="<span class='span1'>Cost:</span><span class='span1'>$$cost</span>";
             $list.="<span class='span1'>Paid:</span><span class='span1'>$$total</span>";
-            $list.="<span class='span1'>Balance:</span><span class='span1'>$owe</span>";
+            $list.="<span class='span1'>Balance:</span><span class='span1'><span style='font-weight:bold;color:red;'>$owe</span></span>";
             $list.="</div>";
         } // end else
 
@@ -2547,6 +2568,49 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_add_participants_dialog($join_url) {
+        $list = "";
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Add participants</h4>
+                </div>
+                <div class='modal-body' style='text-align:center;'>
+                
+                <input type='hidden' id='join_url' value='$join_url'>
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <input type='text' id='participants' style='width:535px;' placeholder='Participant emails separated by comma'>
+                </div><br>
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <textarea rows='5' style='width:535px;' id='invitation_text' placeholder='Invitation text'></textarea>
+                </div>
+
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='inv_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='add_meeting_participants'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function send_meeting_invitation($inv) {
+        $m = new Mailer();
+        $m->send_meeting_invitation($inv);
+        $list = "Invitation(s) are sent";
+        return $list;
+    }
+
     function renew_user_certificate($certificate) {
         $certstr = $certificate->id . ",";
         $cert = new Certificates();
@@ -3140,7 +3204,7 @@ class Dashboard extends Util {
         $userid = $this->user->id;
         $list.="<form id='start_meeting_$courseid' method='post' target='_blank' action='https://medical2.com/lms/custom/hangouts/meeting.php'>";
         $list.="<input type='hidden' name='courseid' value='$courseid'>";
-        $list.="<input type='hidden' name='roomid' value='$roomid'>";
+        $list.="<input type='hidden' name='roomid' id='roomid' value='$roomid'>";
         $list.="<input type='hidden' name='userid' value='$userid'>";
         $list.="<button style='width:175px;' id='meeting_start' data-courseid='$courseid'>Start Meeting</button>";
         $list.="</form>";
@@ -3161,10 +3225,21 @@ class Dashboard extends Util {
     function get_join_button($id) {
         $list = "";
         $userid = $this->user->id;
-        $list.="<form id='join_webinar_$id' action='https://medical2.com/lms/custom/hangouts/webinar.php' method='post' target='_blank'>";
+        $list.="<form id='join_webinar_$id' action='https://medical2.com/lms/custom/hangouts/meeting.php?roomid=$id' method='post' target='_blank'>";
         $list.="<input type='hidden' name='webinarid' value='$id'>";
         $list.="<input type='hidden' name='userid' value='$userid'>";
         $list.="<a href='#' onClick='return false;' id='wjoin_$id'>Join</a>";
+        $list.="</form>";
+        return $list;
+    }
+    
+    function get_start_button($id) {
+        $list = "";
+        $userid = $this->user->id;
+        $list.="<form id='start_webinar_$id' action='https://medical2.com/lms/custom/hangouts/meeting.php' method='post' target='_blank'>";
+        $list.="<input type='hidden' name='roomid' id='roomid' value='$id'>";
+        $list.="<input type='hidden' name='userid' value='$userid'>";
+        $list.="<a href='#' onClick='return false;' id='wstart_$id'>Start</a>";
         $list.="</form>";
         return $list;
     }
@@ -3192,7 +3267,9 @@ class Dashboard extends Util {
                 $list.="<span class='span4'>$item->title</span>";
                 $list.="<span class='span3'>$date</span>";
                 if ($roleid == '' || $roleid < 5) {
+                    $start_btn=$this->get_start_button($item->id);
                     $list.="<span class='span1'><a href='#' onClick='return false;' id='wedit_$item->id'>Edit</a></span>";
+                    $list.="<span class='span1'>$start_btn</span>";
                 }
                 $list.="<span class='span1'>$joinbtn</span>";
                 $list.="</div>";

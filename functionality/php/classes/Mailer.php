@@ -769,7 +769,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -857,7 +857,7 @@ class Mailer {
         <td colspan='2'>Billing<br></td>
         </tr>";
 
-        $list.="<tr>";        
+        $list.="<tr>";
         if ($user->billing_name != '') {
             $list.="<td>Billing Name</td><td>$user->billing_name</td>";
         } // end if
@@ -865,7 +865,7 @@ class Mailer {
             $list.="<td>Billing Name</td><td>$userdata->firstname $userdata->lastname</td>";
         } // end else
         $list.="</tr>";
-        
+
         if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
             $list.="<tr style=''>
             <td>Email</td><td>$user->receipt_email</td>
@@ -1511,6 +1511,43 @@ class Mailer {
             //echo 'Message has been sent to ' . $recipient;
             return true;
         }
+    }
+
+    function send_meeting_invitation($inv) {
+        $mail = new PHPMailer;
+
+        $message = $inv->text;
+        $message.="<p style='font-weight:bold;'>Meeting join URL: $inv->join_url</p>";
+        $emails_arr = explode(',', $inv->parts);
+
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+
+        if (count($emails_arr) > 0) {
+            foreach ($emails_arr as $recipient) {
+                $mail->addAddress($recipient);
+                $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+                $mail->isHTML(true);
+                $mail->Subject = 'Medical2 - Meeting Invitation';
+                $mail->Body = $message;
+                if (!$mail->send()) {
+                    //echo 'Message could not be sent.';
+                    //echo 'Mailer Error: ' . $mail->ErrorInfo;
+                    return false;
+                } // end if !$mail->send()
+                else {
+                    //echo 'Message has been sent to ' . $recipient;
+                    return true;
+                } // end else 
+            } // end foreach
+        } // end if count($emails_arr) > 0
     }
 
     function send_workshop_notification($recipients, $message) {

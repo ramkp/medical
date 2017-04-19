@@ -6363,11 +6363,6 @@ $(document).ready(function () {
                     });
         }
 
-        if (event.target.id == 'meeting_start') {
-            var courseid = $('#meeting_start').data('courseid');
-
-        }
-
         if (event.target.id == 'add_new_webinar_btn') {
             var title = $('#webinar_title').val();
             var date = $('#webinar_date').val();
@@ -6436,18 +6431,69 @@ $(document).ready(function () {
 
         }
 
+        if (event.target.id.indexOf("wstart_") >= 0) {
+            var id = event.target.id.replace("wstart_", "");
+            var formid = '#start_webinar_' + id;
+            $(formid).submit();
+        }
+
+
         if (event.target.id.indexOf("wjoin_") >= 0) {
             var id = event.target.id.replace("wjoin_", "");
             var formid = '#join_webinar_' + id;
             $(formid).submit();
         }
 
+
         if (event.target.id == 'meeting_start') {
             var courseid = $('#meeting_add').data('courseid');
+            var roomid = $('#roomid').val();
             var formid = '#start_meeting_' + courseid;
+            console.log('Room id: ' + roomid);
             console.log('Form id: ' + formid);
             $(formid).submit();
         }
+
+        if (event.target.id == 'show_dialog') {
+            var roomid = $('#room-id').val();
+            var join_url = 'https://medical2.com/lms/custom/hangouts/meeting.php?roomid=' + roomid;
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "/lms/custom/my/get_add_participants_dialog.php";
+                        $.post(url, {join_url: join_url}).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
+        }
+
+        if (event.target.id == 'add_meeting_participants') {
+            var join_url = $('#join_url').val();
+            var parts = $('#participants').val();
+            var text = $('#invitation_text').val();
+            if (parts != '' && text != '') {
+                $('#inv_err').html('');
+                var inv = {join_url: join_url, parts: parts, text: text};
+                console.log('Invitation object: ' + JSON.stringify(inv));
+                var url = "/lms/custom/my/send_meeting_invitation.php";
+                $.post(url, {inv: JSON.stringify(inv)}).done(function (data) {
+                    $('#inv_err').html("<span style='color:black'>" + data + "</span>");
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                }); // end of post
+            } // end if 
+            else {
+                $('#inv_err').html('Please provide at least one participant and invitation text');
+            } // end else
+
+        }
+
+
+
 
 
     }); // end of body click event
