@@ -89,9 +89,10 @@ class Groups extends Util {
             $list.="<div id='groups_container'>";
             foreach ($groups as $g) {
                 $users = $this->get_group_users($g->id);
+                $total_users = $this->get_group_total_users($g->id);
                 $coursename = $this->get_course_name($g->courseid);
                 $list.="<div class='row-fluid'>";
-                $list.="<span class='span3'>$g->name</span>";
+                $list.="<span class='span3'>$g->name <br>" . $total_users . " total participants</span>";
                 $list.="<span class='span3'>$coursename</span>";
                 $list.="<span class='span3'>$users</span>";
                 $list.="</div>";
@@ -131,6 +132,12 @@ class Groups extends Util {
         }
 
         return $list;
+    }
+
+    function get_group_total_users($groupid) {
+        $query = "select * from mdl_groups_members where groupid=$groupid";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
     function get_total_groups() {
