@@ -4,7 +4,13 @@ $h = new Hangout();
 $userid = $_REQUEST['userid'];
 $roomid = $_REQUEST['roomid'];
 $courseid = $_REQUEST['courseid'];
-//$roleid=$h->get_use
+if (isset($userid) && isset($courseid)) {
+    $contextid = $h->get_course_context($courseid);
+    $roleid = $h->get_user_role($userid, contextid);
+} // end if
+else {
+    $roleid = 5; // student
+}
 ?>
 
 <html>
@@ -22,7 +28,7 @@ $courseid = $_REQUEST['courseid'];
 
         <!-- Site script -->
         <script type='text/javascript' src='https://medical2.com/lms/custom/nav/js/navigation.js'></script>
-
+        
         <!-- Optional Bootstrap theme -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" >
 
@@ -66,10 +72,18 @@ $courseid = $_REQUEST['courseid'];
                     <button id="open-room" style="display:none;">Open Room</button>
                     <button id="join-room" style="display:none;">Join Room</button>
                     <button id="open-or-join-room" style="display:none;">Auto Open Or Join Room</button>
+                    <hr/>
 
+                    <?php
+                    if ($roleid != 5) {
+                        // Only teachers could send invitations or share screen
+                        echo "<br><button id='capture-screen' class='btn btn-success'>Share Screen</button><br>";
+                        echo "<span id='room-urls' style='width:80%;font-weight: bold; text-align: center;margin: auto;font-size: 16px;border:1px;'></span>
+                        <span><br/><button id='show_dialog' class='btn btn-success'>Invite participants</button></span>
+                        <br/><br/>";
+                    }
+                    ?>
 
-                    <span id="room-urls" style="width:80%;font-weight: bold; text-align: center;margin: auto;font-size: 16px;border:1px;"></span>
-                    <span><br/><button id='show_dialog' class='btn btn-success'>Invite participants</button></span>
                     <br/><br/>
                     <button id="btn-leave-room" disabled class="btn btn-success">Leave meeting</button>
                     <br/><br/>
@@ -110,6 +124,7 @@ $courseid = $_REQUEST['courseid'];
             <!-- custom layout for HTML5 audio/video elements -->
             <script src="https://cdn.webrtc-experiment.com/getMediaElement.js"></script>
             <script src="https://cdn.webrtc-experiment.com:443/FileBufferReader.js"></script>
+            <script src="https://cdn.webrtc-experiment.com/getScreenId.js"></script>
 
             <script>
 
@@ -222,13 +237,16 @@ $courseid = $_REQUEST['courseid'];
                     document.getElementById('share-file').disabled = false;
                     document.getElementById('input-text-chat').disabled = false;
                     document.getElementById('btn-leave-room').disabled = false;
-                    document.querySelector('h1').innerHTML = 'You are connected with: ' + connection.getAllParticipants().join(', ');
+                    //document.querySelector('h1').innerHTML = 'You are connected with: ' + connection.getAllParticipants().join(', ');
+                    console.log('You are connected with: ' + connection.getAllParticipants().join(', '));
                 };
                 connection.onclose = function () {
                     if (connection.getAllParticipants().length) {
-                        document.querySelector('h1').innerHTML = 'You are still connected with: ' + connection.getAllParticipants().join(', ');
+                        //document.querySelector('h1').innerHTML = 'You are still connected with: ' + connection.getAllParticipants().join(', ');
+                        console.log('You are still connected with: ' + connection.getAllParticipants().join(', '));
                     } else {
-                        document.querySelector('h1').innerHTML = 'Seems session has been closed or all participants left.';
+                        //document.querySelector('h1').innerHTML = 'Seems session has been closed or all participants left.';
+                        console.log('Seems session has been closed or all participants left.');
                     }
                 };
                 connection.onEntireSessionClosed = function (event) {
@@ -257,9 +275,9 @@ $courseid = $_REQUEST['courseid'];
                     document.getElementById('join-room').disabled = true;
                     document.getElementById('room-id').disabled = true;
                 }
-                // ......................................................
-                // ......................Handling Room-ID................
-                // ......................................................
+            // ......................................................
+            // ......................Handling Room-ID................
+            // ......................................................
                 function showRoomURL(roomid) {
                     var roomHashURL = '#' + roomid;
                     var roomQueryStringURL = '?roomid=' + roomid;

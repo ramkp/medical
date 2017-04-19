@@ -1513,13 +1513,8 @@ class Mailer {
         }
     }
 
-    function send_meeting_invitation($inv) {
+    function send_meeting_invitation($message, $recipient) {
         $mail = new PHPMailer;
-
-        $message = $inv->text;
-        $message.="<p style='font-weight:bold;'>Meeting join URL: $inv->join_url</p>";
-        $emails_arr = explode(',', $inv->parts);
-
         $mail->isSMTP();
         $mail->Host = $this->mail_smtp_host;
         $mail->SMTPAuth = true;
@@ -1529,25 +1524,21 @@ class Mailer {
         $mail->Port = $this->mail_smtp_port;
 
         $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addAddress($recipient);
 
-        if (count($emails_arr) > 0) {
-            foreach ($emails_arr as $recipient) {
-                $mail->addAddress($recipient);
-                $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
-                $mail->isHTML(true);
-                $mail->Subject = 'Medical2 - Meeting Invitation';
-                $mail->Body = $message;
-                if (!$mail->send()) {
-                    //echo 'Message could not be sent.';
-                    //echo 'Mailer Error: ' . $mail->ErrorInfo;
-                    return false;
-                } // end if !$mail->send()
-                else {
-                    //echo 'Message has been sent to ' . $recipient;
-                    return true;
-                } // end else 
-            } // end foreach
-        } // end if count($emails_arr) > 0
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        $mail->isHTML(true);
+        $mail->Subject = 'Medical2 - Meeting Invitation';
+        $mail->Body = $message;
+        if (!$mail->send()) {
+            echo 'Message could not be sent.';
+            echo 'Mailer Error: ' . $mail->ErrorInfo;
+            return false;
+        } // end if !$mail->send()
+        else {
+            //echo 'Message has been sent to ' . $recipient;
+            return true;
+        } // end else 
     }
 
     function send_workshop_notification($recipients, $message) {

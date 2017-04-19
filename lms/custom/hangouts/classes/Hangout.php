@@ -3,9 +3,11 @@
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 
 class Hangout extends Util {
-    //put your code here
+
+    function __construct() {
+        parent::__construct();
+    }
     
-    //function __constru
     
-    
+
 }

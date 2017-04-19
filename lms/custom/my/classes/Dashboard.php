@@ -2606,7 +2606,15 @@ class Dashboard extends Util {
 
     function send_meeting_invitation($inv) {
         $m = new Mailer();
-        $m->send_meeting_invitation($inv);
+        $recipients = explode(',', $inv->parts);
+        $message = $inv->text;
+        $message.="<p style='font-weight:bold;'>Meeting joon url: $inv->join_url</p>";
+        if (count($recipients) > 0) {
+            foreach ($recipients as $recipient) {
+                echo "Currenr recipient: " . $recipient . "<br>";
+                $m->send_meeting_invitation($message, $recipient);
+            } // end foreach
+        } // end if count($recipients)>0
         $list = "Invitation(s) are sent";
         return $list;
     }
@@ -3222,23 +3230,25 @@ class Dashboard extends Util {
         return $list;
     }
 
-    function get_join_button($id) {
+    function get_join_button($roomid, $courseid) {
         $list = "";
         $userid = $this->user->id;
-        $list.="<form id='join_webinar_$id' action='https://medical2.com/lms/custom/hangouts/meeting.php?roomid=$id' method='post' target='_blank'>";
-        $list.="<input type='hidden' name='webinarid' value='$id'>";
+        $list.="<form id='join_webinar_$roomid' action='https://medical2.com/lms/custom/hangouts/meeting.php?roomid=$roomid' method='post' target='_blank'>";
+        $list.="<input type='hidden' name='roomid' id='roomid' value='$roomid'>";
         $list.="<input type='hidden' name='userid' value='$userid'>";
-        $list.="<a href='#' onClick='return false;' id='wjoin_$id'>Join</a>";
+        $list.="<input type='hidden' name='courseid' value='$courseid'>";
+        $list.="<a href='#' onClick='return false;' id='wjoin_$roomid'>Join</a>";
         $list.="</form>";
         return $list;
     }
-    
-    function get_start_button($id) {
+
+    function get_start_button($roomid, $courseid) {
         $list = "";
         $userid = $this->user->id;
         $list.="<form id='start_webinar_$id' action='https://medical2.com/lms/custom/hangouts/meeting.php' method='post' target='_blank'>";
-        $list.="<input type='hidden' name='roomid' id='roomid' value='$id'>";
+        $list.="<input type='hidden' name='roomid' id='roomid' value='$roomid'>";
         $list.="<input type='hidden' name='userid' value='$userid'>";
+        $list.="<input type='hidden' name='courseid' value='$courseid'>";
         $list.="<a href='#' onClick='return false;' id='wstart_$id'>Start</a>";
         $list.="</form>";
         return $list;
@@ -3262,12 +3272,12 @@ class Dashboard extends Util {
             $list.="</div>";
             foreach ($items as $item) {
                 $date = date('m-d-Y', $item->mdate) . " " . $item->mh . ":" . $item->mm;
-                $joinbtn = $this->get_join_button($item->id);
+                $joinbtn = $this->get_join_button($item->id, $courseid);
                 $list.="<div class='row-fluid' style='padding-left:12px;'>";
                 $list.="<span class='span4'>$item->title</span>";
                 $list.="<span class='span3'>$date</span>";
                 if ($roleid == '' || $roleid < 5) {
-                    $start_btn=$this->get_start_button($item->id);
+                    $start_btn = $this->get_start_button($item->id, $courseid);
                     $list.="<span class='span1'><a href='#' onClick='return false;' id='wedit_$item->id'>Edit</a></span>";
                     $list.="<span class='span1'>$start_btn</span>";
                 }

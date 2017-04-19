@@ -6482,6 +6482,7 @@ $(document).ready(function () {
                 console.log('Invitation object: ' + JSON.stringify(inv));
                 var url = "/lms/custom/my/send_meeting_invitation.php";
                 $.post(url, {inv: JSON.stringify(inv)}).done(function (data) {
+                    console.log(data);
                     $('#inv_err').html("<span style='color:black'>" + data + "</span>");
                     $("[data-dismiss=modal]").trigger({type: "click"});
                 }); // end of post
