@@ -1663,10 +1663,43 @@ class Dashboard extends Util {
         return $courses;
     }
 
+    function get_course_id_by_slot_id($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $schedulerid = $row['schedulerid'];
+        }
+        $query = "select * from mdl_scheduler where id=$schedulerid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['course'];
+        }
+        return $courseid;
+    }
+
+    function get_profile_course_slotid($userid, $courseid) {
+        $query = "SELECT * FROM `mdl_scheduler_appointment` WHERE studentid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $course_by_slot = $this->get_course_id_by_slot_id($row['slotid']);
+                if ($course_by_slot == $courseid) {
+                    $slotid = $row['slotid'];
+                    break;
+                } // end if $course_by_slot==$courseid
+            } // end while 
+        } // end if $num > 0
+        else {
+            $slotid = null;
+        }
+        return $slotid;
+    }
+
     function get_user_course_balance($userid, $courseid, $report = false) {
         $list = "";
         $b = new Balance();
-        $slotid = $this->get_user_course_slot($courseid, $userid);
+        $slotid = $this->get_profile_course_slotid($userid, $courseid);
         $cost = $b->get_item_cost($courseid, $userid, $slotid);
         $total = $b->get_student_payments($courseid, $userid);
         $diff = $cost - $total;
