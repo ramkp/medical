@@ -20,6 +20,7 @@ function scheduler_prepare_formdata(scheduler_slot $slot) {
       echo "<pre>";
       print_r($data);
       echo "</pre>";
+      die();
      * 
      */
 
@@ -33,14 +34,33 @@ function scheduler_prepare_formdata(scheduler_slot $slot) {
     }
 
     $i = 0;
+    //echo "Before foreach appointments ...<br>";
     foreach ($slot->get_appointments() as $appointment) {
+
+        /*
+          echo "--------------------------------------------<br><pre>";
+          print_r($appointment);
+          echo "</pre>--------------------------------------------<br>";
+         */
+
+        //echo "Appointment note: " . $appointment->appointmentnote . "<br>";
+        $notes = ($appointment->appointmentnote == '') ? 'n/a' : $appointment->appointmentnote;
+        //echo "Updated notes: " . $notes . "<br>";
+        //echo "Index: " . $i . "<br>";
         $data->studentid[$i] = $appointment->studentid;
+        //echo "data->studentid ok <br>";
         $data->attended[$i] = $appointment->attended;
-        $data->appointmentnote[$i]['text'] = $appointment->appointmentnote;
-        $data->appointmentnote[$i]['format'] = $appointment->appointmentnoteformat;
+        //echo "data->attended ok <br>";
+        //$data->appointmentnote[$i]['text'] = $appointment->appointmentnote;
+        //$data->appointmentnote[$i]['text'] = $notes;
+        //echo "data->appointmentnote text ok <br>";
+        //$data->appointmentnote[$i]['format'] = $appointment->appointmentnoteformat;
+        //echo "data->appointmentnote format ok <br>";
         $data->grade[$i] = $appointment->grade;
+        //echo "data->grade ok <br>";
         $i++;
     }
+
     return $data;
 }
 
@@ -155,7 +175,7 @@ function scheduler_save_slotform(scheduler_instance $scheduler, $course, $slotid
 
 function scheduler_print_schedulebox(scheduler_instance $scheduler, $studentid, $groupid = 0) {
     global $output;
-    $ds = new Schedule();
+    // $ds = new Schedule();
     $availableslots = $scheduler->get_slots_available_to_student($studentid);
 
     $startdatemem = '';
@@ -245,10 +265,10 @@ if ($action != 'view') {
 echo $output->header();
 
 /*
-echo "Action: " . $action . "<br>";
-echo "Course id: " . $COURSE->id . "<br>";
-echo "Module id: " . $cm->id . "<br>";
-*/
+  echo "Action: " . $action . "<br>";
+  echo "Course id: " . $COURSE->id . "<br>";
+  echo "Module id: " . $cm->id . "<br>";
+ */
 
 /* * ********************************** View : New single slot form *************************************** */
 if ($action == 'addslot') {
@@ -294,35 +314,30 @@ if ($action == 'addslot') {
 }
 /* * ********************************** View : Update single slot form *************************************** */
 if ($action == 'updateslot') {
-
+    //echo "Action update ....<br>";
     $slotid = required_param('slotid', PARAM_INT);
+    //echo "Slot id: ".$slotid."<br>";
     $slot = $scheduler->get_slot($slotid);
+    //print_r($slot);
+    //echo "<br>Before prepare data<br>................<br>";
     $data = scheduler_prepare_formdata($slot);
-
-    /*
-     * 
-      echo "Module object: <pre>";
-      print_r($cm);
-      echo "</pre>";
-      echo "<br>Subpage: $subpage<br>";
-     * 
-     */
-    
+    //echo "Adter prepare data<br>................<br>";
+    //print_r($data);
+    //echo "Before set notes :<br>................<br>";
     $data->notes = $data->notes['text'];
-    
-    /*
-    echo "<pre>";
-    print_r($data);
-    echo "</pre>";
-    */
-    
+
+
+    //echo "Data after notes: <pre>";
+    //print_r($data);
+    //echo "</pre>";
     //echo "Module id: ".$cm->id."<br>";
+
     $actionurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'updateslot', 'id' => $cm->id, 'slotid' => $slotid, 'subpage' => $subpage, 'offset' => $offset));
     $returnurl = new moodle_url('/mod/scheduler/view.php', array('what' => 'view', 'id' => $cm->id, 'subpage' => $subpage, 'offset' => $offset));
 
     //echo "<br><Action URL: $actionurl><br>";
     //echo "<br><Return URL: $returnurl><br>";
-
+    //die();
     $mform = new scheduler_editslot_form($actionurl, $scheduler, $cm, $groupsicansee, array('slotid' => $slotid));
     $mform->set_data($data);
 
@@ -336,15 +351,15 @@ if ($action == 'updateslot') {
         <script type="text/javascript">
             $(document).ready(function () {
 
-                
+
                 $.get('/lms/custom/utils/wslocation.json', function (data) {
                     $('#id_appointmentlocation').typeahead({source: data, items: 24});
                 }, 'json');
                 $.post('/lms/custom/utils/hotels.json', {id: 1}, function (data) {
                     $('#id_notes').typeahead({source: data, items: 240});
                 }, 'json');
-                
-                
+
+
 
             }); // end of document ready
 
