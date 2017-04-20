@@ -256,6 +256,9 @@ class Report extends Util {
             $list.="<div class='container-fluid'>";
             $list.="<span class='span3'>$courses</span><span class='span1'>From</span><span class='span2'><input type='text' id='datepicker1' style='width:75px;'></span><span class='span1'>To</span><span class='span2'><input type='text' id='datepicker2' style='width:75px;'></span><span class='span1'><button type='button' id='rev_go' class='btn btn-primary'>Go</button></span>";
             $list.="</div>";
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span3'><input type='text' id='report_state' placeholder='State' style='width:160px;'></span><span class='span3'><input type='text' id='report_city' placeholder='City' style='width:150px;'></span>";
+            $list.="</div>";
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading'><img src='http://$this->host/assets/img/ajax.gif' /></span>";
             $list.="</div>";
@@ -283,7 +286,19 @@ class Report extends Util {
         fclose($output);
     }
 
-    function get_revenue_report_data($courseid, $from, $to, $status = true, $output = true) {
+    function filer_by_state($state, $userid) {
+        $query = "select * from mdl_user where id=$userid and state='$state'";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function filer_by_city($city, $userid) {
+        $query = "select * from mdl_user where id=$userid and city='$city'";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_revenue_report_data($courseid, $from, $to, $state, $city, $status = true, $output = true) {
 
         $this->courseid = $courseid;
         $this->from = $from;
@@ -332,11 +347,11 @@ class Report extends Util {
             } // end while
         } // end if $num > 0
         //$payments = $this->get_period_payments($courseid, $unix_from, $unix_to);
-        $card_payments_detailes = $this->get_card_payments_detailes($courseid, $from, $to);
-        $cash_payments_detailes = $this->get_other_payment_report_data($courseid, $from, $to, 1);
-        $cheque_payments_detailes = $this->get_other_payment_report_data($courseid, $from, $to, 2);
-        $refund_payment_detailes = $this->get_refund_payments_detailes($courseid, $from, $to);
-        $invoice_data_details = $this->get_invoice_payments_detailes($courseid, $from, $to);
+        $card_payments_detailes = $this->get_card_payments_detailes($courseid, $from, $to, $state, $city);
+        $cash_payments_detailes = $this->get_other_payment_report_data($courseid, $from, $to, 1, $state, $city);
+        $cheque_payments_detailes = $this->get_other_payment_report_data($courseid, $from, $to, 2, $state, $city);
+        $refund_payment_detailes = $this->get_refund_payments_detailes($courseid, $from, $to, $state, $city);
+        $invoice_data_details = $this->get_invoice_payments_detailes($courseid, $from, $to, $state, $city);
         $grand_total = $this->total_card + $this->total_cash + $this->total_cheque;
         $list.="<div class='container-fluid'>";
         $list.="<div class='span12'>
@@ -737,7 +752,7 @@ class Report extends Util {
         return $list;
     }
 
-    function get_card_payments_detailes($courseid, $from, $to) {
+    function get_card_payments_detailes($courseid, $from, $to, $state, $city) {
         $payments = array();
         $this->courseid = $courseid;
         $this->from = $from;
@@ -774,11 +789,35 @@ class Report extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_status = $this->is_user_deleted($row['userid']);
                 if ($user_status == 0) {
-                    $payment = new stdClass();
-                    foreach ($row as $key => $value) {
-                        $payment->$key = $value;
+                    if ($state == '' && $city == '') {
+                        $payment = new stdClass();
+                        foreach ($row as $key => $value) {
+                            $payment->$key = $value;
+                        }
+                        $payments[] = $payment;
+                    } // end if $state, $city
+
+                    if ($state != '' && $city == '') {
+                        $location_status = $this->filer_by_state($state, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            }
+                            $payments[] = $payment;
+                        } // end if $location_status>0
                     }
-                    $payments[] = $payment;
+
+                    if ($city != '') {
+                        $location_status = $this->filer_by_city($city, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            }
+                            $payments[] = $payment;
+                        } // end if $location_status>0
+                    }
                 } // end if $user_status==0
             } // end while
 
@@ -840,7 +879,7 @@ class Report extends Util {
         return $list;
     }
 
-    function get_refund_payments_detailes($courseid, $from, $to) {
+    function get_refund_payments_detailes($courseid, $from, $to, $state, $city) {
 
         $payments = array();
         $partial_payments = array();
@@ -878,11 +917,35 @@ class Report extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_status = $this->is_user_deleted($row['userid']);
                 if ($user_status == 0) {
-                    $payment = new stdClass();
-                    foreach ($row as $key => $value) {
-                        $payment->$key = $value;
-                    }
-                    $payments[] = $payment;
+                    if ($state == '' && $city == '') {
+                        $payment = new stdClass();
+                        foreach ($row as $key => $value) {
+                            $payment->$key = $value;
+                        }
+                        $payments[] = $payment;
+                    } // end if $state=='' && $city==''
+
+                    if ($state != '' && $city == '') {
+                        $location_status = $this->filer_by_state($state, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            }
+                            $payments[] = $payment;
+                        } // end if $location_status>0
+                    } // end if $state != '' && $city == ''
+
+                    if ($city != '') {
+                        $location_status = $this->filer_by_city($city, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            }
+                            $payments[] = $payment;
+                        } // end if $location_status>0
+                    } // end if $city!=''
                 } // end if $user_status==0
             } // end while
         } // end if $num > 0
@@ -901,11 +964,39 @@ class Report extends Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $payment = new stdClass();
-                foreach ($row as $key => $value) {
-                    $payment->$key = $value;
-                } // end foreach
-                $partial_payments[] = $payment;
+                $user_status = $this->is_user_deleted($row['userid']);
+                if ($user_status == 0) {
+
+                    if ($state == '' && $city == '') {
+                        $payment = new stdClass();
+                        foreach ($row as $key => $value) {
+                            $payment->$key = $value;
+                        } // end foreach
+                        $partial_payments[] = $payment;
+                    } // end if $state == '' && $city == ''
+
+                    if ($state != '' && $city == '') {
+                        $location_status = $this->filer_by_state($state, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            } // end foreach
+                            $partial_payments[] = $payment;
+                        } // end if $location_status>0
+                    } // end if $state != '' && $city == ''
+
+                    if ($city != '') {
+                        $location_status = $this->filer_by_city($city, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            } // end foreach
+                            $partial_payments[] = $payment;
+                        } // end if $location_status>0
+                    } // end if $city!=''
+                } // end if $user_status == 0
             } // end while
         } // end if $num > 0
         $all_refunds = array_merge($payments, $partial_payments); //this array is not compatible
@@ -971,7 +1062,7 @@ class Report extends Util {
         return $list;
     }
 
-    function get_invoice_payments_detailes($courseid, $from, $to) {
+    function get_invoice_payments_detailes($courseid, $from, $to, $state, $city) {
 
         $payments = array();
         $this->courseid = $courseid;
@@ -1057,7 +1148,7 @@ class Report extends Util {
         return $list;
     }
 
-    function get_other_payment_report_data($courseid, $from, $to, $type) {
+    function get_other_payment_report_data($courseid, $from, $to, $type, $state, $city) {
 
         $payments = array();
         $this->courseid = $courseid;
@@ -1095,11 +1186,33 @@ class Report extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_status = $this->is_user_deleted($row['userid']);
                 if ($user_status == 0) {
-                    $payment = new stdClass();
-                    foreach ($row as $key => $value) {
-                        $payment->$key = $value;
-                    }
-                    $payments[] = $payment;
+                    if ($state == '' && $city == '') {
+                        $payment = new stdClass();
+                        foreach ($row as $key => $value) {
+                            $payment->$key = $value;
+                        }
+                        $payments[] = $payment;
+                    } // end if $state=='' && $city==''
+                    if ($state != '' && $city == '') {
+                        $location_status = $this->filer_by_state($state, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            }
+                            $payments[] = $payment;
+                        } // end if $location_status > 0
+                    } // end if $state != '' && $city == ''
+                    if ($city != '') {
+                        $location_status = $this->filer_by_city($city, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            }
+                            $payments[] = $payment;
+                        } // end if $location_status > 0
+                    } // end if $city != ''
                 } // end if $user_status==0
             } // end while         
 

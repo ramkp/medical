@@ -967,6 +967,14 @@ $(document).ready(function () {
         var url = "/lms/custom/reports/get_revenue_report.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+
+            $.post('/lms/custom/utils/states.json', {id: 1}, function (data) {
+                $('#report_state').typeahead({source: data, items: 240});
+            }, 'json');
+
+            $.post('/lms/custom/utils/cities.json', {id: 1}, function (data) {
+                $('#report_city').typeahead({source: data, items: 52000});
+            }, 'json');
         });
     }
 
@@ -974,15 +982,24 @@ $(document).ready(function () {
         var courseid = $('#courses').val();
         var from = $('#datepicker1').val();
         var to = $('#datepicker2').val();
+        var state = $('#report_state').val();
+        var city = $('#report_city').val();
         if (from != '' && to != '') {
             $('#revenue_report_err').html('');
             $('#ajax_loading').show();
             var url = "/lms/custom/reports/get_revenue_report_data.php";
-            $.post(url, {courseid: courseid, from: from, to: to}).done(function (data) {
+            $.post(url, {courseid: courseid, from: from, to: to, state: state, city: city}).done(function (data) {
                 $('#ajax_loading').hide();
                 $('#revenue_report_container').html(data);
+                // ************ JQuery plugins initialization ***********
                 $('#stat_start').datepicker();
                 $('#stat_end').datepicker();
+                $.post('/lms/custom/utils/states.json', {id: 1}, function (data) {
+                    $('#report_state').typeahead({source: data, items: 240});
+                }, 'json');
+                $.post('/lms/custom/utils/cities.json', {id: 1}, function (data) {
+                    $('#report_city').typeahead({source: data, items: 52000});
+                }, 'json');
             });
         } // end if courseid>0 && from!='' && to!=''
         else {
@@ -6489,6 +6506,84 @@ $(document).ready(function () {
             } // end if 
             else {
                 $('#inv_err').html('Please provide at least one participant and invitation text');
+            } // end else
+
+        }
+
+
+        if (event.target.id.indexOf("group_select_all_") >= 0) {
+            var groupid = event.target.id.replace("group_select_all_", "");
+            console.log('Group id: ' + groupid);
+            var boxid = '#' + event.target.id;
+            var checkbox_class = '.user_group_' + groupid;
+            if ($(boxid).prop('checked')) {
+                $(checkbox_class).prop('checked', true);
+            } // end if
+            else {
+                $(checkbox_class).prop('checked', false);
+            } // end else
+
+        }
+
+
+
+        if (event.target.id.indexOf("renew_group_button_") >= 0) {
+            var users = [];
+            var groupid = event.target.id.replace("renew_group_button_", "");
+            var courseelid = '#group_course_' + groupid;
+            var checkbox_class = '.user_group_' + groupid;
+            var group_err_id = '#group_err_' + groupid;
+            var courseid = $(courseelid).val();
+            $(checkbox_class).each(function () {
+                if (this.checked) {
+                    users.push($(this).val());
+                }
+            }); // end foeeach
+            if (users.length > 0) {
+                $(group_err_id).html('');
+                var list = users.join();
+                var gusers = {groupid: groupid, courseid: courseid, users: list};
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/usrgroups/get_group_renew_dialog.php";
+                            $.post(url, {gusers: JSON.stringify(gusers)}).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // end if
+            else {
+                $(group_err_id).html('Please select at least one group user');
+            } // end else
+        }
+
+
+        if (event.target.id == 'renew_group_cert_manager') {
+            var groupid = $('#groupid').val();
+            var group_err_id = '#group_err_' + groupid;
+            var period = $("input[name='period']:checked").val();
+            var ptype = $("input[name='renew_payment_type']:checked").val();
+            var courseid = $('#courseid').val();
+            var users = $('#users').val();
+            var cert = {courseid: courseid, users: users, period: period, ptype: ptype};
+            if (ptype == 0) {
+                $("[data-dismiss=modal]").trigger({type: "click"})
+                var url2 = "https://medical2.com/payments/group_renew/" + courseid + "/" + period + "/" + users;
+                var oWindow = window.open(url2, "print");
+            } // end if ptype==0
+            else {
+                if (confirm('Renew certificate for selected user(s)?')) {
+                    var url = "/lms/custom/usrgroups/renew_group_certificates.php";
+                    $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                        $(group_err_id).html(data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                    });
+                } // end if confirm
             } // end else
 
         }
