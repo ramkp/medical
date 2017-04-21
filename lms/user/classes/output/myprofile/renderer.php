@@ -61,7 +61,7 @@ class renderer extends \plugin_renderer_base {
 
         $userid = $USER->id;
 
-        if ($userid == 2 || $userid == 234) {
+        //if ($userid == 2 || $userid == 234) {
 
             parse_str($_SERVER['QUERY_STRING']);
             $ds = new \Dashboard();
@@ -69,7 +69,7 @@ class renderer extends \plugin_renderer_base {
             $return .= \html_writer::start_tag('section', array('class' => 'node_category', 'id' => 'custom_section'));
             $return .=$ds->get_user_profile_custom_sections($id);
             $return .= \html_writer::end_tag('section');
-        }
+        //}
 
         return $return;
     }

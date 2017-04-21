@@ -2519,6 +2519,9 @@ $(document).ready(function () {
             } // end else
 
 
+            if (event.target.id == 'make_group_renew_payment') {
+                
+            }
 
         }
 

@@ -505,6 +505,7 @@ class Dashboard extends Util {
 
     function get_user_invoice_payments($userid, $courseid) {
         $list = "";
+        $current_user_id = $this->user->id;
         $query = "select * from mdl_invoice "
                 . "where courseid=$courseid and userid=$userid";
         $num = $this->db->numrows($query);
@@ -515,7 +516,7 @@ class Dashboard extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style=''>";
                 $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_pdate']) . ") &nbsp; $coursename </span>";
-                if ($status == 0) {
+                if ($status == 0 && ($current_user_id == 2 || $current_user_id == 234)) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Move</button></span>";
                     $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Refund</button></span>";
                 }
@@ -529,6 +530,7 @@ class Dashboard extends Util {
     function get_user_partial_payments($userid, $courseid) {
         $list = "";
         $already_paid = 0;
+        $current_user_id = $this->user->id;
         $b = new Balance();
         $slotid = $this->get_user_course_slot($courseid, $userid);
         $cost = $b->get_item_cost($courseid, $userid, $slotid);
@@ -551,7 +553,7 @@ class Dashboard extends Util {
                 else {
                     $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
                 } // end else
-                if ($status == 0) {
+                if ($status == 0 && ($current_user_id == 2 || $current_user_id == 234)) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
                     $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Refund</button></span>";
                 }
@@ -1541,20 +1543,20 @@ class Dashboard extends Util {
             </div>";
         } // end if
         else {
-            $status = $this->is_student_only_career_college($id);
-            if ($status == 1) {
-                $list.="<ul class='nav nav-tabs'>
+            //$status = $this->is_student_only_career_college($id);
+            //if ($status == 1) {
+            $list.="<ul class='nav nav-tabs'>
                 <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>";
-                $list.="<input type='hidden' id='userid' value='$id'>  
+            $list.="<input type='hidden' id='userid' value='$id'>  
             </ul>";
 
-                $list.="<div class='tab-content'>
+            $list.="<div class='tab-content'>
               <div id='home' class='tab-pane fade in active'>
                 <h3>Payments &nbsp;&nbsp;<button id='print_payment'>Print</button></h3>
                 <p>$payments</p>
               </div>
              </div>";
-            } // end if $status == 1
+            //} // end if $status == 1
         } // end else
 
         return $list;
