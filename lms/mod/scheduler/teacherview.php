@@ -384,10 +384,9 @@ if ($action == 'updateslot') {
                             var elid = '#id_appointmentnote_' + i;
                             $(elid).text(current_item);
                         } // end for 
-
                     } // end if
                 });
-
+                // ******* Set typehead functionality *******
                 $.get('/lms/custom/utils/wslocation.json', function (data) {
                     $('#id_appointmentlocation').typeahead({source: data, items: 24});
                 }, 'json');
