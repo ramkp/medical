@@ -1474,4 +1474,18 @@ class Schedule extends Util {
         } // end if count($users_arr)>0
     }
 
+    function get_slot_student_notes($slotid) {
+        $notes = array();
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid=$slotid order by id";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $notes[] = $row['appointmentnote'];
+            } // end while
+        } // end if $num > 0
+        return json_encode($notes);
+    }
+
 }

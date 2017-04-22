@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Contains various sub-screens that a teacher can see.
  *
@@ -297,7 +296,6 @@ if ($action == 'addslot') {
 
 
     <?php
-
     if ($mform->is_cancelled()) {
         redirect($returnurl);
     } // end if
@@ -351,7 +349,6 @@ if ($action == 'updateslot') {
         <script type="text/javascript">
             $(document).ready(function () {
 
-
                 $.get('/lms/custom/utils/wslocation.json', function (data) {
                     $('#id_appointmentlocation').typeahead({source: data, items: 24});
                 }, 'json');
@@ -366,7 +363,6 @@ if ($action == 'updateslot') {
         </script>
 
         <?php
-
     } // end else if $formdata = $mform->get_data()
     else {
         echo $output->heading(get_string('updatesingleslot', 'scheduler'));
@@ -375,6 +371,22 @@ if ($action == 'updateslot') {
         ?>
         <script type="text/javascript">
             $(document).ready(function () {
+                // ******* Set appointment notes *******
+                var url = '/lms/custom/schedule/get_slot_student_notes.php';
+                $.post(url, {slotid: <?php echo $slotid; ?>}, function (data) {
+                    var pdata = JSON.parse(data);
+                    console.log('Server response: ' + data);
+                    console.log('Parsed data: ' + pdata)
+                    if (pdata.length > 0) {
+                        for (var i = 0; i <= pdata.length - 1; i++) {
+                            var current_item = pdata[i];
+                            console.log('Current item: ' + current_item);
+                            var elid = '#id_appointmentnote_' + i;
+                            $(elid).text(current_item);
+                        } // end for 
+
+                    } // end if
+                });
 
                 $.get('/lms/custom/utils/wslocation.json', function (data) {
                     $('#id_appointmentlocation').typeahead({source: data, items: 24});
@@ -387,7 +399,6 @@ if ($action == 'updateslot') {
         </script>
 
         <?php
-
         die;
     } // end else
 }
