@@ -1204,6 +1204,10 @@ class Mailer {
         return $list;
     }
 
+    function send_group_renewal_message() {
+        
+    }
+
     function send_payment_confirmation_message($payment, $group = null, $free = null) {
         //$renew_fee = $this->get_renew_fee($payment->courseid);
         $recipient = $payment->bill_email;
@@ -1736,6 +1740,161 @@ class Mailer {
         $mail->Subject = $item->title;
         $mail->Body = $item->text;
         $email = $item->email;
+        $addrA = 'sirromas@gmail.com';
+        $mail->AddAddress($email);
+        $mail->addCC($addrA);
+        if (!$mail->send()) {
+            return false;
+        } // end if !$mail->send()
+        else {
+            return true;
+        }
+    }
+
+    function get_group_users_details($users_arr) {
+        $list = "";
+        $students_num = count($users_arr);
+        foreach ($users_arr as $userid) {
+            $user = $this->get_user_details($userid);
+
+            $list.="<tr>";
+            $list.="<td>First name</td><td>$user->firstname</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td>Last name</td><td>$user->lastname</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td>Email</td><td>$user->email</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td colspan='2'><br></td>";
+            $list.="</tr>";
+        }  // end foreach
+
+        $list.="<tr style='background-color:#F5F5F5;'>
+        <td>Total students</td><td>$students_num</td>
+        </tr>";
+
+        return $list;
+    }
+
+    function get_state_name($id) {
+        $query = "select * from mdl_states where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        }
+        return $state;
+    }
+
+    function send_group_renewal_receipt($p, $ptype) {
+        $list = "";
+        $subject = "Medical2 - Group Renewal";
+        $state = $this->get_state_name($p->billing_state);
+        $users_arr = explode(',', $p->userslist);
+        $group_users = $this->get_group_users_details($users_arr);
+        $catid = $this->get_course_category($p);
+        $list.= "<!DOCTYPE HTML><html><head><title>Payment Confirmation</title>";
+        $list.="</head>";
+        $list.="<body><br/><br/><br/><br/>";
+        $list.="<div class='datagrid'>            
+            <table style='table-layout: fixed;' width='360'>
+            <thead>";
+
+        if ($catid == 5) {
+            $list.="<tr>";
+            $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
+            $list.="</tr>";
+        } // end if
+        else {
+            $list.="<tr>";
+            $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+            $list.="</tr>";
+        } // end else
+
+        $list.="</thead>";
+
+        $list.="<tbody>";
+
+        $list.=$group_users;
+
+        $list.="<tr style=''>
+        <td colspan='2' style='font-weight:bold;'><br>Billing info</td>
+        </tr>";
+
+        $list.="<tr>";
+        $list.="<td>Billing name:</td><td>$p->billing_name</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Email:</td><td>$p->billing_email</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Phone:</td><td>$p->billing_phone</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Address:</td><td>$p->billing_addr </td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>City:</td><td>$p->billing_city</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>State:</td><td>$state</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Zip:</td><td>$p->billing_zip</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Applied program:</td><td>Group certificate renewal</td>";
+        $list.="</tr>";
+
+        if ($ptype == 0) {
+            $list.="<tr>";
+            $list.="<td>Payment status:</td><td>Paid by card $$p->psum</td>";
+            $list.="</tr>";
+        } // end if $ptype==0
+        else {
+            $list.="<tr>";
+            $list.="<td>Payment status:</td><td>Paid by cheque $$p->psum</td>";
+            $list.="</tr>";
+        } // end ele
+
+        $list.="<tr>";
+        $list.="<td>Order date:</td><td>" . date('m-d-Y h:i:s') . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='2'><br>If you need assistance please contact us by email help@medical2.com or call us 877-741-1996</td>";
+        $list.="</tr>";
+
+        $list.="</tbody>";
+
+        $list.="</table>";
+
+
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $list;
+        $email = $p->billing_email;
         $addrA = 'sirromas@gmail.com';
         $mail->AddAddress($email);
         $mail->addCC($addrA);

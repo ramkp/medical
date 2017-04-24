@@ -1,6 +1,8 @@
 <?php
 
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates2.php';
 
 /**
  * Description of Groups
@@ -91,10 +93,13 @@ class Groups extends Util {
                 $users = $this->get_group_users($g->id);
                 $total_users = $this->get_group_total_users($g->id);
                 $coursename = $this->get_course_name($g->courseid);
+                $renew_button = $this->is_course_certificate_expired($g->courseid, $g->id);
                 $list.="<div class='row-fluid'>";
-                $list.="<span class='span3'>$g->name <br>" . $total_users . " total participants</span>";
+                $list.="<input type='hidden' id='group_course_$g->id' value='$g->courseid'>";
+                $list.="<span class='span3'>$g->name <br>" . $total_users . " total participants<br> <input type='checkbox' id='group_select_all_$g->id'>Select All<br><span id='group_err_$g->id'></span></span>";
                 $list.="<span class='span3'>$coursename</span>";
                 $list.="<span class='span3'>$users</span>";
+                $list.="<span calss='span2'>$renew_button</span>";
                 $list.="</div>";
                 $list.="<div class='row-fluid'>";
                 $list.="<span class='span9'><hr/></span>";
@@ -116,6 +121,244 @@ class Groups extends Util {
         return $list;
     }
 
+    function is_course_certificate_expired($courseid, $groupid) {
+        $list = "";
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $expired = $row['expired'];
+        }
+        if ($expired == 0) {
+            $list.="<button class='btn btn-primary' disabled id='renew_group_button_$groupid'>Renew</button>";
+        } // end if $expired==0
+        else {
+            $list.="<button class='btn btn-primary' id='renew_group_button_$groupid'>Renew</button>";
+        } // end else
+        return $list;
+    }
+
+    function get_states_box() {
+        $list = "";
+        $list.="<select id='billing_state' style='width:220px;'>";
+        $list.="<otpion value='0' selected>State</option>";
+        $query = "select * from mdl_states order by state";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $list.="<option value='" . $row['id'] . "'>" . $row['state'] . "</option>";
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_billing_person_info() {
+        $list = "";
+        $state = $this->get_states_box();
+        $list.="<div class='container-fluid' style='text-align:left;'>
+                        <span class='span2'>Billing name*</span>
+                        <span class='span2'><input type='text' id='billing_name'></span>
+                    </div>
+                    
+                    <div class='container-fluid' style='text-align:left;'>
+                        <span class='span2'>Billing email*</span>
+                        <span class='span2'><input type='text' id='billing_email'></span>
+                    </div>
+                    
+                    <div class='container-fluid' style='text-align:left;'>
+                        <span class='span2'>Billing Phone*</span>
+                        <span class='span2'><input type='text' id='billing_phone'></span>
+                    </div>
+                    
+                    <div class='container-fluid' style='text-align:left;'>
+                        <span class='span2'>Billing Address*</span>
+                        <span class='span2'><input type='text' id='billing_addr'></span>
+                    </div>
+                    
+                    <div class='container-fluid' style='text-align:left;'>
+                        <span class='span2'>Billing City*</span>
+                        <span class='span2'><input type='text' id='billing_city'></span>
+                    </div>
+                    
+                    <div class='container-fluid' style='text-align:left;'>
+                        <span class='span2'>Billing State*</span>
+                        <span class='span2'>$state</span>
+                    </div>
+                    
+                    <div class='container-fluid' style='text-align:left;'>
+                        <span class='span2'>Billing Zip*</span>
+                        <span class='span2'><input type='text' id='billing_zip'></span>
+                    </div>";
+
+
+
+        return $list;
+    }
+
+    function get_renew_cert_dialog($gusers) {
+        $list = "";
+        $billing_info = $this->get_billing_person_info();
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Renew user certificate</h4>
+                </div>
+                <div class='modal-body' style='text-align:center;'>
+                
+                <input type='hidden' id='courseid' value='$gusers->courseid'>
+                <input type='hidden' id='users' value='" . base64_encode($gusers->users) . "'>  
+                <input type='hidden' id='groupid' value='$gusers->groupid'>      
+                
+                <div class='container-fluid' style='text-align:left;'>
+                
+                 <span class='span1'>
+                 <input type='radio' name='renew_payment_type' class='ptype' value='0' checked>Card
+                 </span>
+                 
+                 <!--
+                  <span class='span1'>
+                  <input type='radio' name='renew_payment_type' class='ptype' value='1'>Cash
+                  </span>
+                  -->
+                  
+                  <span class='span2'>
+                  <input type='radio' name='renew_payment_type' class='ptype' value='2'>Cheque
+                  </span>
+              
+                </div>
+                
+                 <div class='container-fluid' style='text-align:left;'>
+                 
+                 <span class='span1'>
+                 <input type='radio' name='period' class='period' value='1' checked>1 Year
+                 </span>
+                 
+                  <span class='span1'>
+                  <input type='radio' name='period' class='period' value='2'>2 Year
+                  </span>
+                 
+                  <span class='span2'>
+                  <input type='radio' name='period' class='period' value='3'>3 Year
+                  </span>
+                  
+                  </div>
+                  
+                <div class='container-fluid' id='billing_div' style='text-align:left;display:none;'>";
+
+        $list.=$billing_info;
+
+        $list.="</div>
+
+                <div class='container-fluid' style=''>
+                <span class='span4' style='color:red;' id='group_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='renew_group_cert_manager'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function calculate_group_renew_amount($courseid, $period, $total) {
+        $query = "select * from mdl_renew_amount where courseid=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $amount = $row['amount'];
+        }
+        $group_amount = $amount * $period * $total;
+        return $group_amount;
+    }
+
+    function renew_group_certificates($cert) {
+        $courseid = $cert->courseid;
+        $groupid = $cert->groupid;
+        $period = $cert->period;
+        $userslist = base64_decode($cert->users); // comma separared list
+        $ptype = $cert->ptype;
+        $users_arr = explode(',', $userslist);
+        $total = count($users_arr);
+        $psum = $this->calculate_group_renew_amount($courseid, $period, $total);
+        $usersum = round($psum / $total);
+        $payment = new stdClass();
+        $payment->courseid = $courseid;
+        $payment->groupid = $groupid;
+        $payment->psum = $psum;
+        $payment->billing_name = $cert->billing_name;
+        $payment->billing_email = $cert->billing_email;
+        $payment->billing_phone = $cert->billing_phone;
+        $payment->billing_addr = $cert->billing_addr;
+        $payment->billing_city = $cert->billing_city;
+        $payment->billing_state = $cert->billing_state;
+        $payment->billing_zip = $cert->billing_zip;
+        $payment->ptype = $ptype;
+        $payment->userslist = $userslist;
+
+        if (count($users_arr) > 0) {
+            $certObj = new Certificates2();
+            foreach ($users_arr as $userid) {
+                $p = new stdClass();
+                $p->courseid = $courseid;
+                $p->userid = $userid;
+                $p->ptype = $ptype;
+                $p->psum = $usersum;
+                $p->pdate = time();
+                $this->add_group_user_renew_payment($p);
+                $certObj->renew_certificate($courseid, $userid, $period);
+            } // end foreach
+            $this->add_group_payer_data($payment);
+            $list = "<span style='font-weight:bold;'>Certificate(s) has been renewed</span>";
+            return $list;
+        } // end if count($users_arr)>0
+    }
+
+    function add_group_payer_data($payment) {
+        $m = new Mailer();
+        $query = "insert into mdl_group_payments "
+                . "(courseid,"
+                . "groupid,"
+                . "psum,"
+                . "billing_name,"
+                . "email,"
+                . "phone,"
+                . "address,"
+                . "city,"
+                . "state,"
+                . "zip,"
+                . "pdate) "
+                . "values ($payment->courseid,"
+                . "$payment->groupid,"
+                . "'$payment->psum',"
+                . "'$payment->billing_name',"
+                . "'$payment->billing_email',"
+                . "'$payment->billing_phone',"
+                . "'$payment->billing_addr',"
+                . "'$payment->billing_city',"
+                . "$payment->billing_state,"
+                . "'$payment->billing_zip',"
+                . "'" . time() . "')";
+        $this->db->query($query);
+        $m->send_group_renewal_receipt($payment, $payment->ptype);
+    }
+
+    function add_group_user_renew_payment($p) {
+        $query = "insert into mdl_partial_payments "
+                . "(courseid,"
+                . "userid,"
+                . "psum,"
+                . "ptype,"
+                . "pdate) "
+                . "values ($p->courseid,"
+                . "$p->userid,"
+                . "$p->psum,"
+                . "$p->ptype,"
+                . "'$p->pdate')";
+        $this->db->query($query);
+    }
+
     function get_group_users($groupid) {
         $list = "";
         $users = array();
@@ -127,7 +370,7 @@ class Groups extends Util {
         foreach ($users as $userid) {
             $user = $this->get_user_details($userid);
             $list.="<div class='row-fluid'>";
-            $list.="<span class='span12'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$userid' target='_blank' style='cursor:pointer;'>$user->firstname $user->lastname</a></span>";
+            $list.="<span class='span12'><input type='checkbox' class='user_group_$groupid' value='$userid'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$userid' target='_blank' style='cursor:pointer;'>$user->firstname $user->lastname</a></span>";
             $list.="</div>";
         }
 

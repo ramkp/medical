@@ -468,6 +468,7 @@ class Dashboard extends Util {
         $list = "";
         $b = new Balance();
         $already_paid = 0;
+        $current_user = $this->user->id;
         $slotid = $this->get_user_course_slot($courseid, $userid);
         $cost = $b->get_item_cost($courseid, $userid, $slotid);
         $renew_amount = $this->get_renew_fee($courseid);
@@ -491,7 +492,7 @@ class Dashboard extends Util {
                 } // end else
                 if ($status == 0) {
                     $prohibit = $this->get_user_roles($userid);
-                    if ($prohibit == 0) {
+                    if ($prohibit == 0 && ($current_user == 2 || $current_user == 234)) {
                         $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
                         $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
                     }
@@ -515,7 +516,7 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style=''>";
-                $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_pdate']) . ") &nbsp; $coursename </span>";
+                $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_date']) . ") &nbsp; $coursename </span>";
                 if ($status == 0 && ($current_user_id == 2 || $current_user_id == 234)) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Move</button></span>";
                     $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Refund</button></span>";
@@ -681,10 +682,11 @@ class Dashboard extends Util {
                 $original_payment = $this->get_original_payment_info($row['courseid'], $row['userid']);
                 $pdate = $original_payment->pdate;
                 $psum = $original_payment->psum;
+                $fullpsum = $psum + $row['psum'];
                 $date = date('m-d-Y', $row['refund_date']);
 
                 $list.="<div class='row-fluid'>";
-                $list.="<span class='span9'>Paid by card $" . $psum . " ($pdate) $coursename</span>";
+                $list.="<span class='span9'>Paid by card $" . $fullpsum . " ($pdate) $coursename</span>";
                 $list.="</div>";
 
                 $list.="<div class='row-fluid' style='color:red;font-weigh:bold;'>";
@@ -700,10 +702,10 @@ class Dashboard extends Util {
         $list = "";
         $card_payments = $this->get_user_card_payments($userid, $courseid);
         //$refund_payments = $this->get_refund_payments($userid, $courseid);
-        $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
+        //$invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
         $free_payments = $this->get_user_free_payments($userid, $courseid);
-        $list.=$card_payments . $partial_payments . $free_payments . $invoice_payments;
+        $list.=$card_payments . $partial_payments . $free_payments;
         return $list;
     }
 

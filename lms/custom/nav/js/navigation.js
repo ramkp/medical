@@ -1,17 +1,6 @@
 
 $(document).ready(function () {
 
-    // *************** Skype meeting configs  *******************
-    var client_id = '7061f110-40c4-4336-8945-6441429282ef';
-    var meeting_request_url = 'https://login.microsoftonline.com/common/oauth2/authorize?response_type=token' +
-            '&redirect_uri=' + 'https://medical2.com/lms/custom/skype/hangout.php?id=16' +
-            '&client_id=' + client_id +
-            '&resource=https://webdir.online.lync.com';
-    var config = {
-        apiKey: 'a42fcebd-5b43-4b89-a065-74450fb91255', // SDK
-        apiKeyCC: '9c967f6b-a846-4df2-b43d-5167e47d81e1' // SDK+UI
-    };
-
     $('#mpermission').click(function () {
         var url = 'https://medical2.com/lms/admin/roles/manage.php';
         //window.open = url;
@@ -4158,6 +4147,17 @@ $(document).ready(function () {
             }); // end of post
         }
 
+        if ($(event.target).attr('class') == 'ptype') {
+            console.log('Inside change ...');
+            var ptype = $("input[name='renew_payment_type']:checked").val();
+            console.log('Payment type: ' + ptype);
+            if (ptype == 2) {
+                $('#billing_div').show();
+            } // end if ptype==2
+            else {
+                $('#billing_div').hide();
+            } // end else
+        }
 
     }); // end of body change event ...
 
@@ -6568,22 +6568,47 @@ $(document).ready(function () {
             var group_err_id = '#group_err_' + groupid;
             var period = $("input[name='period']:checked").val();
             var ptype = $("input[name='renew_payment_type']:checked").val();
+            var billing_name = $('#billing_name').val();
+            var billing_email = $('#billing_email').val();
+            var billing_phone = $('#billing_phone').val();
+            var billing_addr = $('#billing_addr').val();
+            var billing_city = $('#billing_city').val();
+            var billing_state = $('#billing_state').val();
+            var billing_zip = $('#billing_zip').val();
+
             var courseid = $('#courseid').val();
             var users = $('#users').val();
-            var cert = {courseid: courseid, users: users, period: period, ptype: ptype};
+            var cert = {courseid: courseid,
+                groupid:groupid,
+                users: users,
+                period: period,
+                ptype: ptype,
+                billing_name: billing_name,
+                billing_email: billing_email,
+                billing_phone: billing_phone,
+                billing_addr: billing_addr,
+                billing_city: billing_city,
+                billing_state: billing_state,
+                billing_zip: billing_zip};
             if (ptype == 0) {
                 $("[data-dismiss=modal]").trigger({type: "click"})
                 var url2 = "https://medical2.com/payments/group_renew/" + courseid + "/" + period + "/" + users;
                 var oWindow = window.open(url2, "print");
             } // end if ptype==0
             else {
-                if (confirm('Renew certificate for selected user(s)?')) {
-                    var url = "/lms/custom/usrgroups/renew_group_certificates.php";
-                    $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
-                        $(group_err_id).html(data);
-                        $("[data-dismiss=modal]").trigger({type: "click"});
-                    });
-                } // end if confirm
+                if (billing_name != '' && billing_email != '' && billing_phone != '' && billing_addr != '' && billing_city != '' && billing_state > 0 && billing_zip != '') {
+                    $('#group_err').html('');
+                    if (confirm('Renew certificate for selected user(s)?')) {
+                        var url = "/lms/custom/usrgroups/renew_group_certificates.php";
+                        $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
+                            $(group_err_id).html(data);
+                            $("[data-dismiss=modal]").trigger({type: "click"});
+                        });
+                    } // end if confirm
+                } // end if billing_name!='' && billing_email!=''
+                else {
+                    $('#group_err').html('Please provide all required fields');
+                } // end else
             } // end else
 
         }
