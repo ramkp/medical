@@ -568,6 +568,7 @@ class Dashboard extends Util {
         $list = "";
         $query = "select * from mdl_free  "
                 . "where courseid=$courseid and userid=$userid";
+        $current_user = $this->user->id;
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $coursename = $this->get_course_name($courseid);
@@ -576,7 +577,7 @@ class Dashboard extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 $list.="<span class='span8'><span style='color:red;'>Discount: $" . round($row['psum']) . "</span>&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
-                if ($status == 0) {
+                if ($status == 0 && ($current_user == 2 || $current_user == 234)) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
                     $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Refund</button></span>";
                 }
@@ -705,7 +706,7 @@ class Dashboard extends Util {
         $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
         $free_payments = $this->get_user_free_payments($userid, $courseid);
-        $list.=$card_payments . $partial_payments . $free_payments.$invoice_payments;
+        $list.=$card_payments . $partial_payments . $free_payments . $invoice_payments;
         return $list;
     }
 
