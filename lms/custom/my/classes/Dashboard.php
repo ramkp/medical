@@ -515,7 +515,7 @@ class Dashboard extends Util {
             $status = $this->get_user_course_completion_status($userid, $courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="<div class='container-fluid' style=''>";
+                $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_date']) . ") &nbsp; $coursename </span>";
                 if ($status == 0 && ($current_user_id == 2 || $current_user_id == 234)) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Move</button></span>";
@@ -702,10 +702,10 @@ class Dashboard extends Util {
         $list = "";
         $card_payments = $this->get_user_card_payments($userid, $courseid);
         //$refund_payments = $this->get_refund_payments($userid, $courseid);
-        //$invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
+        $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
         $free_payments = $this->get_user_free_payments($userid, $courseid);
-        $list.=$card_payments . $partial_payments . $free_payments;
+        $list.=$card_payments . $partial_payments . $free_payments.$invoice_payments;
         return $list;
     }
 
@@ -762,10 +762,12 @@ class Dashboard extends Util {
     function get_address_block($userid) {
         $list = "";
         $currentuser = $this->user->id;
+        $groupname = $this->get_user_group_name($userid);
         if ($currentuser != 2 && $userid != $currentuser) {
             $prohibit = $this->get_user_roles($userid);
             if ($prohibit == 0) {
                 $user_detailes = $this->get_user_details($userid);
+                $list.="Grpoup name: " . $groupname . "<br>";
                 $list.="$user_detailes->firstname $user_detailes->lastname<br>";
                 $list.="Phone: $user_detailes->phone1<br>";
                 $list.="Email: $user_detailes->email<br>";
@@ -775,6 +777,7 @@ class Dashboard extends Util {
         } // end if $currentuser != 2 && $userid != $currentuser
         else {
             $user_detailes = $this->get_user_details($userid);
+            $list.="Grpoup name: " . $groupname . "<br>";
             $list.="$user_detailes->firstname $user_detailes->lastname<br>";
             $list.="Phone: $user_detailes->phone1<br>";
             $list.="Email: $user_detailes->email<br>";
@@ -3542,8 +3545,25 @@ class Dashboard extends Util {
                 . "mdate='$date', "
                 . "mh='$w->hour', "
                 . "mm='$w->min' where id='$w->id'";
-        echo "Query: " . $query . "<br>";
         $this->db->query($query);
+    }
+
+    function get_user_group_name($userid) {
+        $groupname = 'N/A';
+        $query = "select * from mdl_groups_members where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $groupid = $row['groupid'];
+            } // end while
+            $query = "select * from mdl_groups where id=$groupid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $groupname = $row['name'];
+            } // end while 
+        } // end if $num > 0
+        return $groupname;
     }
 
 }

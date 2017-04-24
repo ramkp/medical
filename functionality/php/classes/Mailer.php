@@ -1790,11 +1790,21 @@ class Mailer {
         return $state;
     }
 
+    function get_group_name($groupid) {
+        $query = "select * from mdl_groups where id=$groupid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $name = $row['name'];
+        }
+        return $name;
+    }
+
     function send_group_renewal_receipt($p, $ptype) {
         $list = "";
         $subject = "Medical2 - Group Renewal";
         $state = $this->get_state_name($p->billing_state);
         $users_arr = explode(',', $p->userslist);
+        $groupname = $this->get_group_name($p->groupid);
         $group_users = $this->get_group_users_details($users_arr);
         $catid = $this->get_course_category($p);
         $list.= "<!DOCTYPE HTML><html><head><title>Payment Confirmation</title>";
@@ -1818,6 +1828,10 @@ class Mailer {
         $list.="</thead>";
 
         $list.="<tbody>";
+
+        $list.="<tr style='font-weight:bold;'>";
+        $list.="<td>Group ID</td><td>$groupname<br></td>";
+        $list.="</tr>";
 
         $list.=$group_users;
 
@@ -1896,8 +1910,12 @@ class Mailer {
         $mail->Body = $list;
         $email = $p->billing_email;
         $addrA = 'sirromas@gmail.com';
+        $addrB = 'info@medical2.com';
+        $addrC = 'help@medical2.com';
         $mail->AddAddress($email);
         $mail->addCC($addrA);
+        $mail->addCC($addrB);
+        $mail->addCC($addrC);
         if (!$mail->send()) {
             return false;
         } // end if !$mail->send()
