@@ -573,8 +573,8 @@ class Dashboard extends Util {
             $status = $this->get_user_course_completion_status($userid, $courseid);
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list.="<div class='container-fluid' style=''>";
-                $list.="<span class='span8'>Free adjustment $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                $list.="<div class='container-fluid' style='padding-left:0px;'>";
+                $list.="<span class='span8'><span style='color:red;'>Discount: $" . round($row['psum']) . "</span>&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
                 if ($status == 0) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
                     $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Refund</button></span>";
@@ -624,8 +624,25 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_original_payment_info($courseid, $userid) {
+        $query = "select * from mdl_card_payments "
+                . "where courseid=$courseid and userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $pdate = date('m-d-Y', $row['pdate']);
+            $psum = $row['psum'];
+        }
+        $p = new stdClass();
+        $p->pdate = $pdate;
+        $p->psum = $psum;
+        return $p;
+    }
+
     function get_user_all_refund_payments($userid) {
         $list = "";
+        $list.="<div class='row-fluid' style='color:red;font-weigh:bold;'>";
+        $list.="<span class='span6'><hr/></span>";
+        $list.="</div>";
 
         // 1. Get full refunds
         $query = "select * from mdl_card_payments "
@@ -638,9 +655,17 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $coursename = $this->get_course_name($row['courseid']);
+                $pdate = date('m-d-Y', $row['pdate']);
                 $date = date('m-d-Y', $row['refund_date']);
-                $list.="<div class='row-fluid'>";
-                $list.="<span span9>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
+
+                // Original payment
+                $list.="<div class='row-fluid' style=''>";
+                $list.="<span class='span9'>Paid by card $" . $row['psum'] . " ($pdate) $coursename</span>";
+                $list.="</div>";
+
+                // Refund info
+                $list.="<div class='row-fluid' style='color:red;font-weigh:bold;'>";
+                $list.="<span class='span9'>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
                 $list.="</div>";
             } // end while
         } // end if $num > 0
@@ -652,10 +677,18 @@ class Dashboard extends Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $coursename = $this->get_course_name($courseid);
+                $coursename = $this->get_course_name($row['courseid']);
+                $original_payment = $this->get_original_payment_info($row['courseid'], $row['userid']);
+                $pdate = $original_payment->pdate;
+                $psum = $original_payment->psum;
                 $date = date('m-d-Y', $row['refund_date']);
+
                 $list.="<div class='row-fluid'>";
-                $list.="<span span9>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
+                $list.="<span class='span9'>Paid by card $" . $psum . " ($pdate) $coursename</span>";
+                $list.="</div>";
+
+                $list.="<div class='row-fluid' style='color:red;font-weigh:bold;'>";
+                $list.="<span class='span9'>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
                 $list.="</div>";
             } // end while
         } // end if $num > 0
@@ -1708,7 +1741,7 @@ class Dashboard extends Util {
         $owe = ($diff < 0) ? '-$' . abs($diff) : '$' . $diff;
         if ($report) {
             $list.="<table>";
-            $list.="<tr style='font-weight:bold;'>";
+            $list.="<tr style='font-weight:bold;' style=''>";
             $list.="<td style='padding:0px'>Program cost:</td><td style='padding:15px'>$$cost</td>";
             $list.="<td style='padding:0px'>Paid:</td><td style='padding:15px'>$$total</td>";
             $list.="<td style='padding:0px'>Balance:</td><td style='padding:15px'>$owe</td>";
@@ -1719,7 +1752,7 @@ class Dashboard extends Util {
             $list.="</table>";
         } // end if $report
         else {
-            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<div class='row-fluid' style='font-weight:bold;color:red;'>";
             $list.="<span class='span1'>Cost:</span><span class='span1'>$$cost</span>";
             $list.="<span class='span1'>Paid:</span><span class='span1'>$$total</span>";
             $list.="<span class='span1'>Balance:</span><span class='span1'><span style='font-weight:bold;color:red;'>$owe</span></span>";
