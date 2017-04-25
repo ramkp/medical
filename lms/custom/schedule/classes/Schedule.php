@@ -1420,7 +1420,7 @@ class Schedule extends Util {
         <div class='modal-dialog'>
             <div class='modal-content' style='min-height:575px;'>
                 <div class='modal-header'>
-                    <h4 class='modal-title'>Send Email <button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button> &nbsp; <button type='button' class='btn btn-primary' id='send_schedule_bulk_email'>OK</button></h4>
+                    <h4 class='modal-title'>Send Email <button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button> &nbsp; <button type='button' class='btn btn-primary' id='send_schedule_bulk_email'>Send</button></h4>
                 </div>
                 <div class='modal-body' style='height:970px;min-height:575px;'>
                 
