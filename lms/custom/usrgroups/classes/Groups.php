@@ -208,17 +208,18 @@ class Groups extends Util {
                 <input type='hidden' id='users' value='" . base64_encode($gusers->users) . "'>  
                 <input type='hidden' id='groupid' value='$gusers->groupid'>      
                 
-                <div class='container-fluid' style='text-align:left;'>
+                <div class='container-fluid' style='text-align:center;'>
                 
+                 <!--
                  <span class='span1'>
                  <input type='radio' name='renew_payment_type' class='ptype' value='0' checked>Card
                  </span>
+                 -->
                  
-                 <!--
                   <span class='span1'>
-                  <input type='radio' name='renew_payment_type' class='ptype' value='1'>Cash
+                  <input type='radio' name='renew_payment_type' class='ptype' value='1' checked>Paypal
                   </span>
-                  -->
+                 
                   
                   <span class='span2'>
                   <input type='radio' name='renew_payment_type' class='ptype' value='2'>Cheque
@@ -342,6 +343,80 @@ class Groups extends Util {
                 . "'" . time() . "')";
         $this->db->query($query);
         $m->send_group_renewal_receipt($payment, $payment->ptype);
+    }
+
+    function send_paypal_group_renew_receipt($g) {
+        /*
+         * 
+          [pid] => 194
+          [userslist] => 11571,11572
+         * 
+         */
+        $m = new Mailer();
+        $query = "select * from mdl_group_payments where id=$g->pid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['courseid'];
+            $groupid = $row['groupid'];
+            $psum = $row['psum'];
+            $name = $row['billing_name'];
+            $email = $row['email'];
+            $phone = $row['phone'];
+            $addr = $row['address'];
+            $city = $row['city'];
+            $state = $row['state'];
+            $zip = $row['zip'];
+        }
+
+        $payment = new stdClass();
+        $payment->courseid = $courseid;
+        $payment->groupid = $groupid;
+        $payment->psum = $psum;
+        $payment->billing_name = $name;
+        $payment->billing_email = $email;
+        $payment->billing_phone = $phone;
+        $payment->billing_addr = $addr;
+        $payment->billing_city = $city;
+        $payment->billing_state = $state;
+        $payment->billing_zip = $zip;
+        $payment->ptype = 0;
+        $payment->userslist = $g->userslist;
+        $m->send_group_renewal_receipt($payment, $payment->ptype);
+    }
+
+    function add_paypal_payer_data($payment) {
+        $billing_name = $payment->b_fname . " " . $payment->b_lname;
+        $query = "insert into mdl_group_payments "
+                . "(courseid,"
+                . "groupid,"
+                . "psum,"
+                . "billing_name,"
+                . "email,"
+                . "phone,"
+                . "address,"
+                . "city,"
+                . "state,"
+                . "zip,"
+                . "pdate) "
+                . "values ($payment->courseid,"
+                . "$payment->groupid,"
+                . "'$payment->psum',"
+                . "'$billing_name',"
+                . "'$payment->b_email',"
+                . "'$payment->b_phone',"
+                . "'$payment->b_addr',"
+                . "'$payment->b_city',"
+                . "$payment->b_state,"
+                . "'$payment->b_zip',"
+                . "'" . time() . "')";
+        $this->db->query($query);
+
+        $query = "select * from mdl_group_payments order by id desc limit 0,1";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row['id'];
+        }
+        return $id;
     }
 
     function add_group_user_renew_payment($p) {

@@ -1830,7 +1830,11 @@ class Mailer {
         $list.="<tbody>";
 
         $list.="<tr style='font-weight:bold;'>";
-        $list.="<td>Group ID</td><td>$groupname<br></td>";
+        $list.="<td>Group ID</td><td>$groupname</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='2'><br></td>";
         $list.="</tr>";
 
         $list.=$group_users;
@@ -1873,7 +1877,7 @@ class Mailer {
 
         if ($ptype == 0) {
             $list.="<tr>";
-            $list.="<td>Payment status:</td><td>Paid by card $$p->psum</td>";
+            $list.="<td>Payment status:</td><td>Paid by card/paypal $$p->psum</td>";
             $list.="</tr>";
         } // end if $ptype==0
         else {

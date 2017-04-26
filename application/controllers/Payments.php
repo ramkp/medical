@@ -100,10 +100,20 @@ class Payments extends CI_Controller {
         $courseid = $this->uri->segment(3);
         $period = $this->uri->segment(4);
         $userslist = base64_decode($this->uri->segment(5));
-        $form = $this->payment_model->get_group_renew_form($courseid, $period, $userslist);
+        $type = $this->uri->segment(6);
+        $form = $this->payment_model->get_group_renew_form($courseid, $period, $userslist, $type);
         $data = array('form' => $form);
         $this->load->view('header_view');
-        $this->load->view('payment_view', $data);
+        $this->load->view('braintree_view', $data);
+        $this->load->view('footer_view');
+    }
+
+    public function paypal_receive() {
+        $response = $_REQUEST;
+        $form = $this->payment_model->process_paypal_response($response);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('braintree_view', $data);
         $this->load->view('footer_view');
     }
 

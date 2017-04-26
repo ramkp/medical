@@ -34,6 +34,81 @@ $(document).ready(function () {
 
     var codeused = 0;
 
+    function supports_local_storage() {
+        try {
+            return 'localStorage' in window && window['localStorage'] !== null;
+        } // end try 
+        catch (e) {
+            return false;
+        } // end else
+    }
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };
+
+    $("#paypal_group_renew_submit").submit(function (event) {
+        var storage = supports_local_storage();
+        if (storage !== false) {
+            // HTML5 storage is supported so  we could proceeed
+            var courseid = $('#courseid').val();
+            var groupid = $('#groupid').val();
+            var psum = $('#psum').val();
+            var b_fname = $('#b_fname').val();
+            var b_lname = $('#b_lname').val();
+            var b_phone = $('#b_phone').val();
+            var b_email = $('#b_email').val();
+            var b_addr = $('#b_addr').val();
+            var b_city = $('#b_city').val();
+            var billing_state = $('#billing_state').val();
+            var b_zip = $('#b_zip').val();
+            if (b_fname != '' && b_lname != '' && b_phone != '' && b_email != '' && b_addr != '' && b_city != '' && billing_state > 0 && b_zip != '') {
+                $('#paypal_err').html('');
+                var payment = {courseid: courseid,
+                    groupid: groupid,
+                    psum: psum,
+                    b_fname: b_fname,
+                    b_lname: b_lname,
+                    b_phone: b_phone,
+                    b_email: b_email,
+                    b_addr: b_addr,
+                    b_city: b_city,
+                    b_state: billing_state,
+                    b_zip: b_zip};
+                var url = "/lms/custom/usrgroups/add_paypal_payer_data.php";
+                $.post(url, {p: JSON.stringify(payment)}).done(function (data) {
+                    var pid = data;
+                    if (pid > 0) {
+                        localStorage.setItem('group_renew_payer_id', pid);
+                    } // end if pid>0
+                    else {
+                        $('#paypal_err').html('Ops, something goes wrong ...');
+                    } // end else
+                });
+            } // end if b_fname != '' && b_lname != '' ...
+            else {
+                event.preventDefault();
+                $('#paypal_err').html('Please provide all required fields');
+            } // end else
+        } // end if storage!==false
+        else {
+            event.preventDefault();
+            $('#paypal_err').html('Your browser is not supported');
+        } // end else
+    });
+
+
     /* ---------- Add class .active to current link ---------- */
     $('ul.main-menu li a').each(function () {
 
@@ -2520,7 +2595,7 @@ $(document).ready(function () {
 
 
             if (event.target.id == 'make_group_renew_payment') {
-                
+
             }
 
         }
