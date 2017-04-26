@@ -377,7 +377,8 @@ class Report extends Util {
                         <div class='tab-pane active' id='option1'>
 
                             <h3>Card payments - $$this->total_card - <a href='http://" . $_SERVER['SERVER_NAME'] . "/lms/custom/reports/files/" . $this->card_report_csv_file . "' target='_blank'>Export to CSV</a></h3>
-							<h5>Grand total (card payments, cash and cheque payments) - $$grand_total</h5>
+                                                <h3>Refund payments - $$this->refund_sum </h3>
+                                                <h3>Grand total (card payments, cash and cheque payments) - $$grand_total</h3>
                             <p>$card_payments_detailes</p>
 
                         </div>                    
