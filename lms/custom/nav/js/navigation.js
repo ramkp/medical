@@ -5554,11 +5554,12 @@ $(document).ready(function () {
 
         if (event.target.id == 'update_deposit') {
             var id = $('#dp_id').val();
+            var banknum = $('#banknum').val();
             var amount = $('#amount').val();
             var date = $('#pdate').val();
-            var deposit = {id: id, amount: amount, date: date};
+            var deposit = {id: id, amount: amount, date: date, banknum: banknum};
             console.log('Deposit: ' + JSON.stringify(deposit));
-            if (amount > 0 && date != '') {
+            if (amount > 0 && date != '' && banknum != '') {
                 $('#dep_err').html('');
                 var url = "/lms/custom/deposit/update_deposit.php";
                 $.post(url, {deposit: JSON.stringify(deposit)}).done(function () {
@@ -6579,7 +6580,7 @@ $(document).ready(function () {
             var courseid = $('#courseid').val();
             var users = $('#users').val();
             var cert = {courseid: courseid,
-                groupid:groupid,
+                groupid: groupid,
                 users: users,
                 period: period,
                 ptype: ptype,
@@ -6592,12 +6593,12 @@ $(document).ready(function () {
                 billing_zip: billing_zip};
             if (ptype == 0) {
                 $("[data-dismiss=modal]").trigger({type: "click"})
-                var url2 = "https://medical2.com/payments/group_renew/" + courseid + "/" + period + "/" + users+"/card";
+                var url2 = "https://medical2.com/payments/group_renew/" + courseid + "/" + period + "/" + users + "/card";
                 var oWindow = window.open(url2, "print");
             } // end if ptype==0
             if (ptype == 1) {
                 $("[data-dismiss=modal]").trigger({type: "click"})
-                var url2 = "https://medical2.com/payments/group_renew/" + courseid + "/" + period + "/" + users+"/paypal";
+                var url2 = "https://medical2.com/payments/group_renew/" + courseid + "/" + period + "/" + users + "/paypal";
                 var oWindow = window.open(url2, "print");
             } // end if ptype==0
             else {

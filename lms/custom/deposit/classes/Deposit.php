@@ -259,6 +259,7 @@ class Deposit extends Util {
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $amount = $row['amount'];
             $added = date('m/d/y', $row['added']);
+            $banknum = $row['banknum'];
         }
 
         $list = "";
@@ -270,6 +271,11 @@ class Deposit extends Util {
                 </div>
                 <div class='modal-body' style='width:650px;'>
                 <input type='hidden' id='dp_id' value='$id'>
+                    
+                <div class='container-fluid'>
+                <span class='span2'>Bank cheque num *</span>
+                <span class='span2'><input type='text' id='banknum' value='$banknum' style=''></span>
+                </div>
                 
                 <div class='container-fluid'>
                 <span class='span2'>Amount ($)*</span>
@@ -300,7 +306,7 @@ class Deposit extends Util {
     function update_deposit($d) {
         $date = strtotime($d->date);
         $query = "update mdl_deposit "
-                . "set amount='$d->amount', "
+                . "set banknum='$d->banknum', amount='$d->amount', "
                 . "added='$date' "
                 . "where id='$d->id'";
         $this->db->query($query);
