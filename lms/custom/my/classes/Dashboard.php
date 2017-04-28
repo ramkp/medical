@@ -40,7 +40,7 @@ class Dashboard extends Util {
     }
 
     function is_user_paid() {
-        if ($this->user->id == 11772 || $this->user->id == 11773) {
+        if ($this->user->id == 11772 || $this->user->id == 11773 || $this->user->id == 13734) {
             return 1;
         } // end if $this->user->id==11772
         $status = 0;

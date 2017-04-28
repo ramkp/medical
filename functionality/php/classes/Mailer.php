@@ -1928,4 +1928,33 @@ class Mailer {
         }
     }
 
+    function send_career_survey_result($m) {
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        $mail->isHTML(true);
+        $mail->Subject = 'Medical2 - Career College Survey Result';
+        $mail->Body = $m;
+
+        $addrA = 'sirromas@gmail.com';
+        $addrB = 'info@medical2.com';
+        $addrC = 'help@medical2.com';
+        $mail->AddAddress($addrA);
+        $mail->addCC($addrB);
+        $mail->addCC($addrC);
+        if (!$mail->send()) {
+            return false;
+        } // end if !$mail->send()
+        else {
+            return true;
+        }
+    }
+
 }

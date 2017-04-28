@@ -6616,9 +6616,62 @@ $(document).ready(function () {
                     $('#group_err').html('Please provide all required fields');
                 } // end else
             } // end else
-
         }
 
+        if (event.target.id == 'submit_career_survey') {
+            var courseid = $('#courseid').val();
+            var userid = $('#userid').val();
+            var inst_att = $("input[name='inst_att']:checked").val();
+            var inst_man = $("input[name='inst_man']:checked").val();
+            var prog_desc = $("input[name='prog_desc']:checked").val();
+            var prog_exp = $("input[name='prog_exp']:checked").val();
+            var facility = $("input[name='facility']:checked").val();
+            var reason_no = $('#reason_no').val();
+            var recommend = $('#recommend').val();
+            var improve = $('#improve').val();
+            var comments = $('#comments').val();
+            var graduate_status = $("input[name='graduate_status']:checked").val();
+            var graduate_date = $('#graduate_date').val();
+            var exam_status = $("input[name='exam_status']:checked").val();
+            var exam_fail_reason = $('#exam_fail_reason').val();
+            var has_job = $("input[name='has_job']:checked").val();
+            var job_place = $('#job_place').val();
+            var no_job_reason = $('#no_job_reason').val();
+
+            var survey = {courseid: courseid,
+                userid: userid,
+                inst_att: inst_att,
+                inst_man: inst_man,
+                prog_desc: prog_desc,
+                prog_exp: prog_exp,
+                facility: facility,
+                reason_no: reason_no,
+                recommend: recommend,
+                improve: improve,
+                comments: comments,
+                graduate_status: graduate_status,
+                graduate_date: graduate_date,
+                exam_status: exam_status,
+                exam_fail_reason: exam_fail_reason,
+                has_job: has_job,
+                job_place: job_place,
+                no_job_reason: no_job_reason};
+            console.log('Instructor attitude ' + inst_att);
+            if (typeof inst_att != 'undefined' && typeof inst_man != 'undefined' && typeof prog_desc != 'undefined' && typeof prog_exp != 'undefined' && typeof facility != 'undefined' && typeof graduate_status != 'undefined' && typeof exam_status != 'undefined' && typeof has_job != 'undefined') {
+                $('#survey_err').html('');
+                console.log('Survey object: ' + JSON.stringify(survey));
+                var url = "/lms/custom/survey/add_career_survey.php";
+                $.post(url, {data: JSON.stringify(survey)}).done(function (data) {
+                    console.log(data);
+                    document.location.reload();
+                });
+            } // end if ....
+            else {
+                $('#survey_err').html('Please provide all required fields ...');
+            } // end else
+
+
+        }
 
 
 

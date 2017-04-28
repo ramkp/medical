@@ -7,6 +7,7 @@ require_once($CFG->libdir . '/completionlib.php');
 require_once($CFG->dirroot . '/custom/my/classes/Dashboard.php');
 require_once($CFG->dirroot . '/custom/calendar/classes/Calendar.php');
 require_once($CFG->dirroot . '/custom/instructors/classes/Instructors.php');
+require_once($CFG->dirroot . '/custom/survey/classes/Survey.php');
 
 $cal = new Calendar();
 $inst = new Instructors();
@@ -289,6 +290,20 @@ if ($roleid == 5 && $category == 2 && $completed > 0 && $has_application > 0) {
 } // end if
 
 
+/* Career college survey */
+if ($roleid == 5) {
+    // Put survey here if student is applicable
+    //if ($USER->id == 13734) {
+        $s = new Survey();
+        $applicable = $s->survey_applicable();
+        if ($applicable) {
+            $list = $s->get_career_collge_survey();
+            echo $list;
+            die();
+        } // end if $applicable
+    //} // end if $USER->id==13734
+} // end if $roleid == 5
+
 /* * **********************************************************
 
  * Code related to instructor's calendar and students attendance
@@ -316,7 +331,6 @@ if ($COURSE->id == 71) {
     $meeting = $ds->get_meeting_block($COURSE->id);
     echo $meeting;
 } // end if $COURSE->id==71
-
 // ************************************************************
 // Course wrapper start.
 echo html_writer::start_tag('div', array('class' => 'course-content'));
@@ -401,11 +415,11 @@ include_course_ajax($course, $modnamesused);
 <?php
 if ($COURSE->id == 71) {
     ?>
-           
+
     <?php
 } // end if course id=71
 ?>
-
+        $('#graduate_date').datepicker();
 
     }); // end of document ready
 
