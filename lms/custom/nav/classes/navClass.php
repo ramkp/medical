@@ -329,29 +329,54 @@ class navClass extends Util {
     }
 
     function get_user_courses($userid) {
-        $contexts = array();
-        $courses = array();
-        $query = "select * from mdl_role_assignments "
-                . "where roleid=5 and userid=$userid ";
+        /*
+          $contexts = array();
+          $courses = array();
+          $query = "select * from mdl_role_assignments "
+          . "where roleid=5 and userid=$userid ";
+          $result = $this->db->query($query);
+          while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+          $contexts[] = $row['contextid'];
+          } // end while
+          if (count($contexts) > 0) {
+          foreach ($contexts as $contextid) {
+          $query = "select * from mdl_context where id=$contextid";
+          $result = $this->db->query($query);
+          while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+          $courses[] = $row['instanceid'];
+          } // end while
+          } // end foreach
+          } // end if count($contexts)>0
+         */
+        $courses = $this->get_user_enrollments($userid);
+        return $courses;
+    }
+
+    function get_user_enrollments($userid) {
+        $query = "select * from mdl_user_enrolments where userid=$userid";
+        //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $contexts[] = $row['contextid'];
-        } // end while
-        if (count($contexts) > 0) {
-            foreach ($contexts as $contextid) {
-                $query = "select * from mdl_context where id=$contextid";
+            $enrols[] = $row['enrolid'];
+        }
+
+        if (count($enrols) > 0) {
+            foreach ($enrols as $enrolid) {
+                //$query = "select * from mdl_enrol where id=$enrolid and enrol='manual'";
+                $query = "select * from mdl_enrol where id=$enrolid ";
                 $result = $this->db->query($query);
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $courses[] = $row['instanceid'];
-                } // end while
+                    $courses[] = $row['courseid'];
+                }
             } // end foreach
-        } // end if count($contexts)>0
-        return $courses;
+        } // end if count($enrols)>0
+        return array_unique($courses);
     }
 
     function get_students_menu_items() {
         $userid = $this->user->id;
         $courses = $this->get_user_courses($userid);
+        //print_r($courses);
         $list = "";
         $list = $list . "<header role='banner' class='navbar'>
         <nav role='navigation' class='navbar-inner'>
@@ -397,8 +422,35 @@ class navClass extends Util {
         } // end if count($courses)>0
         $list.="</ul>
                         </li>                        
-                    </ul>                            
-                    <div class='nav-collapse collapse'>
+                    </ul>";
+        // Books section
+
+        $list.="<div class='nav-collapse collapse'>
+                        <ul class='nav pull-left'>                   
+                            <li class='dropdown'><a title='Books' class='dropdown-toggle' href='#cm_submenu_2'>Books<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>";
+        foreach ($courses as $courseid) {
+            if ($courseid == 44) {
+                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy/M2%20PhlebBook.pdf' target='_blank'>M2 PhlebBook</a></li>";
+                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy/Phlebotomy.pdf' target='_blank'>Phlebotomy</a></li>";
+            } // end if
+            if ($courseid == 45) {
+                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/EKG-%20ECG.pdf' target='_blank'>EKG - ECG</a></li>";
+                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/M2%20PhlebBook.pdf' target='_blank'>M2 Phlebotomy Book</a></li>";
+                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/Phlebotomy.pdf' target='_blank'>Phlebotomy</a></li>";
+            } // end if
+        } // end foreach
+        $list.="</ul>
+                            </li>
+                        </ul>
+                        <div class='nav-divider-right'></div>
+                        <ul class='nav pull-right'>
+                            <li></li>
+                        </ul>
+                    </div>";
+
+        // Profile section
+        $list.="<div class='nav-collapse collapse'>
                         <ul class='nav pull-right'>                   
                             <li class='dropdown'><a title='Account' class='dropdown-toggle' href='#cm_submenu_2'>Account<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                

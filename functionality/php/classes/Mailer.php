@@ -769,7 +769,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -920,10 +920,17 @@ class Mailer {
         </tr>";
 
         if ($catid == 2) {
+
+            if ($user->courseid == 44 || $user->courseid == 45) {
+                $list.="<tr>";
+                $list.="<td colspan='2'>To download your books, please login into system using your username and password and click on 'Books' link at the top.</td>";
+                $list.="</tr>";
+            } // end if $user->courseid==44 || $user->courseid==45
+
             $list.="<tr style=''>";
             $list.="<td colspan='2'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
             $list.="</tr>";
-        }
+        } // end if $catid == 2
 
         $list.="</tbody>
         </table>
