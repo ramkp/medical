@@ -29,6 +29,7 @@ class Dashboard extends Util {
     public $assesment_path;
     public $student_role = 5;
     public $workshop_category = 2;
+    public $renew_payments;
 
     function __construct() {
         parent::__construct();
@@ -37,6 +38,7 @@ class Dashboard extends Util {
         $this->assignment_module = 1;
         $this->assesment_path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/my";
         $this->create_programs_data();
+        $this->renew_payments = array(50, 75, 100, 125, 150, 225);
     }
 
     function is_user_paid() {
@@ -467,11 +469,9 @@ class Dashboard extends Util {
     function get_user_card_payments($userid, $courseid) {
         $list = "";
         $b = new Balance();
+        $certificate_date = $b->has_certificate($courseid, $userid);
         $already_paid = 0;
         $current_user = $this->user->id;
-        $slotid = $this->get_user_course_slot($courseid, $userid);
-        $cost = $b->get_item_cost($courseid, $userid, $slotid);
-        $renew_amount = $this->get_renew_fee($courseid);
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid and userid=$userid and refunded=0";
         $num = $this->db->numrows($query);
@@ -481,14 +481,18 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $already_paid = $already_paid + $row['psum'];
-                $diff = $cost - $already_paid;
-                $owe = ($diff < 0) ? '-$' . abs($diff) : '$' . $diff;
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
-                if ($row['psum'] != $renew_amount) {
+                if (!in_array($row['psum'], $this->renew_payments)) {
                     $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
                 } // end if $row['psum']!=$renew_amount
                 else {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                    // Payments are similar to renew, we need to make additional checks
+                    if ($certificate_date != null && $certificate_date < $row['pdate']) {
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                    } // end if 
+                    else {
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    }
                 } // end else
                 if ($status == 0) {
                     $prohibit = $this->get_user_roles($userid);
@@ -496,7 +500,7 @@ class Dashboard extends Util {
                         $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
                         $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
                     }
-                }
+                } // end if status==0
                 $list.="</div>";
             } // end while
         } // end if $num>0
@@ -507,6 +511,8 @@ class Dashboard extends Util {
     function get_user_invoice_payments($userid, $courseid) {
         $list = "";
         $current_user_id = $this->user->id;
+        $b = new Balance();
+        $certificate_date = $b->has_certificate($courseid, $userid);
         $query = "select * from mdl_invoice "
                 . "where courseid=$courseid and userid=$userid";
         $num = $this->db->numrows($query);
@@ -516,7 +522,18 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
-                $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_date']) . ") &nbsp; $coursename </span>";
+                if (!in_array($row['i_sum'], $this->renew_payments)) {
+                    $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_date']) . ") &nbsp; $coursename </span>";
+                } // end if 
+                else {
+                    // Payments are similar to renew, we need additional cahecking
+                    if ($certificate_date != null && $certificate_date < $row['i_date']) {
+                        $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_date']) . ") &nbsp; Certificate Renew ($coursename) </span>";
+                    } // end if
+                    else {
+                        $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_date']) . ") &nbsp; $coursename </span>";
+                    } // end else
+                } // end else
                 if ($status == 0 && ($current_user_id == 2 || $current_user_id == 234)) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Move</button></span>";
                     $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='i_" . $row['id'] . "'>Refund</button></span>";
@@ -533,9 +550,7 @@ class Dashboard extends Util {
         $already_paid = 0;
         $current_user_id = $this->user->id;
         $b = new Balance();
-        $slotid = $this->get_user_course_slot($courseid, $userid);
-        $cost = $b->get_item_cost($courseid, $userid, $slotid);
-        $renew_amount = $this->get_renew_fee($courseid);
+        $certificate_date = $b->has_certificate($courseid, $userid);
         $query = "select * from mdl_partial_payments  "
                 . "where courseid=$courseid and userid=$userid";
         $num = $this->db->numrows($query);
@@ -545,14 +560,17 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $already_paid = $already_paid + $row['psum'];
-                $diff = $cost - $already_paid;
-                $owe = ($diff < 0) ? '-$' . abs($diff) : '$' . $diff;
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
-                if ($row['psum'] != $renew_amount) {
+                if (!in_array($row['psum'], $this->renew_payments)) {
                     $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
                 } // end if 
                 else {
-                    $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                    if ($certificate_date != null && $certificate_date < $row['pdate']) {
+                        $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                    } // end if 
+                    else {
+                        $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    } // end else
                 } // end else
                 if ($status == 0 && ($current_user_id == 2 || $current_user_id == 234)) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
@@ -566,6 +584,8 @@ class Dashboard extends Util {
 
     function get_user_free_payments($userid, $courseid) {
         $list = "";
+        $b = new Balance();
+        $certificate_date = $b->has_certificate($courseid, $userid);
         $query = "select * from mdl_free  "
                 . "where courseid=$courseid and userid=$userid";
         $current_user = $this->user->id;
@@ -576,7 +596,17 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
-                $list.="<span class='span8'><span style='color:red;'>Discount: $" . round($row['psum']) . "</span>&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                if (!in_array($row['psum'], $this->renew_payments)) {
+                    $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                } // end if 
+                else {
+                    if ($certificate_date != null && $certificate_date < $row['pdate']) {
+                        $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                    } // end if 
+                    else {
+                        $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    } // end else
+                } // end else
                 if ($status == 0 && ($current_user == 2 || $current_user == 234)) {
                     $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Move</button></span>";
                     $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='p_" . $row['id'] . "'>Refund</button></span>";
@@ -1756,34 +1786,70 @@ class Dashboard extends Util {
         return $slotid;
     }
 
+    function is_exam_attempt($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $category = $row['category'];
+        }
+        $status = ($category == 4) ? true : false;
+        return $status;
+    }
+
     function get_user_course_balance($userid, $courseid, $report = false) {
         $list = "";
         $b = new Balance();
         $slotid = $this->get_profile_course_slotid($userid, $courseid);
         $cost = $b->get_item_cost($courseid, $userid, $slotid);
-        $total = $b->get_student_payments($courseid, $userid);
-        $diff = $cost - $total;
-        $owe = ($diff < 0) ? '-$' . abs($diff) : '$' . $diff;
-        if ($report) {
-            $list.="<table>";
-            $list.="<tr style='font-weight:bold;' style=''>";
-            $list.="<td style='padding:0px'>Program cost:</td><td style='padding:15px'>$$cost</td>";
-            $list.="<td style='padding:0px'>Paid:</td><td style='padding:15px'>$$total</td>";
-            $list.="<td style='padding:0px'>Balance:</td><td style='padding:15px'>$owe</td>";
-            $list.="</tr>";
-            //$list.="<tr style='font-weight:bold;'>";
-            //$list.="<td style='padding:0px' colspan='9'><hr/></td>";
-            //$list.="</tr>";
-            $list.="</table>";
-        } // end if $report
+        $exam_status = $this->is_exam_attempt($courseid);
+        if ($exam_status) {
+            $total = $cost;
+            $owe = '$0';
+            if ($report) {
+                $list.="<table>";
+                $list.="<tr style='font-weight:bold;' style=''>";
+                $list.="<td style='padding:0px'>Program cost:</td><td style='padding:15px'>$$cost</td>";
+                $list.="<td style='padding:0px'>Paid:</td><td style='padding:15px'>$$total</td>";
+                $list.="<td style='padding:0px'>Balance:</td><td style='padding:15px'>$owe</td>";
+                $list.="</tr>";
+                $list.="</table>";
+            } // end if $report
+            else {
+                $list.="<div class='row-fluid' style='font-weight:bold;color:red;'>";
+                $list.="<span class='span1'>Cost:</span><span class='span1'>$$cost</span>";
+                $list.="<span class='span1'>Paid:</span><span class='span1'>$$total</span>";
+                $list.="<span class='span1'>Balance:</span><span class='span1'><span style='font-weight:bold;color:red;'>$owe</span></span>";
+                $list.="</div>";
+            } // end else
+        } // end if $exam_status
         else {
-            $list.="<div class='row-fluid' style='font-weight:bold;color:red;'>";
-            $list.="<span class='span1'>Cost:</span><span class='span1'>$$cost</span>";
-            $list.="<span class='span1'>Paid:</span><span class='span1'>$$total</span>";
-            $list.="<span class='span1'>Balance:</span><span class='span1'><span style='font-weight:bold;color:red;'>$owe</span></span>";
-            $list.="</div>";
-        } // end else
-
+            // It is not failed exam attempt, so we should calculate everything
+            $total = $b->get_student_payments_for_balance($courseid, $userid);
+            $late_fee = $b->get_course_late_fee($courseid);
+            $diff = $cost - $total;
+            if ($diff < 0 && abs($diff) == $late_fee) {
+                $owe = '$0';
+            } // end if  
+            else {
+                $owe = ($diff < 0) ? '-$' . abs($diff) : '$' . $diff;
+            }
+            if ($report) {
+                $list.="<table>";
+                $list.="<tr style='font-weight:bold;' style=''>";
+                $list.="<td style='padding:0px'>Program cost:</td><td style='padding:15px'>$$cost</td>";
+                $list.="<td style='padding:0px'>Paid:</td><td style='padding:15px'>$$total</td>";
+                $list.="<td style='padding:0px'>Balance:</td><td style='padding:15px'>$owe</td>";
+                $list.="</tr>";
+                $list.="</table>";
+            } // end if $report
+            else {
+                $list.="<div class='row-fluid' style='font-weight:bold;color:red;'>";
+                $list.="<span class='span1'>Cost:</span><span class='span1'>$$cost</span>";
+                $list.="<span class='span1'>Paid:</span><span class='span1'>$$total</span>";
+                $list.="<span class='span1'>Balance:</span><span class='span1'><span style='font-weight:bold;color:red;'>$owe</span></span>";
+                $list.="</div>";
+            } // end else
+        } // end else when it is not exam
         return $list;
     }
 

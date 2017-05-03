@@ -10,11 +10,37 @@ require_once ('/home/cnausa/public_html/lms/class.pdo.database.php');
 class Balance {
 
     public $db;
+    public $renew_payments;
+    public $career_courses;
 
     function __construct() {
-
         $db = new pdo_db();
         $this->db = $db;
+        $this->renew_payments = array(50, 75, 100, 125, 150, 225);
+        $this->career_courses = $this->get_career_courses();
+    }
+
+    function has_certificate($courseid, $userid) {
+        $date = null;
+        $query = "select * from mdl_certificates "
+                . "where courseid=$courseid and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $date = $row['issue_date'];
+            } // end while
+        } // end if $num > 0
+        return $date;
+    }
+
+    function get_career_courses() {
+        $query = "SELECT * FROM `mdl_course` WHERE category BETWEEN 5 and 8";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courses[] = $row['id'];
+        }
+        return $courses;
     }
 
     function get_course_cost($courseid) {
@@ -33,6 +59,21 @@ class Balance {
             $cost = $row['cost'];
         }
         return $cost;
+    }
+
+    function get_course_late_fee($courseid) {
+        $query = "select * from mdl_late_fee where courseid=$courseid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $fee = $row['fee_amount'];
+            } // end while
+        } // end if $num > 0
+        else {
+            $fee = 25;
+        }
+        return $fee;
     }
 
     function get_user_promo_code_discount($courseid, $userid) {
@@ -63,6 +104,95 @@ class Balance {
             $list.="</div>";
         } // end if $num > 0
         return $list;
+    }
+
+    function is_renew_payment($sum, $courseid, $userid, $pdate) {
+        $cert_issue_date = $this->has_certificate($courseid, $userid);
+        if ($cert_issue_date != null) {
+            if (in_array($courseid, $this->career_courses)) {
+                // carrer courses do not have renew payments - it is part of balance
+                $payment = $sum;
+            } /// end if in_array($courseid, $this->career_courses
+            if (in_array($sum, $this->renew_payments) && $pdate > $cert_issue_date) {
+                $payment = 0; // it is renew payment and should not be part of balance
+            } // end if in_array($sum, $this->renew_payments
+            else {
+                $payment = $sum;
+            } // end else
+        } // end if $cert_issue_date!=null
+        else {
+            // Certificate is not yet issued, so payment is part of balance
+            $payment = $sum;
+        } // end else
+        return $payment;
+    }
+
+    function get_student_payments_for_balance($courseid, $userid) {
+
+        // 1. Check credit card payments
+        // 2. Check cash payments
+        // 3. Check free payments
+        // 4. Check invoice payments
+
+        $card_payments = 0;
+        $cash_payments = 0;
+        $free_payments = 0;
+        $invoice_payments = 0;
+
+        $query = "select * from mdl_card_payments "
+                . "where courseid=$courseid "
+                . "and userid=$userid "
+                . "and refunded=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $card_payments = $card_payments + $this->is_renew_payment($row['psum'], $courseid, $userid, $row['pdate']);
+            }
+        }
+
+        // ------------------------------------------------------------- //
+
+        $query = "select * from mdl_partial_payments "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $cash_payments = $cash_payments + $this->is_renew_payment($row['psum'], $courseid, $userid, $row['pdate']);
+            }
+        }
+
+        // ------------------------------------------------------------- //
+
+        $query = "select * from mdl_free "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $free_payments = $free_payments + $this->is_renew_payment($row['psum'], $courseid, $userid, $row['pdate']);
+            }
+        }
+
+        // ------------------------------------------------------------- //
+
+        $query = "select * from mdl_invoice "
+                . "where courseid=$courseid "
+                . "and userid=$userid and i_status=1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $invoice_payments = $invoice_payments + $this->is_renew_payment($row['i_sum'], $courseid, $userid, $row['i_pdate']);
+            }
+        }
+
+        $totalpaid = $card_payments + $cash_payments + $free_payments + $invoice_payments;
+
+        return $totalpaid;
     }
 
     function get_student_payments($courseid, $userid) {
