@@ -920,13 +920,6 @@ class Mailer {
         </tr>";
 
         if ($catid == 2) {
-
-            if ($user->courseid == 44 || $user->courseid == 45) {
-                $list.="<tr>";
-                $list.="<td colspan='2'>To download your books, please login into system using your username and password and click on 'Books' link at the top.</td>";
-                $list.="</tr>";
-            } // end if $user->courseid==44 || $user->courseid==45
-
             $list.="<tr style=''>";
             $list.="<td colspan='2'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
             $list.="</tr>";
