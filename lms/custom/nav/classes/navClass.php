@@ -430,11 +430,8 @@ class navClass extends Util {
                             <li class='dropdown'><a title='Books' class='dropdown-toggle' href='#cm_submenu_2'>Books<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>";
         foreach ($courses as $courseid) {
-            if ($courseid == 44) {
-                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy/M2%20PhlebBook.pdf' target='_blank'>M2 PhlebBook</a></li>";
-                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy/Phlebotomy.pdf' target='_blank'>Phlebotomy</a></li>";
-            } // end if
-            if ($courseid == 45) {
+            $completion_status = $this->is_course_completed($courseid, $this->user->id);
+            if ($courseid == 45 && $completion_status > 0) {
                 $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/EKG-%20ECG.pdf' target='_blank'>EKG - ECG</a></li>";
                 $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/M2%20PhlebBook.pdf' target='_blank'>M2 Phlebotomy Book</a></li>";
                 $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/Phlebotomy.pdf' target='_blank'>Phlebotomy</a></li>";
