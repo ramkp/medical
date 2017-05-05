@@ -374,10 +374,61 @@ class Certificates2 {
     }
 
     function renew_certificate($courseid, $userid, $expire_year) {
+        $this->make_certificate_copy($courseid, $userid);
         $template = $this->get_certificate_template($courseid, $userid, $expire_year);
         $m = new Mailer();
         $m->send_updated_certificate($courseid, $userid);
         return $template;
+    }
+
+    function make_certificate_copy($courseid, $userid) {
+        $src = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf";
+        $dir = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$userid/$courseid/copy";
+        if (!is_dir($dir)) {
+            echo "Directory $dir is not exists ... <br>";
+            $dir_status = mkdir($dir, 0777, true);
+            if ($dir_status) {
+                echo "Directory $dir was successfully created ... <br>";
+                $dest = $dir . '/certificate.pdf';
+                if (!copy($src, $dest)) {
+                    echo "File $src was not successfully copied ...<br>";
+                } // end if
+                else {
+                    echo "File $src was successfully copied ...<br>";
+                } // end else
+            } // end if $dir_status
+            else {
+                echo "Directory $dir was not created ... <br>";
+            } // end else
+        } // end if !is_dir($dir)
+    }
+
+    function get_certificate_src_file($courseid, $userid) {
+        $file = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf";
+        $src = (is_file($file) === TRUE) ? $file : FALSE;
+        return $src;
+    }
+
+    function migrate_certificates() {
+        $i = 0;
+        $query = "select * from mdl_certificates";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['courseid'];
+            $userid = $row['userid'];
+            $src = $this->get_certificate_src_file($courseid, $userid);
+            if ($src !== false) {
+                echo "Certificate file exists: $src ...<br>";
+                $this->make_certificate_copy($courseid, $userid);
+                echo "<br>------------------------------------------------<br>";
+                $i++;
+            } // end if $src!==false
+            else {
+                echo "Certificate file is not exists ....<br>";
+                echo "<br>------------------------------------------------<br>";
+            } // end else
+        } // end while
+        echo "Total certificates found: " . $i . "<br>";
     }
 
 }
