@@ -53,4 +53,50 @@ class Register2 extends CI_Controller {
         $this->load->view('footer_view');
     }
 
+    function brain_register() {
+        $courseid = $this->uri->segment(3);
+        $slotid = $this->uri->segment(4);
+        if ($courseid == null) {
+            $form = $this->register_model->get_brain_register_form();
+        } // end if $courseid==null
+        else {
+            if ($slotid == '') {
+                $slotid = 0;
+            }
+            $form = $this->register_model->get_brain_register_form($courseid, $slotid);
+        } // end if 
+
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('register_view', $data);
+        $this->load->view('footer_view');
+    }
+
+    function payment_card() {
+        $user = $this->uri->segment(3);
+        $form = $this->register_model->get_brain_card_form($user);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('brain_card', $data);
+        $this->load->view('footer_view');
+    }
+
+    function payment_paypal() {
+        $user = $this->uri->segment(3);
+        $form = $this->register_model->get_brain_paypal_form($user);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('register_view', $data);
+        $this->load->view('footer_view');
+    }
+
+    function receive_paypal_register_payment() {
+        $payment = $_REQUEST;
+        $form = $this->register_model->process_paypal_payment($payment);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('register_view', $data);
+        $this->load->view('footer_view');
+    }
+
 }

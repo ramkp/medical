@@ -202,7 +202,7 @@ class Enroll {
 
     function send_confirmation_email($user) {
         $mailer = new Mailer();
-        $mailer->send_account_confirmation_message($user);
+        $mailer->send_account_confirmation_message($user, FALSE);
     }
 
     function add_user_to_course_schedule($userid, $user) {

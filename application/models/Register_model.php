@@ -14,6 +14,7 @@ class register_model extends CI_Model {
     public function __construct() {
         parent::__construct();
         $this->load->database();
+        //$this->load->library('session');
         $this->host = $_SERVER['SERVER_NAME'];
     }
 
@@ -666,16 +667,16 @@ class register_model extends CI_Model {
             $list.="<span class='span2'>Card number*</span>";
             $list.="<span class='span2'><input type='text' id='card_no2' name='card_no2'  ></span>";
             $list.="<span class='span2'>CVV*</span>";
-            $list.="<span class='span2'><input type='text' id='cvv2' name='cvv2'  ></span>";    
+            $list.="<span class='span2'><input type='text' id='cvv2' name='cvv2'  ></span>";
             $list.="</div>";
-            
+
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>&nbsp;</span>";
             $list.="<span class='span2'>&nbsp;</span>";
             $list.="<span class='span2'>Expiration Date*</span>";
             $list.="<span class='span2'>" . $card_month2 . "&nbsp;&nbsp;&nbsp;" . $card_year2 . "</span>";
             $list.="</div>";
-         
+
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span8'><input type='checkbox' id='da'> &nbsp; If billing address is different</span>";
             $list.="</div>";
@@ -873,9 +874,423 @@ class register_model extends CI_Model {
             return $list;
         }
 
+        return $list;
+    }
 
+    function get_register_paypal_button($coursid, $slotid, $userid) {
+        $list = "";
+
+
+        $list.="<form action='https://www.sandbox.paypal.com/cgi-bin/webscr' method='post' id='paypal_group_renew_submit'>"; // sandbox
+        $list.="<input type='hidden' name='cmd' value='_xclick'>";
+        $list.="<INPUT TYPE='hidden' name='charset' value='utf-8'>";
+        //$list.="<input type='hidden' name='business' value='contato@iprovida.org.br'>"; // production
+        $list.="<input type='hidden' name='business' value='sirromas-facilitator@outlook.com'>"; // sandbox
+        $list.="<input type='hidden' name='item_name' value='Group certificate renewal'>
+        <input type='hidden' name='amount' value='$cost'>
+        <input type='hidden' name='custom' value='$courseid/$userid'>    
+        <INPUT TYPE='hidden' NAME='currency_code' value='USD'>    
+        <INPUT TYPE='hidden' NAME='return' value='https://medical2.com/payments/paypal_receive/'>
+        <input type='image' id='paypal_btn' src='https://www.sandbox.paypal.com/en_US/i/btn/btn_buynow_LG.gif' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'>
+        <img alt='' border='0' src='https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif' width='1' height='1'>
+        </form>";
 
         return $list;
+    }
+
+    function get_brain_register_form($courseid = null, $slotid = null) {
+        $list = "";
+        $cats = $this->get_course_categories();
+        $courses = $this->get_courses_by_category();
+        $participants = $this->get_participants_dropbox();
+        $come_from = $this->come_from();
+        $states = $this->get_states_list();
+        $register_state = $this->get_register_course_states_list();
+        $countries = $this->get_countries_list();
+        $cities = $this->get_register_course_cities_list();
+
+        // ****************** Program information **************************
+
+        if ($courseid == null) {
+            $list.="<br/><div  class='form_div'>";
+
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program information</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>$cats</span>";
+            $list.="<span class='span2' id='cat_course'>$courses</span>";
+            $list.="<span class='span2' id='register_states_container'>$register_state</span>";
+            $list.="<span class='span2' id='register_cities_container'>$cities</span>";
+            $list.="<span class='span2' id='program_err' style='color:red;'></span>";
+            $list.="</div>"; // end of container-fluid
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span9'>Already have an account? Please <a href='/index.php/login' target='_blank'>sign-in</a> and apply for course you need.</span>";
+            $list.="</div>"; // end of container-fluid
+            $list.="</div>"; // end of panel-body
+            $list.="</div>"; // end of panel panel-default 
+            // ********************  Individual registration form **************************        
+            $list.="<div class='panel panel-default' id='personal_section'>";
+            $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>User details </h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2' >First name*</span>";
+            $list.="<span class='span2' ><input type='text' required id='first_name' name='first_name' ></span>";
+            $list.="<span class='span2' >Last name*</span>";
+            $list.="<span class='span2' ><input type='text' required id='last_name' name='last_name'  ></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Mailing Address*</span>";
+            $list.="<span class='span2'><input type='text' required id='addr' name='addr' ></span>";
+            $list.="<span class='span2'>City*</span>";
+            $list.="<span class='span2'><input type='text' required id='city' name='city' ></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>State*</span>";
+            $list.="<span class='span2'>$states</span>";
+            $list.="<span class='span2'>Country*</span>";
+            $list.="<span class='span2' id='register_cities_container'>$countries</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>ZIP Code*</span>";
+            $list.="<span class='span2'><input type='text' required id='zip' name='zip' ></span>";
+            $list.="<span class='span2'>Email*</span>";
+            $list.="<span class='span2'><input type='text' required id='email' name='email' ></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Phone*</span>";
+            $list.="<span class='span2'><input type='text' required id='phone' name='phone'></span>";
+            $list.="<span class='span2'>How did you hear about us?</span>";
+            $list.="<span class='span2'>$come_from</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;display:none;' id='course_fee'>";
+            $list.="<span class='span2'>Selected program</span>";
+            $list.="<span class='span2' id='dyn_course_name'></span>";
+            $list.="<span class='span2'>Fee</span>";
+            $list.="<span class='span2' id='dyn_course_fee'></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='card' checked>I want to pay by card</span>";
+            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='paypal'>I want to pay by Paypal</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8' id='personal_err' style='color:red;'></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><button class='btn btn-primary' id='next_register_payment'>Next</button></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><hr></span>";
+            $list.="</div>";
+
+            $list.="</div></div></div>";
+        } // end if $courseid==null
+        else {
+            $selected_program = $this->get_selected_program($courseid);
+            $program_schedule = $this->get_program_schedule($slotid);
+            $p = new Payment();
+            $courseObj = json_decode($p->get_course_data($courseid, $slotid));
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program information</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Selected program:</span>";
+            $list.="<span class='span4'>$selected_program</span>";
+            $list.="<span class='span1'><input type='hidden' value='$slotid' id='selected_slot'></span>";
+            $list.="<span class='span1'><input type='hidden' value='$courseid' id='selected_course'></span>";
+            $list.="<span class='span1'><input type='hidden' value='$courseObj->raw_cost' id='payment_sum'></span>";
+            $list.="<span class='span3'>$program_schedule</span>";
+            $list.="</div>"; // end of container-fluid
+
+            $list.="</div>"; // end of panel-body
+            $list.="</div>"; // end of panel panel-default
+            // ********************  Individual registration form **************************        
+            $list.="<div class='panel panel-default' id='personal_section'>";
+            $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>User details </h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2' >First name*</span>";
+            $list.="<span class='span2' ><input type='text' id='first_name' name='first_name' ></span>";
+            $list.="<span class='span2' >Last name*</span>";
+            $list.="<span class='span2' ><input type='text' id='last_name' name='last_name'  ></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Mailing Address*</span>";
+            $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
+            $list.="<span class='span2'>City*</span>";
+            $list.="<span class='span2'><input type='text' id='city' name='city' ></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>State*</span>";
+            $list.="<span class='span2'>$states</span>";
+            $list.="<span class='span2'>Country*</span>";
+            $list.="<span class='span2' id='register_cities_container'>$countries</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>ZIP Code*</span>";
+            $list.="<span class='span2'><input type='text' id='zip' name='zip' ></span>";
+            $list.="<span class='span2'>Email*</span>";
+            $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Phone*</span>";
+            $list.="<span class='span2'><input type='text' id='phone' name='phone'  ></span>";
+            $list.="<span class='span2'>How did you hear about us?</span>";
+            $list.="<span class='span2'>$come_from</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='card' checked>I want to pay by card</span>";
+            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='paypal'>I want to pay by Paypal</span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8' id='personal_err' style='color:red;'></span>";
+            $list.="</div>";
+
+            $list.="<br><div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><button class='btn btn-primary' id='next_register_payment'>Next</button></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><hr></span>";
+            $list.="</div>";
+
+            $list.="</div>";
+            $list.="</div></div>";
+
+            return $list;
+        }
+        return $list;
+    }
+
+    function get_brain_card_form($user) {
+        $list = "";
+        $userObj = json_decode(base64_decode($user));
+        $program = $this->get_coure_name_by_id($userObj->courseid);
+        $cost = $userObj->amount;
+        $userObj->program = $program;
+        $userdata = json_encode($userObj);
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program checkout</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'>Selected program:</span>";
+        $list.="<span class='span2'>$program</span>";
+        $list.="<span class='span2'>Program fee</span>";
+        $list.="<span class='span2'>$$cost</span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' id='user' value='$userdata'>";
+        $list.="<input type='hidden' id='amount' value='$cost'>";
+        $list.="<input type='hidden' id='email' value='$userObj->email'>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><hr/></span>";
+        $list.="</div>";
+
+        $list.="<form id='checkout-form' action='/' method='post'>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' id='error-message'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'><label for='card-number'>Card Number</label></span>";
+        $list.="<span class='span2' style='max-height:25px;'><div class='hosted-field' id='card-number'></div></span>";
+        $list.="<span class='span2'><label for='cvv'>CVV</label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='cvv'></div></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span4'>&nbsp;</span>";
+        $list.="<span class='span2'><label for='expiration-date'>Expiration Date</label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='expiration-date'></div></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' id='err' style='color:red;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>By clicking the 'I Agree, Submit' button, you confirm you have reviewed and agree to the Pay by Computer Terms & Conditions (<a href='#' onClick='return false;' id='policy'>click to view).</a></span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' name='payment_method_nonce'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><input type='submit' id='make_register_braintree_pyament' style='background-color: #e2a500;' value='I Agree, Submit' disabled></span>";
+        $list.="</div>";
+
+        $list.="</div></div></div>";
+
+        return $list;
+    }
+
+    function get_brain_paypal_form($user) {
+        $userObj = json_decode(base64_decode($user));
+        $cost = $userObj->amount;
+        $email = $userObj->email;
+        $_SESSION[$email] = $user;
+
+        $paypal_btn = $this->get_paypal_register_button($userObj);
+        $program = $this->get_coure_name_by_id($userObj->courseid);
+
+        $list = "";
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program checkout</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'>Selected program:</span>";
+        $list.="<span class='span2'>$program</span>";
+        $list.="<span class='span2'>Program fee</span>";
+        $list.="<span class='span2'>$$cost</span>";
+        $list.="</div>";
+
+        $list.="<br><div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>$paypal_btn</span>";
+        $list.="</div>";
+
+        $list.="</div></div></div>";
+
+        return $list;
+    }
+
+    function get_paypal_register_button($userObj) {
+        $list = "";
+
+        $cost = $userObj->amount;
+        $email = $userObj->email;
+        $program = $this->get_coure_name_by_id($userObj->courseid);
+
+        //$list.="<form action='https://www.paypal.com/cgi-bin/webscr' method='post'>"; // production
+        $list.="<form action='https://www.sandbox.paypal.com/cgi-bin/webscr' method='post'>"; // sandbox
+        $list.="<input type='hidden' name='cmd' value='_xclick'>";
+        $list.="<INPUT TYPE='hidden' name='charset' value='utf-8'>";
+        //$list.="<input type='hidden' name='business' value='contato@iprovida.org.br'>"; // production
+        $list.="<input type='hidden' name='business' value='sirromas-facilitator@outlook.com'>"; // sandbox
+        $list.="<input type='hidden' name='item_name' value='$program'>
+        <input type='hidden' name='amount' value='$cost'>
+        <input type='hidden' name='custom' value='$email'>    
+        <INPUT TYPE='hidden' NAME='currency_code' value='USD'>    
+        <INPUT TYPE='hidden' NAME='return' value='https://medical2.com/register2/receive_paypal_register_payment/'>
+        <input type='image' id='paypal_btn' src='https://www.sandbox.paypal.com/en_US/i/btn/btn_buynow_LG.gif' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'>
+        <img alt='' border='0' src='https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif' width='1' height='1'>
+        </form>";
+
+        return $list;
+    }
+
+    function process_paypal_payment($payment) {
+        $list = "";
+
+        $status = $payment['st'];
+        if ($status == 'Completed') {
+            $email = $payment['cm'];
+            $transactionid = $payment['tx'];
+            $user = $_SESSION[$email];
+            $userObj = json_decode(base64_decode($user));
+            $userObj->transactionid = $transactionid;
+            $p = new Payment();
+            $signup_status = $p->enroll->single_signup($userObj);
+            if ($signup_status === true) {
+                $userObj->userid = $p->get_user_id_by_email($userObj->email);
+                $userObj->renew = 0;
+                $this->add_paypal_payment($userObj);
+                $list.="<br/><div  class='form_div'>";
+                $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+                $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+                $list.="<div class='panel-body'>";
+
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span8'>Payment is successful, thank you! Confirmation email is sent to $email</span>";
+                $list.="</div>";
+
+                $list.="</div></div></div>";
+            } // end if $signup_status === true
+            else {
+                $list.="<br/><div  class='form_div'>";
+                $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+                $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Signup status</h5></div>";
+                $list.="<div class='panel-body'>";
+
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span8'>Payment is successful, thank you, but signup was not ok, please cotact us and provide your email address</span>";
+                $list.="</div>";
+
+                $list.="</div></div></div>";
+            } // end else when signup was not successfull ....
+        } // end if $status=='Completed'
+        else {
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'>Payment is failed</span>";
+            $list.="</div>";
+
+            $list.="</div></div></div>";
+        } // end else
+
+        return $list;
+    }
+
+    function add_paypal_payment($user) {
+        $date = time();
+        $p = new Payment();
+        $m = new Mailer();
+        $query = "insert into mdl_paypal_payments "
+                . "(courseid,"
+                . "userid,"
+                . "psum,"
+                . "trans_id,"
+                . "renew,"
+                . "pdate) "
+                . "values ($user->courseid,"
+                . "$user->userid,"
+                . "'$user->amount', "
+                . "'$user->transactionid',"
+                . "'$user->renew', '$date')";
+        $this->db->query($query);
+        $p->confirm_user($user->email);
+        // Make user object compatible with email receipt
+        $user_detailes = $p->get_user_detailes($user->userid);
+        $user->sum = $user->amount;
+        $user->pwd = $user_detailes->purepwd;
+        $user->payment_amount = $user->amount;
+        $user->card_holder = $user->first_time . " " . $user->last_name;
+        $user->signup_first = $user->first_name;
+        $user->signup_last = $user->last_name;
+        $m->send_payment_confirmation_message($user, null, null, true);
     }
 
     function get_policy_dialog() {
@@ -1039,7 +1454,7 @@ class register_model extends CI_Model {
 
     function get_scholl_app_form() {
         $list = "";
-        $policy=$this->get_school_app_policy();
+        $policy = $this->get_school_app_policy();
         $programs = $this->get_college_programs();
         $states = $this->get_state_list2();
         $pc = $this->get_pc_box();

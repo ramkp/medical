@@ -764,7 +764,7 @@ class Mailer {
         return $list;
     }
 
-    function get_account_confirmation_message2($user, $printed_data = null) {
+    function get_account_confirmation_message2($user, $printed_data = null, $paypal) {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
@@ -905,10 +905,16 @@ class Mailer {
         if (property_exists($user, 'payment_amount')) {
             date_default_timezone_set("America/New_York");
             $date = date('m-d-Y h:i:s', time());
-
-            $list.="<tr style=''>
-            <td>Payment: </td><td>Paid by card: $$user->payment_amount</td>
-            </tr>";
+            if ($paypal) {
+                $list.="<tr style=''>
+                <td>Payment: </td><td>Paid by PayPal: $$user->payment_amount</td>
+                </tr>";
+            } // end if $paypal
+            else {
+                $list.="<tr style=''>
+                <td>Payment: </td><td>Paid by card: $$user->payment_amount</td>
+                </tr>";
+            } // end else
 
             $list.="<tr style=''>";
             $list.="<td>Date Order:</td><td>$date</td>";
@@ -939,7 +945,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1045,7 +1051,7 @@ class Mailer {
 
     function create_registration_data_details($user) {
         $dompdf = new Dompdf();
-        $message = $this->get_account_confirmation_message2($user, true);
+        $message = $this->get_account_confirmation_message2($user, NULL, true);
         $dompdf->loadHtml($message);
 
         $dompdf->setPaper('A4', 'portrait');
@@ -1057,9 +1063,9 @@ class Mailer {
         file_put_contents($file_path, $output);
     }
 
-    function send_account_confirmation_message($user) {
+    function send_account_confirmation_message($user, $paypal=false) {
         $subject = "Medical2 - registration confirmation";
-        $message = $this->get_account_confirmation_message2($user);
+        $message = $this->get_account_confirmation_message2($user, null, $paypal);
         $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
         if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
             $recipient = $user->receipt_email;
@@ -1208,11 +1214,11 @@ class Mailer {
         
     }
 
-    function send_payment_confirmation_message($payment, $group = null, $free = null) {
+    function send_payment_confirmation_message($payment, $group = null, $free = null, $paypal = FALSE) {
         //$renew_fee = $this->get_renew_fee($payment->courseid);
         $recipient = $payment->bill_email;
-        if ($payment->renew == null) {
-            $this->send_account_confirmation_message($payment); // send user info to info@medical2.com        
+        if ($payment->renew == null || $payment->renew == 0) {
+            $this->send_account_confirmation_message($payment, $paypal); // send user info to info@medical2.com        
         } // end if $payment->sum!=$renew_fee
         else {
             $subject = "Medical2 - Certificate Renew Payment";
@@ -1949,6 +1955,35 @@ class Mailer {
         $mail->AddAddress($addrA);
         $mail->addCC($addrB);
         $mail->addCC($addrC);
+        if (!$mail->send()) {
+            return false;
+        } // end if !$mail->send()
+        else {
+            return true;
+        }
+    }
+
+    function send_braintree_failed_transaction_info($m) {
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        $mail->isHTML(true);
+        $mail->Subject = 'Medical2 - Failed Transaction Info';
+        $mail->Body = $m;
+
+        $addrA = 'sirromas@gmail.com';
+        $addrB = 'info@medical2.com';
+        $addrC = 'help@medical2.com';
+        $mail->AddAddress($addrA);
+        //$mail->addCC($addrB);
+        //$mail->addCC($addrC);
         if (!$mail->send()) {
             return false;
         } // end if !$mail->send()

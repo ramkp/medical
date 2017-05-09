@@ -322,7 +322,12 @@ class Balance {
         } // end else
         $totalpaid = $this->get_student_payments($courseid, $userid);
         $balance = $itemcost - $totalpaid;
-        $balance_due = ($balance >= 0) ? $balance : 0;
+        // Apply workaround in case if we have discount in CNA program
+        if ($courseid == 41 && $balance == 20) {
+            $balance_due = 0;
+        } else {
+            $balance_due = ($balance > 0) ? $balance : 0;
+        }
         return $balance_due;
     }
 

@@ -35,6 +35,7 @@ echo "<script type='text/javascript' src='//releases.flowplayer.org/7.0.1/commer
 echo "<script src='https://releases.flowplayer.org/hlsjs/flowplayer.hlsjs.min.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/jquery.simplePagination.js'></script>";
 echo "<script type = 'text/javascript' src = 'https://www.gstatic.com/charts/loader.js' ></script>";
+echo "<script src='https://js.braintreegateway.com/js/braintree-2.32.0.min.js'></script>";
 
 echo "<script type = 'text/javascript'>";
 echo "google.charts.load('current', {'packages': ['corechart']})";
