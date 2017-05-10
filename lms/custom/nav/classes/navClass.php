@@ -10,8 +10,13 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certi
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Renew.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Invoice.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/balance/classes/Balance.php';
 
 class navClass extends Util {
+
+    function __construct() {
+        parent::__construct();
+    }
 
     function get_navigation_items($userid) {
         $top_menu = "";
@@ -424,18 +429,19 @@ class navClass extends Util {
                         </li>                        
                     </ul>";
         // Books section
-
         $list.="<div class='nav-collapse collapse'>
                         <ul class='nav pull-left'>                   
                             <li class='dropdown'><a title='Books' class='dropdown-toggle' href='#cm_submenu_2'>Books<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>";
         foreach ($courses as $courseid) {
             $completion_status = $this->is_course_completed($courseid, $this->user->id);
+            $phlebotomy_exam_books = $this->get_phlebotomy_exam_book_links($courseid, $this->user->id);
             if ($courseid == 45 && $completion_status > 0) {
                 $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/EKG-%20ECG.pdf' target='_blank'>EKG - ECG</a></li>";
                 $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/M2%20PhlebBook.pdf' target='_blank'>M2 Phlebotomy Book</a></li>";
                 $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/Phlebotomy.pdf' target='_blank'>Phlebotomy</a></li>";
-            } // end if
+            } // end if $courseid == 45 && $completion_status > 0
+            $list.=$phlebotomy_exam_books;
         } // end foreach
         $list.="</ul>
                             </li>
@@ -468,6 +474,19 @@ class navClass extends Util {
             </div>
         </nav>
     </header>";
+        return $list;
+    }
+
+    function get_phlebotomy_exam_book_links($courseid, $userid) {
+        $list = "";
+        if ($courseid == 57) {
+            $b = new Balance();
+            $cost = $b->get_course_cost($courseid);
+            $paid = $b->get_student_payments($courseid, $userid);
+            if ($paid > $cost) {
+                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/M2%20PhlebBook.pdf' target='_blank'>M2 Phlebotomy Book</a></li>";
+            } // end if $paid>$cost
+        } // end if $courseid==57
         return $list;
     }
 
