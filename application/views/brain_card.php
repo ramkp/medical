@@ -165,6 +165,7 @@ echo $form;
                                         return;
                                     }
                                     console.log('Nonce: ' + payload.nonce);
+                                    $('#err').html('');
                                     $('#ajax_loading_payment').show();
                                     $('#make_register_braintree_pyament').prop('disabled', true);
                                     $('#make_register_braintree_pyament').text('Processing request');

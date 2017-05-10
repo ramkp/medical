@@ -56,48 +56,52 @@ class Cards {
         ]);
 
         /*
-         * 
-          echo "------------<pre>";
+          echo "<br>Result object-------------<pre></br>";
+          print_r($result);
+          echo "<pre>-------------------------</pre><br>";
+         */
+
+        $transaction = $result->transaction;
+        /*
+          echo "Transacton object------------<pre>";
           print_r($transaction);
           echo "</pre>-----------------<br>";
           echo "Transaction  id: " . $transid . "<br>";
           echo "Status: " . $status . "<br>";
           die();
-         * 
          */
-        $transaction = $result->transaction;
+
         if ($result->success) {
+            $m = new Mailer();
             $p = new Payment();
-            $status = $p->enroll->single_signup($userObj);
-            if ($status === TRUE) {
-                $transid = $transaction->id;
-                $status = $transaction->status;
-                $m = new Mailer();
-                $p->confirm_user($userObj->email);
-                $userid = $p->get_user_id_by_email($userObj->email);
-                $user_detailes = $p->get_user_detailes($userid);
-                $userObj->userid = $userid;
-                $userObj->sum = $userObj->amount;
-                $userObj->pwd = $user_detailes->purepwd;
-                $userObj->payment_amount = $userObj->amount;
-                $userObj->card_holder = $userObj->first_time . " " . $userObj->last_name;
-                $userObj->signup_first = $userObj->first_name;
-                $userObj->signup_last = $userObj->last_name;
-                $userObj->transid = $transid;
-                $userObj->status = $status;
-                $this->add_success_registration_payment($result, $userObj);
-                $m->send_payment_confirmation_message($userObj);
-                return true;
-            } // end if $status 
-            else {
-                return FALSE;
-            } // end else
+            $p->enroll->single_signup($userObj);
+            $p->confirm_user($userObj->email);
+            $userid = $p->get_user_id_by_email($userObj->email);
+            $p->enroll->add_user_to_course_schedule($userid, $userObj);
+            $transid = $transaction->id;
+            $status = $transaction->status;
+            $user_detailes = $p->get_user_detailes($userid);
+
+            $userObj->userid = $userid;
+            $userObj->sum = $userObj->amount;
+            $userObj->pwd = $user_detailes->purepwd;
+            $userObj->payment_amount = $userObj->amount;
+            $userObj->card_holder = $userObj->first_time . " " . $userObj->last_name;
+            $userObj->signup_first = $userObj->first_name;
+            $userObj->signup_last = $userObj->last_name;
+            $userObj->transid = $transid;
+            $userObj->status = $status;
+            $this->add_success_registration_payment($userObj);
+            $m->send_payment_confirmation_message($userObj);
+            return true;
         } // end if 
         else {
+            $msg = $result->message;
             $failObj = new stdClass();
             $failObj->status = $transaction->status;
             $failObj->code = $transaction->processorResponseCode;
-            $failObj->msg = $transaction->processorResponseText;
+            //$failObj->msg = $transaction->processorResponseText;
+            $failObj->msg = $msg;
             $failObj->info = $transaction->additionalProcessorResponse;
             $failObj->user = $userObj;
             $this->send_failed_transaction_info($failObj);
@@ -108,9 +112,11 @@ class Cards {
     function send_failed_transaction_info($failObj) {
         $m = new Mailer();
 
-        echo "<br>Failure object:------------<pre>";
-        print_r($failObj);
-        echo "</pre>-----------------<br>";
+        /*
+          echo "<br>Failure object:------------<pre>";
+          print_r($failObj);
+          echo "</pre>-----------------<br>";
+         */
 
         $first = $failObj->user->first_name;
         $last = $failObj->user->last_name;
@@ -120,7 +126,7 @@ class Cards {
         $amount = $failObj->user->amount;
         $status = $failObj->status;
         $code = $failObj->code;
-        $msg = $failObj->msg;
+        $message = $failObj->msg;
         $info = $failObj->info;
 
         $msg.="<html>";
@@ -157,25 +163,33 @@ class Cards {
         $msg.="<td style='padding:15px;'>$$amount</td>";
         $msg.="</tr>";
 
-        $msg.="<tr>";
-        $msg.="<td style='padding:15px;'>Transaction status</td>";
-        $msg.="<td style='padding:15px;'>$status</td>";
-        $msg.="</tr>";
+        /*
+         * 
+          $msg.="<tr>";
+          $msg.="<td style='padding:15px;'>Transaction status</td>";
+          $msg.="<td style='padding:15px;'>$status</td>";
+          $msg.="</tr>";
 
-        $msg.="<tr>";
-        $msg.="<td>Transaction code</td>";
-        $msg.="<td>$code</td>";
-        $msg.="</tr>";
+          $msg.="<tr>";
+          $msg.="<td>Transaction code</td>";
+          $msg.="<td>$code</td>";
+          $msg.="</tr>";
+         * 
+         */
 
         $msg.="<tr>";
         $msg.="<td style='padding:15px;'>Transaction message</td>";
-        $msg.="<td style='padding:15px;'>$msg</td>";
+        $msg.="<td style='padding:15px;'>$message</td>";
         $msg.="</tr>";
 
-        $msg.="<tr>";
-        $msg.="<td style='padding:15px;'>Transaction bank info</td>";
-        $msg.="<td style='padding:15px;'>$info</td>";
-        $msg.="</tr>";
+        /*
+         * 
+          $msg.="<tr>";
+          $msg.="<td style='padding:15px;'>Transaction bank info</td>";
+          $msg.="<td style='padding:15px;'>$info</td>";
+          $msg.="</tr>";
+         * 
+         */
 
         $msg.="</table>";
         $msg.="</body>";
@@ -184,7 +198,7 @@ class Cards {
         $m->send_braintree_failed_transaction_info($msg);
     }
 
-    function add_success_registration_payment($result, $userObj) {
+    function add_success_registration_payment($userObj) {
         $date = time();
         $query = "insert into mdl_card_payments2 "
                 . "(userid,"

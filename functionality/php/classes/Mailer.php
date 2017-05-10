@@ -335,7 +335,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * ***************************************************************
+        /*  ****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -764,7 +764,7 @@ class Mailer {
         return $list;
     }
 
-    function get_account_confirmation_message2($user, $printed_data = null, $paypal) {
+    function get_account_confirmation_message2($user, $printed_data = null, $paypal=false) {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
@@ -1982,8 +1982,8 @@ class Mailer {
         $addrB = 'info@medical2.com';
         $addrC = 'help@medical2.com';
         $mail->AddAddress($addrA);
-        //$mail->addCC($addrB);
-        //$mail->addCC($addrC);
+        $mail->addCC($addrB);
+        $mail->addCC($addrC);
         if (!$mail->send()) {
             return false;
         } // end if !$mail->send()

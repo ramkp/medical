@@ -1117,7 +1117,7 @@ class register_model extends CI_Model {
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span2'><label for='card-number'>Card Number</label></span>";
-        $list.="<span class='span2' style='max-height:25px;'><div class='hosted-field' id='card-number'></div></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='card-number'></div></span>";
         $list.="<span class='span2'><label for='cvv'>CVV</label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='cvv'></div></span>";
         $list.="</div>";
