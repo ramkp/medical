@@ -130,9 +130,11 @@ class Balance {
     function get_student_payments_for_balance($courseid, $userid) {
 
         // 1. Check credit card payments
-        // 2. Check cash payments
-        // 3. Check free payments
-        // 4. Check invoice payments
+        // 2. Check brain card payments
+        // 3. Check PayPal payments 
+        // 4. Check cash payments
+        // 5. Check free payments
+        // 6. Check invoice payments
 
         $card_payments = 0;
         $cash_payments = 0;
@@ -148,6 +150,34 @@ class Balance {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $card_payments = $card_payments + $this->is_renew_payment($row['psum'], $courseid, $userid, $row['pdate']);
+            }
+        }
+
+        // ------------------------------------------------------------- //
+
+        $query = "select * from mdl_card_payments2 "
+                . "where courseid=$courseid "
+                . "and userid=$userid "
+                . "and refunded=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $card_payments = $card_payments + $row['psum'];
+            }
+        }
+
+        // ------------------------------------------------------------- //
+
+        $query = "select * from mdl_paypal_payments "
+                . "where courseid=$courseid "
+                . "and userid=$userid "
+                . "and refunded=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $paypal_payments = $paypal_payments + $row['psum'];
             }
         }
 
@@ -198,11 +228,14 @@ class Balance {
     function get_student_payments($courseid, $userid) {
 
         // 1. Check credit card payments
-        // 2. Check cash payments
-        // 3. Check free payments
-        // 4. Check invoice payments
+        // 2. Check brain credit card payments
+        // 3. Check PayPal payments
+        // 4. Check cash payments
+        // 5. Check free payments
+        // 6. Check invoice payments
 
         $card_payments = 0;
+        $paypal_payments = 0;
         $cash_payments = 0;
         $free_payments = 0;
         $invoice_payments = 0;
@@ -216,6 +249,34 @@ class Balance {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $card_payments = $card_payments + $row['psum'];
+            }
+        }
+
+        // ------------------------------------------------------------- //
+
+        $query = "select * from mdl_card_payments2 "
+                . "where courseid=$courseid "
+                . "and userid=$userid "
+                . "and refunded=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $card_payments = $card_payments + $row['psum'];
+            }
+        }
+
+        // ------------------------------------------------------------- //
+
+        $query = "select * from mdl_paypal_payments "
+                . "where courseid=$courseid "
+                . "and userid=$userid "
+                . "and refunded=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $paypal_payments = $paypal_payments + $row['psum'];
             }
         }
 
@@ -258,7 +319,7 @@ class Balance {
             }
         }
 
-        $totalpaid = $card_payments + $cash_payments + $free_payments + $invoice_payments;
+        $totalpaid = $card_payments + $paypal_payments + $cash_payments + $free_payments + $invoice_payments;
         return $totalpaid;
     }
 
@@ -325,7 +386,8 @@ class Balance {
         // Apply workaround in case if we have discount in CNA program
         if ($courseid == 41 && $balance == 20) {
             $balance_due = 0;
-        } else {
+        } // end if $courseid == 41 && $balance == 20 
+        else {
             $balance_due = ($balance > 0) ? $balance : 0;
         }
         return $balance_due;
@@ -344,6 +406,19 @@ class Balance {
                 $courses[] = $row['courseid'];
             } // enw while
         } // end if $num > 0
+
+        $query = "select * from mdl_card_payments2 "
+                . "where userid=$userid "
+                . "and refunded=0 "
+                . "and promo_code<>''";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courses[] = $row['courseid'];
+            } // enw while
+        } // end if $num > 0
+
         return $courses;
     }
 
