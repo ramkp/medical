@@ -1083,11 +1083,46 @@ class Students {
         }
     }
 
-    /*     * ************Code related to financial report ******************** */
+    /*     * ***********Code related to financial report ******************** */
 
     function get_report_credit_card_payments($start, $end) {
         $payments = array();
+        // Authorize.net card payments
         $query = "select * from mdl_card_payments "
+                . "where refunded=0 and pdate between $start and $end";
+        //echo "CC Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        // Braintree card payments
+        $query = "select * from mdl_card_payments2 "
+                . "where refunded=0 and pdate between $start and $end";
+        //echo "CC Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        return $payments;
+    }
+
+    function get_report_paypal_payments($start, $end) {
+        $payments = array();
+        $query = "select * from mdl_paypal_payments "
                 . "where refunded=0 and pdate between $start and $end";
         //echo "CC Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
@@ -1181,20 +1216,26 @@ class Students {
         return $payments;
     }
 
-    function prepare_financial_report($type, $start, $end, $card_payments, $invoice_payments, $parial_payments, $refund_payments) {
+    function prepare_financial_report($type, $start, $end, $card_payments, $paypal_payments, $invoice_payments, $parial_payments, $refund_payments) {
 
         //echo "<br>Type: " . $type . "<br>";
         //echo "Start: " . $start . "<br>";
         //echo "End: " . $end . "<br>";
 
         $list = "";
+
         $cc_list = "";
-        $refund_list = "";
-        $refund_subtotal = 0;
-        $cc_subtotal = 0;
-        $in_list = "";
-        $in_subtotal = 0;
+        $paypal_list = "";
         $pp_list = "";
+        $refund_list = "";
+        $in_list = "";
+
+        $cc_subtotal = 0;
+        $paypal_subtotal = 0;
+        $refund_subtotal = 0;
+        $in_subtotal = 0;
+
+
         $cash_subtotal = 0;
 
         switch ($type) {
@@ -1269,6 +1310,65 @@ class Students {
             $cc_list.="</table>";
         } // end if count($card_payments)>0
 
+        if (count($paypal_payments) > 0) {
+            $paypal_list.="<table>";
+            $paypal_list.="<th>";
+            $paypal_list.="<td style='padding:15px;font-weight:bold;' colspan='2' align='center'>PayPal Payments</td>";
+            $paypal_list.="</th>";
+            
+            foreach ($paypal_payments as $payment) {
+                $renew_fee = $this->get_renew_fee($payment->courseid);
+                $coursename = $this->get_course_name($payment->courseid);
+                $date = date('m-d-Y h:i:s', ($payment->pdate - 86400));
+                $userdata = $this->get_user_data($payment->userid);
+                $workshop_data = $this->get_student_workshops_data($payment->userid);
+                $firstname = $userdata->firstname;
+                $lastname = $userdata->lastname;
+                $amount = $payment->psum;
+                
+                $paypal_list.="<tr>";
+                if ($amount != $renew_fee) {
+                    $paypal_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
+                } // end if $amount!=$renew_fee
+                else {
+                    $paypal_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename - Certificate Renew Payment</td>";
+                }
+                $paypal_list.="</tr>";
+
+                $paypal_list.="<tr>";
+                $paypal_list.="<td style='padding:15px;'>Workshop location</td><td style='padding:15px;'>" . $workshop_data['location'] . "</td>";
+                $paypal_list.="</tr>";
+
+                $paypal_list.="<tr>";
+                $paypal_list.="<td style='padding:15px;'>Workshop date</td><td style='padding:15px;'>" . $workshop_data['date'] . "</td>";
+                $paypal_list.="</tr>";
+
+                $paypal_list.="<tr>";
+                $paypal_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
+                $paypal_list.="</tr>";
+                
+                $paypal_list.="<tr>";
+                $paypal_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
+                $paypal_list.="</tr>";
+                
+                $paypal_list.="<tr>";
+                $paypal_list.="<td style='padding:15px;'>Transaction date:</td><td style='padding:15px;'>$date</td>";
+                $paypal_list.="</tr>";
+                
+                $paypal_list.="<tr>";
+                $paypal_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
+                $paypal_list.="</tr>";
+                
+                $paypal_subtotal = $paypal_subtotal + $amount;
+            } // end foreach
+            
+            $paypal_list.="<tr>";
+            $paypal_list.="<td style='padding:15px;font-weight:bold;'>Subtotal:</td><td style='padding:15px;font-weight:bold;'>$$paypal_subtotal</td>";
+            $paypal_list.="</tr>";
+            
+            $paypal_list.="</table>";
+        } // end if count($paypal_payments)>0
+
         if (count($refund_payments) > 0) {
             $refund_list.="<table>";
             $refund_list.="<th>";
@@ -1315,6 +1415,7 @@ class Students {
             $refund_list.="</tr>";
             $refund_list.="</table>";
         } // end if count($refund_payments)>0
+        
         // Invoice payments
         if (count($invoice_payments) > 0) {
             $in_list.="<table>";
@@ -1513,10 +1614,11 @@ class Students {
                 echo "End moment: " . date('m-d-Y h:i:s', $end) . "<br>";
 
                 $card_payments = $this->get_report_credit_card_payments($start, $end);
+                $paypal_payments = $this->get_report_paypal_payments($start, $end);
                 $refund_payments = $this->get_refund_data($start, $end);
                 $invoice_payments = $this->get_report_invoice_payments($start, $end);
                 $parial_payments = $this->get_report_partial_payments($start, $end);
-                $list.=$this->prepare_financial_report($type, $start, $end, $card_payments, $invoice_payments, $parial_payments, $refund_payments);
+                $list.=$this->prepare_financial_report($type, $start, $end, $card_payments, $paypal_payments, $invoice_payments, $parial_payments, $refund_payments);
                 $this->send_financial_report($type, $timestamp, $timestamp, $list);
                 break;
             case 2:
@@ -1532,10 +1634,11 @@ class Students {
                 echo "</pre><br>";
 
                 $card_payments = $this->get_report_credit_card_payments(strtotime($start->date), strtotime($end->date));
+                $paypal_payments = $this->get_report_paypal_payments(strtotime($start->date), strtotime($end->date));
                 $invoice_payments = $this->get_report_invoice_payments(strtotime($start->date), strtotime($end->date));
                 $refund_payments = $this->get_refund_data(strtotime($start->date), strtotime($end->date));
                 $parial_payments = $this->get_report_partial_payments(strtotime($start->date), strtotime($end->date));
-                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $invoice_payments, $parial_payments, $refund_payments);
+                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $paypal_payments, $invoice_payments, $parial_payments, $refund_payments);
                 $this->send_financial_report($type, strtotime($start->date), strtotime($end->date), $list);
                 break;
             case 3:
@@ -1551,10 +1654,11 @@ class Students {
                 echo "</pre><br>";
 
                 $card_payments = $this->get_report_credit_card_payments(strtotime($start->date), strtotime($end->date));
+                $paypal_payments = $this->get_report_paypal_payments(strtotime($start->date), strtotime($end->date));
                 $invoice_payments = $this->get_report_invoice_payments(strtotime($start->date), strtotime($end->date));
                 $refund_payments = $this->get_refund_data(strtotime($start->date), strtotime($end->date));
                 $parial_payments = $this->get_report_partial_payments(strtotime($start->date), strtotime($end->date));
-                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $invoice_payments, $parial_payments, $refund_payments);
+                $list.=$this->prepare_financial_report($type, strtotime($start->date), strtotime($end->date), $card_payments, $paypal_payments, $invoice_payments, $parial_payments, $refund_payments);
                 $this->send_financial_report($type, strtotime($start->date), strtotime($end->date), $list);
                 break;
             case 4:

@@ -68,22 +68,25 @@ class Dashboard extends Util {
                 $query = "select * from mdl_card_payments "
                         . "where userid=$userid and courseid=$courseid and refunded=0 ";
                 $card_payments_num = $this->db->numrows($query);
-
-                //echo "Card payments num: " . $card_payments_num . "<br>";
-                // 2. Check among invoice payments
+                //2. Check brain card payments
+                $query = "select * from mdl_card_payments2 where "
+                        . "courseid=$courseid and userid=$userid and refunded=0";
+                $brain_card_payments_num = $this->db->numrows($query);
+                //3. Check PayPal payments
+                $query = "select * from mdl_paypal_payments where "
+                        . "courseid=$courseid and userid=$userid and refunded=0";
+                $paypal_payments_num = $this->db->numrows($query);
+                // 4. Check among invoice payments
                 $query = "select * from mdl_invoice "
                         . "where userid=$userid and courseid=$courseid and i_status=1";
                 $invoice_payments_num = $this->db->numrows($query);
-                //echo "Invoice payments num: " . $invoice_payments_num . "<br>";
-                // 3. Check among partial payments
+                // 5. Check among partial payments
                 $query = "select * from mdl_partial_payments "
                         . "where userid=$userid and courseid=$courseid";
                 $partial_num = $this->db->numrows($query);
-                //echo "Partial payments num: " . $partial_num . "<br>";
-                //4. Check among free access 
+                //6. Check among free access 
                 $query = "select * from mdl_free where courseid=$courseid and userid=$userid";
                 $free_num = $this->db->numrows($query);
-                //echo "Free payments num: " . $free_num . "<br>";
                 //5. Check among any invoice payments
                 $query = "select * from mdl_any_invoice_user where userid=$userid";
                 $num = $this->db->numrows($query);
@@ -108,8 +111,13 @@ class Dashboard extends Util {
                 else {
                     $any_invoice_num = 0;
                 }
-                //echo "Any invoice num: " . $card_payments_num . "<br>";
-                if ($card_payments_num > 0 || $invoice_payments_num > 0 || $partial_num > 0 || $any_invoice_num > 0 || $free_num > 0) {
+                if ($card_payments_num > 0 ||
+                        $brain_card_payments_num > 0 ||
+                        $paypal_payments_num > 0 ||
+                        $invoice_payments_num > 0 ||
+                        $partial_num > 0 ||
+                        $any_invoice_num > 0 ||
+                        $free_num > 0) {
                     $status = 1;
                 } // end if $card_payments_num>0 || $invoice_payments_num>0
             } // end if $installment_status==0
@@ -929,14 +937,16 @@ class Dashboard extends Util {
     function get_payments_history_block($courseid, $userid) {
         $list = "";
         $cc_list = "";
+        $paypal_list="";
         $pp_list = "";
         $inv_list = "";
         $cc_payments = array();
+        $paypal_payments=array();
         $cash_payments = array();
         $invoice_payments = array();
         $course_category = $this->get_course_category($courseid);
 
-// 1. Get data from mdl_card_payments // payments made by card
+        // 1. Get data from mdl_card_payments
         $query = "select * from mdl_card_payments "
                 . "where refunded=0 and courseid=$courseid "
                 . "and userid=$userid";
@@ -951,7 +961,37 @@ class Dashboard extends Util {
                 $cc_payments[] = $payment;
             } // end while
         } // end if $num > 0
-//2. Get data from mdl_partial_payments  // cash payments
+        //2. Get data from brain card payments 
+        $query = "select * from mdl_card_payments2 "
+                . "where refunded=0 and courseid=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $cc_payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        //3. Get data from Paypal payments
+        $query = "select * from mdl_paypal_payments "
+                . "where refunded=0 and courseid=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                } // end foreach
+                $paypal_payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        //4. Get data from mdl_partial_payments  // cash payments
         $query = "select * from mdl_partial_payments "
                 . "where courseid=$courseid "
                 . "and userid=$userid";
@@ -966,7 +1006,7 @@ class Dashboard extends Util {
                 $cash_payments[] = $payment;
             } // end while
         } // end if $num > 0
-//3. Check invoice table
+        //5. Check invoice table
         $query = "select * from mdl_invoice "
                 . "where userid=$userid "
                 . "and courseid=$courseid "
@@ -982,8 +1022,6 @@ class Dashboard extends Util {
                 $invoice_payments[] = $payment;
             } // end while
         } // end if $num>0
-
-
         $coursename = $this->get_course_name($courseid);
         $coursecost = $this->get_course_cost($courseid);
         $renew_fee = $this->get_renew_fee($courseid);
@@ -998,19 +1036,25 @@ class Dashboard extends Util {
                     $cc_list.="<td style='padding:15px;'>Program/Workshop payment</td><td style='padding:15px;'>$$payment->psum</td><td style='padding:15px;'>$date</td>";
                     $total_paid = $total_paid + $payment->psum;
                 } // end if $payment->psum!=$renew_fee
-
-                /*
-                  else {
-                  $cc_list.="<td style='padding:15px;'>Certificate renew payment</td><td style='padding:15px;'>$$payment->psum</td><td style='padding:15px;'>$date</td>";
-                  } // end else
-                 */
-
                 $cc_list.="</tr>";
             } // end foreach
             $cc_list.="</table>";
         } // end if count($cc_payments)>0
-
-
+        
+        if (count($paypal_payments)>0) {
+            $paypal_list.="<table>";
+            foreach ($paypal_payments as $payment) {
+                $date = date('m-d-Y', $payment->pdate);
+                $paypal_list.="<tr>";
+                if ($payment->psum != $renew_fee) {
+                    $paypal_list.="<td style='padding:15px;'>Program/Workshop payment</td><td style='padding:15px;'>$$payment->psum</td><td style='padding:15px;'>$date</td>";
+                    $total_paid = $total_paid + $payment->psum;
+                } // end if $payment->psum!=$renew_fee
+                $paypal_list.="</tr>";
+            } // end foreach
+            $paypal_list.="</table>";
+        } // end if count($paypal_payments)>0
+        
         if (count($cash_payments) > 0) {
             $pp_list.="<table>";
             foreach ($cash_payments as $payment) {
@@ -1063,6 +1107,9 @@ class Dashboard extends Util {
 
         $list.="<tr>";
         $list.="<td>$cc_list</td>";
+        $list.="</tr>";
+        $list.="<tr>";
+        $list.="<td>$paypal_list</td>";
         $list.="</tr>";
         $list.="<tr>";
         $list.="<td>$pp_list</td>";
