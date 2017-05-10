@@ -531,18 +531,12 @@ class Dashboard extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $already_paid = $already_paid + $row['psum'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
-                if (!in_array($row['psum'], $this->renew_payments)) {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
-                } // end if $row['psum']!=$renew_amount
+                if ($certificate_date != null && $certificate_date < $row['pdate']) {
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                } // end if 
                 else {
-                    // Payments are similar to renew, we need to make additional checks
-                    if ($certificate_date != null && $certificate_date < $row['pdate']) {
-                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
-                    } // end if 
-                    else {
-                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
-                    }
-                } // end else
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                }
                 if ($status == 0) {
                     $prohibit = $this->get_user_roles($userid);
                     if ($prohibit == 0 && ($current_user == 2 || $current_user == 234)) {
@@ -826,8 +820,7 @@ class Dashboard extends Util {
         $paypal_payments = $this->get_user_paypal_payments($userid, $courseid);
         $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
-        $free_payments = $this->get_user_free_payments($userid, $courseid);
-        $list.=$card_payments . $paypal_payments . $partial_payments . $free_payments . $invoice_payments;
+        $list.=$card_payments . $paypal_payments . $partial_payments . $invoice_payments;
         return $list;
     }
 
