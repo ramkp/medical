@@ -474,6 +474,47 @@ class Dashboard extends Util {
         return $num;
     }
 
+    function get_user_paypal_payments($userid, $courseid) {
+        $list = "";
+        $b = new Balance();
+        $certificate_date = $b->has_certificate($courseid, $userid);
+        $already_paid = 0;
+        $current_user = $this->user->id;
+        $query = "select * from mdl_paypal_payments "
+                . "where courseid=$courseid and userid=$userid and refunded=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $coursename = $this->get_course_name($courseid);
+            $status = $this->get_user_course_completion_status($userid, $courseid);
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $already_paid = $already_paid + $row['psum'];
+                $list.="<div class='container-fluid' style='padding-left:0px;'>";
+                if (!in_array($row['psum'], $this->renew_payments)) {
+                    $list.="<span class='span8'>Paid by PayPal $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                } // end if $row['psum']!=$renew_amount
+                else {
+                    // Payments are similar to renew, we need to make additional checks
+                    if ($certificate_date != null && $certificate_date < $row['pdate']) {
+                        $list.="<span class='span8'>Paid by PayPal $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                    } // end if 
+                    else {
+                        $list.="<span class='span8'>Paid by PayPal $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    }
+                } // end else
+                if ($status == 0) {
+                    $prohibit = $this->get_user_roles($userid);
+                    if ($prohibit == 0 && ($current_user == 2 || $current_user == 234)) {
+                        $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
+                        $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                    }
+                } // end if status==0
+                $list.="</div>";
+            } // end while
+        } // end if $num>0
+        return $list;
+    }
+
     function get_user_card_payments($userid, $courseid) {
         $list = "";
         $b = new Balance();
@@ -512,7 +553,49 @@ class Dashboard extends Util {
                 $list.="</div>";
             } // end while
         } // end if $num>0
+        $braintree_card_payments = $this->get_braintree_user_card_payments($userid, $courseid);
+        $list.=$braintree_card_payments;
+        return $list;
+    }
 
+    function get_braintree_user_card_payments($userid, $courseid) {
+        $list = "";
+        $b = new Balance();
+        $certificate_date = $b->has_certificate($courseid, $userid);
+        $already_paid = 0;
+        $current_user = $this->user->id;
+        $query = "select * from mdl_card_payments2 "
+                . "where courseid=$courseid and userid=$userid and refunded=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $coursename = $this->get_course_name($courseid);
+            $status = $this->get_user_course_completion_status($userid, $courseid);
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $already_paid = $already_paid + $row['psum'];
+                $list.="<div class='container-fluid' style='padding-left:0px;'>";
+                if (!in_array($row['psum'], $this->renew_payments)) {
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                } // end if $row['psum']!=$renew_amount
+                else {
+                    // Payments are similar to renew, we need to make additional checks
+                    if ($certificate_date != null && $certificate_date < $row['pdate']) {
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                    } // end if 
+                    else {
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    }
+                } // end else
+                if ($status == 0) {
+                    $prohibit = $this->get_user_roles($userid);
+                    if ($prohibit == 0 && ($current_user == 2 || $current_user == 234)) {
+                        $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
+                        $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                    }
+                } // end if status==0
+                $list.="</div>";
+            } // end while
+        } // end if $num>0
         return $list;
     }
 
@@ -740,11 +823,11 @@ class Dashboard extends Util {
     function get_user_payments($userid, $courseid) {
         $list = "";
         $card_payments = $this->get_user_card_payments($userid, $courseid);
-        //$refund_payments = $this->get_refund_payments($userid, $courseid);
+        $paypal_payments = $this->get_user_paypal_payments($userid, $courseid);
         $invoice_payments = $this->get_user_invoice_payments($userid, $courseid);
         $partial_payments = $this->get_user_partial_payments($userid, $courseid);
         $free_payments = $this->get_user_free_payments($userid, $courseid);
-        $list.=$card_payments . $partial_payments . $free_payments . $invoice_payments;
+        $list.=$card_payments . $paypal_payments . $partial_payments . $free_payments . $invoice_payments;
         return $list;
     }
 
@@ -937,11 +1020,11 @@ class Dashboard extends Util {
     function get_payments_history_block($courseid, $userid) {
         $list = "";
         $cc_list = "";
-        $paypal_list="";
+        $paypal_list = "";
         $pp_list = "";
         $inv_list = "";
         $cc_payments = array();
-        $paypal_payments=array();
+        $paypal_payments = array();
         $cash_payments = array();
         $invoice_payments = array();
         $course_category = $this->get_course_category($courseid);
@@ -1040,8 +1123,8 @@ class Dashboard extends Util {
             } // end foreach
             $cc_list.="</table>";
         } // end if count($cc_payments)>0
-        
-        if (count($paypal_payments)>0) {
+
+        if (count($paypal_payments) > 0) {
             $paypal_list.="<table>";
             foreach ($paypal_payments as $payment) {
                 $date = date('m-d-Y', $payment->pdate);
@@ -1054,7 +1137,7 @@ class Dashboard extends Util {
             } // end foreach
             $paypal_list.="</table>";
         } // end if count($paypal_payments)>0
-        
+
         if (count($cash_payments) > 0) {
             $pp_list.="<table>";
             foreach ($cash_payments as $payment) {
