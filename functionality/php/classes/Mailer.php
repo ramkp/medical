@@ -335,7 +335,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*  ****************************************************************
+        /*         * ***************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -764,7 +764,7 @@ class Mailer {
         return $list;
     }
 
-    function get_account_confirmation_message2($user, $printed_data = null, $paypal=false) {
+    function get_account_confirmation_message2($user, $printed_data = null, $paypal = false) {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
@@ -780,7 +780,6 @@ class Mailer {
         } // end else
         $init_cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $cost = $this->get_course_fee_block($init_cost, $user);
-        //$cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $catid = $this->get_course_category($user);
         $p = new Payment();
         $state = $p->get_state_name_by_id($user->state);
@@ -792,7 +791,7 @@ class Mailer {
         <table style='table-layout: fixed;' width='375'>
         <thead>";
 
-        if ($printed_data == NULL) {
+        if ($printed_data == null) {
             if ($catid == 5) {
                 $list.="<tr>";
                 $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
@@ -804,7 +803,6 @@ class Mailer {
                 $list.="</tr>";
             } // end else
         } // end if $printed_data == NULL
-
 
         $list.="</thead>
         <tbody>
@@ -882,7 +880,7 @@ class Mailer {
         </tr>
        
         <tr style=''>
-        <td>Address</td><td>$user->addr</td>
+        <td>Address</td><td>$userdata->address</td>
         </tr>
         <tr >
         <td>City</td><td>$user->city</td>
@@ -945,7 +943,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1049,9 +1047,9 @@ class Mailer {
         return $list;
     }
 
-    function create_registration_data_details($user) {
+    function create_registration_data_details($user, $paypal) {
         $dompdf = new Dompdf();
-        $message = $this->get_account_confirmation_message2($user, NULL, true);
+        $message = $this->get_account_confirmation_message2($user, true, $paypal);
         $dompdf->loadHtml($message);
 
         $dompdf->setPaper('A4', 'portrait');
@@ -1063,7 +1061,7 @@ class Mailer {
         file_put_contents($file_path, $output);
     }
 
-    function send_account_confirmation_message($user, $paypal=false) {
+    function send_account_confirmation_message($user, $paypal = false) {
         $subject = "Medical2 - registration confirmation";
         $message = $this->get_account_confirmation_message2($user, null, $paypal);
         $payment_amount = (property_exists($user, 'payment_amount') == true) ? $user->payment_amount : null;
@@ -1075,7 +1073,7 @@ class Mailer {
         } // end else
         //$recipient = ($user->receipt_email != 'n/a') ? $user->receipt_email : $user->email;
         $this->send_signup_confirmation_email($subject, $message, $recipient, $payment_amount);
-        $this->create_registration_data_details($user);
+        $this->create_registration_data_details($user, $paypal);
     }
 
     function send_signup_confirmation_email($subject, $message, $recipient, $payment_amount) {
@@ -1158,7 +1156,6 @@ class Mailer {
 
     function get_renew_certificate_message($user) {
         $list = "";
-        $course_name = $this->get_course_name($user);
         $userdata = $this->get_user_data($user);
         $list.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
         $list.="</head>";

@@ -36,6 +36,114 @@ class Cards {
         return $clientToken;
     }
 
+    function get_course_name_by_id($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $name = $row['fullname'];
+        }
+        return $name;
+    }
+
+    function create_any_pay_transaction($transObj) {
+        $amount = $transObj->amount;
+        $period = $transObj->period;
+        $courseid = $transObj->courseid;
+        $program = $this->get_course_name_by_id($courseid);
+        $slotid = $transObj->slotid;
+        $nonceFromTheClient = $transObj->nonce;
+        $userObj = json_decode($transObj->user); // user from mdl_user table
+        $userObj->phone = $userObj->phone1;
+        $this->authorize_sandbox();
+        $result = Braintree\Transaction::sale([
+                    'amount' => $amount,
+                    'paymentMethodNonce' => $nonceFromTheClient,
+                    'customer' => [
+                        'firstName' => $userObj->firstname,
+                        'lastName' => $userObj->lastname,
+                        'phone' => $userObj->phone,
+                        'email' => $userObj->email
+                    ],
+                    'options' => [
+                        'submitForSettlement' => True
+                    ]
+        ]);
+
+        $transaction = $result->transaction;
+
+        if ($result->success) {
+            $m = new Mailer();
+            $transid = $transaction->id;
+            $status = $transaction->status;
+
+            $userObj->userid = $userObj->id;
+            $userObj->courseid = $courseid;
+            $userObj->slotid = $slotid;
+            $userObj->sum = $amount;
+            $userObj->amount = $amount;
+            $userObj->payment_amount = $amount;
+            $userObj->pwd = $userObj->purepwd;
+            $userObj->card_holder = $userObj->firstname . " " . $userObj->lastname;
+            $userObj->signup_first = $userObj->firstname;
+            $userObj->signup_last = $userObj->lastname;
+            $userObj->transid = $transid;
+            $userObj->status = $status;
+            $userObj->renew = $period;
+            $userObj->period = $period;
+            $userObj->promo_code = '';
+            $userObj->bill_email = $userObj->email;
+            $this->add_any_pay_payment($userObj);
+            $m->send_payment_confirmation_message($userObj);
+            return true;
+        } // end if 
+        else {
+            $msg = $result->message;
+            $failObj = new stdClass();
+            $failObj->status = $transaction->status;
+            $failObj->code = $transaction->processorResponseCode;
+            $failObj->program = $program;
+            $failObj->msg = $msg;
+            $failObj->info = $transaction->additionalProcessorResponse;
+            $failObj->amount = $amount;
+            $failObj->firstname = $userObj->firstname;
+            $failObj->lastname = $userObj->lastname;
+            $failObj->email = $userObj->email;
+            $failObj->phone = $userObj->phone;
+            $this->send_any_pay_failed_transaction_info($failObj);
+            return false;
+        }
+    }
+
+    function add_any_pay_payment($userObj) {
+        $date = time();
+        $query = "insert into mdl_card_payments2 "
+                . "(userid,"
+                . "courseid,"
+                . "psum, renew, "
+                . "trans_id,"
+                . "auth_code,"
+                . "promo_code,"
+                . "pdate)"
+                . "values ($userObj->userid,"
+                . "$userObj->courseid,"
+                . "'$userObj->amount', $userObj->period,"
+                . "'$userObj->transid',"
+                . "'$userObj->status',"
+                . "'$userObj->promo_code',"
+                . "'$date')";
+        $this->db->query($query);
+        if ($userObj->period > 0) {
+            $cert = new Certificates2();
+            $cert->renew_certificate($userObj->courseid, $userObj->userid, $userObj->period);
+        } // end if 
+        else {
+            if ($userObj->slotid > 0) {
+                $p = new Payment();
+                $p->enroll->add_user_to_course_schedule($userObj->userid, $userObj);
+            } // end if $userObj->slotid>0
+        } // end else
+    }
+
     function create_transaction($transObj) {
         $amount = $transObj->amount;
         $nonceFromTheClient = $transObj->nonce;
@@ -55,21 +163,7 @@ class Cards {
                     ]
         ]);
 
-        /*
-          echo "<br>Result object-------------<pre></br>";
-          print_r($result);
-          echo "<pre>-------------------------</pre><br>";
-         */
-
         $transaction = $result->transaction;
-        /*
-          echo "Transacton object------------<pre>";
-          print_r($transaction);
-          echo "</pre>-----------------<br>";
-          echo "Transaction  id: " . $transid . "<br>";
-          echo "Status: " . $status . "<br>";
-          die();
-         */
 
         if ($result->success) {
             $m = new Mailer();
@@ -100,7 +194,6 @@ class Cards {
             $failObj = new stdClass();
             $failObj->status = $transaction->status;
             $failObj->code = $transaction->processorResponseCode;
-            //$failObj->msg = $transaction->processorResponseText;
             $failObj->msg = $msg;
             $failObj->info = $transaction->additionalProcessorResponse;
             $failObj->user = $userObj;
@@ -109,25 +202,16 @@ class Cards {
         }
     }
 
-    function send_failed_transaction_info($failObj) {
+    function send_any_pay_failed_transaction_info($failObj) {
         $m = new Mailer();
 
-        /*
-          echo "<br>Failure object:------------<pre>";
-          print_r($failObj);
-          echo "</pre>-----------------<br>";
-         */
-
-        $first = $failObj->user->first_name;
-        $last = $failObj->user->last_name;
-        $email = $failObj->user->email;
-        $phone = $failObj->user->phone;
-        $program = $failObj->user->program;
-        $amount = $failObj->user->amount;
-        $status = $failObj->status;
-        $code = $failObj->code;
+        $first = $failObj->firstname;
+        $last = $failObj->lastname;
+        $email = $failObj->email;
+        $phone = $failObj->phone;
+        $program = $failObj->program;
+        $amount = $failObj->amount;
         $message = $failObj->msg;
-        $info = $failObj->info;
 
         $msg.="<html>";
         $msg.="<body>";
@@ -163,33 +247,67 @@ class Cards {
         $msg.="<td style='padding:15px;'>$$amount</td>";
         $msg.="</tr>";
 
-        /*
-         * 
-          $msg.="<tr>";
-          $msg.="<td style='padding:15px;'>Transaction status</td>";
-          $msg.="<td style='padding:15px;'>$status</td>";
-          $msg.="</tr>";
-
-          $msg.="<tr>";
-          $msg.="<td>Transaction code</td>";
-          $msg.="<td>$code</td>";
-          $msg.="</tr>";
-         * 
-         */
-
         $msg.="<tr>";
         $msg.="<td style='padding:15px;'>Transaction message</td>";
         $msg.="<td style='padding:15px;'>$message</td>";
         $msg.="</tr>";
 
-        /*
-         * 
-          $msg.="<tr>";
-          $msg.="<td style='padding:15px;'>Transaction bank info</td>";
-          $msg.="<td style='padding:15px;'>$info</td>";
-          $msg.="</tr>";
-         * 
-         */
+        $msg.="</table>";
+        $msg.="</body>";
+        $msg.="</html>";
+
+        $m->send_braintree_failed_transaction_info($msg);
+    }
+
+    function send_failed_transaction_info($failObj) {
+        $m = new Mailer();
+
+        $first = $failObj->user->first_name;
+        $last = $failObj->user->last_name;
+        $email = $failObj->user->email;
+        $phone = $failObj->user->phone;
+        $program = $failObj->user->program;
+        $amount = $failObj->user->amount;
+        $message = $failObj->msg;
+
+        $msg.="<html>";
+        $msg.="<body>";
+        $msg.="<table align='center'>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>User Firstname</td>";
+        $msg.="<td style='padding:15px;'>$first</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>User Lastname</td>";
+        $msg.="<td style='padding:15px;'>$last</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>User Email</td>";
+        $msg.="<td style='padding:15px;'>$email</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>User Phone</td>";
+        $msg.="<td style='padding:15px;'>$phone</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>Program applied</td>";
+        $msg.="<td style='padding:15px;'>$program</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>Program cost</td>";
+        $msg.="<td style='padding:15px;'>$$amount</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>Transaction message</td>";
+        $msg.="<td style='padding:15px;'>$message</td>";
+        $msg.="</tr>";
 
         $msg.="</table>";
         $msg.="</body>";
@@ -215,7 +333,6 @@ class Cards {
                 . "'$userObj->status',"
                 . "'$userObj->promo_code',"
                 . "'$date')";
-        //echo "Query: " . $query . "<br>";
         $this->db->query($query);
     }
 

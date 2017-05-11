@@ -1151,6 +1151,91 @@ class register_model extends CI_Model {
         return $list;
     }
 
+    function get_user_detailes($userid) {
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $data = $row;
+        }
+        return $data;
+    }
+
+    function get_any_pay_payment_form($user) {
+        $list = "";
+        if ($user->period == 0) {
+            $program = $this->get_coure_name_by_id($user->courseid);
+        } // end if $user->period==0
+        else {
+            $program = 'Certificate renewal';
+        } // end else
+        $cost = $user->amount;
+        $user->program = $program;
+        $userdetails = $this->get_user_detailes($user->userid);
+        $userdata = json_encode($userdetails);
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program checkout</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'>Selected program:</span>";
+        $list.="<span class='span2'>$program</span>";
+        $list.="<span class='span2'>Program fee</span>";
+        $list.="<span class='span2'>$$cost</span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' id='courseid' value='$user->courseid'>";
+        $list.="<input type='hidden' id='slotid' value='$user->slotid'>";
+        $list.="<input type='hidden' id='period' value='$user->period'>";
+        $list.="<input type='hidden' id='amount' value='$cost'>";
+        $list.="<input type='hidden' id='user' value='$userdata'>";
+        $list.="<input type='hidden' id='email' value='$userdetails->email'>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><hr/></span>";
+        $list.="</div>";
+
+        $list.="<form id='checkout-form' action='/' method='post'>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' id='error-message'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'><label for='card-number'>Card Number</label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='card-number'></div></span>";
+        $list.="<span class='span2'><label for='cvv'>CVV</label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='cvv'></div></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span4'>&nbsp;</span>";
+        $list.="<span class='span2'><label for='expiration-date'>Expiration Date</label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='expiration-date'></div></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' id='err' style='color:red;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>By clicking the 'I Agree, Submit' button, you confirm you have reviewed and agree to the Pay by Computer Terms & Conditions (<a href='#' onClick='return false;' id='policy'>click to view).</a></span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' name='payment_method_nonce'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><input type='submit' id='make_any_pay_payment' style='background-color: #e2a500;' value='I Agree, Submit' disabled></span>";
+        $list.="</div>";
+
+        $list.="</div></div></div>";
+
+        return $list;
+    }
+
     function get_brain_paypal_form($user) {
         $userObj = json_decode(base64_decode($user));
         $cost = $userObj->amount;
