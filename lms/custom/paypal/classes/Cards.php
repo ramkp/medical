@@ -36,6 +36,17 @@ class Cards {
         return $clientToken;
     }
 
+    function make_refund($trans_id, $amount) {
+        $this->authorize_sandbox();
+        $result = Braintree\Transaction::refund($trans_id, $amount);
+        if ($result->success) {
+            return true;
+        } // end if
+        else {
+            return false;
+        } // end else
+    }
+
     function get_course_name_by_id($courseid) {
         $query = "select * from mdl_course where id=$courseid";
         $result = $this->db->query($query);

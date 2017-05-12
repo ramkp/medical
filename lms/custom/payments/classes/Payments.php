@@ -8,6 +8,7 @@
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/classes/Invoice.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Classes/ProcessPayment.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/paypal/classes/Cards.php';
 
 class Payments extends Util {
 
@@ -311,6 +312,7 @@ class Payments extends Util {
         if ($this->session->justloggedin == 1) {
             $payments1 = array();
             $payments2 = array();
+            $payments3 = array();
 
             $query = "select * "
                     . "from mdl_card_payments where refunded=1 "
@@ -328,6 +330,21 @@ class Payments extends Util {
             } // end if $num>0
 
             $query = "select * "
+                    . "from mdl_card_payments2 where refunded=1 "
+                    . "order by refund_date desc ";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $payment = new stdClass();
+                    foreach ($row as $key => $value) {
+                        $payment->$key = $value;
+                    } // end foreach      
+                    $payments3[] = $payment;
+                } // end while
+            } // end if $num>0
+
+            $query = "select * "
                     . "from mdl_partial_refund_payments "
                     . "order by refund_date desc ";
             $num = $this->db->numrows($query);
@@ -341,7 +358,7 @@ class Payments extends Util {
                     $payments2[] = $payment;
                 } // end while
             } // end if $num>0
-            $payments = array_merge($payments2, $payments1);
+            $payments = array_merge($payments2, $payments1, $payments3);
             //ksort($payments);
             $list.= $this->create_refunded_payments_page($payments);
         } // end if 
@@ -427,6 +444,18 @@ class Payments extends Util {
         $list.="</span></div>";
         return $list;
     }
+    
+    function get_user_address_block($userid, $invoice_id = null) {
+        $list = "";
+        $user_detailes = $this->get_user_details($userid);
+        $list.="$user_detailes->firstname $user_detailes->lastname<br>";
+        $list.="Phone: $user_detailes->phone1<br>";
+        $list.="Email: $user_detailes->username<br>";
+        $list.="$user_detailes->address<br>";
+        $list.="$user_detailes->city, $user_detailes->state, $user_detailes->zip";
+
+        return $list;
+    }
 
     function create_card_payments_page($payments, $toolbar = true, $search = false) {
         $list = "";
@@ -462,7 +491,7 @@ class Payments extends Util {
                 $list.="<span class='span2'>User</span><span class='span3'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$payment->userid' target='_blank'>$user->firstname &nbsp $user->lastname ($user->email)</a></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span2'>Address</span><span class='span3'>$user_payments</span>";
+                $list.="<span class='span4'>Address</span><span class='span3'>$user_payments</span>";
                 $list.="</div>";
 
                 $list.="<div class='container-fluid'>";
@@ -472,7 +501,7 @@ class Payments extends Util {
                 $list.="<span class='span2'>Paid sum</span><span class='span3'>$$payment->psum from $date</span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid'>";
-                $list.="<span class='span7'><hr/></span>";
+                $list.="<span class='span10'><hr/></span>";
                 $list.="</div>";
             } // end foreach
             $list.="</div>";
@@ -717,9 +746,14 @@ class Payments extends Util {
         return $list;
     }
 
-    function get_refund_courses() {
+    function get_refund_courses($authorize = false) {
         $list = "";
-        $list.="<select id='refund_courses' style='width:375px;'>";
+        if ($authorize) {
+            $list.="<select id='refund_courses2' style='width:375px;'>";
+        } // end if
+        else {
+            $list.="<select id='refund_courses' style='width:375px;'>";
+        } // end else
         $list.="<option value='0' selected>Programs</option>";
         $query = "select * from mdl_course where cost>0 and visible=1";
         $num = $this->db->numrows($query);
@@ -761,24 +795,54 @@ class Payments extends Util {
         } // end if $courseid != null
     }
 
+    function get_course_payments2($courseid = null) {
+        $users = array();
+        if ($courseid != null) {
+            $query = "select * from mdl_card_payments2 "
+                    . "where courseid=$courseid "
+                    . "and refunded=0 order by pdate desc";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $userdata = $this->get_user_details($row['userid']);
+                    $date = date('m-d-Y', $row['pdate']);
+                    $user = new stdClass();
+                    $user->id = $row['id'];
+                    $user->firstname = $userdata->firstname;
+                    $user->lastname = $userdata->lastname;
+                    $user->amount = $row['psum'];
+                    $user->date = $date;
+                    $item = mb_convert_encoding($user->firstname, 'UTF-8') . " " . mb_convert_encoding($user->lastname, 'UTF-8') . " " . mb_convert_encoding('$' . $user->amount, 'UTF-8') . " " . mb_convert_encoding($user->date, 'UTF-8');
+                    $users[] = $item;
+                } // end while
+                file_put_contents('/home/cnausa/public_html/lms/custom/utils/payments2.json', json_encode($users));
+            } // end if $num > 0
+        } // end if $courseid != null
+    }
+
     function get_refund_modal_dialog() {
         $list = "";
         $courses = $this->get_refund_courses();
-        $this->get_course_payments();
-        $list.="<div id='myModal' class='modal fade' style='height:375px;'>
+        $courses2 = $this->get_refund_courses(true);
+        $list.="<div id='myModal' class='modal fade' style='height:610px;'>
         <div class='modal-dialog'>
         <div class='modal-content'>
             <div class='modal-header'>                
                 <h4 class='modal-title'>Make refund</h4>
                 </div>                
-                <div class='modal-body' style='height:275px;'>                                
+                <div class='modal-body' style='height:600px;'> 
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span5'>Authorize.net payments</span>    
+                </div> 
                 
                 <div class='container-fluid' style='text-align:left;'>
                 <span class='span5'>$courses</span>    
                 </div>            
                 
                 <div class='container-fluid' style='text-align:left;'>
-                <span class='span5' id='course_payments_span'><input type='text' id='course_payments' style='width:365px;'></span>                    
+                <span class='span5'><input type='text' id='course_payments' style='width:365px;'></span>                    
                 </div>       
                 
                 <div class='container-fluid' style='text-align:left;'>
@@ -789,14 +853,46 @@ class Payments extends Util {
                 <div class='container-fluid' style='text-align:left;'>
                 <span class='span5' id='refund_err'></span>
                 </div>
-
-
+                
+                 <div class='container-fluid' style='text-align:left;margin-left:25px;'>
+                 <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                 <span align='center'><button type='button' class='btn btn-primary'  id='make_new_refund'>Go</button></span>   
+                 </div>
+                 
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span5'><hr/></span>
+                 </div>
+                 
+                 <!-------------- Braintree payments -------------->
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span5'>Braintree payments</span>    
+                 </div> 
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span5'>$courses2</span>    
+                </div>            
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span5'><input type='text' id='course_payments2' style='width:365px;'></span>                    
+                </div>       
+                
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span2'>Refund amount $</span>
+                <span class='span2'><input type='text' id='refund_amount2' style='width:160px;'></span>                    
                 </div>
                 
-                <div class='modal-footer'>
-                <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
-                <span align='center'><button type='button' class='btn btn-primary'  id='make_new_refund'>Go</button></span>
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span5' id='refund_err2'></span>
                 </div>
+                
+                 <div class='container-fluid' style='text-align:left;margin-left:25px;'>
+                 <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                 <span align='center'><button type='button' class='btn btn-primary'  id='make_new_refund2'>Go</button></span>   
+                 </div>
+            
+                 </div>
+                
+                
         </div>
         </div>
         </div>";
@@ -838,6 +934,57 @@ class Payments extends Util {
                 // Update card payments amount
                 $rest_sum = $db_amount - $amount;
                 $query = "update mdl_card_payments set psum='$rest_sum' "
+                        . "where id=$paymentid";
+                $this->db->query($query);
+                // Add data to partial refunds table
+                $date = time();
+                $query = "INSERT INTO mdl_partial_refund_payments "
+                        . "(userid,"
+                        . "courseid,"
+                        . "psum,"
+                        . "refund_date) "
+                        . "values ($userid,$courseid,'$amount','$date')";
+                $this->db->query($query);
+            } // end else when it was partial refund
+            return true;
+        } // end if $status==true
+        else {
+            return false;
+        }
+    }
+
+    function make_refund2($payment, $amount) {
+        $payment_arr = explode(" ", $payment);
+        $firstname = $payment_arr[0];
+        $lastname = $payment_arr[1];
+        $data = $lastname . " " . $firstname;
+        $userid = $this->get_userid_by_fio($data);
+        $fullamount = str_replace('$', '', $payment_arr[2]);
+        $date = $payment_arr[3];
+        $query = "select * from mdl_card_payments2 "
+                . "where userid=$userid "
+                . "and psum='$fullamount' "
+                . "and FROM_UNIXTIME(pdate, '%m-%d-%Y')='$date'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $paymentid = $row['id'];
+            $db_amount = $row['psum'];
+            $trans_id = $row['trans_id'];
+            $courseid = $row['courseid'];
+        } // end while
+        $c = new Cards();
+        $status = $c->make_refund($trans_id, $amount);
+        if ($status == true) {
+            if ($amount == $db_amount) {
+                $query = "update mdl_card_payments2 set refunded=1 "
+                        . "where id=$paymentid";
+                //echo "Query0: ".$query."<br>";
+                $this->db->query($query);
+            } // end if $amount == $db_amount             
+            else {
+                // Update card payments amount
+                $rest_sum = $db_amount - $amount;
+                $query = "update mdl_card_payments2 set psum='$rest_sum' "
                         . "where id=$paymentid";
                 $this->db->query($query);
                 // Add data to partial refunds table
