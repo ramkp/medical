@@ -24,10 +24,10 @@ class Cards {
 
     function autorize_production() {
         // ******* Production *******
-        Braintree\Configuration::environment('BT_ENVIRONMENT');
-        Braintree\Configuration::merchantId('BT_MERCHANT_ID');
-        Braintree\Configuration::publicKey('BT_PUBLIC_KEY');
-        Braintree\Configuration::privateKey('BT_PRIVATE_KEY');
+        Braintree\Configuration::environment('production');
+        Braintree\Configuration::merchantId('r4fpcmgpvk9bfgwq');
+        Braintree\Configuration::publicKey('5pkv399brrnwwsr7');
+        Braintree\Configuration::privateKey('e89b32d1dbbe736cba6efb6d4d9f24a5');
     }
 
     function get_sandbox_token() {
@@ -37,7 +37,8 @@ class Cards {
     }
 
     function make_refund($trans_id, $amount) {
-        $this->authorize_sandbox();
+        //$this->authorize_sandbox();
+        $this->autorize_production();
         $result = Braintree\Transaction::refund($trans_id, $amount);
         if ($result->success) {
             return true;
@@ -65,7 +66,7 @@ class Cards {
         $nonceFromTheClient = $transObj->nonce;
         $userObj = json_decode($transObj->user); // user from mdl_user table
         $userObj->phone = $userObj->phone1;
-        
+
         $cardholder = $transObj->cardholder;
         $names = explode(" ", $cardholder);
         if (count($names) == 2) {
@@ -77,8 +78,8 @@ class Cards {
             $billing_fisrtname = $names[0] . " " . $names[1];
             $billing_lastname = $names[2];
         } // end if
-        
-        $this->authorize_sandbox();
+        //$this->authorize_sandbox();
+        $this->autorize_production();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
                     'paymentMethodNonce' => $nonceFromTheClient,
@@ -89,7 +90,7 @@ class Cards {
                         'email' => $userObj->email
                     ],
                     'creditCard' => [
-                        'cardholderName'=>$cardholder
+                        'cardholderName' => $cardholder
                     ],
                     'options' => [
                         'submitForSettlement' => True
@@ -111,7 +112,7 @@ class Cards {
             $userObj->payment_amount = $amount;
             $userObj->pwd = $userObj->purepwd;
             $userObj->card_holder = $cardholder;
-            $userObj->billing_name=$cardholder;
+            $userObj->billing_name = $cardholder;
             $userObj->signup_first = $userObj->firstname;
             $userObj->signup_last = $userObj->lastname;
             $userObj->transid = $transid;
@@ -188,8 +189,8 @@ class Cards {
             $billing_fisrtname = $names[0] . " " . $names[1];
             $billing_lastname = $names[2];
         } // end if
-
-        $this->authorize_sandbox();
+        //$this->authorize_sandbox();
+        $this->autorize_production();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
                     'paymentMethodNonce' => $nonceFromTheClient,
@@ -200,7 +201,7 @@ class Cards {
                         'email' => $userObj->email
                     ],
                     'creditCard' => [
-                        'cardholderName'=>$cardholder
+                        'cardholderName' => $cardholder
                     ],
                     'options' => [
                         'submitForSettlement' => True
@@ -225,7 +226,7 @@ class Cards {
             $userObj->pwd = $user_detailes->purepwd;
             $userObj->payment_amount = $userObj->amount;
             $userObj->card_holder = $cardholder;
-            $userObj->billing_name=$cardholder;
+            $userObj->billing_name = $cardholder;
             $userObj->signup_first = $userObj->first_name;
             $userObj->signup_last = $userObj->last_name;
             $userObj->transid = $transid;

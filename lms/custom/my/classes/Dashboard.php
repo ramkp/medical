@@ -1963,8 +1963,10 @@ class Dashboard extends Util {
         $cost = $b->get_item_cost($courseid, $userid, $slotid);
         $exam_status = $this->is_exam_attempt($courseid);
         if ($exam_status) {
-            $total = $cost;
-            $owe = '$0';
+            // You need to find workaround for failed attempts balance
+            $total = $b->get_student_payments_for_balance($courseid, $userid);
+            $diff = $cost - $total;
+            $owe = ($diff < 0) ? '-$' . abs($diff) : '$' . $diff;
             if ($report) {
                 $list.="<table>";
                 $list.="<tr style='font-weight:bold;' style=''>";

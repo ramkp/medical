@@ -2511,7 +2511,7 @@ $(document).ready(function () {
                 });
             } // end if confirm
         }
-        
+
         if ($(event.target).attr('class') == 'profile_refund_payment_braintree') {
             var userid = $(this).data('userid');
             var courseid = $(this).data('courseid');
@@ -4851,7 +4851,8 @@ $(document).ready(function () {
                             $.post(url, {userid: userid, courseid: program.courseid}).done(function () {
                                 var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
                                 var new_url = "https://medical2.com/index.php/register2/any_pay/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount + "/0";
-                                window.open(url, '_blank');
+                                $("[data-dismiss=modal]").trigger({type: "click"});
+                                window.open(new_url, '_blank');
                             });
                         } // end if ptype == 'card'
                         else {

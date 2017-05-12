@@ -902,7 +902,7 @@ class register_model extends CI_Model {
         $list = "";
         $cats = $this->get_course_categories();
         $courses = $this->get_courses_by_category();
-        $participants = $this->get_participants_dropbox();
+        //$participants = $this->get_participants_dropbox();
         $come_from = $this->come_from();
         $states = $this->get_states_list();
         $register_state = $this->get_register_course_states_list();
@@ -979,8 +979,10 @@ class register_model extends CI_Model {
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='card' checked>I want to pay by card</span>";
-            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='paypal'>I want to pay by Paypal</span>";
+            $list.="<span class='span2'><img
+                        src='https://www.merchantequip.com/image/?logos=v|m|a|d&height=16' alt='Merchant Equipment Store Credit Card Logos'/></span><span class='span2'><input type='radio' name='ptype' id='ptype' value='card' checked><span style='font-size:14px;font-weight:bold;color:blue;'>Pay with Credit or debit card</span></span>";
+            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='paypal'><img
+                        src='https://www.merchantequip.com/image/?logos=p&height=16' alt='Merchant Equipment Store Credit Card Logos'/><span style='font-size:14px;font-weight:bold;color:blue;'> Pay with Paypal</span></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -993,6 +995,11 @@ class register_model extends CI_Model {
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span8'><hr></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><img
+                        src='https://www.merchantequip.com/image/?logos=v|m|a|d|p&height=64' alt='Merchant Equipment Store Credit Card Logos'/></span>";
             $list.="</div>";
 
             $list.="</div></div></div>";
@@ -1059,8 +1066,10 @@ class register_model extends CI_Model {
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='card' checked>I want to pay by card</span>";
-            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='paypal'>I want to pay by Paypal</span>";
+            $list.="<span class='span2'><img
+                        src='https://www.merchantequip.com/image/?logos=v|m|a|d&height=16' alt='Merchant Equipment Store Credit Card Logos'/></span><span class='span2'><input type='radio' name='ptype' id='ptype' value='card' checked><span style='font-size:14px;font-weight:bold;color:blue;'>Pay with Credit or debit card</span></span>";
+            $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='paypal'><img
+                        src='https://www.merchantequip.com/image/?logos=p&height=16' alt='Merchant Equipment Store Credit Card Logos'/><span style='font-size:14px;font-weight:bold;color:blue;'> Pay with Paypal</span></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -1073,6 +1082,11 @@ class register_model extends CI_Model {
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span8'><hr></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'><img
+                        src='https://www.merchantequip.com/image/?logos=v|m|a|d|p&height=64' alt='Merchant Equipment Store Credit Card Logos'/></span>";
             $list.="</div>";
 
             $list.="</div>";
@@ -1277,12 +1291,12 @@ class register_model extends CI_Model {
         $email = $userObj->email;
         $program = $this->get_coure_name_by_id($userObj->courseid);
 
-        //$list.="<form action='https://www.paypal.com/cgi-bin/webscr' method='post'>"; // production
-        $list.="<form action='https://www.sandbox.paypal.com/cgi-bin/webscr' method='post'>"; // sandbox
+        $list.="<form action='https://www.paypal.com/cgi-bin/webscr' method='post'>"; // production
+        //$list.="<form action='https://www.sandbox.paypal.com/cgi-bin/webscr' method='post'>"; // sandbox
         $list.="<input type='hidden' name='cmd' value='_xclick'>";
         $list.="<INPUT TYPE='hidden' name='charset' value='utf-8'>";
-        //$list.="<input type='hidden' name='business' value='contato@iprovida.org.br'>"; // production
-        $list.="<input type='hidden' name='business' value='sirromas-facilitator@outlook.com'>"; // sandbox
+        $list.="<input type='hidden' name='business' value='info@medical2.com'>"; // production
+        //$list.="<input type='hidden' name='business' value='sirromas-facilitator@outlook.com'>"; // sandbox
         $list.="<input type='hidden' name='item_name' value='$program'>
         <input type='hidden' name='amount' value='$cost'>
         <input type='hidden' name='custom' value='$email'>    
