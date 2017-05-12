@@ -65,6 +65,19 @@ class Cards {
         $nonceFromTheClient = $transObj->nonce;
         $userObj = json_decode($transObj->user); // user from mdl_user table
         $userObj->phone = $userObj->phone1;
+        
+        $cardholder = $transObj->cardholder;
+        $names = explode(" ", $cardholder);
+        if (count($names) == 2) {
+            $billing_fisrtname = $names[0];
+            $billing_lastname = $names[1];
+        } // end if
+
+        if (count($names) == 3) {
+            $billing_fisrtname = $names[0] . " " . $names[1];
+            $billing_lastname = $names[2];
+        } // end if
+        
         $this->authorize_sandbox();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
@@ -74,6 +87,9 @@ class Cards {
                         'lastName' => $userObj->lastname,
                         'phone' => $userObj->phone,
                         'email' => $userObj->email
+                    ],
+                    'creditCard' => [
+                        'cardholderName'=>$cardholder
                     ],
                     'options' => [
                         'submitForSettlement' => True
@@ -94,7 +110,8 @@ class Cards {
             $userObj->amount = $amount;
             $userObj->payment_amount = $amount;
             $userObj->pwd = $userObj->purepwd;
-            $userObj->card_holder = $userObj->firstname . " " . $userObj->lastname;
+            $userObj->card_holder = $cardholder;
+            $userObj->billing_name=$cardholder;
             $userObj->signup_first = $userObj->firstname;
             $userObj->signup_last = $userObj->lastname;
             $userObj->transid = $transid;
@@ -159,6 +176,19 @@ class Cards {
         $amount = $transObj->amount;
         $nonceFromTheClient = $transObj->nonce;
         $userObj = json_decode($transObj->user);
+
+        $cardholder = $transObj->cardholder;
+        $names = explode(" ", $cardholder);
+        if (count($names) == 2) {
+            $billing_fisrtname = $names[0];
+            $billing_lastname = $names[1];
+        } // end if
+
+        if (count($names) == 3) {
+            $billing_fisrtname = $names[0] . " " . $names[1];
+            $billing_lastname = $names[2];
+        } // end if
+
         $this->authorize_sandbox();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
@@ -168,6 +198,9 @@ class Cards {
                         'lastName' => $userObj->last_name,
                         'phone' => $userObj->phone,
                         'email' => $userObj->email
+                    ],
+                    'creditCard' => [
+                        'cardholderName'=>$cardholder
                     ],
                     'options' => [
                         'submitForSettlement' => True
@@ -191,7 +224,8 @@ class Cards {
             $userObj->sum = $userObj->amount;
             $userObj->pwd = $user_detailes->purepwd;
             $userObj->payment_amount = $userObj->amount;
-            $userObj->card_holder = $userObj->first_time . " " . $userObj->last_name;
+            $userObj->card_holder = $cardholder;
+            $userObj->billing_name=$cardholder;
             $userObj->signup_first = $userObj->first_name;
             $userObj->signup_last = $userObj->last_name;
             $userObj->transid = $transid;

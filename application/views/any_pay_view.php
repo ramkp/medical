@@ -160,12 +160,60 @@ echo $form;
                             submit.removeAttribute('disabled');
                             form.addEventListener('submit', function (event) {
                                 event.preventDefault();
+                                var card_holder = $('#cardholder').val();
                                 hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
                                     if (tokenizeErr) {
                                         $('#err').html('Please provide correct credit card data');
                                         return;
                                     }
+
+                                    var firstname, lastname;
+                                    if (card_holder == '') {
+                                        $('#err').html('Please provide correct credit card data');
+                                        return;
+                                    }
+
+                                    if (card_holder != '') {
+                                        // Remove double spaces between words
+                                        var clean_holder = card_holder.replace(/\s\s+/g, ' ');
+                                        var names_arr = clean_holder.split(" ");
+
+                                        console.log('names array length: ' + names_arr.length);
+
+                                        if (names_arr.length == 1) {
+                                            $('#err').html('Please provide correct card holder name separated by space');
+                                            return;
+                                        }
+
+                                        if (names_arr.length == 2) {
+                                            console.log('Two names case ....');
+                                            console.log('Holder name: ' + card_holder);
+                                            firstname = names_arr[0];
+                                            lastname = names_arr[1];
+                                            console.log('Billing firstname: ' + firstname);
+                                            console.log('Billing lastname: ' + lastname);
+                                            if (typeof (firstname) === "undefined" || firstname == '' || typeof (lastname) === "undefined" || lastname == '') {
+                                                $('#err').html('Please provide correct card holder name separated by space');
+                                                return;
+                                            }
+                                        } // end if names_arr.length == 2
+
+                                        if (names_arr.length == 3) {
+                                            console.log('Three names case ...');
+                                            console.log('Holder name: ' + card_holder);
+                                            firstname = names_arr[0] + ' ' + names_arr[1];
+                                            lastname = names_arr[2];
+                                            console.log('Billing firstname: ' + firstname);
+                                            console.log('Billing lastname: ' + lastname);
+                                            if (typeof (firstname) === "undefined" || firstname == '' || typeof (lastname) === "undefined" || lastname == '') {
+                                                $('#err').html('Please provide correct card holder name separated by space');
+                                                return;
+                                            }
+                                        } // end if names_arr.length == 3
+                                    } // end if card_holder != ''
+
                                     console.log('Nonce: ' + payload.nonce);
+
                                     $('#err').html('');
                                     $('#ajax_loading_payment').show();
                                     $('#make_any_pay_payment').prop('disabled', true);
@@ -182,6 +230,7 @@ echo $form;
                                         user: user,
                                         period: period,
                                         slotid: slotid,
+                                        cardholder: card_holder,
                                         courseid: courseid};
                                     $.post(url, {trans: JSON.stringify(trans)}).done(function (status) {
                                         $('#ajax_loading_payment').hide();

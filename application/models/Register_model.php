@@ -1116,15 +1116,16 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span2'><label for='card-number'>Card Number</label></span>";
+        $list.="<span class='span2'><label for='card-number'>Card Number*</label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='card-number'></div></span>";
-        $list.="<span class='span2'><label for='cvv'>CVV</label></span>";
+        $list.="<span class='span2'><label for='cvv'>CVV*</label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='cvv'></div></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span4'>&nbsp;</span>";
-        $list.="<span class='span2'><label for='expiration-date'>Expiration Date</label></span>";
+        $list.="<span class='span2'><label for='cardholder'>Card Holder*</label></span>";
+        $list.="<span class='span2'><input class='hosted-field' id='cardholder' placeholder=''></span>";
+        $list.="<span class='span2'><label for='expiration-date'>Expiration Date*</label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='expiration-date'></div></span>";
         $list.="</div>";
 
@@ -1201,15 +1202,16 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span2'><label for='card-number'>Card Number</label></span>";
+        $list.="<span class='span2'><label for='card-number'>Card Number*</label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='card-number'></div></span>";
-        $list.="<span class='span2'><label for='cvv'>CVV</label></span>";
+        $list.="<span class='span2'><label for='cvv'>CVV*</label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='cvv'></div></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span4'>&nbsp;</span>";
-        $list.="<span class='span2'><label for='expiration-date'>Expiration Date</label></span>";
+        $list.="<span class='span2'><label for='cardholder'>Card Holder*</label></span>";
+        $list.="<span class='span2'><input class='hosted-field' id='cardholder' placeholder=''></span>";
+        $list.="<span class='span2'><label for='expiration-date'>Expiration Date*</label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='expiration-date'></div></span>";
         $list.="</div>";
 
@@ -1306,7 +1308,9 @@ class register_model extends CI_Model {
             $p = new Payment();
             $signup_status = $p->enroll->single_signup($userObj);
             if ($signup_status === true) {
-                $userObj->userid = $p->get_user_id_by_email($userObj->email);
+                $p->confirm_user($userObj->email);
+                $userid = $p->get_user_id_by_email($userObj->email);
+                $p->enroll->add_user_to_course_schedule($userid, $userObj);
                 $userObj->renew = 0;
                 $this->add_paypal_payment($userObj);
                 $list.="<br/><div  class='form_div'>";

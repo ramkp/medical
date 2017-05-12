@@ -860,7 +860,7 @@ class Report extends Util {
             $unix_from = strtotime($from);
             $unix_to = strtotime($to) + 86400;
         } // end else
-        
+
         if ($courseid > 0) {
             $query = "select * from mdl_card_payments2 "
                     . "where courseid=$courseid and refunded=0 "
@@ -915,14 +915,11 @@ class Report extends Util {
         return $payments;
     }
 
-    function get_card_payments_detailes($courseid, $from, $to, $state, $city) {
-        $payments = array();
+    function get_authorize_payments($courseid, $from, $to, $state, $city) {
         $authorize_payments = array();
         $this->courseid = $courseid;
         $this->from = $from;
         $this->to = $to;
-        $list = "";
-        $total = 0;
 
         if ($from == $to) {
             $timestamp = time();
@@ -933,7 +930,7 @@ class Report extends Util {
             $unix_from = strtotime($from);
             $unix_to = strtotime($to) + 86400;
         } // end else
-     
+
         if ($courseid > 0) {
             $query = "select * from mdl_card_payments "
                     . "where courseid=$courseid and refunded=0 "
@@ -984,17 +981,18 @@ class Report extends Util {
                     }
                 } // end if $user_status==0
             } // end while
-            $braintree_payments = $this->get_braintree_card_payments($courseid, $from, $to, $state, $city);
-            $payments = array_merge($authorize_payments, $braintree_payments);
-            
-            /*
-            echo "<pre>";
-            print_r($payments);
-            echo "</pre>";
-            */
-            
-            
+        } // end if num>0
+        return $authorize_payments;
+    }
 
+    function get_card_payments_detailes($courseid, $from, $to, $state, $city) {
+        $total = 0;
+    
+        $authorize_payments = $this->get_authorize_payments($courseid, $from, $to, $state, $city);
+        $braintree_payments = $this->get_braintree_card_payments($courseid, $from, $to, $state, $city);
+        $payments = array_merge($authorize_payments, $braintree_payments);
+
+        if (count($payments) > 0) {
             $this->create_csv_file($this->card_report_csv_file, $payments);
             $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
             $list.="<span class='span3'>User</span>";
@@ -1017,7 +1015,8 @@ class Report extends Util {
                 $list.="</div>";
             } // end for
             $this->total_card = $total;
-        } // end if $num > 0
+            
+        } // end if count($payments)>0
         else {
             $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span12'>No data found</span>";
@@ -1121,7 +1120,6 @@ class Report extends Util {
                 } // end if $user_status==0
             } // end while
         } // end if $num > 0
-        
         //2. Full refunded braintree payments
         if ($courseid > 0) {
             $query = "select * from mdl_card_payments2 "
@@ -1172,7 +1170,6 @@ class Report extends Util {
                 } // end if $user_status==0
             } // end while
         } // end if $num > 0
-        
         //3. Partial refunded payments
         if ($courseid > 0) {
             $query = "select * from mdl_partial_refund_payments "
