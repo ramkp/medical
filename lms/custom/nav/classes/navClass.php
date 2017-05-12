@@ -722,10 +722,6 @@ class navClass extends Util {
         $renew_amount = $renew->get_renew_amount($courseid);
         $late_fee = $renew->get_renew_late_fee($courseid, $expire);
 
-        //echo "Renew amount: " . $renew_amount . "<br>";
-        //echo "Late fee: " . $late_fee . "<brr>";
-
-
         $one_year_payment = $renew_amount + $late_fee;
         $two_year_payment = $renew_amount * 2 + $late_fee;
         $three_year_payment = $renew_amount * 3 + $late_fee;
@@ -735,17 +731,30 @@ class navClass extends Util {
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span></span>";
+        $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Two years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span></span>";
+        $list.="<span class='span9'>Two years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span></span>";
-
+        $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
         $list.="</div>";
+
+        if ($this->user->id == 11773) {
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9'>Two years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
+            $list.="</div>";
+        } // end if 
 
         return $list;
     }
