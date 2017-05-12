@@ -82,7 +82,7 @@ class User extends Util {
                 $list.="<a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'><span class='span2'>$user->firstname</a></span>";
                 $list.="<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/user/profile.php?id=$user->id' target='_blank'>$user->lastname</a></span>";
                 $list.="<span class='span2'>$user->phone1</span>";
-                $list.="<span class='span4'>$user->email</span>";
+                $list.="<span class='span4'>$user->username</span>";
                 if ($user->email != 'info@medical2.com') {
                     $list.="<span class='span2'>$user->purepwd</span>";
                 } // end if
@@ -179,7 +179,7 @@ class User extends Util {
         $list = "";
         $users = array();
 
-        /*         * ***************************************************************
+        /* ****************************************************************
          * 
          * Function argument could be email, phone, user firstname and
          * user lastname, user firstname, middlename and lastname  and
