@@ -18,6 +18,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/grades/classes/Grades.php'
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/paypal/classes/Cards.php';
 
 use Dompdf\Dompdf;
 
@@ -583,8 +584,8 @@ class Dashboard extends Util {
                 if ($status == 0) {
                     $prohibit = $this->get_user_roles($userid);
                     if ($prohibit == 0 && ($current_user == 2 || $current_user == 234)) {
-                        $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
-                        $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                        // $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
+                        $list.="<span class='span2'><button class='profile_refund_payment_braintree' data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
                     }
                 } // end if status==0
                 $list.="</div>";
@@ -703,15 +704,15 @@ class Dashboard extends Util {
     }
 
     function get_refund_payments($userid, $courseid) {
+        
         $list = "";
 
-        // 1. Get full refunds
+        // 1. Get authorize full refunds
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid "
                 . "and userid=$userid and refunded=1 and refund_date<>''";
         //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
-        //echo "Num: " . $num . "<br>";
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -722,7 +723,25 @@ class Dashboard extends Util {
                 $list.="</div>";
             } // end while
         } // end if $num > 0
-        // 2. Get partial refunds
+        
+        // Get Braintree full refunds 
+        $query = "select * from mdl_card_payments2 "
+                . "where courseid=$courseid "
+                . "and userid=$userid and refunded=1 and refund_date<>''";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $coursename = $this->get_course_name($courseid);
+                $date = date('m-d-Y', $row['refund_date']);
+                $list.="<div class='row-fluid'>";
+                $list.="<span span9>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
+        
+        // 3. Get partial refunds
         $query = "select * from mdl_partial_refund_payments "
                 . "where courseid=$courseid and userid=$userid";
         //echo "Query: " . $query . "<br>";
@@ -786,7 +805,25 @@ class Dashboard extends Util {
                 $list.="</div>";
             } // end while
         } // end if $num > 0
-        // 2. Get partial refunds
+        
+        // Get Braintree full refunds 
+        $query = "select * from mdl_card_payments2 "
+                . "where userid=$userid "
+                . "and refunded=1 and refund_date<>''";
+        //echo "Query: " . $query . "<br>";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $coursename = $this->get_course_name($row['courseid']);
+                $date = date('m-d-Y', $row['refund_date']);
+                $list.="<div class='row-fluid'>";
+                $list.="<span span9>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
+        
+        // 3. Get partial refunds
         $query = "select * from mdl_partial_refund_payments "
                 . "where userid=$userid";
         //echo "Query: " . $query . "<br>";
@@ -2466,6 +2503,26 @@ class Dashboard extends Util {
             $mailer = new Mailer();
             //$mailer->send_partial_payment_confirmation($userObj);
             $mailer->send_partial_payment_confirmation2($userObj);
+        }
+    }
+
+    function refund_braintree_payment($payment) {
+        $now = time();
+        $payments_data = explode('_', $payment->id);
+        $query = "select * from mdl_card_payments2 "
+                . "where id=$payments_data[1]";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $amount = $row['psum'];
+            $trans_id = $row['trans_id'];
+        }
+        $c = new Cards();
+        $status = $c->make_refund($trans_id, $amount);
+        if ($status) {
+            $query = "update mdl_card_payments2 "
+                    . "set refunded=1, refund_date='$now' "
+                    . "where id=$payments_data[1]";
+            $this->db->query($query);
         }
     }
 

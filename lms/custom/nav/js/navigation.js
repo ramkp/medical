@@ -2021,6 +2021,8 @@ $(document).ready(function () {
             get_refund_modal_dialog();
         }
 
+
+
         if (event.target.id == 'create_campaign') {
             console.log('Enrolled users: ' + $('select#users').val());
             if (typeof $('select#users').val() !== 'undefined') {
@@ -2501,6 +2503,22 @@ $(document).ready(function () {
             console.log('Payment id: ' + id);
             if (confirm('Refund current payment?')) {
                 var url = "/lms/custom/my/refund.php";
+                var payment = {userid: userid, courseid: courseid, id: id};
+                $.post(url, {payment: JSON.stringify(payment)}).done(function (data) {
+                    console.log(data);
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    document.location.reload();
+                });
+            } // end if confirm
+        }
+        
+        if ($(event.target).attr('class') == 'profile_refund_payment_braintree') {
+            var userid = $(this).data('userid');
+            var courseid = $(this).data('courseid');
+            var id = $(this).data('paymentid');
+            console.log('Payment id: ' + id);
+            if (confirm('Refund current payment?')) {
+                var url = "/lms/custom/my/braintree_refund.php";
                 var payment = {userid: userid, courseid: courseid, id: id};
                 $.post(url, {payment: JSON.stringify(payment)}).done(function (data) {
                     console.log(data);
@@ -3715,8 +3733,8 @@ $(document).ready(function () {
         var amount = $('#amount').val();
         if (amount != '' && $.isNumeric(amount)) {
             $('#partial_err').html('');
-            //var url = "http://medical2.com/index.php/payments/index/" + userid + "/" + courseid + "/" + slotid + "/" + amount;
             var url = "http://medical2.com/index.php/payments/payment/" + userid + "/" + courseid + "/" + slotid + "/" + amount;
+            var new_url = "http://medical2.com/index.php/register2/any_pay/" + userid + "/" + courseid + "/" + slotid + "/" + amount + '/0';
             window.open(url, "Payment");
         } // end if amount!='' &&  $.isNumeric(amount)
         else {
@@ -3963,6 +3981,27 @@ $(document).ready(function () {
             } // end if paymentid>0
             else {
                 $('#refund_err').html('Please select user payment and amount');
+            }
+        }
+
+        if (event.target.id == 'make_new_refund2') {
+            var paymentid = $('#course_payments2').val();
+            var amount = $('#refund_amount2').val();
+            console.log('Payment ID: ' + paymentid);
+            if (paymentid != '' && amount != '' && $.isNumeric(amount)) {
+                $('#refund_err').html('');
+                if (confirm('Make refund for current payment?')) {
+                    var url = "/lms/custom/payments/make_refund2.php";
+                    var request = {paymentid: paymentid, amount: amount};
+                    $.post(url, request).done(function (data) {
+                        console.log('Server response: ' + data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        get_refund_page();
+                    });
+                } // end if confirm
+            } // end if paymentid>0
+            else {
+                $('#refund_err2').html('Please select user payment and amount');
             }
         }
 
@@ -4245,17 +4284,28 @@ $(document).ready(function () {
             if (courseid > 0) {
                 var url = "/lms/custom/payments/get_course_payments.php";
                 $.post(url, {id: courseid}).done(function () {
-                    //console.log('Server response: ' + data);
-                    //$('#course_payments_span').html(data);
                     $.post('/lms/custom/utils/payments.json', {id: 1}, function (data) {
                         $('#course_payments').typeahead({source: data, items: 240});
                     }, 'json');
                 }); // end if $.post
-
             } // end if course_payment_id>0
         }
 
-    }); // end of body change select even 
+        if (event.target.id == 'refund_courses2') {
+            var courseid = $('#refund_courses2').val();
+            console.log('Course id: ' + courseid);
+            if (courseid > 0) {
+                var url = "/lms/custom/payments/get_course_payments2.php";
+                $.post(url, {id: courseid}).done(function () {
+                    $.post('/lms/custom/utils/payments2.json', {id: 1}, function (data) {
+                        $('#course_payments2').typeahead({source: data, items: 240});
+                    }, 'json');
+                }); // end if $.post
+            } // end if course_payment_id>0
+        }
+
+
+    }); // end of body change select event 
 
 
     $('body').on('click', function (event) {
@@ -4800,6 +4850,7 @@ $(document).ready(function () {
                             var url = "/lms/custom/my/enroll_user.php";
                             $.post(url, {userid: userid, courseid: program.courseid}).done(function () {
                                 var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
+                                var new_url = "https://medical2.com/index.php/register2/any_pay/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount + "/0";
                                 window.open(url, '_blank');
                             });
                         } // end if ptype == 'card'
@@ -5004,6 +5055,7 @@ $(document).ready(function () {
                 if (ptype == 0) {
                     $("[data-dismiss=modal]").trigger({type: "click"});
                     var url = "http://medical2.com/index.php/payments/payment/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
+                    var new_url = "http://medical2.com/index.php/register2/any_pay/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
                     var oWindow = window.open(url, "renew");
                 } // end if ptype == 0
                 else {

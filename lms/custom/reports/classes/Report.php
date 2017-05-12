@@ -1121,7 +1121,59 @@ class Report extends Util {
                 } // end if $user_status==0
             } // end while
         } // end if $num > 0
-        //2. Partial refunded payments
+        
+        //2. Full refunded braintree payments
+        if ($courseid > 0) {
+            $query = "select * from mdl_card_payments2 "
+                    . "where courseid=$courseid and refunded=1 "
+                    . "and refund_date between $unix_from and $unix_to "
+                    . "order by refund_date desc ";
+        } // end if $courseid>0
+        else {
+            $query = "select * from mdl_card_payments2 "
+                    . "where refund_date between $unix_from and $unix_to "
+                    . "and refunded=1 order by refund_date desc ";
+        } // end else    
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_status = $this->is_user_deleted($row['userid']);
+                if ($user_status == 0) {
+                    if ($state == '' && $city == '') {
+                        $payment = new stdClass();
+                        foreach ($row as $key => $value) {
+                            $payment->$key = $value;
+                        }
+                        $payments[] = $payment;
+                    } // end if $state=='' && $city==''
+
+                    if ($state != '' && $city == '') {
+                        $location_status = $this->filer_by_state($state, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            }
+                            $payments[] = $payment;
+                        } // end if $location_status>0
+                    } // end if $state != '' && $city == ''
+
+                    if ($city != '') {
+                        $location_status = $this->filer_by_city($city, $row['userid']);
+                        if ($location_status > 0) {
+                            $payment = new stdClass();
+                            foreach ($row as $key => $value) {
+                                $payment->$key = $value;
+                            }
+                            $payments[] = $payment;
+                        } // end if $location_status>0
+                    } // end if $city!=''
+                } // end if $user_status==0
+            } // end while
+        } // end if $num > 0
+        
+        //3. Partial refunded payments
         if ($courseid > 0) {
             $query = "select * from mdl_partial_refund_payments "
                     . "where courseid=$courseid "
