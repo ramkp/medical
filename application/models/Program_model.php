@@ -5,6 +5,8 @@
  *
  * @author sirromas
  */
+
+
 class program_model extends CI_Model {
 
     public $host;
@@ -122,6 +124,15 @@ class program_model extends CI_Model {
             $discount = $row->group_discount_size;
         }
         return $discount;
+    }
+
+    function get_course_cost($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $cost = $row->cost;
+        }
+        return $cost;
     }
 
     public function calculate_item_cost($id, $item_cost, $item_discount) {
@@ -257,7 +268,7 @@ class program_model extends CI_Model {
                     $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/programs/schedule/$coursename'><button class='btn btn-primary'>Schedule/Register</button></a>";
                 } // end if $has_schedule>0
                 else {
-                    $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
+                    $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
                 } // end else    
                 if ($cat_name == 'Hands-On Certification Workshops') {
                     if ($item->id == 45) {
@@ -281,11 +292,10 @@ class program_model extends CI_Model {
                     <p><img src='$item->path' alt='program' style='vertical-align:text-bottom; margin: 0 .5em;'   $size></p></div></div><ul class='teachers'><p align='justify'>$summary_string</p><p align='left'>" . $blocks['item_cost'] . "</p><p align='left'>" . $blocks['item_group_cost'] . "</p><p align='left'><a href='https://" . $_SERVER['SERVER_NAME'] . "/programs/detailes/$item->id'>More</a></p></ul></div></div>";
                     } // end if $item->id==46
                     if ($item->id == 58) {
-                    	$summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . ' ...' : strip_tags($item->summary);
-                    	$list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='https://" . $_SERVER['SERVER_NAME'] . "/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
+                        $summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . ' ...' : strip_tags($item->summary);
+                        $list.= "<div class='coursebox clearfix odd first' data-courseid='12' data-type='1'><div class='info'><h3 class='coursename'><a class='' href='https://" . $_SERVER['SERVER_NAME'] . "/programs/detailes/$item->id'>$item->fullname</a></h3><div class='moreinfo'></div><div class='enrolmenticons'>$register_button</div></div><div class='content'><div class='summary'><div class='no-overflow'><div class='course-summary-heading'><strong> $cat_name</strong></div>
                     	<p><img src='$item->path' alt='program' style='vertical-align:text-bottom; margin: 0 .5em;'   $size></p></div></div><ul class='teachers'><p align='justify'>$summary_string</p><p align='left'>" . $blocks['item_cost'] . "</p><p align='left'>" . $blocks['item_group_cost'] . "</p><p align='left'><a href='https://" . $_SERVER['SERVER_NAME'] . "/programs/detailes/$item->id'>More</a></p></ul></div></div>";
                     } // end if $item->id==46
-                    
                 } // end if $cat_name == 'Hands-On Certification Workshops'                
                 else {
                     $summary_string = (strlen(strip_tags($item->summary)) > 375) ? substr(strip_tags($item->summary), 0, 275) . ' ...' : strip_tags($item->summary);
@@ -454,7 +464,7 @@ class program_model extends CI_Model {
                     $coursename = 'phlebotomy-technician-certification';
                     break;
                 case 58:
-                	$coursename = 'cpr-program';
+                    $coursename = 'cpr-program';
             }
 
             //$list.= "<span class='span2'><a href='https://" . $_SERVER['SERVER_NAME'] . "/programs/schedule/$item->id'><button id='program_$item->id' class='btn btn-primary'>Schedule/Register</button></a></span>";
@@ -625,7 +635,7 @@ class program_model extends CI_Model {
 
             $result = $this->db->query($query);
             $num = $result->num_rows();
-            
+
             if ($num > 0) {
                 foreach ($result->result() as $row) {
                     $human_date = date('m-d-Y', $row->starttime);
@@ -686,11 +696,7 @@ class program_model extends CI_Model {
 
     public function get_course_schedule($courseid, $state = null) {
         $list = "";
-        //if ($courseid == 44 || $courseid == 45) {
-        //  $list.=$this->get_shared_schedule($courseid, $state);
-        //} // end if $courseid==44 || $courseid==45
-        //else {
-        // 1.Get scheduler id
+         // 1.Get scheduler id
         $query = "select id from mdl_scheduler where course=$courseid";
         $result = $this->db->query($query);
         $num = $result->num_rows();
@@ -719,7 +725,7 @@ class program_model extends CI_Model {
 
             $result = $this->db->query($query);
             $num = $result->num_rows();
-            
+
             if ($num > 0) {
                 foreach ($result->result() as $row) {
                     $human_date = date('m-d-Y', $row->starttime);
@@ -740,7 +746,7 @@ class program_model extends CI_Model {
                     $list.= "<span class='span2'>$location</span>";
                     $list.= "<span class='span3'>$row->notes</span>";
                     $list.= "<span class='span1'>9am -  5pm</span>";
-                    $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
+                    $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
                     $list.="</div>";
 
                     $list.="<div class='container-fluid' style='text-align:left;'>";

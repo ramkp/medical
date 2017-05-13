@@ -3735,7 +3735,7 @@ $(document).ready(function () {
             $('#partial_err').html('');
             var url = "http://medical2.com/index.php/payments/payment/" + userid + "/" + courseid + "/" + slotid + "/" + amount;
             var new_url = "http://medical2.com/index.php/register2/any_pay/" + userid + "/" + courseid + "/" + slotid + "/" + amount + '/0';
-            window.open(url, "Payment");
+            window.open(new_url, "Payment");
         } // end if amount!='' &&  $.isNumeric(amount)
         else {
             $('#partial_err').html('Please provide amount to be charged');
@@ -5057,7 +5057,7 @@ $(document).ready(function () {
                     $("[data-dismiss=modal]").trigger({type: "click"});
                     var url = "http://medical2.com/index.php/payments/payment/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
                     var new_url = "http://medical2.com/index.php/register2/any_pay/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
-                    var oWindow = window.open(url, "renew");
+                    var oWindow = window.open(new_url, "renew");
                 } // end if ptype == 0
                 else {
                     if (confirm('Renew user certificate?')) {

@@ -726,35 +726,39 @@ class navClass extends Util {
         $two_year_payment = $renew_amount * 2 + $late_fee;
         $three_year_payment = $renew_amount * 3 + $late_fee;
 
+        /*
+         * 
+          $list.="<div class='container-fluid'>";
+          $list.="<span class='span9'>Certificate renew is a paid service (late fee could be applied) .  Please select option: </span>";
+          $list.="</div>";
+
+          $list.="<div class='container-fluid'>";
+          $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
+          $list.="</div>";
+
+          $list.="<div class='container-fluid'>";
+          $list.="<span class='span9'>Two years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span>";
+          $list.="</div>";
+
+          $list.="<div class='container-fluid'>";
+          $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
+          $list.="</div>";
+         * 
+         */
+
+        /****************** New URLS for renew payments ******************/
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Certificate renew is a paid service (late fee could be applied) .  Please select option: </span>";
+        $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
+        $list.="<span class='span9'>Two years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Two years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span>";
+        $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
         $list.="</div>";
 
-        $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
-        $list.="</div>";
-
-        if ($this->user->id == 11773) {
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
-            $list.="</div>";
-
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Two years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span>";
-            $list.="</div>";
-
-            $list.="<div class='container-fluid'>";
-            $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
-            $list.="</div>";
-        } // end if 
 
         return $list;
     }
