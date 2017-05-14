@@ -747,20 +747,26 @@ class Mailer {
         $code = $user->promo_code;
         $courseid = $user->courseid;
         $status = $this->is_code_exists($courseid, $code, TRUE);
-        if ($status > 0) {
-            $codedata = $this->get_code_details($code);
-            if ($codedata->type == 'amount') {
-                $newprice = (int) $oldprice - (int) $codedata->amount;
-                $list = round($newprice) . " Discount applied: $$codedata->amount off";
-            } // end if
-            else {
-                $newprice = (int) $oldprice - (int) ($oldprice * $codedata->amount) / 100;
-                $list = round($newprice) . " Discount applied: $codedata->amount%";
-            } // end else
-        } // end if $status>0
-        else {
-            $list = $oldprice;
-        } // end else
+        // You need to find workaround how to fix late fee issue
+        /*
+         * 
+          if ($status > 0) {
+          $codedata = $this->get_code_details($code);
+          if ($codedata->type == 'amount') {
+          $newprice = (int) $oldprice - (int) $codedata->amount;
+          $list = round($newprice) . " Discount applied: $$codedata->amount off";
+          } // end if
+          else {
+          $newprice = (int) $oldprice - (int) ($oldprice * $codedata->amount) / 100;
+          $list = round($newprice) . " Discount applied: $codedata->amount%";
+          } // end else
+          } // end if $status>0
+          else {
+          $list = $oldprice;
+          } // end else
+         * 
+         */
+        $list = $oldprice;
         return $list;
     }
 
