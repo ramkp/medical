@@ -36,8 +36,13 @@ class Cards {
         return $clientToken;
     }
 
+    function get_production_token() {
+        $this->autorize_production();
+        $clientToken = Braintree\ClientToken::generate();
+        return $clientToken;
+    }
+
     function make_refund($trans_id, $amount) {
-        //$this->authorize_sandbox();
         $this->autorize_production();
         $result = Braintree\Transaction::refund($trans_id, $amount);
         if ($result->success) {
@@ -78,7 +83,6 @@ class Cards {
             $billing_fisrtname = $names[0] . " " . $names[1];
             $billing_lastname = $names[2];
         } // end if
-        //$this->authorize_sandbox();
         $this->autorize_production();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
@@ -189,7 +193,6 @@ class Cards {
             $billing_fisrtname = $names[0] . " " . $names[1];
             $billing_lastname = $names[2];
         } // end if
-        //$this->authorize_sandbox();
         $this->autorize_production();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
