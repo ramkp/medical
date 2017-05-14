@@ -22,7 +22,7 @@ class Cards {
         Braintree\Configuration::privateKey('be5c1b5fe42f8297abaea82d1e3c152e');
     }
 
-    function autorize_production() {
+    function authorize_production() {
         // ******* Production *******
         Braintree\Configuration::environment('production');
         Braintree\Configuration::merchantId('r4fpcmgpvk9bfgwq');
@@ -37,13 +37,13 @@ class Cards {
     }
 
     function get_production_token() {
-        $this->autorize_production();
+        $this->authorize_production();
         $clientToken = Braintree\ClientToken::generate();
         return $clientToken;
     }
 
     function make_refund($trans_id, $amount) {
-        $this->autorize_production();
+        $this->authorize_production();
         $result = Braintree\Transaction::refund($trans_id, $amount);
         if ($result->success) {
             return true;
@@ -83,7 +83,7 @@ class Cards {
             $billing_fisrtname = $names[0] . " " . $names[1];
             $billing_lastname = $names[2];
         } // end if
-        $this->autorize_production();
+        $this->authorize_production();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
                     'paymentMethodNonce' => $nonceFromTheClient,
@@ -165,15 +165,18 @@ class Cards {
                 . "'$userObj->promo_code',"
                 . "'$date')";
         $this->db->query($query);
+
+        if ($userObj->promo_code != '') {
+            $this->make_promo_code_used($userObj->promo_code);
+        }
+
         if ($userObj->period > 0) {
             $cert = new Certificates2();
             $cert->renew_certificate($userObj->courseid, $userObj->userid, $userObj->period);
         } // end if 
         else {
-            if ($userObj->slotid > 0) {
-                $p = new Payment();
-                $p->enroll->add_user_to_course_schedule($userObj->userid, $userObj);
-            } // end if $userObj->slotid>0
+            $p = new Payment();
+            $p->enroll->add_user_to_course_schedule($userObj->userid, $userObj);
         } // end else
     }
 
@@ -193,7 +196,7 @@ class Cards {
             $billing_fisrtname = $names[0] . " " . $names[1];
             $billing_lastname = $names[2];
         } // end if
-        $this->autorize_production();
+        $this->authorize_production();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
                     'paymentMethodNonce' => $nonceFromTheClient,
@@ -382,6 +385,15 @@ class Cards {
                 . "'$userObj->status',"
                 . "'$userObj->promo_code',"
                 . "'$date')";
+        $this->db->query($query);
+
+        if ($userObj->promo_code != '') {
+            $this->make_promo_code_used($userObj->promo_code);
+        }
+    }
+
+    function make_promo_code_used($pomo_code) {
+        $query = "update mdl_code set used=1 where code='$pomo_code'";
         $this->db->query($query);
     }
 
