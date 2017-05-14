@@ -244,10 +244,10 @@ echo $form;
                                             else {
                                                 msg = "This certification has been renewed";
                                             } // end else
-                                            $('#err').html("<span style='color:black'>" + msg + "</span>");
+                                            $('#err').html("<span style='color:red;font-size:bold;'>" + msg + "</span>");
                                         } // end if status
                                         else {
-                                            $('#err').html("<span style='color:black'>Credit card was declined</span>");
+                                            $('#err').html("<span style='color:red;font-size:bold;'>Credit card was declined</span>");
                                         } // end else
                                     }); // end of post
                                 });

@@ -269,6 +269,7 @@ class program_model extends CI_Model {
                 } // end if $has_schedule>0
                 else {
                     $register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
+                    //$register_button = "<a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id/0'><button class='btn btn-primary'>Register</button></a>";
                 } // end else    
                 if ($cat_name == 'Hands-On Certification Workshops') {
                     if ($item->id == 45) {
@@ -747,6 +748,7 @@ class program_model extends CI_Model {
                     $list.= "<span class='span3'>$row->notes</span>";
                     $list.= "<span class='span1'>9am -  5pm</span>";
                     $list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
+                    //$list.= "<span class='span1'><a href='https://" . $_SERVER['SERVER_NAME'] . "/register2/index/$courseid/$row->id'><button class='btn btn-primary'>Register</button></a></span>";
                     $list.="</div>";
 
                     $list.="<div class='container-fluid' style='text-align:left;'>";

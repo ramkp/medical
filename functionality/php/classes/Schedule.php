@@ -58,9 +58,11 @@ class Schedule extends Programs {
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
         if ($state == false) {
             $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
+            //$list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
         }  // end if $state == false        
         else {
             $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/$item->id'><button id='program_$item->id/$state' class='btn btn-primary'>Register</button></a></span>";
+            //$list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id'><button id='program_$item->id/$state' class='btn btn-primary'>Register</button></a></span>";
         }
         $list.="</div>";
 
@@ -109,9 +111,11 @@ class Schedule extends Programs {
         $list.="<br/><div class='container-fluid' style='text-align:left;'>";
         if ($state == false) {
             $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
+            //$list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id'><button id='program_$item->id' class='btn btn-primary'>Register</button></a></span>";
         }  // end if $state == false        
         else {
             $list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/$item->id'><button id='program_$item->id/$state' class='btn btn-primary'>Register</button></a></span>";
+            //$list.= "<span class='span2'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/index/$item->id'><button id='program_$item->id/$state' class='btn btn-primary'>Register</button></a></span>";
         }
         $list.="</div>";
 
@@ -233,9 +237,11 @@ class Schedule extends Programs {
                     $list.= "<span class='span1'>9am -  5pm</span>";
                     if ($row['schedulerid'] == 6) {
                         $list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/44/" . $row['id'] . "'><button class='btn btn-primary'>Register</button></a></span>";
+                        //$list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/index/44/" . $row['id'] . "'><button class='btn btn-primary'>Register</button></a></span>";
                     }
                     if ($row['schedulerid'] == 5) {
                         $list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/brain_register/45/" . $row['id'] . "'><button class='btn btn-primary'>Register</button></a></span>";
+                        //$list.= "<span class='span1'><a href='http://" . $_SERVER['SERVER_NAME'] . "/register2/index/45/" . $row['id'] . "'><button class='btn btn-primary'>Register</button></a></span>";
                     }
                     $list.="</div>";
 

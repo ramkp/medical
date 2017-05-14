@@ -937,35 +937,35 @@ class register_model extends CI_Model {
             $list.="<div class='panel-body'>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2' >First name*</span>";
+            $list.="<span class='span2' >First name<span style='color:red;'>*</span></span>";
             $list.="<span class='span2' ><input type='text' required id='first_name' name='first_name' ></span>";
-            $list.="<span class='span2' >Last name*</span>";
+            $list.="<span class='span2' >Last name<span style='color:red;'>*</span></span>";
             $list.="<span class='span2' ><input type='text' required id='last_name' name='last_name'  ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Mailing Address*</span>";
+            $list.="<span class='span2'>Mailing Address<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' required id='addr' name='addr' ></span>";
-            $list.="<span class='span2'>City*</span>";
+            $list.="<span class='span2'>City<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' required id='city' name='city' ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>State*</span>";
+            $list.="<span class='span2'>State<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'>$states</span>";
-            $list.="<span class='span2'>Country*</span>";
+            $list.="<span class='span2'>Country<span style='color:red;'>*</span></span>";
             $list.="<span class='span2' id='register_cities_container'>$countries</span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>ZIP Code*</span>";
+            $list.="<span class='span2'>ZIP Code<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' required id='zip' name='zip' ></span>";
-            $list.="<span class='span2'>Email*</span>";
+            $list.="<span class='span2'>Email<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' required id='email' name='email' ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Phone*</span>";
+            $list.="<span class='span2'>Phone<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' required id='phone' name='phone'></span>";
             $list.="<span class='span2'>How did you hear about us?</span>";
             $list.="<span class='span2'>$come_from</span>";
@@ -1031,35 +1031,35 @@ class register_model extends CI_Model {
             $list.="<div class='panel-body'>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2' >First name*</span>";
+            $list.="<span class='span2' >First name<span style='color:red;'>*</span></span>";
             $list.="<span class='span2' ><input type='text' id='first_name' name='first_name' ></span>";
-            $list.="<span class='span2' >Last name*</span>";
+            $list.="<span class='span2' >Last name<span style='color:red;'>*</span></span>";
             $list.="<span class='span2' ><input type='text' id='last_name' name='last_name'  ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Mailing Address*</span>";
+            $list.="<span class='span2'>Mailing Address<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' id='addr' name='addr' ></span>";
-            $list.="<span class='span2'>City*</span>";
+            $list.="<span class='span2'>City<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' id='city' name='city' ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>State*</span>";
+            $list.="<span class='span2'>State<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'>$states</span>";
-            $list.="<span class='span2'>Country*</span>";
+            $list.="<span class='span2'>Country<span style='color:red;'>*</span></span>";
             $list.="<span class='span2' id='register_cities_container'>$countries</span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>ZIP Code*</span>";
+            $list.="<span class='span2'>ZIP Code<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' id='zip' name='zip' ></span>";
-            $list.="<span class='span2'>Email*</span>";
+            $list.="<span class='span2'>Email<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
             $list.="</div>";
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span2'>Phone*</span>";
+            $list.="<span class='span2'>Phone<span style='color:red;'>*</span></span>";
             $list.="<span class='span2'><input type='text' id='phone' name='phone'  ></span>";
             $list.="<span class='span2'>How did you hear about us?</span>";
             $list.="<span class='span2'>$come_from</span>";
@@ -1130,16 +1130,16 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span2'><label for='card-number'>Card Number*</label></span>";
+        $list.="<span class='span2'><label for='card-number'>Card Number<span style='color:red;'>*</span></label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='card-number'></div></span>";
-        $list.="<span class='span2'><label for='cvv'>CVV*</label></span>";
+        $list.="<span class='span2'><label for='cvv'>CVV<span style='color:red;'>*</span></label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='cvv'></div></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span2'><label for='cardholder'>Card Holder*</label></span>";
+        $list.="<span class='span2'><label for='cardholder'>Cardholder Name<span style='color:red;'>*</span></label></span>";
         $list.="<span class='span2'><input class='hosted-field' id='cardholder' placeholder=''></span>";
-        $list.="<span class='span2'><label for='expiration-date'>Expiration Date*</label></span>";
+        $list.="<span class='span2'><label for='expiration-date'>Expiration Date<span style='color:red;'>*</span></label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='expiration-date'></div></span>";
         $list.="</div>";
 
@@ -1216,16 +1216,16 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span2'><label for='card-number'>Card Number*</label></span>";
+        $list.="<span class='span2'><label for='card-number'>Card Number<span style='color:red;'>*</span></label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='card-number'></div></span>";
-        $list.="<span class='span2'><label for='cvv'>CVV*</label></span>";
+        $list.="<span class='span2'><label for='cvv'>CVV<span style='color:red;'>*</span></label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='cvv'></div></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span2'><label for='cardholder'>Card Holder*</label></span>";
+        $list.="<span class='span2'><label for='cardholder'>Cardholder Name<span style='color:red;'>*</span></label></span>";
         $list.="<span class='span2'><input class='hosted-field' id='cardholder' placeholder=''></span>";
-        $list.="<span class='span2'><label for='expiration-date'>Expiration Date*</label></span>";
+        $list.="<span class='span2'><label for='expiration-date'>Expiration Date<span style='color:red;'>*</span></label></span>";
         $list.="<span class='span2'><div class='hosted-field' id='expiration-date'></div></span>";
         $list.="</div>";
 

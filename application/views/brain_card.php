@@ -227,10 +227,10 @@ echo $form;
                                         $('#make_register_braintree_pyament').text('I Agree, Submit');
                                         if (status) {
                                             var msg = "Payment is successful. Thank you! You can print your registration data <a href='https://medical2.com/lms/custom/invoices/registrations/" + email + ".pdf' target='_blank'>here.</a>";
-                                            $('#err').html("<span style='color:black'>" + msg + "</span>");
+                                            $('#err').html("<span style='color:red;font-size:bold;'>" + msg + "</span>");
                                         } // end if status
                                         else {
-                                            $('#err').html("<span style='color:black'>Credit card was declined</span>");
+                                            $('#err').html("<span style='color:red;font-size:bold;'>Credit card was declined</span>");
                                         }
                                     }); // end of post
                                 });
