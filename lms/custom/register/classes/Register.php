@@ -239,6 +239,11 @@ class Register extends Util {
         $list.="<span class='span2'>Email*</span>";
         $list.="<span class='span2'><input type='text' id='email' name='email' ></span>";
         $list.="</div>";
+        
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Amount*</span>";
+        $list.="<span class='span2'><input type='text' id='amount' name='amount' ></span>";
+        $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";
         $list.="<span class='span12' style='color:red;' id='register_cash_error'></span>";
