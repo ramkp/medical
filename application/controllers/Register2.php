@@ -114,4 +114,16 @@ class Register2 extends CI_Controller {
         $this->load->view('footer_view');
     }
 
+    function group_renew() {
+        $cert = new stdClass();
+        $cert->courseid = $this->uri->segment(3);
+        $cert->period = $this->uri->segment(4);
+        $cert->users = base64_decode($this->uri->segment(5));
+        $form = $this->register_model->get_group_renew_form($cert);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('group_renew_view', $data);
+        $this->load->view('footer_view');
+    }
+
 }

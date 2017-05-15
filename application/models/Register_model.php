@@ -1764,6 +1764,88 @@ class register_model extends CI_Model {
 
         $list.="</div><br/>";
 
+        return $list;
+    }
+
+    function get_group_renewal_fee($courseid, $period, $total) {
+        $query = "select * from mdl_renew_amount where courseid=$courseid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $amount = $row->amount; // payment for every year renewal
+        }
+        $grand_total = $amount * $period * $total;
+        return $grand_total;
+    }
+
+    function get_group_renew_form($cert) {
+        $list = "";
+        $courseid = $cert->courseid;
+        $period = $cert->period;
+        $userslist = $cert->users;
+        $users_arr = explode(',', $userslist);
+        $total = count($users_arr);
+        $program = 'Group certificate renewal';
+        $cost = $this->get_group_renewal_fee($courseid, $period, $total);
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program checkout</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'>Selected program:</span>";
+        $list.="<span class='span2'>$program</span>";
+        $list.="<span class='span2'>Program fee</span>";
+        $list.="<span class='span2'>$$cost</span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' id='courseid' value='$courseid'>";
+        $list.="<input type='hidden' id='slotid' value='0'>";
+        $list.="<input type='hidden' id='period' value='$period'>";
+        $list.="<input type='hidden' id='amount' value='$cost'>";
+        $list.="<input type='hidden' id='users' value='$userslist'>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><hr/></span>";
+        $list.="</div>";
+
+        $list.="<form id='checkout-form' action='/' method='post'>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' id='error-message'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'><label for='card-number'>Card Number<span style='color:red;'>*</span></label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='card-number'></div></span>";
+        $list.="<span class='span2'><label for='cvv'>CVV<span style='color:red;'>*</span></label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='cvv'></div></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'><label for='cardholder'>Cardholder Name<span style='color:red;'>*</span></label></span>";
+        $list.="<span class='span2'><input class='hosted-field' id='cardholder' placeholder=''></span>";
+        $list.="<span class='span2'><label for='expiration-date'>Expiration Date<span style='color:red;'>*</span></label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='expiration-date'></div></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' id='err' style='color:red;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>By clicking the 'I Agree, Submit' button, you confirm you have reviewed and agree to the Pay by Computer Terms & Conditions (<a href='#' onClick='return false;' id='policy'>click to view).</a></span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' name='payment_method_nonce'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><input type='submit' id='make_group_certificate_renewal_payment' style='background-color: #e2a500;' value='I Agree, Submit' disabled></span>";
+        $list.="</div>";
+
+        $list.="</div></div></div>";
 
         return $list;
     }

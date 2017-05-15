@@ -775,7 +775,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1987,6 +1987,35 @@ class Mailer {
         $mail->AddAddress($addrA);
         $mail->addCC($addrB);
         $mail->addCC($addrC);
+        if (!$mail->send()) {
+            return false;
+        } // end if !$mail->send()
+        else {
+            return true;
+        }
+    }
+
+    function send_group_certificate_renewal_message_failure_info($m) {
+        $mail = new PHPMailer();
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        $mail->isHTML(true);
+        $mail->Subject = 'Medical2 - Group Certificates Renewal Failed Transaction Info';
+        $mail->Body = $m;
+
+        $addrA = 'sirromas@gmail.com';
+        $addrB = 'info@medical2.com';
+        $addrC = 'help@medical2.com';
+        $mail->AddAddress($addrA);
+        //$mail->addCC($addrB);
+        //$mail->addCC($addrC);
         if (!$mail->send()) {
             return false;
         } // end if !$mail->send()

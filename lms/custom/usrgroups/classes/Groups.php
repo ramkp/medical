@@ -210,16 +210,17 @@ class Groups extends Util {
                 
                 <div class='container-fluid' style='text-align:center;'>
                 
-                 <!--
+                 
                  <span class='span1'>
                  <input type='radio' name='renew_payment_type' class='ptype' value='0' checked>Card
                  </span>
-                 -->
                  
+                 
+                 <!--
                   <span class='span1'>
                   <input type='radio' name='renew_payment_type' class='ptype' value='1' checked>Paypal
                   </span>
-                 
+                 -->
                   
                   <span class='span2'>
                   <input type='radio' name='renew_payment_type' class='ptype' value='2'>Cheque

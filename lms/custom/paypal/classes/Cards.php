@@ -152,14 +152,16 @@ class Cards {
         $query = "insert into mdl_card_payments2 "
                 . "(userid,"
                 . "courseid,"
-                . "psum, renew, "
+                . "psum, "
+                . "renew, "
                 . "trans_id,"
                 . "auth_code,"
                 . "promo_code,"
                 . "pdate)"
                 . "values ($userObj->userid,"
                 . "$userObj->courseid,"
-                . "'$userObj->amount', $userObj->period,"
+                . "'$userObj->amount', "
+                . "$userObj->period,"
                 . "'$userObj->transid',"
                 . "'$userObj->status',"
                 . "'$userObj->promo_code',"
@@ -368,6 +370,42 @@ class Cards {
         $m->send_braintree_failed_transaction_info($msg);
     }
 
+    function send_group_certificate_renewal_message_failure_info($failObj) {
+        $msg = "";
+        $m = new Mailer();
+
+        $program = $failObj->program;
+        $message = $failObj->msg;
+        $cardholder = $failObj->cardholder;
+
+        $msg.="<html>";
+        $msg.="<body>";
+
+        $msg.="<table align='center'>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>Program</td>";
+        $msg.="<td style='padding:15px;'>$program</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>Cardholder Name</td>";
+        $msg.="<td style='padding:15px;'>$cardholder</td>";
+        $msg.="</tr>";
+
+        $msg.="<tr>";
+        $msg.="<td style='padding:15px;'>Message</td>";
+        $msg.="<td style='padding:15px;'>$message</td>";
+        $msg.="</tr>";
+
+        $msg.="</table>";
+
+        $msg.="</body>";
+        $msg.="</html>";
+
+        $m->send_group_certificate_renewal_message_failure_info($msg);
+    }
+
     function add_success_registration_payment($userObj) {
         $date = time();
         $query = "insert into mdl_card_payments2 "
@@ -395,6 +433,99 @@ class Cards {
     function make_promo_code_used($pomo_code) {
         $query = "update mdl_code set used=1 where code='$pomo_code'";
         $this->db->query($query);
+    }
+
+    function renew_group_certificates($trans) {
+        $amount = $trans->amount;
+        $nonceFromTheClient = $trans->nonce;
+        $cardholder = $trans->cardholder;
+        $courseid = $trans->courseid;
+        $period = $trans->period;
+        $users_arr = explode(',', $trans->users);
+        $total = count($users_arr);
+
+        $names = explode(" ", $cardholder);
+        if (count($names) == 2) {
+            $billing_firstname = $names[0];
+            $billing_lastname = $names[1];
+        } // end if
+
+        if (count($names) == 3) {
+            $billing_firstname = $names[0] . " " . $names[1];
+            $billing_lastname = $names[2];
+        } // end if
+
+        $this->authorize_production();
+        $result = Braintree\Transaction::sale([
+                    'amount' => $amount,
+                    'paymentMethodNonce' => $nonceFromTheClient,
+                    'customer' => [
+                        'firstName' => $billing_firstname,
+                        'lastName' => $billing_lastname,
+                    ],
+                    'creditCard' => [
+                        'cardholderName' => $cardholder
+                    ],
+                    'options' => [
+                        'submitForSettlement' => True
+                    ]
+        ]);
+
+        $transaction = $result->transaction;
+
+        if ($result->success) {
+            $transid = $transaction->id;
+            $status = $transaction->status;
+            $single_renew_amount = round($amount / $total);
+            foreach ($users_arr as $userid) {
+                $userObj = new stdClass();
+                $userObj->userid = $userid;
+                $userObj->courseid = $courseid;
+                $userObj->amount = $single_renew_amount;
+                $userObj->period = $period;
+                $userObj->transid = $transid;
+                $userObj->status = $status;
+                $userObj->promo_code = '';
+                $this->add_user_certificate_renewal_payment($userObj);
+                $this->renew_user_certificate($userObj);
+            } // end foreach
+        } // end if $result->success
+        else {
+            $program = $this->get_course_name_by_id($courseid);
+            $msg = $result->message;
+            $failObj = new stdClass();
+            $failObj->msg = $msg;
+            $failObj->program = "$program - Group certificates renewal";
+            $failObj->cardholder = $cardholder;
+            $this->send_group_certificate_renewal_message_failure_info($failObj);
+        } // end else
+    }
+
+    function add_user_certificate_renewal_payment($userObj) {
+        $date = time();
+        $query = "insert into mdl_card_payments2 "
+                . "(userid,"
+                . "courseid,"
+                . "psum, "
+                . "renew, "
+                . "trans_id,"
+                . "auth_code,"
+                . "promo_code,"
+                . "pdate)"
+                . "values ($userObj->userid,"
+                . "$userObj->courseid,"
+                . "'$userObj->amount', "
+                . "$userObj->period,"
+                . "'$userObj->transid',"
+                . "'$userObj->status',"
+                . "'$userObj->promo_code',"
+                . "'$date')";
+        $this->db->query($query);
+    }
+
+    function renew_user_certificate($userObj) {
+        $cert = new Certificates2();
+        $cert->renew_certificate($userObj->courseid, $userObj->userid, $userObj->period);
     }
 
 }

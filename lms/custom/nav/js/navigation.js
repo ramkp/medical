@@ -6872,7 +6872,7 @@ $(document).ready(function () {
                 billing_zip: billing_zip};
             if (ptype == 0) {
                 $("[data-dismiss=modal]").trigger({type: "click"})
-                var url2 = "https://medical2.com/payments/group_renew/" + courseid + "/" + period + "/" + users + "/card";
+                var url2 = "https://medical2.com/register2/group_renew/" + courseid + "/" + period + "/" + users + "/card";
                 var oWindow = window.open(url2, "print");
             } // end if ptype==0
             if (ptype == 1) {
@@ -6952,7 +6952,7 @@ $(document).ready(function () {
 
         }
 
-
+        
 
 
     }); // end of body click event
