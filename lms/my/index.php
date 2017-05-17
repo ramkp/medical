@@ -163,13 +163,22 @@ if (empty($CFG->forcedefaultmymoodle) && $PAGE->user_allowed_editing()) {
 
 echo $OUTPUT->header();
 
- 
+
 $ds = new Dashboard();
 $roleid = $ds->get_user_role($USER->id);
-if ($USER->id!=2 && ($roleid == 5 || $roleid=='')) {
-    $list = $ds->get_programs_panel();
-    echo $list;
-}
+// Show available programs panel
+if ($USER->id != 2 && ($roleid == 5 || $roleid == '')) {
+    $user_profile_complete_form = $ds->get_profile_complete_form();
+    if ($user_profile_complete_form != '') {
+        // Profile data are not compeleted - force to complete it
+        echo $user_profile_complete_form;
+        die();
+    } // end if
+    else {
+        $list = $ds->get_programs_panel();
+        echo $list;
+    } // end else
+} // end if $USER->id != 2 && ($roleid == 5 || $roleid == '')
 
 echo $OUTPUT->custom_block_region('content');
 

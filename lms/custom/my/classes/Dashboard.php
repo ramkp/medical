@@ -31,6 +31,7 @@ class Dashboard extends Util {
     public $student_role = 5;
     public $workshop_category = 2;
     public $renew_payments;
+    public $required_fields;
 
     function __construct() {
         parent::__construct();
@@ -40,6 +41,14 @@ class Dashboard extends Util {
         $this->assesment_path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/my";
         $this->create_programs_data();
         $this->renew_payments = array(50, 75, 100, 125, 150, 225);
+        $this->required_fields = array('firstname',
+            'lastname',
+            'email',
+            'phone1',
+            'address',
+            'city',
+            'zip',
+            'state');
     }
 
     function is_user_paid() {
@@ -704,7 +713,7 @@ class Dashboard extends Util {
     }
 
     function get_refund_payments($userid, $courseid) {
-        
+
         $list = "";
 
         // 1. Get authorize full refunds
@@ -723,7 +732,6 @@ class Dashboard extends Util {
                 $list.="</div>";
             } // end while
         } // end if $num > 0
-        
         // Get Braintree full refunds 
         $query = "select * from mdl_card_payments2 "
                 . "where courseid=$courseid "
@@ -740,7 +748,6 @@ class Dashboard extends Util {
                 $list.="</div>";
             } // end while
         } // end if $num > 0
-        
         // 3. Get partial refunds
         $query = "select * from mdl_partial_refund_payments "
                 . "where courseid=$courseid and userid=$userid";
@@ -805,7 +812,6 @@ class Dashboard extends Util {
                 $list.="</div>";
             } // end while
         } // end if $num > 0
-        
         // Get Braintree full refunds 
         $query = "select * from mdl_card_payments2 "
                 . "where userid=$userid "
@@ -822,7 +828,6 @@ class Dashboard extends Util {
                 $list.="</div>";
             } // end while
         } // end if $num > 0
-        
         // 3. Get partial refunds
         $query = "select * from mdl_partial_refund_payments "
                 . "where userid=$userid";
@@ -2892,8 +2897,8 @@ class Dashboard extends Util {
                 
                   </div>
 
-                <div class='container-fluid' style=''>
-                <span class='span6' style='color:red;' id='program_err'></span>
+                <div class='container-fluid' style='left'>
+                <span class='span4' style='color:red;' id='program_err'></span>
                 </div>
              
                 <div class='modal-footer' style='text-align:center;'>
@@ -2975,35 +2980,39 @@ class Dashboard extends Util {
             $expire = $row['expiration_date'];
         }
 
-        $renew = new Renew();
-        $renew_amount = $renew->get_renew_amount($courseid);
-        $late_fee = $renew->get_renew_late_fee($courseid, $expire);
+        $failed_fields = $this->get_user_profile_status($userid);
+        if (count($failed_fields) > 0) {
+            return -1;
+        } // end if count($failed_fields)>0
+        else {
+            $renew = new Renew();
+            $renew_amount = $renew->get_renew_amount($courseid);
+            $late_fee = $renew->get_renew_late_fee($courseid, $expire);
 
-        $one_year_payment = $renew_amount + $late_fee;
-        $two_year_payment = $renew_amount * 2 + $late_fee;
-        $three_year_payment = $renew_amount * 3 + $late_fee;
+            $one_year_payment = $renew_amount + $late_fee;
+            $two_year_payment = $renew_amount * 2 + $late_fee;
+            $three_year_payment = $renew_amount * 3 + $late_fee;
 
-        switch ($certificate->period) {
-            case 1:
-                $amount = $one_year_payment;
-                break;
-            case 2:
-                $amount = $two_year_payment;
-                break;
-            case 3:
-                $amount = $three_year_payment;
-                break;
-        }
-
-        $outcert = array(
-            'userid' => $userid,
-            'courseid' => $courseid,
-            'slot' => 0,
-            'amount' => $amount,
-            'period' => $certificate->period
-        );
-
-        return json_encode($outcert);
+            switch ($certificate->period) {
+                case 1:
+                    $amount = $one_year_payment;
+                    break;
+                case 2:
+                    $amount = $two_year_payment;
+                    break;
+                case 3:
+                    $amount = $three_year_payment;
+                    break;
+            }
+            $outcert = array(
+                'userid' => $userid,
+                'courseid' => $courseid,
+                'slot' => 0,
+                'amount' => $amount,
+                'period' => $certificate->period
+            );
+            return json_encode($outcert);
+        } // end else 
     }
 
     function renew_user_certificate_manager_cash($cert) {
@@ -3813,6 +3822,86 @@ class Dashboard extends Util {
             } // end while 
         } // end if $num > 0
         return $groupname;
+    }
+
+    /* Code related to profile completness status */
+
+    function get_profile_complete_form() {
+        $list = "";
+        $userid = $this->user->id;
+        $failed_fields = $this->get_user_profile_status($userid);
+        if (count($failed_fields) > 0) {
+            $list.=$this->profile_form_to_complete($userid, $failed_fields);
+        } // end if count($failed_fields)>0
+        return $list;
+    }
+
+    function get_user_profile_status($userid) {
+        $failed_fields = array();
+        $required_fields = $this->required_fields;
+        foreach ($required_fields as $field) {
+            $field_status = $this->get_user_field_status($userid, $field);
+            if ($field_status == '') {
+                $failed_fields[] = $field;
+            } // end if 
+        } // end foreach
+        return $failed_fields;
+    }
+
+    function get_user_field_status($userid, $field) {
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $status = $row[$field];
+        } // end while
+        return $status;
+    }
+
+    function profile_form_to_complete($userid, $failed_fields) {
+        $list = "";
+        $failed_fields_list = implode(',', $failed_fields);
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Please complete profile data to proceeed</h5></div>";
+        $list.="<div class='panel-body' style='text-align:center;'>";
+        $list.="<input type='hidden' id='profile_userid' value='$userid'>";
+        $list.="<input type='hidden' id='profile_fields_list' value='$failed_fields_list'>";
+        foreach ($failed_fields as $field) {
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span2'>" . ucfirst($field) . "*</span>";
+            $list.="<span class='span2'><input type='text' id='$field' name='$field'></span>";
+            $list.="</div>";
+        } // end foreach
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span4' style='color:red;' id='profile_err'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'><button class='btn btn-primary' id='update_missed_profile_fields'>Update</button></span>";
+        $list.="</div>";
+
+        $list.="</div></div></div><br>";
+        return $list;
+    }
+
+    function update_profile_missed_fields($p) {
+        $query = "";
+        $userid = $p->userid;
+        $fields = json_decode($p->fields);
+        $total = count($fields);
+        $query.="update mdl_user set ";
+        $i = 0;
+        foreach ($fields as $field) {
+            if ($i < $total - 1) {
+                $query.="$field->name='$field->value', ";
+            } // end if
+            else {
+                $query.="$field->name='$field->value' ";
+            } // end else
+            $i++;
+        } // end foreach
+        $query.="where id=$userid";
+        $this->db->query($query);
     }
 
 }

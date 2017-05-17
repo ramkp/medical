@@ -5166,7 +5166,6 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'renew_user_cert_manager') {
-            console.log('Clicked ... ');
             var id = $('#id').val();
             var period = $("input[name='period']:checked").val();
             var ptype = $("input[name='renew_payment_type']:checked").val();
@@ -5176,24 +5175,29 @@ $(document).ready(function () {
 
             $.post(url, {cert: JSON.stringify(cert)}).done(function (data) {
                 console.log('Server response step1: ' + data);
-                var fullcert = $.parseJSON(data);
-                if (ptype == 0) {
-                    $("[data-dismiss=modal]").trigger({type: "click"});
-                    var url = "http://medical2.com/index.php/payments/payment/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
-                    var new_url = "http://medical2.com/index.php/register2/any_pay/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
-                    var oWindow = window.open(new_url, "renew");
-                } // end if ptype == 0
+                if (data == -1) {
+                    $('#program_err').html('User profile is not compeleted. Renew is not possible');
+                } // end if data==-1
                 else {
-                    if (confirm('Renew user certificate?')) {
-                        var url2 = "/lms/custom/my/renew_user_certificate_manager_cash.php";
-                        $.post(url2, {cert: JSON.stringify(cert)}).done(function (data) {
-                            $("[data-dismiss=modal]").trigger({type: "click"});
-                            console.log(data);
-                            document.location.reload();
-                        }); // end of post
-                    } // end if confirm
+                    $('#program_err').html('');
+                    var fullcert = $.parseJSON(data);
+                    if (ptype == 0) {
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        var url = "http://medical2.com/index.php/payments/payment/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
+                        var new_url = "http://medical2.com/index.php/register2/any_pay/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
+                        var oWindow = window.open(new_url, "renew");
+                    } // end if ptype == 0
+                    else {
+                        if (confirm('Renew user certificate?')) {
+                            var url2 = "/lms/custom/my/renew_user_certificate_manager_cash.php";
+                            $.post(url2, {cert: JSON.stringify(cert)}).done(function (data) {
+                                $("[data-dismiss=modal]").trigger({type: "click"});
+                                console.log(data);
+                                document.location.reload();
+                            }); // end of post
+                        } // end if confirm
+                    } // end else
                 } // end else
-
             }); // end of post
 
 
@@ -5831,7 +5835,7 @@ $(document).ready(function () {
                     $('#register_cash_error').html('Please provide fee amount');
                     return;
                 }
-                console.log('Sum: '+sum);
+                console.log('Sum: ' + sum);
                 var user = {
                     first_name: firstname,
                     last_name: lastname,
@@ -6952,8 +6956,39 @@ $(document).ready(function () {
 
         }
 
-        
+        if (event.target.id == 'update_missed_profile_fields') {
+            var failed_fields = [];
+            var userid = $('#profile_userid').val();
+            var fieldslist = $('#profile_fields_list').val();
+            var fieldsarr = fieldslist.split(',');
+            $.each(fieldsarr, function (index, value) {
+                var field_el = '#' + value;
+                var fieldval = $(field_el).val();
+                if (fieldval != '') {
+                    $('#profile_err').html('');
+                    var missedfield = {name: value, value: fieldval};
+                    failed_fields.push(missedfield);
+                } // end if
+                else {
+                    $('#profile_err').html('Please provide all required fields');
+                    return false;
+                } // end else
+            }); // end of each function
+            if (failed_fields.length < fieldsarr.length) {
+                $('#profile_err').html('Please provide all required fields');
+            } // end if
+            else {
+                $('#profile_err').html('');
+                var profile = {userid: userid, fields: JSON.stringify(failed_fields)};
+                var url = "/lms/custom/my/update_profile_missed_fields.php";
+                $.post(url, {profile: JSON.stringify(profile)}).done(function (data) {
+                    console.log(data);
+                    document.location.reload();
+                }); // end of post
+            } // end else
 
+
+        }
 
     }); // end of body click event
 
