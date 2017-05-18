@@ -4233,6 +4233,27 @@ $(document).ready(function () {
             });
         }
 
+        if (event.target.id == 'update_special_permissions') {
+            var items = [];
+            if (confirm('Update permissions for current role?')) {
+                $(".permissions").each(function () {
+                    if ($(this).prop('checked')) {
+                        var val = $(this).val();
+                        var permid = $(this).data('permid');
+                        var roleid = $(this).data('roleid');
+                        var item = {permid: permid, roleid: roleid, val: val};
+                        items.push(item);
+                    } // end if
+                }); // end of each
+                var url = "/lms/custom/reports/update_role_permissions.php";
+                $.post(url, {items: JSON.stringify(items)}).done(function (data) {
+                    $('#result').html('');
+                    $('#result').html('Current role permissions has been updated');
+                });
+            }
+        }
+
+
     }); // end of body click function
 
 
@@ -4245,6 +4266,13 @@ $(document).ready(function () {
         //console.log('Event id: ' + elID);
         console.log('Event class: ' + elClass);
 
+        if (event.target.id == 'user_roles') {
+            var roleid = $('#user_roles').val();
+            var url = "/lms/custom/reports/get_role_based_permissions.php";
+            $.post(url, {roleid: roleid}).done(function (data) {
+                $('#perm_table').html(data);
+            });
+        }
 
         if (event.target.id == 'user_calendar') {
             var date = new Date($('#user_calendar').datepicker("getDate"));

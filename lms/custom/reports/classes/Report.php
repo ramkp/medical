@@ -987,7 +987,7 @@ class Report extends Util {
 
     function get_card_payments_detailes($courseid, $from, $to, $state, $city) {
         $total = 0;
-    
+
         $authorize_payments = $this->get_authorize_payments($courseid, $from, $to, $state, $city);
         $braintree_payments = $this->get_braintree_card_payments($courseid, $from, $to, $state, $city);
         $payments = array_merge($authorize_payments, $braintree_payments);
@@ -1015,7 +1015,6 @@ class Report extends Util {
                 $list.="</div>";
             } // end for
             $this->total_card = $total;
-            
         } // end if count($payments)>0
         else {
             $list.="<div class='container-fluid' style='text-align:center;'>";
@@ -1477,55 +1476,61 @@ class Report extends Util {
         $list = "";
 
         if ($this->session->justloggedin == 1) {
-            $permissions = array();
-            $query = "select * from mdl_permissions order by module_name";
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $permission = new stdClass();
-                foreach ($row as $key => $value) {
-                    $permission->$key = $value;
-                }
-                $permissions[] = $permission;
-            }
 
-            $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span12' style='font-weight:bold;'>Permissions based list of modules</span>";
-            $list.="</div>";
+            /*
+              $permissions = array();
+              $query = "select * from mdl_permissions order by module_name";
+              $result = $this->db->query($query);
+              while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+              $permission = new stdClass();
+              foreach ($row as $key => $value) {
+              $permission->$key = $value;
+              }
+              $permissions[] = $permission;
+              }
 
-            $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
-            $list.="<span class='span3'>Module name</span>";
-            $list.="<span class='span3'>Permission status</span>";
-            $list.="</div>";
+              $list.="<div class='container-fluid' style='text-align:center;'>";
+              $list.="<span class='span12' style='font-weight:bold;'>Permissions based list of modules</span>";
+              $list.="</div>";
 
-            foreach ($permissions as $permission) {
-                switch ($permission->module_name) {
-                    case 'invoice':
-                        $moduleName = 'Invoices';
-                        break;
-                    case 'cash':
-                        $moduleName = 'Cash/Cheque payments';
-                        break;
-                } // end switch
+              $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;'>";
+              $list.="<span class='span3'>Module name</span>";
+              $list.="<span class='span3'>Permission status</span>";
+              $list.="</div>";
 
-                if ($permission->enabled == 0) {
-                    $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id'>";
-                } // end if $permission->enabled==0
-                else {
-                    $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id' checked>";
-                } // end else 
+              foreach ($permissions as $permission) {
+              switch ($permission->module_name) {
+              case 'invoice':
+              $moduleName = 'Invoices';
+              break;
+              case 'cash':
+              $moduleName = 'Cash/Cheque payments';
+              break;
+              } // end switch
 
-                $list.="<div class='container-fluid' style='text-align:left;'>";
-                $list.="<span class='span3'>$moduleName</span>";
-                $list.="<span class='span3'>$status</span>";
-                $list.="</div>";
-            } // end foreach
-            $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span6' id='status'></span>";
-            $list.="</div>";
+              if ($permission->enabled == 0) {
+              $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id'>";
+              } // end if $permission->enabled==0
+              else {
+              $status = "Enable &nbsp; <input type='checkbox' id='permission_$permission->id' checked>";
+              } // end else
+
+              $list.="<div class='container-fluid' style='text-align:left;'>";
+              $list.="<span class='span3'>$moduleName</span>";
+              $list.="<span class='span3'>$status</span>";
+              $list.="</div>";
+              } // end foreach
+              $list.="<div class='container-fluid' style='text-align:center;'>";
+              $list.="<span class='span6' id='status'></span>";
+              $list.="</div>";
+             */
+
+            $list.=$this->get_permissions_module_page(); // permission module
         } // end if 
         else {
             $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
         }
+
 
 
         return $list;
@@ -1536,6 +1541,151 @@ class Report extends Util {
                 . "set enabled=$status where id=$moduleid";
         $this->db->query($query);
         $list = "Module permissions updated";
+        return $list;
+    }
+
+    function get_permissions_module_page() {
+        $list = "";
+        $userid = $this->user->id;
+        $roles_list = $this->get_roles_list($userid);
+
+        $list.="<div class='container-fluid'>";
+        $list.="<span class='span3'>Please select user role: </span>";
+        $list.="<span calss='span3'>$roles_list</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' id='perm_table'></div>";
+
+        return $list;
+    }
+
+    function is_role_has_permission($permid, $roleid) {
+        $query = "select * from mdl_role2perm "
+                . "where permid=$permid "
+                . "and roleid=$roleid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_yes_radio_box($permid, $roleid, $assigned) {
+        $list = "";
+        $list.=($assigned > 0) ? "<input type='radio' name='permissions_$permid' class='permissions' data-permid='$permid' data-roleid='$roleid' value='1' checked> Enabled" : "<input type='radio' name='permissions_$permid'  class='permissions' data-permid='$permid' data-roleid='$roleid' value='1'> Enabled";
+        return $list;
+    }
+
+    function get_no_radio_box($permid, $roleid, $assigned) {
+        $list = "";
+        $list.=($assigned > 0) ? "<input type='radio' name='permissions_$permid' class='permissions' data-permid='$permid' data-roleid='$roleid' value='0'> Disable" : "<input type='radio' name='permissions' class='permissions_$permid' data-permid='$permid' data-roleid='$roleid' value='0' checked> Disabled";
+        return $list;
+    }
+
+    function get_boxes_part($permid, $roleid, $assigned) {
+        $list = "";
+        if ($assigned > 0) {
+            $list.="<input type='radio' name='permissions_$permid' class='permissions' data-permid='$permid' data-roleid='$roleid' value='1' checked> Enabled &nbsp;&nbsp; <input type='radio' name='permissions_$permid' class='permissions' data-permid='$permid' data-roleid='$roleid' value='0'> Disabled";
+        } // end if
+        else {
+            $list.="<input type='radio' name='permissions_$permid' class='permissions' data-permid='$permid' data-roleid='$roleid' value='1'> Enabled &nbsp;&nbsp; <input type='radio' name='permissions_$permid' class='permissions' data-permid='$permid' data-roleid='$roleid' value='0' checked> Disabled";
+        } // end else
+        return $list;
+    }
+
+    function get_role_based_permissions($roleid) {
+        $list = "";
+        $userid = $this->user->id;
+        if ($userid == 2) {
+            $query = "select * from mdl_special_permissions order by item";
+        } // end if
+        else {
+            $query = "select * from mdl_special_permissions "
+                    . "where item<>'reports' order by item";
+        } // end else
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $permid = $row['id'];
+            $item = $row['item'];
+            $assigned = $this->is_role_has_permission($permid, $roleid);
+            $boxes = $this->get_boxes_part($permid, $roleid, $assigned);
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'>$item</span>";
+            $list.="<span class='span4'>$boxes</span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span6'><hr/></span>";
+            $list.="</div>";
+        } // end while
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span6' id='result'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span3'><button class='btn btn-primary' id='update_special_permissions'>Update</button></span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function update_role_permissions($items) {
+        foreach ($items as $item) {
+            $permid = $item->permid;
+            $roleid = $item->roleid;
+            $value = $item->val;
+            $status = ($value == 1) ? $this->enable_special_permission($permid, $roleid) : $this->disable_special_permission($permid, $roleid);
+        } // end foreach
+        return $status;
+    }
+
+    function is_permission_exists($permid, $roleid) {
+        $query = "select * from mdl_role2perm "
+                . "where permid=$permid and roleid=$roleid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function enable_special_permission($permid, $roleid) {
+        $status = $this->is_permission_exists($permid, $roleid);
+        if ($status == 0) {
+            $query = "insert into mdl_role2perm (permid,roleid) "
+                    . "values ($permid,$roleid)";
+            $this->db->query($query);
+            $list = "Current role permissions has been updated";
+            return $list;
+        } // end if
+    }
+
+    function disable_special_permission($permid, $roleid) {
+        $query = "delete from mdl_role2perm "
+                . "where permid=$permid and roleid=$roleid";
+        $this->db->query($query);
+        $list = "Current role permissions has been updated";
+        return $list;
+    }
+
+    function get_roles_list($userid) {
+        $list = "";
+        if ($userid == 2) {
+            $query = "select * from mdl_role "
+                    . "where archetype<>'guest' "
+                    . "and archetype<>'user' "
+                    . "and archetype<>'frontpage' "
+                    . "order by shortname";
+        } // end if
+        else {
+            $query = "select * from mdl_role "
+                    . "where archetype<>'guest' "
+                    . "and archetype<>'user' "
+                    . "and archetype<>'frontpage' and shortname<>'manager'"
+                    . "order by shortname";
+        } // end else
+        $list.="<select id='user_roles'>";
+        $list.="<option value='0' selected>Please select role</option>";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $list.="<option value='" . $row['id'] . "'>" . $row['shortname'] . "</option>";
+        }
+        $list.="</select>";
         return $list;
     }
 
