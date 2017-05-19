@@ -2024,7 +2024,8 @@ class Dashboard extends Util {
         $list = "";
         $current_userid = $this->user->id;
         $courses = $this->get_user_courses($id);
-        if ($current_userid == 2 || $current_userid == 234) {
+        $system_role = $this->get_system_wide_roles($current_userid);
+        if ($current_userid == 2 || $current_userid == 234 || $system_role==9) {
             $list.="<div class='container-fluid' style=''>";
             $list.="<span class='span3'><button class='profile_add_payment' style='width:175px;' data-userid='$id'>Add payment</button></span>";
             $list.="</div><br><br>";
