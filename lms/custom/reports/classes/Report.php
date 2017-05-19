@@ -825,7 +825,7 @@ class Report extends Util {
             foreach ($payments as $payment) {
                 $total = $total + $payment->psum;
                 $amount = $this->get_cards_payment_block($payment);
-                $date = date('m-d-Y', $payment->pdate);
+                $date = date('m-d-Y H:i:s', $payment->pdate);
                 $coursename = $this->get_course_name($payment->courseid);
                 $userdata = $this->get_user_details($payment->userid);
                 $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -1004,7 +1004,7 @@ class Report extends Util {
             foreach ($payments as $payment) {
                 $total = $total + $payment->psum;
                 $amount = $this->get_cards_payment_block($payment);
-                $date = date('m-d-Y', $payment->pdate);
+                $date = date('m-d-Y H:i:s', $payment->pdate);
                 $coursename = $this->get_course_name($payment->courseid);
                 $userdata = $this->get_user_details($payment->userid);
                 $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -1231,7 +1231,7 @@ class Report extends Util {
             $list.="</div>";
 
             foreach ($all_refunds as $payment) {
-                $date = date('m-d-Y', $payment->refund_date);
+                $date = date('m-d-Y H:i:s', $payment->refund_date);
                 $coursename = $this->get_course_name($payment->courseid);
                 $userdata = $this->get_user_details($payment->userid);
                 $list.="<div class='container-fluid' style='text-align:left;'>";
@@ -1447,7 +1447,7 @@ class Report extends Util {
             foreach ($payments as $payment) {
                 //echo "Inside payments ...<br>";
                 $total = $total + $payment->psum;
-                $date = date('m-d-Y', $payment->pdate);
+                $date = date('m-d-Y H:i:s', $payment->pdate);
                 $coursename = $this->get_course_name($payment->courseid);
                 $userdata = $this->get_user_details($payment->userid);
                 $list.="<div class='container-fluid' style='text-align:left;'>";
