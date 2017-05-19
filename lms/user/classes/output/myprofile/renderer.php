@@ -60,12 +60,11 @@ class renderer extends \plugin_renderer_base {
         $return .= \html_writer::end_tag('div');
 
         $userid = $USER->id;
+        $ds = new \Dashboard();
+        $system_role = $ds->get_system_wide_roles($userid);
 
-        if ($userid == 2 || $userid == 234) {
-
+        if ($userid == 2 || $userid == 234 || $system_role == 9) {
             parse_str($_SERVER['QUERY_STRING']);
-            $ds = new \Dashboard();
-
             $return .= \html_writer::start_tag('section', array('class' => 'node_category', 'id' => 'custom_section'));
             $return .=$ds->get_user_profile_custom_sections($id);
             $return .= \html_writer::end_tag('section');

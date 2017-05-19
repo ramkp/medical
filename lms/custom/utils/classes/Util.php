@@ -104,6 +104,22 @@ class Util {
         } // end if $num > 0
     }
 
+    function get_system_wide_roles($userid) {
+        $query = "select * from mdl_role_assignments"
+                . "   where userid=$userid and contextid=1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $roleid = $row['roleid'];
+            }
+        } // end if $num > 0
+        else {
+            $roleid = 0;
+        }
+        return $roleid;
+    }
+
     function prepare_editor_data($vTexte) {
         $aTexte = explode("\n", $vTexte);
         for ($i = 0; $i < count($aTexte) - 1; $i++) {

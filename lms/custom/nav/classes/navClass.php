@@ -14,13 +14,19 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/balance/classes/Balance.ph
 
 class navClass extends Util {
 
+    public $prices_feature = 1;
+    public $schedule_feature = 2;
+    public $course_manage = 4;
+
     function __construct() {
         parent::__construct();
     }
 
     function get_navigation_items($userid) {
         $top_menu = "";
-        $roleid = $this->get_user_role($userid);
+        $course_roleid = $this->get_user_role($userid);
+        $system_role = $this->get_system_wide_roles($userid);
+        $roleid = ($system_role > 0) ? $system_role : $course_roleid;
         $username = $this->user->username;
         if ($userid == 2) {
             // This is Admin
@@ -28,8 +34,6 @@ class navClass extends Util {
         }// end if $userid==2
         else {
             if ($roleid != '') {
-                //echo "Role ID: ".$roleid."<br>";                
-                //echo "Username: ".$username."<br>";            
                 if ($roleid == 3 || $roleid == 4) {
                     // Tutors
                     $top_menu = $this->get_tutors_menu_items();
@@ -40,15 +44,418 @@ class navClass extends Util {
                 } // end if $roleid == 5
                 if ($roleid == 1 || $username == 'manager') {
                     // Manager
-                    $top_menu = $this->get_manager_menu();
+                    //$top_menu = $this->get_manager_menu();
+                    $top_menu = $this->get_permission_based_user_menu($roleid);
                 } // end if $roleid==1
+                if ($roleid > 5) {
+                    $top_menu = $this->get_permission_based_user_menu($roleid);
+                } // end if $roleid>5
             } // end if $roleid!=''
             else {
-                // This is user w/o enrolled courses            
+                // This is user w/o enrolled courses or specidic role            
                 $top_menu = $this->get_user_menu();
             }
         } // end else when it is not admin user
         return $top_menu;
+    }
+
+    function get_permission_based_user_menu($roleid) {
+        $userid = $this->user->id;
+        $courses_items = $this->get_courses_tab_items($roleid);
+        $invoice_itmes = $this->get_invoices_tab_items($roleid);
+        $payments_items = $this->get_payments_tab_items($roleid);
+        $tools_items = $this->get_tools_tab_items($roleid);
+        $user_items = $this->get_user_tab_items($roleid);
+        $site_items = $this->get_site_pages_tab_items($roleid);
+        $list = "";
+        $list.= "<header role='banner' class='navbar'>
+        <nav role='navigation' class='navbar-inner'>
+            <div class='container-fluid'>
+                <a class='brand' href='#'><img src='../../../../../assets/icons/home2.png' width='20' height='20'>&nbsp; Medical2</a>
+                <a class='btn btn-navbar' data-toggle='collapse' data-target='.nav-collapse'>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                </a>
+                <div class='nav-collapse collapse'>
+                    <div class='nav-divider-right'></div>
+                    <ul class='nav pull-right'>
+                        <li></li>
+                    </ul>
+                    <div class='nav-collapse collapse'>
+                    <ul class='nav'>";
+
+        // Permission based menu items
+        $list.=$courses_items;
+        $list.=$invoice_itmes;
+        $list.=$payments_items;
+        $list.=$tools_items;
+        $list.=$user_items;
+        $list.=$site_items;
+
+        $list.="</ul></div>";
+
+        /*         * ********* Account block  *********** */
+        $list.="<div class='nav-collapse collapse'>
+                        <ul class='nav pull-right'>                   
+                            <li class='dropdown'><a title='Account' class='dropdown-toggle' href='#cm_submenu_2'>Account<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>                                
+                                    <li><a href='/lms/user/profile.php?id=$userid' title='Profile'>Profile</a></li>                                    
+                                    <li><a href='/lms/user/preferences.php' title='Preferences'>Preferences</a></li>
+                                    <li><a href='/lms/message/index.php' title='Preferences'>Messages</a></li>
+                                    <li><a href='/lms/login/logout.php?seskey='gqe32fe3' title='Logout'>Logout</a></li>                                            
+                                </ul>
+                            </li>
+                        </ul>
+                        <div class='nav-divider-right'></div>
+                        <ul class='nav pull-right'>
+                            <li></li>
+                        </ul>
+                    </div>";
+        /*         * ********* Closing block *********** */
+        $list.="<div class='nav-divider-left'></div>
+                </div>
+            </div>
+        </nav>
+    </header>";
+        return $list;
+    }
+
+    function get_courses_tab_items($roleid) {
+        $list = "";
+        $query = "select p.id, p.category, p.item, r.permid, r.roleid "
+                . "from mdl_special_permissions p, mdl_role2perm r "
+                . "where p.category='courses' "
+                . "and p.id=r.permid "
+                . "and r.roleid=$roleid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $perms[] = $row['item'];
+            } // end while
+
+            $list.="<li class='dropdown'><a title='Programs' class='dropdown-toggle' href='#'>Courses<b class='caret'></b></a>";
+            $list.="<ul class='dropdown-menu' id='prices'>";
+            foreach ($perms as $p) {
+
+                switch ($p) {
+                    case 'schedule':
+                        $list.=$this->get_schedule_item();
+                        break;
+                    case 'prices':
+                        $list.=$this->get_prices_menu_items();
+                        break;
+                    case 'courses management':
+                        $list.=$this->get_courses_management_item();
+                        break;
+                }
+            } // end foreach
+            $list.="</ul>";
+            $list.="</li>";
+        } // end if $num > 0
+        return $list;
+    }
+
+    function get_invoices_tab_items($roleid) {
+        $list = "";
+
+        $query = "select p.id, p.category, p.item, r.permid, r.roleid "
+                . "from mdl_special_permissions p, mdl_role2perm r "
+                . "where p.category='invoices' "
+                . "and p.id=r.permid "
+                . "and r.roleid=$roleid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $perms[] = $row['item'];
+            } // end while
+
+            $list.="<li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Invoices<b class='caret'></b></a>";
+            $list.="<ul class='dropdown-menu'>";
+
+            foreach ($perms as $p) {
+
+                switch ($p) {
+                    case 'invoices':
+                        $list.=$this->get_invoice_credentials_item();
+                        break;
+                    case 'open invoices':
+                        $list.=$this->get_open_invoice_item();
+                        break;
+                    case 'paid invoices':
+                        $list.=$this->get_paid_invoice_item();
+                        break;
+                    case 'send invoice':
+                        $list.=$this->get_send_invoice_item();
+                        break;
+                }
+            } // end foreach
+
+            $list.="</ul>";
+            $list.="</li>";
+        } // end if $num > 0
+
+        return $list;
+    }
+
+    function get_invoice_credentials_item() {
+        $list = "<li><a href='#' title='Invoice' id='data_inv'>Invoice</a></li>";
+        return $list;
+    }
+
+    function get_open_invoice_item() {
+        $list = "<li><a href='#' title='Open invoices' id='opn_inv'>Open invoices</a></li>";
+        return $list;
+    }
+
+    function get_paid_invoice_item() {
+        $list = "<li><a href='#' title='Paid invoices' id='paid_inv'>Paid invoices</a></li>";
+        return $list;
+    }
+
+    function get_send_invoice_item() {
+        $list = "<li><a href='#' title='Send invoice' id='send_inv'>Send invoice</a></li>";
+        return $list;
+    }
+
+    function get_payments_tab_items($roleid) {
+        $list = "";
+
+        $query = "select p.id, p.category, p.item, r.permid, r.roleid "
+                . "from mdl_special_permissions p, mdl_role2perm r "
+                . "where p.category='payments' "
+                . "and p.id=r.permid "
+                . "and r.roleid=$roleid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $perms[] = $row['item'];
+            } // end while
+
+            $list.="<li class='dropdown'><a title='Payments' class='dropdown-toggle' href='#'>Payments<b class='caret'></b></a>";
+            $list.="<ul class='dropdown-menu'>";
+
+            foreach ($perms as $p) {
+                switch ($p) {
+                    case 'refund payments':
+                        $list.=$this->get_refund_payemtns_item();
+                        break;
+                } // end of switch
+            } // end foreach
+
+            $list.="</ul>";
+            $list.="</li>";
+        } // end if $num > 0
+
+        return $list;
+    }
+
+    function get_refund_payemtns_item() {
+        $list = "<li><a href='#' id='refund' title='Refund'>Refund payments</a></li>";
+        return $list;
+    }
+
+    function get_tools_tab_items($roleid) {
+        $list = "";
+
+        $query = "select p.id, p.category, p.item, r.permid, r.roleid "
+                . "from mdl_special_permissions p, mdl_role2perm r "
+                . "where p.category='tools' "
+                . "and p.id=r.permid "
+                . "and r.roleid=$roleid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $perms[] = $row['item'];
+            } // end while
+
+            $list.="<li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>";
+            $list.="<ul class='dropdown-menu'>";
+
+            foreach ($perms as $p) {
+
+                switch ($p) {
+                    case 'hotels book':
+                        $list.=$this->get_hotels_book_item();
+                        break;
+                    case 'hotels expenses':
+                        $list.=$this->get_hotels_expenses_item();
+                        break;
+                    case 'promotion codes':
+                        $list.=$this->get_promotion_codes_item();
+                        break;
+                    case 'late fee':
+                        $list.=$this->get_late_fee_item();
+                        break;
+                    case 'inventory':
+                        $list.=$this->get_inventory_item();
+                        break;
+                    case 'campus location':
+                        $list.=$this->get_campus_location_item();
+                        break;
+                    case 'permissions':
+                        $list.=$this->get_permissions_item();
+                        break;
+                    case 'deposit':
+                        $list.=$this->get_deposit_item();
+                        break;
+                } // end of switch
+            } // end foreach
+
+            $list.="</ul>";
+            $list.="</li>";
+        } // end if $num > 0
+
+        return $list;
+    }
+
+    function get_permissions_item() {
+        $list = "<li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>";
+        return $list;
+    }
+
+    function get_deposit_item() {
+        $list = "<li><a href='#' title='Deposit' id='deposit'>Deposit</a></li>";
+        return $list;
+    }
+
+    function get_hotels_book_item() {
+        $list = "<li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>";
+        return $list;
+    }
+
+    function get_hotels_expenses_item() {
+        $list = "<li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>";
+        return $list;
+    }
+
+    function get_promotion_codes_item() {
+        $list = "<li><a href='#' title='Promotion codes' id='code'>Promotion codes</a></li>";
+        return $list;
+    }
+
+    function get_late_fee_item() {
+        $list = "<li><a href='#' title='Late Fee' id='late_fee'>Late Fee</a></li> ";
+        return $list;
+    }
+
+    function get_inventory_item() {
+        $list = "<li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>";
+        return $list;
+    }
+
+    function get_campus_location_item() {
+        $list = "<li><a href='#' title='Campus' id='campus'>Campus locations</a></li>";
+        return $list;
+    }
+
+    function get_user_tab_items($roleid) {
+        $list = "";
+
+        $query = "select p.id, p.category, p.item, r.permid, r.roleid "
+                . "from mdl_special_permissions p, mdl_role2perm r "
+                . "where p.category='users' "
+                . "and p.id=r.permid "
+                . "and r.roleid=$roleid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $perms[] = $row['item'];
+            } // end while
+
+            $list.="<li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='user_tab'>User<b class='caret'></b></a>";
+            $list.="<ul class='dropdown-menu'>";
+
+            foreach ($perms as $p) {
+
+                switch ($p) {
+                    case 'certificates':
+                        $list.=$this->get_certificates_item();
+                        break;
+                    case 'bulk messaging':
+                        $list.=$this->get_bulk_messaging_item();
+                        break;
+                    case 'register user':
+                        $list.=$this->get_register_item();
+                        break;
+                    case 'search user':
+                        $list.=$this->get_search_user_item();
+                        break;
+                    case 'groups':
+                        $list.=$this->get_groups_item();
+                        break;
+                    case 'instructors':
+                        $list.=$this->get_instructors_item();
+                        break;
+                } // end switch
+            } // end foreach
+
+            $list.="</ul>";
+            $list.="</li>";
+        } // end if $num > 0
+
+        return $list;
+    }
+
+    function get_certificates_item() {
+        $list = "<li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>";
+        return $list;
+    }
+
+    function get_bulk_messaging_item() {
+        $list = "<li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>";
+        return $list;
+    }
+
+    function get_register_item() {
+        $list = "<li><a href='#' title='Register User' id='register_user'>Register User</a></li>";
+        return $list;
+    }
+
+    function get_search_user_item() {
+        $list = "<li><a href='#' title='View User' id='user_cred'>View User</a></li>";
+        return $list;
+    }
+
+    function get_groups_item() {
+        $list = "<li><a href='#' title='Groups' id='groups'>Groups</a></li>";
+        return $list;
+    }
+
+    function get_instructors_item() {
+        $list = "<li><a href='#' title='Instructors' id='instructors'>Instructors</a></li>";
+        return $list;
+    }
+
+    function get_site_pages_tab_items($roleid) {
+        $list = "";
+
+        $query = "select p.id, p.category, p.item, r.permid, r.roleid "
+                . "from mdl_special_permissions p, mdl_role2perm r "
+                . "where p.category='pages' "
+                . "and p.id=r.permid "
+                . "and r.roleid=$roleid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+
+            $list.="<li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Manage Site Pages<b class='caret'></b></a>
+                                <ul class='dropdown-menu'>
+                                    <li><a href='#' title='About' id='about'>About page</a></li>
+                                     <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
+                                    <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
+                                    <li><a href='#' title='FAQ' id='faq'>FAQ</a></li>
+                                    <li><a href='#' title='Index page' id='index'>Index page</a></li>
+                                    <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>
+                                    <li><a href='#' title='Terms' id='terms'>Terms & Conditions</a></li> 
+                                </ul>
+                       </li>";
+        } // end if $num > 0 
+        return $list;
     }
 
     function get_user_menu() {
@@ -134,6 +541,7 @@ class navClass extends Util {
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>                                   
+                                    <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>    
                                     <li><a href='#' title='Deposit' id='deposit'>Deposit</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
@@ -304,22 +712,71 @@ class navClass extends Util {
         return $list;
     }
 
+    function get_schedule_item() {
+        $list = "<li><a href='' title='Schedule' onClick='return false;' id='sch'>Schedule</a></li>";
+        return $list;
+    }
+
+    function get_courses_management_item() {
+        $list = "<li><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/course/management.php' id='course_management' target='_blank'>Courses Management</a></li>";
+        return $list;
+    }
+
+    function has_courses($categoryid) {
+        $query = "select * from mdl_course where category=$categoryid "
+                . "and visible=1";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function is_feature_enabled($permid, $roleid) {
+        $query = "select * from mdl_role2perm "
+                . "where permid=$permid and roleid=$roleid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_prices_menu_items() {
+        $list = "";
+        $query = "select id,name from mdl_course_categories order by id ";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $has_courses = $this->has_courses($row['id']);
+            if ($has_courses > 0) {
+                $list .= "<li><a href='' title='" . $row['name'] . "' id='" . $row['id'] . "' onClick='return false;'>" . $row['name'] . "</a></li>";
+            } // end if
+        } // end while
+        return $list;
+    }
+
     function get_price_items() {
+        $userid = $this->user->id;
+        $roleid = $this->get_user_role($userid);
         $list = "";
         $list = $list . "<ul class='dropdown-menu' id='prices'>";
-        $query = "select id,name from mdl_course_categories order by id ";
-        $num = $this->db->numrows($query);
-        if ($num) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $list = $list . "<li><a href='' title='" . $row['name'] . "' id='" . $row['id'] . "' onClick='return false;'>" . $row['name'] . "</a></li>";
-            } // end while
-        } // end if $num)
+        if ($userid == 2) {
+            // It is admin
+            $list.=$this->get_prices_menu_items();
+            $list.=$this->get_schedule_item();
+            $list.=$this->get_courses_management_item();
+        } // end if
         else {
-            $list = $list . "<li><a href='' title='There are no price items' >There are no price items</a></li>";
-        }
-        $list.="<li><a href='' title='Schedule' onClick='return false;' id='sch'>Schedule</a></li>";
-        $list.="<li><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/course/management.php' id='course_management' target='_blank'>Courses Management</a></li>";
+            $prices_enabled = $this->is_feature_enabled($this->prices_feature, $roleid);
+            $schedule_enabled = $this->is_feature_enabled($this->schedule_feature, $roleid);
+            $course_enabled = $this->is_feature_enabled($this->course_manage, $roleid);
+
+            if ($prices_enabled > 0) {
+                $list.=$this->get_prices_menu_items();
+            }
+
+            if ($schedule_enabled > 0) {
+                $list.=$this->get_schedule_item();
+            }
+
+            if ($course_enabled > 0) {
+                $list.=$this->get_courses_management_item();
+            }
+        } // end else 
         $list = $list . "</ul>";
         return $list;
     }
@@ -334,32 +791,12 @@ class navClass extends Util {
     }
 
     function get_user_courses($userid) {
-        /*
-          $contexts = array();
-          $courses = array();
-          $query = "select * from mdl_role_assignments "
-          . "where roleid=5 and userid=$userid ";
-          $result = $this->db->query($query);
-          while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-          $contexts[] = $row['contextid'];
-          } // end while
-          if (count($contexts) > 0) {
-          foreach ($contexts as $contextid) {
-          $query = "select * from mdl_context where id=$contextid";
-          $result = $this->db->query($query);
-          while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-          $courses[] = $row['instanceid'];
-          } // end while
-          } // end foreach
-          } // end if count($contexts)>0
-         */
         $courses = $this->get_user_enrollments($userid);
         return $courses;
     }
 
     function get_user_enrollments($userid) {
         $query = "select * from mdl_user_enrolments where userid=$userid";
-        //echo "Query: ".$query."<br>";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $enrols[] = $row['enrolid'];
@@ -367,12 +804,11 @@ class navClass extends Util {
 
         if (count($enrols) > 0) {
             foreach ($enrols as $enrolid) {
-                //$query = "select * from mdl_enrol where id=$enrolid and enrol='manual'";
                 $query = "select * from mdl_enrol where id=$enrolid ";
                 $result = $this->db->query($query);
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                     $courses[] = $row['courseid'];
-                }
+                } // end while
             } // end foreach
         } // end if count($enrols)>0
         return array_unique($courses);
@@ -726,7 +1162,7 @@ class navClass extends Util {
         $two_year_payment = $renew_amount * 2 + $late_fee;
         $three_year_payment = $renew_amount * 3 + $late_fee;
 
-          /*
+        /*
           $list.="<div class='container-fluid'>";
           $list.="<span class='span9'>Certificate renew is a paid service (late fee could be applied) .  Please select option: </span>";
           $list.="</div>";
@@ -742,10 +1178,10 @@ class navClass extends Util {
           $list.="<div class='container-fluid'>";
           $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/payment/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
           $list.="</div>";
-          */
-        
-        /****************** New URLS for renew payments ******************/
-        
+         */
+
+        /*         * **************** New URLS for renew payments ***************** */
+
         $list.="<div class='container-fluid'>";
         $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
         $list.="</div>";
@@ -757,7 +1193,7 @@ class navClass extends Util {
         $list.="<div class='container-fluid'>";
         $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
         $list.="</div>";
-        
+
 
         return $list;
     }

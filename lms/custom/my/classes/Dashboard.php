@@ -1755,8 +1755,8 @@ class Dashboard extends Util {
         $grades = $this->get_user_grades($id);
         $attend = $this->get_student_attendance($id);
         $other = $this->get_other_tab($id);
-
-        if ($current_user_id == 2 || $current_user_id == 234) {
+        $system_role = $this->get_system_wide_roles($current_user_id);
+        if ($current_user_id == 2 || $current_user_id == 234 || $system_role == 9) {
             $list.="<ul class='nav nav-tabs'>
                 <li class='active'><a data-toggle='tab' href='#home'>Payments</a></li>";
             $list.="<li><a data-toggle='tab' href='#menu1'>Courses</a></li>
