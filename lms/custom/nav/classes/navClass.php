@@ -300,6 +300,9 @@ class navClass extends Util {
                     case 'permissions':
                         $list.=$this->get_permissions_item();
                         break;
+                    case 'mpermission':
+                        $list.=$this->get_mpermissions_item();
+                        break;
                     case 'deposit':
                         $list.=$this->get_deposit_item();
                         break;
@@ -316,6 +319,12 @@ class navClass extends Util {
     function get_permissions_item() {
         $list = "<li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>";
         return $list;
+    }
+    
+    function get_mpermissions_item() {
+        $list="<li><a href='https://medical2.com/lms/admin/roles/manage.php' title='Permissions' target='_blank'>Moodle Permissions</a></li>";
+        return $list;
+        
     }
 
     function get_deposit_item() {
