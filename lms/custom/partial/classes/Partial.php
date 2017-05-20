@@ -473,18 +473,19 @@ class Partial extends Util {
 
     function add_partial_payment($courseid, $userid, $sum, $source, $slotid, $period) {
         $date = time();
-        $payment_type = 0; // cc                
+        $payment_type = 0; // cc    
+        $current_user=$this->user->id;
         if ($source == 'cheque' || $source == 'cash') {
             //1 - cash
             //2 - cheque 
             $payment_type = ($source == 'cash') ? 1 : 2;
             $query = "insert into mdl_partial_payments "
-                    . "(userid,"
+                    . "(userid,	managerid,"
                     . "courseid, slotid,"
                     . "ptype,"
                     . "psum,"
                     . "pdate) "
-                    . "values($userid, "
+                    . "values($userid, $current_user,"
                     . "$courseid, $slotid,"
                     . "$payment_type,"
                     . "'$sum',"

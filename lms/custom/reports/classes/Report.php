@@ -1449,12 +1449,19 @@ class Report extends Util {
                 $total = $total + $payment->psum;
                 $date = date('m-d-Y H:i:s', $payment->pdate);
                 $coursename = $this->get_course_name($payment->courseid);
+                if ($payment->managerid > 0) {
+                    $managerdata = $this->get_user_details($payment->managerid);
+                    $manager = $managerdata->firstname . ' ' . $managerdata->lastname;
+                } // end if
+                else {
+                    $manager = 'N/A';
+                } // end else
                 $userdata = $this->get_user_details($payment->userid);
                 $list.="<div class='container-fluid' style='text-align:left;'>";
                 $list.="<span class='span3'><a href='https://medical2.com/lms/user/profile.php?id=$payment->userid' target='_blank'>$userdata->firstname $userdata->lastname</a></span>";
                 $list.="<span class='span3'>$coursename</span>";
                 $list.="<span class='span3'>$$payment->psum</span>";
-                $list.="<span class='span3'>$date</span>";
+                $list.="<span class='span3'>$date<br>($manager)</span>";
                 $list.="</div>";
             } // end for
             if ($type == 1) {
