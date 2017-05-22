@@ -516,7 +516,7 @@ class Dashboard extends Util {
                     $prohibit = $this->get_user_roles($userid);
                     if ($prohibit == 0 && ($current_user == 2 || $current_user == 234)) {
                         $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
-                        $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                        $list.="<span class='span2'><button class='profile_refund_payment_paypal' data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
                     }
                 } // end if status==0
                 $list.="</div>";
@@ -551,7 +551,7 @@ class Dashboard extends Util {
                     $prohibit = $this->get_user_roles($userid);
                     if ($prohibit == 0 && ($current_user == 2 || $current_user == 234)) {
                         $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
-                        $list.="<span class='span2'><button class='profile_refund_payment'data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                        $list.="<span class='span2'><button class='profile_refund_payment' data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
                     }
                 } // end if status==0
                 $list.="</div>";
@@ -2025,7 +2025,7 @@ class Dashboard extends Util {
         $current_userid = $this->user->id;
         $courses = $this->get_user_courses($id);
         $system_role = $this->get_system_wide_roles($current_userid);
-        if ($current_userid == 2 || $current_userid == 234 || $system_role==9) {
+        if ($current_userid == 2 || $current_userid == 234 || $system_role == 9) {
             $list.="<div class='container-fluid' style=''>";
             $list.="<span class='span3'><button class='profile_add_payment' style='width:175px;' data-userid='$id'>Add payment</button></span>";
             $list.="</div><br><br>";
@@ -2515,70 +2515,187 @@ class Dashboard extends Util {
     }
 
     function refund_braintree_payment($payment) {
-        $now = time();
+        $list = "";
         $payments_data = explode('_', $payment->id);
+        $ptype = $payments_data[0];
+        $pid = $payments_data[1];
+
+        $list.="<div id='myModal' class='modal fade' style='width:650px;left:50%;'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Refund Payment</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='ptype' value='$ptype'>
+                <input type='hidden' id='pid' value='$pid'>
+                    
+                <div class='row-fluid' style=''>
+                <span class='span3'>Amount to refund:*</span>
+                <span class='span3'><input type='text' id='refund_amount'></span>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='braintree_refund_err'></span>
+                </div><br><br>
+             
+                <div class='container-fluid' style='text-align:left;'>
+                    <span class='span1' style='margin-left:0px;'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span class='span1' style='padding-left:25px;'><button type='button' class='btn btn-primary' id='make_braintree_refund'>OK</button></span>
+                </div>
+                
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function make_braintree_refund($payment) {
+
+        $amount = $payment->amount;
+        $pid = $payment->pid;
+        $now = time();
+
         $query = "select * from mdl_card_payments2 "
-                . "where id=$payments_data[1]";
+                . "where id=$pid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $amount = $row['psum'];
+            $db_amount = $row['psum'];
+            $courseid = $row['courseid'];
+            $userid = $row['userid'];
             $trans_id = $row['trans_id'];
         }
         $c = new Cards();
         $status = $c->make_refund($trans_id, $amount);
         if ($status) {
-            $query = "update mdl_card_payments2 "
-                    . "set refunded=1, refund_date='$now' "
-                    . "where id=$payments_data[1]";
-            $this->db->query($query);
-        }
+            if ($amount == $db_amount) {
+                $query = "update mdl_card_payments2 "
+                        . "set refunded=1, refund_date='$now' "
+                        . "where id=$pid";
+                $this->db->query($query);
+            } // end if
+            else {
+                // Update card payments amount
+                $rest_sum = $db_amount - $amount;
+                $query = "update mdl_card_payments2 set psum='$rest_sum' "
+                        . "where id=$pid";
+                $this->db->query($query);
+                // Add data to partial refunds table
+                $date = time();
+                $query = "INSERT INTO mdl_partial_refund_payments "
+                        . "(userid,"
+                        . "courseid,"
+                        . "psum,"
+                        . "refund_date) "
+                        . "values ($userid,$courseid,'$amount','$date')";
+                $this->db->query($query);
+            } // end else 
+        } // end if $status
     }
 
     function refund_payment($payment) {
-
-        /*
-         * 
-          echo "<pre>";
-          print_r($payment);
-          echo "</pre>";
-          die();
-         * 
-         */
-        $now = time();
+        $list = "";
         $payments_data = explode('_', $payment->id);
-        switch ($payments_data[0]) {
+        $ptype = $payments_data[0];
+        $pid = $payments_data[1];
+
+        $list.="<div id='myModal' class='modal fade' style='width:650px;left:50%;'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Refund Payment</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='ptype' value='$ptype'>
+                <input type='hidden' id='pid' value='$pid'>
+                    
+                <div class='row-fluid' style=''>
+                <span class='span3'>Amount to refund:*</span>
+                <span class='span3'><input type='text' id='refund_amount'></span>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='authorize_refund_err'></span>
+                </div><br><br>
+             
+                <div class='container-fluid' style='text-align:left;'>
+                    <span class='span1' style='margin-left:0px;'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span class='span1' style='padding-left:25px;'><button type='button' class='btn btn-primary' id='make_authorize_refund'>OK</button></span>
+                </div>
+                
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function make_authorize_refund($payment) {
+
+        $ptype = $payment->ptype;
+        $pid = $payment->pid;
+        $amount = $payment->amount;
+
+        switch ($ptype) {
             case 'c':
                 // credit cards
                 $query = "select * from mdl_card_payments "
-                        . "where id=$payments_data[1]";
+                        . "where id=$pid";
                 $result = $this->db->query($query);
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    $amount = $row['psum'];
+                    $db_amount = $row['psum'];
+                    $courseid = $row['courseid'];
+                    $userid = $row['userid'];
                     $card_last_four = $row['card_last_four'];
                     $exp_date = $row['exp_date'];
                     $trans_id = $row['trans_id'];
                 }
                 $pr = new ProcessPayment();
                 $status = $pr->makeRefund($amount, $card_last_four, $exp_date, $trans_id);
-                if ($status) {
-                    $query = "update mdl_card_payments "
-                            . "set refunded=1, refund_date='$now' "
-                            . "where id=$payments_data[1]";
-                    $this->db->query($query);
+                if ($status == true) {
+                    if ($amount == $db_amount) {
+                        $refund_date = time();
+                        $query = "update mdl_card_payments set refunded=1, refund_date='$refund_date' "
+                                . "where id=$pid";
+                        //echo "Query0: ".$query."<br>";
+                        $this->db->query($query);
+                    } // end if $amount == $db_amount             
+                    else {
+                        // Update card payments amount
+                        $rest_sum = $db_amount - $amount;
+                        $query = "update mdl_card_payments set psum='$rest_sum' "
+                                . "where id=$pid";
+                        $this->db->query($query);
+                        // Add data to partial refunds table
+                        $date = time();
+                        $query = "INSERT INTO mdl_partial_refund_payments "
+                                . "(userid,"
+                                . "courseid,"
+                                . "psum,"
+                                . "refund_date) "
+                                . "values ($userid,$courseid,'$amount','$date')";
+                        $this->db->query($query);
+                    } // end else when it was partial refund
+                    return true;
+                } // end if $status==true
+                else {
+                    return false;
                 }
                 break;
             case 'i':
                 // invoices
                 $query = "delete from mdl_invoice "
-                        . "where id=$payments_data[1]";
+                        . "where id=$pid";
+                $this->db->query($query);
                 break;
             case 'p':
                 // partial payments (cash/cheque)
                 $query = "delete from mdl_partial_payments "
-                        . "where id=$payments_data[1]";
+                        . "where id=$pid";
+                $this->db->query($query);
                 break;
-        }
-        $this->db->query($query);
+        } //  end of switch
     }
 
     function get_add_to_workshop_dialog($userid) {

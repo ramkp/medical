@@ -444,7 +444,7 @@ class Payments extends Util {
         $list.="</span></div>";
         return $list;
     }
-    
+
     function get_user_address_block($userid, $invoice_id = null) {
         $list = "";
         $user_detailes = $this->get_user_details($userid);
@@ -925,7 +925,8 @@ class Payments extends Util {
         //$status = true; // temp workarount for testing
         if ($status == true) {
             if ($amount == $db_amount) {
-                $query = "update mdl_card_payments set refunded=1 "
+                $refund_date = time();
+                $query = "update mdl_card_payments set refunded=1, refund_date='$refund_date' "
                         . "where id=$paymentid";
                 //echo "Query0: ".$query."<br>";
                 $this->db->query($query);
@@ -976,7 +977,8 @@ class Payments extends Util {
         $status = $c->make_refund($trans_id, $amount);
         if ($status == true) {
             if ($amount == $db_amount) {
-                $query = "update mdl_card_payments2 set refunded=1 "
+                $refund_date = time();
+                $query = "update mdl_card_payments2 set refunded=1, refund_date='$refund_date' "
                         . "where id=$paymentid";
                 //echo "Query0: ".$query."<br>";
                 $this->db->query($query);

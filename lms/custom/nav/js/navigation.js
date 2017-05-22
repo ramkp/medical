@@ -2624,32 +2624,40 @@ $(document).ready(function () {
             var userid = $(this).data('userid');
             var courseid = $(this).data('courseid');
             var id = $(this).data('paymentid');
-            console.log('Payment id: ' + id);
-            if (confirm('Refund current payment?')) {
-                var url = "/lms/custom/my/refund.php";
-                var payment = {userid: userid, courseid: courseid, id: id};
-                $.post(url, {payment: JSON.stringify(payment)}).done(function (data) {
-                    console.log(data);
-                    $("[data-dismiss=modal]").trigger({type: "click"});
-                    document.location.reload();
-                });
-            } // end if confirm
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "/lms/custom/my/refund.php";
+                        var payment = {userid: userid, courseid: courseid, id: id};
+                        $.post(url, {payment: JSON.stringify(payment)}).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
         }
 
         if ($(event.target).attr('class') == 'profile_refund_payment_braintree') {
             var userid = $(this).data('userid');
             var courseid = $(this).data('courseid');
             var id = $(this).data('paymentid');
-            console.log('Payment id: ' + id);
-            if (confirm('Refund current payment?')) {
-                var url = "/lms/custom/my/braintree_refund.php";
-                var payment = {userid: userid, courseid: courseid, id: id};
-                $.post(url, {payment: JSON.stringify(payment)}).done(function (data) {
-                    console.log(data);
-                    $("[data-dismiss=modal]").trigger({type: "click"});
-                    document.location.reload();
-                });
-            } // end if confirm
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "/lms/custom/my/braintree_refund.php";
+                        var payment = {userid: userid, courseid: courseid, id: id};
+                        $.post(url, {payment: JSON.stringify(payment)}).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
         }
 
         if ($(event.target).attr('class') == 'profile_add_to_workshop') {
@@ -5684,6 +5692,50 @@ $(document).ready(function () {
         }
 
         console.log('Event ID: ' + event.target.id);
+
+        if (event.target.id == 'make_authorize_refund') {
+            var ptype = $('#ptype').val();
+            var pid = $('#pid').val();
+            var amount = $('#refund_amount').val();
+            if (amount > 0) {
+                $('#authorize_refund_err').html('');
+                if (confirm('Make refund?')) {
+                    var payment = {ptype: ptype, pid: pid, amount: amount};
+                    var url = "/lms/custom/my/make_authorize_refund.php";
+                    $.post(url, {payment: JSON.stringify(payment)}).done(function (data) {
+                        console.log(data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        document.location.reload();
+                    });
+                } // end if confirm
+            } // end if amount>0
+            else {
+                $('#authorize_refund_err').html('Please provide refund amount');
+            } // end else 
+        }
+
+        if (event.target.id == 'make_braintree_refund') {
+            var ptype = $('#ptype').val();
+            var pid = $('#pid').val();
+            var amount = $('#refund_amount').val();
+            if (amount > 0) {
+                $('#braintree_refund_err').html('');
+                if (confirm('Make refund?')) {
+                    var payment = {ptype: ptype, pid: pid, amount: amount};
+                    var url = "/lms/custom/my/make_braintree_refund.php";
+                    $.post(url, {payment: JSON.stringify(payment)}).done(function (data) {
+                        console.log(data);
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        document.location.reload();
+                    });
+                } // end if confirm
+            } // end if amount>0
+            else {
+                $('#braintree_refund_err').html('Please provide refund amount');
+            } // end else 
+        }
+
+
 
         if (event.target.id == 'promo_reset_search') {
             get_promotion_codes_page();
