@@ -515,8 +515,8 @@ class Dashboard extends Util {
                 if ($status == 0) {
                     $prohibit = $this->get_user_roles($userid);
                     if ($prohibit == 0 && ($current_user == 2 || $current_user == 234)) {
-                        $list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
-                        $list.="<span class='span2'><button class='profile_refund_payment_paypal' data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
+                        //$list.="<span class='span2'><button class='profile_move_payment'  data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Move</button></span>";
+                        //$list.="<span class='span2'><button class='profile_refund_payment_paypal' data-userid='$userid' data-courseid='$courseid' data-paymentid='c_" . $row['id'] . "'>Refund</button></span>";
                     }
                 } // end if status==0
                 $list.="</div>";
@@ -1692,47 +1692,6 @@ class Dashboard extends Util {
         else {
             $list.="N/A";
         } // end else
-
-
-        /*
-          $query = "select * from mdl_card_payments "
-          . "where userid=$userid and refunded=0";
-          $num = $this->db->numrows($query);
-          if ($num > 0) {
-          $result = $this->db->query($query);
-          while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-          $courseid = $row['courseid'];
-          $coursename = $this->get_course_name($courseid);
-          $date = date('m-d-Y', $row['pdate']);
-          $sum = $row['psum'];
-          $list.="<tr>";
-          $list.="<td style='padding:15px;'>Paid by Card</td>";
-          $list.="<td style='padding:15px;'>$$sum</td>";
-          $list.="<td style='padding:15px;'>$date</td>";
-          $list.="<td style='padding:15px;'>$coursename</td>";
-          $list.="</tr>";
-          } // end while
-          } // end if $num >0
-
-          $query = "select * from mdl_partial_payments "
-          . "where userid=$userid ";
-          $num = $this->db->numrows($query);
-          if ($num > 0) {
-          $result = $this->db->query($query);
-          while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-          $courseid = $row['courseid'];
-          $coursename = $this->get_course_name($courseid);
-          $date = date('m-d-Y', $row['pdate']);
-          $sum = $row['psum'];
-          $list.="<tr>";
-          $list.="<td style='padding:15px;'>Paid by Cash/Cheque</td>";
-          $list.="<td style='padding:15px;'>$$sum</td>";
-          $list.="<td style='padding:15px;'>$date</td>";
-          $list.="<td style='padding:15px;'>$coursename</td>";
-          $list.="</tr>";
-          } // end while
-          } // end if $num >0
-         */
 
         $list.="</table>";
 
