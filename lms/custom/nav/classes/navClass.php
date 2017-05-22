@@ -322,7 +322,7 @@ class navClass extends Util {
     }
     
     function get_mpermissions_item() {
-        $list="<li><a href='https://medical2.com/lms/admin/roles/manage.php' title='Permissions' target='_blank'>Moodle Permissions</a></li>";
+        $list="<li><a href='https://medical2.com/lms/admin/roles/manage.php' title='Permissions' target='_blank'>Define Roles</a></li>";
         return $list;
         
     }
@@ -663,7 +663,7 @@ class navClass extends Util {
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>
-                                    <li><a href='#' title='Moodle Permissions' id='mpermission' onClick='return false;'>Moodle Permissions</a></li>
+                                    <li><a href='#' title='Moodle Permissions' id='mpermission' onClick='return false;'>Define Roles</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
