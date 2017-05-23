@@ -3982,4 +3982,53 @@ class Dashboard extends Util {
         $this->db->query($query);
     }
 
+    function get_course_payment_stats_data($courseid) {
+        $list = "";
+        $total_cards = 0;
+        $total_cash = 0;
+        $c_payments = array();
+        $cash_payments = array();
+
+        $query = "select * from mdl_card_payments "
+                . "where courseid=$courseid and refunded=0";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $c_payments[] = $row['id'];
+            $total_cards = $total_cards + $row['psum'];
+        }
+
+        $query = "select * from mdl_card_payments2 "
+                . "where courseid=$courseid and refunded=0";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $c_payments[] = $row['id'];
+            $total_cards = $total_cards + $row['psum'];
+        }
+
+        $query = "select * from mdl_partial_payments where courseid=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $cash_payments[] = $row['id'];
+            $total_cash = $total_cash + $row['psum'];
+        }
+        $grand_total = $total_cards + $total_cash;
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Paid by card</span>";
+        $list.="<span class='span1'>$$total_cards</span><span class='span3'> (" . count($c_payments) . " payments found)</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Paid by cash/cheque</span>";
+        $list.="<span class='span1'>$$total_cash</span><span class='span3'> (" . count($cash_payments) . " payments found)</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='font-weight:bold;'>";
+        $list.="<span class='span2'>Grand total</span>";
+        $list.="<span class='span1'>$$grand_total</span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
 }

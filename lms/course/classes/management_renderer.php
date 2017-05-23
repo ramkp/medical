@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot.'/course/renderer.php');
+require_once($CFG->dirroot.'/custom/my/classes/Dashboard.php');
 
 /**
  * Main renderer for the course management pages.
@@ -818,12 +819,14 @@ class core_course_management_renderer extends plugin_renderer_base {
      * @return string
      */
     public function course_detail(course_in_list $course) {
+        $ds=new Dashboard();
+        $payment_data=$ds->get_course_payment_stats_data($course->id);
         $details = \core_course\management\helper::get_course_detail_array($course);
         $fullname = $details['fullname']['value'];
-
         $html  = html_writer::start_div('course-detail');
         $html .= html_writer::tag('h3', $fullname, array('id' => 'course-detail-title', 'tabindex' => '0'));
         $html .= $this->course_detail_actions($course);
+        $html .= $this->detail_pair('Course payments data', $payment_data, $class);
         foreach ($details as $class => $data) {
             $html .= $this->detail_pair($data['key'], $data['value'], $class);
         }
