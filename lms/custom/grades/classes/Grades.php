@@ -15,7 +15,7 @@ class Grades extends Util {
     function get_course_grade_items($courseid) {
         $items = array();
         $query = "select * from mdl_grade_items "
-                . "where itemmodule='quiz' "
+                . "where itemmodule='quiz' or itemmodule='assign' "
                 . "and courseid=$courseid";
         $num = $this->db->numrows($query);
         if ($num > 0) {
