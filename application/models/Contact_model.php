@@ -72,7 +72,7 @@ class Contact_model extends CI_Model {
 
         $list.="<div>";
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span9'>&nbsp;</span>";
+        $list.="<span class='span9' style='font-weight:bold;font-size:+1;'>Send message<br><br></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
