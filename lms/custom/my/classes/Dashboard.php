@@ -2425,19 +2425,20 @@ class Dashboard extends Util {
     function add_other_payment($payment) {
         $date = time();
         // Enroll user into course
+        $current_user = $this->user->id;
         $this->assign_roles($payment->userid, $payment->courseid);
         if ($payment->ptype != 'free') {
             $type = ($payment->ptype == 'cash') ? 1 : 2;
             $slotid = $payment->slotid;
             $query = "insert into mdl_partial_payments "
                     . "(courseid,"
-                    . "userid,"
+                    . "userid, managerid,"
                     . "slotid,"
                     . "ptype,"
                     . "psum,"
                     . "pdate) "
                     . "values($payment->courseid, "
-                    . "$payment->userid, "
+                    . "$payment->userid, $current_user,"
                     . "$slotid, "
                     . "'$type', "
                     . "'$payment->amount', "
