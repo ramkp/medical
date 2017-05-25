@@ -1342,10 +1342,18 @@ class Dashboard extends Util {
         $list = "";
         $gr = new Grades;
         $courses = $gr->get_user_courses($userid);
+        /*
+          echo "User courses:<pre>";
+          print_r($courses);
+          echo "</pre>";
+         */
         if (count($courses) > 0) {
             foreach ($courses as $courseid) {
                 $coursename = $this->get_course_name($courseid);
                 $grades = $this->get_grades_block($courseid, $userid);
+                $list.="<div class='row-fluid' style='font-weight:bold;'>";
+                $list.="<span class='span6'><hr/></span>";
+                $list.="</div>";
                 $list.="<div class='row-fluid' style='font-weight:bold;'>";
                 $list.="<span class='span12'>$coursename</span>";
                 $list.="</div>";
