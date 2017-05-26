@@ -1321,16 +1321,33 @@ class Dashboard extends Util {
 
     function get_grades_block($courseid, $userid) {
         $list = "";
+        $total_grade = 0;
+        $total_grade_max = 0;
         $gr = new Grades;
         $grades = $gr->get_student_grades($courseid, $userid);
         if (count($grades) > 0) {
             foreach ($grades as $gradeitem) {
+                $total_grade = $total_grade + $gradeitem->grade;
+                $total_grade_max = $total_grade_max + $gradeitem->max;
                 $list.="<div class='row-fluid'>";
                 $list.="<span class='span4'>$gradeitem->name</span>";
                 $list.="<span class='span1'>$gradeitem->grade %</span>";
                 $list.="<span class='span1'>$gradeitem->date</span>";
                 $list.="</div>";
             } // end foreach
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span6'><hr/></span>";
+            $list.="</div>";
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span3'>Total grade $total_grade points</span>";
+            $list.="</div>";
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span3'>Total course max $total_grade_max points</span>";
+            $list.="</div>";
+            $average = round(($total_grade / $total_grade_max) * 100);
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span3'>Average $average %</span>";
+            $list.="</div>";
         } // end if count($grades)>0
         else {
             $list.='N/A';
@@ -1703,7 +1720,7 @@ class Dashboard extends Util {
 
         $list.="</table>";
 
-        $pdf = new mPDF('utf-8', 'A4-L');
+        $pdf = new mPDF('utf-8', 'A4-P');
         $pdf->WriteHTML($list);
         $filename = "payment_$userid.pdf";
         $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/my/$filename";

@@ -51,6 +51,7 @@ class Grades extends Util {
                 $pr->name = $name;
                 $pr->grade = $grade;
                 $pr->date = $date;
+                $pr->max = $row['rawgrademax'];
             } // end while
         } // end if $num > 0
         else {
@@ -139,6 +140,8 @@ class Grades extends Util {
         $list = "";
         $user = $this->get_user_details($userid);
         $courses = $this->get_user_courses($userid);
+        $total_grade = 0;
+        $total_grade_max = 0;
         $list.="<p align='center' style='font-weight:bold;'>$user->firstname $user->lastname</p>";
         if (count($courses) > 0) {
             $list.="<table align='center'>";
@@ -150,12 +153,27 @@ class Grades extends Util {
                 $list.="</tr>";
                 if (count($grades) > 0) {
                     foreach ($grades as $gr) {
+                        $total_grade = $total_grade + $gr->grade;
+                        $total_grade_max = $total_grade_max + $gr->max;
                         $list.="<tr>";
                         $list.="<td style='padding:15px;'>$gr->name</td>";
                         $list.="<td style='padding:15px;'>$gr->grade%</td>";
                         $list.="<td style='padding:15px;'>$gr->date</td>";
                         $list.="</tr>";
                     } // end foreach
+                    $average = round(($total_grade / $total_grade_max) * 100);
+                    $list.="<tr>";
+                    $list.="<td style='padding:15px;' colspan='3'><hr/></td>";
+                    $list.="</tr>";
+                    $list.="<tr>";
+                    $list.="<td style='padding:15px;'>Total grade $total_grade points</td>";
+                    $list.="</tr>";
+                    $list.="<tr>";
+                    $list.="<td style='padding:15px;'>Total course max $total_grade_max points</td>";
+                    $list.="</tr>";
+                    $list.="<tr>";
+                    $list.="<td style='padding:15px;'>Average $average %</td>";
+                    $list.="</tr>";
                 } // end if count($grades)>0
             } // end foreach
             $list.="</table>";
