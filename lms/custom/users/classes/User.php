@@ -179,7 +179,7 @@ class User extends Util {
         $list = "";
         //$users = array();
 
-        /* ****************************************************************
+        /*****************************************************************
          * 
          * Function argument could be email, phone, user firstname and
          * user lastname, user firstname, middlename and lastname  and
@@ -187,15 +187,30 @@ class User extends Util {
          * 
          * *************************************************************** */
 
-        /*
-        $data = explode(' ', $email);
 
+        $data = explode(' ', trim($email));
+        //echo "Total pieces: ".count($data)."<br>";
         if (count($data) == 1) {
-            $query = "select * from mdl_user "
-                    . "where deleted=0 "
-                    . " and ( email like '%" . trim($email) . "%' "
-                    . "or phone1 like '%" . trim($email) . "%') "
-                    . " order by lastname ";
+            /*
+             * 
+              $query = "select * from mdl_user "
+              . "where deleted=0 "
+              . " and ( email like '%" . trim($email) . "%' "
+              . "or phone1 like '%" . trim($email) . "%') "
+              . " order by lastname ";
+             * 
+             */
+
+            $users = $this->full_text_search($email);
+            if (count($users) > 0) {
+                $list.= $this->create_users_list($users, count($users), false, $email);
+            } // end if $count($users) > 0 
+            else {
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span8'>No users found</span>";
+                $list.="</div>";
+            } // end else
+            return $list;
         }
 
         if (count($data) == 2) {
@@ -219,7 +234,6 @@ class User extends Util {
                     . " order by lastname ";
         }
 
-        //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
@@ -243,18 +257,7 @@ class User extends Util {
                 $list.="</div>";
             } // end else
         }
-         * 
-         */
-        
-        $users=$this->full_text_search($email);
-        if (count($users) > 0) {
-                $list.= $this->create_users_list($users, count($users), false, $email);
-            } // end if $count($users) > 0 
-            else {
-                $list.="<div class='container-fluid' style='text-align:center;'>";
-                $list.="<span class='span8'>No users found</span>";
-                $list.="</div>";
-            } // end else
+
         return $list;
     }
 
