@@ -360,6 +360,20 @@ class Balance {
         return $newprice;
     }
 
+    function get_student_free_adjustments($courseid, $userid) {
+        $sum = 0;
+        $query = "select * from mdl_free where courseid=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $sum = $row['psum'];
+            } // end while
+        } // end if $num > 0
+        return $sum;
+    }
+
     function get_user_balance($courseid, $userid, $slotid = null) {
         $promo_courses = $this->get_user_promo_paid_courses($userid);
         if (!in_array($courseid, $promo_courses)) {
@@ -368,7 +382,9 @@ class Balance {
         else {
             $itemcost = $this->get_promo_course_cost($courseid, $userid);
         } // end else
-        $totalpaid = $this->get_student_payments($courseid, $userid);
+        $user_free_adjustments = $this->get_student_free_adjustments($courseid, $userid);
+        $paid = $this->get_student_payments($courseid, $userid);
+        $totalpaid = $paid + $user_free_adjustments;
         $balance = $itemcost - $totalpaid;
         // Apply workaround in case if we have discount in CNA program
         if ($courseid == 41 && $balance == 20) {

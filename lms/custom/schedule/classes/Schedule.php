@@ -1233,7 +1233,8 @@ class Schedule extends Util {
         else {
             $slotid = $this->get_student_slot($courseid, $students);
             $balance = $b->get_user_balance($courseid, $students, $slotid);
-            return $balance;
+            $total_balance = $total_balance + $balance;
+            return $total_balance;
         } // end else 
     }
 
