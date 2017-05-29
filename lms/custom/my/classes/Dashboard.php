@@ -4056,4 +4056,14 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_course_category_by_name($coursename) {
+        $categoryid = 0;
+        $query = "select * from mdl_course where fullname='$coursename'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $categoryid = $row['category'];
+        }
+        return $categoryid;
+    }
+
 }

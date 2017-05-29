@@ -3382,17 +3382,12 @@ $(document).ready(function () {
     }
 
     function get_user_credentials_page() {
-
         var url = "/lms/custom/users/get_users_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
-           
-            /*
             $.get('/lms/custom/utils/data.json', function (data) {
                 $('#search_user_input').typeahead({source: data, items: 24});
             }, 'json');
-            */
-           
         });
     }
 
@@ -5002,44 +4997,95 @@ $(document).ready(function () {
             var ptype = $("input[name='ptype']:checked").val();
             var amount = $('#amount').val();
             var wsname = $('#wsname').val();
-            if (amount > 0 && coursename != '') {
-                $('#payment_err').html('');
-                var url = "/lms/custom/my/get_course_id.php";
-                var request = {coursename: coursename, wsname: wsname};
-                $.post(url, request).done(function (data) {
-                    console.log('Server response: ' + data);
-                    var program = JSON.parse(data);
-                    if (program.courseid > 0) {
-                        if (ptype == 'card') {
-                            var url = "/lms/custom/my/enroll_user.php";
-                            $.post(url, {userid: userid, courseid: program.courseid}).done(function () {
-                                var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
-                                var new_url = "https://medical2.com/index.php/register2/any_pay/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount + "/0";
-                                $("[data-dismiss=modal]").trigger({type: "click"});
-                                window.open(new_url, '_blank');
-                            });
-                        } // end if ptype == 'card'
-                        else {
-                            if (confirm('Add payment for current user?')) {
-                                var url2 = "/lms/custom/my/add_other_payment.php";
-                                var payment = {courseid: program.courseid, userid: userid, ptype: ptype, amount: amount, slotid: program.slotid};
-                                $.post(url2, {payment: JSON.stringify(payment)}).done(function (data) {
-                                    console.log(data);
-                                    $("[data-dismiss=modal]").trigger({type: "click"});
-                                    document.location.reload();
-                                });
-                            } // end if
-                        }  // end else
-                    } // end if courseid>0
+            var category_url = "/lms/custom/my/get_course_category_by_name.php";
+            var request = {coursename: coursename, wsname: wsname};
+            $.post(category_url, request).done(function (categoryid) {
+                if (categoryid == 2 || categoryid == 5) {
+                    // It is classes with mandatory venue
+                    if (amount > 0 && coursename != '' && wsname != '') {
+                        $('#payment_err').html('');
+                        var url = "/lms/custom/my/get_course_id.php";
+                        var request = {coursename: coursename, wsname: wsname};
+                        $.post(url, request).done(function (data) {
+                            console.log('Server response: ' + data);
+                            var program = JSON.parse(data);
+                            if (program.courseid > 0) {
+                                if (ptype == 'card') {
+                                    var url = "/lms/custom/my/enroll_user.php";
+                                    $.post(url, {userid: userid, courseid: program.courseid}).done(function () {
+                                        var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
+                                        var new_url = "https://medical2.com/index.php/register2/any_pay/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount + "/0";
+                                        $("[data-dismiss=modal]").trigger({type: "click"});
+                                        window.open(new_url, '_blank');
+                                    });
+                                } // end if ptype == 'card'
+                                else {
+                                    if (confirm('Add payment for current user?')) {
+                                        var url2 = "/lms/custom/my/add_other_payment.php";
+                                        var payment = {courseid: program.courseid, userid: userid, ptype: ptype, amount: amount, slotid: program.slotid};
+                                        $.post(url2, {payment: JSON.stringify(payment)}).done(function (data) {
+                                            console.log(data);
+                                            $("[data-dismiss=modal]").trigger({type: "click"});
+                                            document.location.reload();
+                                        });
+                                    } // end if
+                                }  // end else
+                            } // end if courseid>0
+                            else {
+                                $('#payment_err').html('Error happened...');
+                            }
+                        }); // end of post
+                    } // end if amount > 0 && coursename != ''
                     else {
-                        $('#payment_err').html('Error happened...');
-                    }
-                }); // end of post
+                        $('#payment_err').html('Please select program, workshop venue and provide amount');
+                    } // end else 
+                } // end if categoryid==2 || categoryid==5
+                else {
+                    // It is other items where venue is not mandatory
+                    if (amount > 0 && coursename != '') {
+                        $('#payment_err').html('');
+                        var url = "/lms/custom/my/get_course_id.php";
+                        var request = {coursename: coursename, wsname: wsname};
+                        $.post(url, request).done(function (data) {
+                            console.log('Server response: ' + data);
+                            var program = JSON.parse(data);
+                            if (program.courseid > 0) {
+                                if (ptype == 'card') {
+                                    var url = "/lms/custom/my/enroll_user.php";
+                                    $.post(url, {userid: userid, courseid: program.courseid}).done(function () {
+                                        var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
+                                        var new_url = "https://medical2.com/index.php/register2/any_pay/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount + "/0";
+                                        $("[data-dismiss=modal]").trigger({type: "click"});
+                                        window.open(new_url, '_blank');
+                                    });
+                                } // end if ptype == 'card'
+                                else {
+                                    if (confirm('Add payment for current user?')) {
+                                        var url2 = "/lms/custom/my/add_other_payment.php";
+                                        var payment = {courseid: program.courseid, userid: userid, ptype: ptype, amount: amount, slotid: program.slotid};
+                                        $.post(url2, {payment: JSON.stringify(payment)}).done(function (data) {
+                                            console.log(data);
+                                            $("[data-dismiss=modal]").trigger({type: "click"});
+                                            document.location.reload();
+                                        });
+                                    } // end if
+                                }  // end else
+                            } // end if courseid>0
+                            else {
+                                $('#payment_err').html('Error happened...');
+                            }
+                        }); // end of post
+                    } // end if amount > 0 && coursename != ''
+                    else {
+                        $('#payment_err').html('Please select program and provide amount');
+                    } // end else 
+                } // end else
+            }); // end of post
 
-            } // end if amount > 0 && coursename != ''
-            else {
-                $('#payment_err').html('Please select program and provide amount');
-            } // end else 
+
+
+
+
         }
 
         if (event.target.id == 'move_profile_payment') {
