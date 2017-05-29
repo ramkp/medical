@@ -177,7 +177,7 @@ class User extends Util {
 
     function search_user_by_email($email) {
         $list = "";
-        $users = array();
+        //$users = array();
 
         /* ****************************************************************
          * 
@@ -187,7 +187,7 @@ class User extends Util {
          * 
          * *************************************************************** */
 
-
+        /*
         $data = explode(' ', $email);
 
         if (count($data) == 1) {
@@ -243,8 +243,45 @@ class User extends Util {
                 $list.="</div>";
             } // end else
         }
-
+         * 
+         */
+        
+        $users=$this->full_text_search($email);
+        if (count($users) > 0) {
+                $list.= $this->create_users_list($users, count($users), false, $email);
+            } // end if $count($users) > 0 
+            else {
+                $list.="<div class='container-fluid' style='text-align:center;'>";
+                $list.="<span class='span8'>No users found</span>";
+                $list.="</div>";
+            } // end else
         return $list;
+    }
+
+    function full_text_search($searchphrase) {
+        $users = array();
+        $sql_search = "select * from mdl_user where ";
+        $sql_search_fields = Array();
+        $sql = "SHOW COLUMNS FROM mdl_user";
+        $result = $this->db->query($sql);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $colum = $row['Field'];
+            $sql_search_fields[] = $colum . " like('%" . $searchphrase . "%')";
+        }
+        $sql_search .= implode(" OR ", $sql_search_fields);
+        $sql_search .=" limit 0, 1000";
+        $num = $this->db->numrows($sql_search);
+        if ($num > 0) {
+            $result = $this->db->query($sql_search);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user = new stdClass();
+                foreach ($row as $key => $value) {
+                    $user->$key = $value;
+                }
+                $users[] = $user;
+            } // end while
+        } // end if $num > 0
+        return $users;
     }
 
     function search_group_users($groupname) {

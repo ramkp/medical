@@ -3386,9 +3386,13 @@ $(document).ready(function () {
         var url = "/lms/custom/users/get_users_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+           
+            /*
             $.get('/lms/custom/utils/data.json', function (data) {
                 $('#search_user_input').typeahead({source: data, items: 24});
             }, 'json');
+            */
+           
         });
     }
 
