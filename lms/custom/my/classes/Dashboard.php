@@ -195,9 +195,9 @@ class Dashboard extends Util {
         $userid = $this->user->id;
         $courseid = $this->course->id;
         $slotid = $this->get_user_course_slot($courseid, $userid);
-        //echo "User slot: " . $slotid . "<br>";
+        $amount = $this->get_course_cost($courseid, $slotid);
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/payments/index/$userid/$courseid/$slotid/0' target='_blank'>click</a> here to pay by card. </span>";
+        $list.="<span class='span12'>Your account is not active because we did not receive payment from you. Please <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/$slotid/$amount/0' target='_blank'>click</a> here to pay by card. </span>";
         $list.="</div>";
         $list.="<div class='container-fluid'>";
         $list.="<span class='span12' >If you need help please contact support team.</span>";
@@ -1028,12 +1028,33 @@ class Dashboard extends Util {
         return $contexts;
     }
 
-    function get_course_cost($courseid) {
+    function get_pure_course_cost($courseid) {
         $query = "select * from mdl_course where id=$courseid";
         $result = $this->db->query($query);
         while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $cost = $row['cost'];
         }
+        return $cost;
+    }
+
+    function get_course_worshop_cost($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $wscost = $row['cost'];
+        }
+        return $wscost;
+    }
+
+    function get_course_cost($courseid, $slotid = null) {
+        $coursecost = $this->get_pure_course_cost($courseid);
+        if ($slotid > 0) {
+            $wscost = $this->get_course_worshop_cost($slotid);
+            $cost = ($wscost > 0) ? $wscost : $coursecost;
+        } // end if $slotid > 0
+        else {
+            $cost = $coursecost;
+        } // end else
         return $cost;
     }
 
