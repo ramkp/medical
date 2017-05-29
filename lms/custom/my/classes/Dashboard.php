@@ -32,12 +32,16 @@ class Dashboard extends Util {
     public $workshop_category = 2;
     public $renew_payments;
     public $required_fields;
+    public $one_year;
+    public $three_year;
 
     function __construct() {
         parent::__construct();
         $this->resolution_path = 'https://' . $_SERVER['SERVER_NAME'] . '/lms/custom/my/get_screen_resolution.php';
         $this->resolution_path2 = $_SERVER['SERVER_NAME'];
         $this->assignment_module = 1;
+        $this->one_year = 3600 * 24 * 365 * 1;
+        $this->three_year = 3600 * 24 * 365 * 3;
         $this->assesment_path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/my";
         $this->create_programs_data();
         $this->renew_payments = array(50, 75, 100, 125, 150, 225);
@@ -2930,7 +2934,7 @@ class Dashboard extends Util {
 
     function get_renew_cert_dialog($cert) {
         $list = "";
-
+        $now = time();
         $userid = $this->user->id;
 
         $query = "select * from mdl_certificates where id=$cert->id";
