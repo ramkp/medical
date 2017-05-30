@@ -1977,16 +1977,16 @@ class Dashboard extends Util {
         $cost = $b->get_item_cost($courseid, $userid, $slotid);
         $exam_status = $this->is_exam_attempt($courseid);
         if ($exam_status) {
-            // You need to find workaround for failed attempts balance
             $total = $b->get_student_payments_for_balance($courseid, $userid);
             $diff = $cost - $total;
-            $owe = ($diff < 0) ? '-$' . abs($diff) : '$' . $diff;
+            $owe_init = ($diff < 0) ? abs($diff) : $diff;
+            $owe = ($owe_init % $cost == 0) ? 0 : $owe_init;
             if ($report) {
                 $list.="<table>";
                 $list.="<tr style='font-weight:bold;' style=''>";
                 $list.="<td style='padding:0px'>Program cost:</td><td style='padding:15px'>$$cost</td>";
                 $list.="<td style='padding:0px'>Paid:</td><td style='padding:15px'>$$total</td>";
-                $list.="<td style='padding:0px'>Balance:</td><td style='padding:15px'>$owe</td>";
+                $list.="<td style='padding:0px'>Balance:</td><td style='padding:15px'>$$owe</td>";
                 $list.="</tr>";
                 $list.="</table>";
             } // end if $report
@@ -1994,7 +1994,7 @@ class Dashboard extends Util {
                 $list.="<div class='row-fluid' style='font-weight:bold;color:red;'>";
                 $list.="<span class='span1'>Cost:</span><span class='span1'>$$cost</span>";
                 $list.="<span class='span1'>Paid:</span><span class='span1'>$$total</span>";
-                $list.="<span class='span1'>Balance:</span><span class='span1'><span style='font-weight:bold;color:red;'>$owe</span></span>";
+                $list.="<span class='span1'>Balance:</span><span class='span1'><span style='font-weight:bold;color:red;'>$$owe</span></span>";
                 $list.="</div>";
             } // end else
         } // end if $exam_status
