@@ -2504,10 +2504,13 @@ class Dashboard extends Util {
         $this->db->query($query);
 
         if ($slotid > 0) {
-            $query = "insert into mdl_scheduler_appointment "
-                    . "(slotid,studentid,attended) "
-                    . "values($slotid,$payment->userid,0)";
-            $this->db->query($query);
+            $already_scheduled = $this->is_user_scheduled($slotid, $payment->userid);
+            if ($already_scheduled == 0) {
+                $query = "insert into mdl_scheduler_appointment "
+                        . "(slotid,studentid,attended) "
+                        . "values($slotid,$payment->userid,0)";
+                $this->db->query($query);
+            }
         }
 
         // Do not create notice for free adjustment
@@ -2522,6 +2525,14 @@ class Dashboard extends Util {
             //$mailer->send_partial_payment_confirmation($userObj);
             $mailer->send_partial_payment_confirmation2($userObj);
         }
+    }
+
+    function is_user_scheduled($slotid, $userid) {
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid=$slotid "
+                . "and studentid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
     function refund_braintree_payment($payment) {
