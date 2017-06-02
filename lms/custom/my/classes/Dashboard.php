@@ -1459,6 +1459,40 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_send_sms_dialog($item) {
+        $list = "";
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Send Text Message</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='at_userid' value='$item->userid'>
+                <input type='hidden' id='at_phone' value='$item->phone'>
+                
+                
+                <div class='container-fluid'>
+                <span class='span1'>Message*:</span>
+                <span class='span3'><textarea id='at_message' style='width:365px;'></textarea></span>
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span4' id='sms_err' style='color:Red;'></span>
+                </div>
+                
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='send_sms_profile'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
     function is_at_date_exists($at) {
         $udate = strtotime($at->date);
         $query = "select * from mdl_user_attendance "
@@ -1855,9 +1889,10 @@ class Dashboard extends Util {
         $list = "";
         $userid = $this->user->id;
         $suspended = $this->is_user_suspended($id);
+        $userdata = $this->get_user_details($id);
         $title = ($suspended == 0) ? 'Suspend' : 'Activate';
         $button = "<button class='profile_user_suspend' data-userid='$id' data-status='$suspended'>$title</button>";
-
+        $sms_button = "<button class='profile_send_sms' data-userid='$id' data-phone='$userdata->phone1'>Send Text Message</button>";
         $list.="<div class='container-fluid'>";
         if ($userid == 2) {
             $list.="<span class='span2'><button data-userid='$id' class='delete_profile_user' style='width:175px;'>Delete User</button></span>";
@@ -1866,6 +1901,7 @@ class Dashboard extends Util {
         else {
             $list.= "<span class='span2'>$button</span>";
         }
+        $list.= "<span class='span2'>$sms_button</span>";
         $list.="</div>";
 
         return $list;

@@ -149,9 +149,31 @@ $(document).ready(function () {
     var domain = 'medical2.com';
     var dialog_loaded;
     console.log("ready!");
+
     function update_navigation_status__menu(item_title) {
         $(".breadcrumb-nav").html('');
         $(".breadcrumb-nav").html("<ul class='breadcrumb'><li><a href='https://" + domain + "/lms/my/'>Dashboard</a> <span class='divider'> <span class='accesshide '><span class='arrow_text'>/</span>&nbsp;</span><span class='arrow sep'>►</span> </span></li><li><a href='#'>" + item_title + "</a></li>");
+    }
+
+    function send_sms_to_user(msg, id, phone) {
+        console.log('Phone: ' + phone);
+        console.log('Message: ' + msg);
+        var xhr = new XMLHttpRequest(),
+                body = JSON.stringify({
+                    "content": msg,
+                    "to": [phone]
+                });
+        xhr.open("POST", 'https://platform.clickatell.com/messages', true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.setRequestHeader("Authorization", "9MUi6DwlT4mE6Nr8y3lpOg==");
+        xhr.onreadystatechange = function () {
+            console.log('Request state: ' + xhr.readyState);
+            console.log('Request status: ' + xhr.status);
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                console.log('success');
+            }
+        };
+        xhr.send(body);
     }
 
     function get_price_items_from_category(id) {
@@ -2507,6 +2529,36 @@ $(document).ready(function () {
                 $.post(url, {userid: userid, state: state}).done(function () {
                     document.location.reload();
                 });
+            }
+        }
+
+        if ($(event.target).attr('class') == 'profile_send_sms') {
+            var userid = $(this).data('userid');
+            var phone = $(this).data('phone');
+            console.log('User ID: ' + userid);
+            console.log('Phone: ' + phone);
+            var item = {userid: userid, phone: phone};
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_send_sms_dialog.php";
+                            $.post(url, {item: JSON.stringify(item)}).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
             }
         }
 
@@ -7116,9 +7168,24 @@ $(document).ready(function () {
                     document.location.reload();
                 }); // end of post
             } // end else
-
-
         }
+
+        if (event.target.id == 'send_sms_profile') {
+            var id = $('#at_userid').val();
+            var phone = $('#at_phone').val();
+            var msg = $('#at_message').val();
+            if (msg != '') {
+                $('#sms_err').html('');
+                if (confirm('Send text message to current user?')) {
+                    send_sms_to_user(msg, id, phone);
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                } // end if
+            } // endbif msg!=''
+            else {
+                $('#sms_err').html('Please provide message text');
+            } // end else 
+        }
+
 
     }); // end of body click event
 

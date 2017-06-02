@@ -14,7 +14,7 @@ class register_model extends CI_Model {
     public function __construct() {
         parent::__construct();
         $this->load->database();
-        //$this->load->library('session');
+        $this->load->helper('string');
         $this->host = $_SERVER['SERVER_NAME'];
     }
 
@@ -927,8 +927,13 @@ class register_model extends CI_Model {
             $list.="</div>"; // end of container-fluid
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span9'>Want to register group? Please click <a href='https://medical2.com/register2/group_register' target='_blank'>here</a></span>";
+            $list.="</div>"; // end of container-fluid
+
+            $list.="<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span9'>Already have an account? Please <a href='/index.php/login' target='_blank'>sign-in</a> and apply for course you need.</span>";
             $list.="</div>"; // end of container-fluid
+
             $list.="</div>"; // end of panel-body
             $list.="</div>"; // end of panel panel-default 
             // ********************  Individual registration form **************************        
@@ -1846,6 +1851,387 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         $list.="</div></div></div>";
+
+        return $list;
+    }
+
+    function get_group_users_block($total) {
+        $list = "";
+        for ($i = 1; $i <= $total; $i++) {
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Firstname<span style='color:red'>*</span></span>";
+            $list.="<span class='span2'><input type='text' id='group_fname_$i'></span>";
+            $list.="<span class='span2'>Lastname<span style='color:red'>*</span></span>";
+            $list.="<span class='span2'><input type='text' id='group_lname_$i'></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span2'>Email<span style='color:red'>*</span></span>";
+            $list.="<span class='span2'><input type='text' id='group_email_$i'></span>";
+            $list.="<span class='span2'>Phone<span style='color:red'>*</span></span>";
+            $list.="<span class='span2'><input type='text' id='group_phone_$i'></span>";
+            $list.="</div>";
+
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span8'><hr/></span>";
+            $list.="</div>";
+        }
+        return $list;
+    }
+
+    function get_total_group_users_dropbox($total) {
+        $list = "";
+        $list.="<select id='total_group_users'>";
+        $list.="<option value='0' selected>Participants</option>";
+        for ($i = 1; $i <= $total; $i++) {
+            $list.="<option value='$i'>$i</option>";
+        }
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_group_register_form() {
+        $list = "";
+
+        $cats = $this->get_course_categories();
+        $courses = $this->get_courses_by_category();
+        $states = $this->get_states_list();
+        $register_state = $this->get_register_course_states_list();
+        $cities = $this->get_register_course_cities_list();
+        $users_dropbox = $this->get_total_group_users_dropbox(12);
+
+        $list.="<br/><div  class='form_div'>";
+
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program details</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>$cats</span>";
+        $list.="<span class='span2' id='cat_course'>$courses</span>";
+        $list.="<span class='span2' id='register_states_container'>$register_state</span>";
+        $list.="<span class='span2' id='register_cities_container'>$cities</span>";
+        $list.="<span class='span2' id='program_err' style='color:red;'></span>";
+        $list.="</div>"; // end of container-fluid
+
+        $list.="</div>"; // end of panel-body
+        $list.="</div>"; // end of panel panel-default 
+
+        $list.="<div class='panel panel-default' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Group details </h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Address<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'><input type='text' id='group_addr' name='group_addr'></span>";
+        $list.="<span class='span2'>Business or Institution</span>";
+        $list.="<span class='span2'><input type='text' id='group_inst' name='group_inst'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>ZIP code<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'><input type='text' id='group_zip' name='group_zip'></span>";
+        $list.="<span class='span2'>City<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'><input type='text' id='group_city' name='group_city'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>State<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'>$states</span>";
+        $list.="<span class='span2'>Group name<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'><input type='text' id='group_name' name='group_name'></span>";
+        $list.="</div>";
+
+        $list.="</div>"; // end of panel-body
+        $list.="</div>"; // end of panel panel-default 
+
+        $list.="<div class='panel panel-default' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Users details</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Total participants<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'>$users_dropbox</span>";
+        $list.="</div>";
+
+        $list.="<div id='users_div'></div>";
+        $list.="</div>"; // end of panel-body
+        $list.="</div>"; // end of panel panel-default 
+
+        $list.="<div class='panel panel-default' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Payment details </h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:left;font-weight:bold;display:none;' id='group_course_fee'>";
+        $list.="<span class='span2'>Selected program</span>";
+        $list.="<span class='span2' id='group_dyn_course_name'></span>";
+        $list.="<span class='span2'>Fee</span>";
+        $list.="<span class='span2' id='group_dyn_course_fee'></span>";
+        $list.="</div><br>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'><img
+                        src='https://www.merchantequip.com/image/?logos=v|m|a|d&height=16' alt='Merchant Equipment Store Credit Card Logos'/></span><span class='span2'><input type='radio' name='ptype' id='ptype' value='card' checked><span style='font-size:14px;font-weight:bold;color:blue;'>Pay with Credit or debit card</span></span>";
+        $list.="<span class='span2'>&nbsp;</span><span class='span2'><input type='radio' name='ptype' id='ptype' value='paypal'><img
+                        src='https://www.merchantequip.com/image/?logos=p&height=16' alt='Merchant Equipment Store Credit Card Logos'/><span style='font-size:14px;font-weight:bold;color:blue;'> Pay with Paypal</span></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' id='group_err' style='color:red;'></span>";
+        $list.="</div><br>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><button class='btn btn-primary' id='next_group_payment'>Next</button></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><hr></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><img
+                        src='https://www.merchantequip.com/image/?logos=v|m|a|d|p&height=64' alt='Merchant Equipment Store Credit Card Logos'/></span>";
+        $list.="</div>";
+
+        $list.="</div>"; // end of panel-body
+        $list.="</div>"; // end of panel panel-default 
+
+        $list.="</div>"; // end of form div
+
+        return $list;
+    }
+
+    function get_workshop_cost($slotid) {
+        if ($slotid > 0) {
+            $query = "select * from mdl_scheduler_slots where id=$slotid";
+            $result = $this->db->query($query);
+            foreach ($result->result() as $row) {
+                $cost = $row->cost;
+            }
+            $wscost = ($cost == '') ? 0 : $cost;
+        } // end if $slotid>0
+        else {
+            $wscost = 0;
+        }
+        return $wscost;
+    }
+
+    function get_course_cost($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $cost = $row->cost;
+        }
+        return $cost;
+    }
+
+    function get_course_name($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $name = $row->fullname;
+        }
+        return $name;
+    }
+
+    function get_group_course_fee($courseid, $slotid, $total) {
+        $course_cost = $this->get_course_cost($courseid);
+        $ws_cost = $this->get_workshop_cost($slotid);
+        $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
+        $group_cost = $cost * $total;
+        $name = $this->get_course_name($courseid);
+        $courseObj = new stdClass();
+        $courseObj->name = $name;
+        $courseObj->cost = $group_cost;
+        return json_encode($courseObj);
+    }
+
+    function is_group_exists($name) {
+        $query = "select * from mdl_groups where name='$name'";
+        $result = $this->db->query($query);
+        return $result->num_rows();
+    }
+
+    function is_username_exists($email) {
+        $query = "select * from mdl_user where username='$email'";
+        $result = $this->db->query($query);
+        return $result->num_rows();
+    }
+
+    function get_braintree_group_payment_form($regdata) {
+        $list = "";
+
+        $decoded_data = json_decode(base64_decode($regdata));
+        $courseObj = json_decode($decoded_data->course);
+
+        $coursename = $this->get_course_name($courseObj->courseid);
+        $amount = $courseObj->amount;
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program checkout</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'>Selected program:</span>";
+        $list.="<span class='span2'>$coursename</span>";
+        $list.="<span class='span2'>Program fee</span>";
+        $list.="<span class='span2'>$$amount</span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' id='register_data' value='$regdata'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><hr/></span>";
+        $list.="</div>";
+
+        $list.="<form id='checkout-form' action='/' method='post'>";
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' id='error-message'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'><label for='card-number'>Card Number<span style='color:red;'>*</span></label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='card-number'></div></span>";
+        $list.="<span class='span2'><label for='cvv'>CVV<span style='color:red;'>*</span></label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='cvv'></div></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'><label for='cardholder'>Cardholder Name<span style='color:red;'>*</span></label></span>";
+        $list.="<span class='span2'><input class='hosted-field' id='cardholder' placeholder=''></span>";
+        $list.="<span class='span2'><label for='expiration-date'>Expiration Date<span style='color:red;'>*</span></label></span>";
+        $list.="<span class='span2'><div class='hosted-field' id='expiration-date'></div></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'><label for='billing_email'>Billing Email<span style='color:red;'>*</span></label></span>";
+        $list.="<span class='span2'><input class='hosted-field' id='billing_email' placeholder=''></span>";
+        $list.="<span class='span2'>Contact phone<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'><input class='hosted-field' id='billing_phone' placeholder=''></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' id='err' style='color:red;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;display:none;' id='ajax_loading_payment'><img src='https://$this->host/assets/img/ajax.gif' /></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>By clicking the 'I Agree, Submit' button, you confirm you have reviewed and agree to the Pay by Computer Terms & Conditions (<a href='#' onClick='return false;' id='policy'>click to view).</a></span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' name='payment_method_nonce'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'><input type='submit' id='make_group_registration_payment' style='background-color: #e2a500;' value='I Agree, Submit' disabled></span>";
+        $list.="</div>";
+
+        $list.="</div></div></div>";
+
+        return $list;
+    }
+
+    function get_paypal_group_payment_form($regdata) {
+        $list = "";
+        // We use local storage to store data
+        $token = random_string('alnum', 8);
+        $decoded_data = json_decode(base64_decode($regdata));
+        $courseObj = json_decode($decoded_data->course);
+        $coursename = $this->get_course_name($courseObj->courseid);
+        $amount = $courseObj->amount;
+        $button = $this->get_group_paypal_payment_button($amount, $coursename, $token);
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Program checkout</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'>Selected program:</span>";
+        $list.="<span class='span2'>$coursename</span>";
+        $list.="<span class='span2'>Program fee</span>";
+        $list.="<span class='span2'>$$amount</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'>Firstname<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'><input type='text' id='fname'></span>";
+        $list.="<span class='span2'>Lastname<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'><input type='text' id='lname'></span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span2'>Email<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'><input type='text' id='email'></span>";
+        $list.="<span class='span2'>Phone<span style='color:red;'>*</span></span>";
+        $list.="<span class='span2'><input type='text' id='phone'></span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' id='token' value='$token'>";
+        $list.="<input type='hidden' id='register_data' value='$regdata'>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8' style='color:red;' id='paypal_err'></span>";
+        $list.="</div>";
+
+        $list.="<br><div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>$button</span>";
+        $list.="</div>";
+
+        $list.="</div></div></div>";
+
+        return $list;
+    }
+
+    function get_group_paypal_payment_button($cost, $program, $token) {
+        $list = "";
+        $list.="<form action='https://www.paypal.com/cgi-bin/webscr' method='post' id='paypal_group_payment'>"; // production
+        //$list.="<form action='https://www.sandbox.paypal.com/cgi-bin/webscr' method='post' id='paypal_group_payment'>"; // sandbox
+        $list.="<input type='hidden' name='cmd' value='_xclick'>";
+        $list.="<INPUT TYPE='hidden' name='charset' value='utf-8'>";
+        $list.="<input type='hidden' name='business' value='info@medical2.com'>"; // production
+        //$list.="<input type='hidden' name='business' value='sirromas-facilitator@outlook.com'>"; // sandbox
+        $list.="<input type='hidden' name='item_name' value='$program'>
+        <input type='hidden' name='amount' value='$cost'>
+        <input type='hidden' name='custom' value='$token'>    
+        <INPUT TYPE='hidden' NAME='currency_code' value='USD'>    
+        <INPUT TYPE='hidden' NAME='return' value='https://medical2.com/register2/receive_paypal_group_register_payment/'>
+        <input type='image' id='paypal_btn' src='https://www.sandbox.paypal.com/en_US/i/btn/btn_buynow_LG.gif' border='0' name='submit' alt='PayPal - The safer, easier way to pay online!'>
+        <img alt='' border='0' src='https://www.sandbox.paypal.com/en_US/i/scr/pixel.gif' width='1' height='1'>
+        </form>";
+        return $list;
+    }
+
+    function process_paypal_group_payment($payment) {
+        $status = $payment['st'];
+        $token = $payment['cm'];
+        $transactionid = $payment['tx'];
+        $_SESSION['group_payment_transactionid'] = $transactionid;
+
+        $list = "";
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+        $list.="<div class='panel-body'>";
+        $list.="<input type='hidden' id='token' value='$token'>";
+        if ($status == 'Completed') {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'>Payment is successful. Thank you! </span>";
+            $list.="</div>";
+        } // end if
+        else {
+            $list.="<div class='container-fluid' style='text-align:center;'>";
+            $list.="<span class='span8'>Transaction failed</span>";
+            $list.="</div>";
+        } // end else
+
+        $list.="</div>";
+        $list.="</div>";
+        $list.="</div>";
 
         return $list;
     }

@@ -528,4 +528,315 @@ class Cards {
         $cert->renew_certificate($userObj->courseid, $userObj->userid, $userObj->period);
     }
 
+    /**     * ************* Code related to group registration  ********* */
+    function make_group_registration_payment($transObj) {
+        $nonceFromTheClient = $transObj->nonce;
+        $cardholder = $transObj->cardholder;
+        $names = explode(" ", $cardholder);
+
+        if (count($names) == 2) {
+            $billing_fisrtname = $names[0];
+            $billing_lastname = $names[1];
+        } // end if
+
+        if (count($names) == 3) {
+            $billing_fisrtname = $names[0] . " " . $names[1];
+            $billing_lastname = $names[2];
+        } // end if
+
+        $billing_email = $transObj->billing_email;
+        $billing_phone = $transObj->billing_phone;
+
+        $regdata = $transObj->data;
+        $decoded_data = json_decode(base64_decode($regdata));
+
+        $courseObj = json_decode($decoded_data->course);
+        $total = $courseObj->total;
+        $amount = $courseObj->amount;
+
+        $groupObj = json_decode($decoded_data->group);
+        $users = json_decode($decoded_data->users); // array of objects
+
+        $single_user_amount = round($amount / $total);
+        $program = $this->get_course_name_by_id($courseObj->courseid);
+
+        $this->authorize_production();
+        $result = Braintree\Transaction::sale([
+                    'amount' => $amount,
+                    'paymentMethodNonce' => $nonceFromTheClient,
+                    'customer' => [
+                        'firstName' => $billing_fisrtname,
+                        'lastName' => $billing_lastname,
+                        'phone' => $billing_phone,
+                        'email' => $billing_email
+                    ],
+                    'creditCard' => [
+                        'cardholderName' => $cardholder
+                    ],
+                    'options' => [
+                        'submitForSettlement' => True
+                    ]
+        ]);
+
+        $transaction = $result->transaction;
+
+        $buyer = new stdClass();
+        $buyer->payment_amount = $amount;
+        $buyer->groupname = $groupObj->name;
+        $buyer->total = $courseObj->total;
+        $buyer->courseid = $courseObj->courseid;
+        $buyer->slotid = $courseObj->slotid;
+        $buyer->state = $groupObj->state;
+        $buyer->firstname = $billing_fisrtname;
+        $buyer->lastname = $billing_lastname;
+        $buyer->email = $billing_email;
+        $buyer->phone = $billing_phone;
+        $buyer->ptype = 'card';
+
+        if ($result->success) {
+
+            $m = new Mailer();
+            $m->send_new_group_payment_confirmation_message($buyer, $users);
+
+            $p = new Payment();
+            $groupid = $this->add_new_group($courseObj->courseid, $groupObj->name);
+            $transid = $transaction->id;
+            $status = $transaction->status;
+            foreach ($users as $user) {
+                // We need to create object compatible with signup workflow
+                $original_email = $user->email;
+                $username_exists = $this->is_username_exists($original_email);
+                if ($username_exists > 0) {
+                    $rnd_string = $this->get_random_string(4);
+                    $new_email = $rnd_string . "_" . $user->email;
+                    $user->email = $new_email;
+                } // end if $username_exists>0
+
+                $userObj = new stdClass();
+                $userObj->firstname = $user->fname;
+                $userObj->first_name = $user->fname;
+
+                $userObj->lastname = $user->lname;
+                $userObj->last_name = $user->lname;
+
+                $userObj->email = $user->email;
+                $userObj->phone = $user->phone;
+
+                $pwd = $this->get_random_string(12);
+                $userObj->pwd = $pwd;
+                $userObj->courseid = $courseObj->courseid;
+
+                $userObj->addr = $groupObj->addr;
+                $userObj->inst = $groupObj->name;
+
+                $userObj->zip = $groupObj->zip;
+                $userObj->city = $groupObj->city;
+
+                $userObj->state = $groupObj->state;
+                $userObj->country = 'US';
+
+                $userObj->slotid = $courseObj->slotid;
+                $userObj->promo_code = '';
+
+                $p->enroll->single_signup($userObj);
+                $p->confirm_user($userObj->email);
+                $userid = $p->get_user_id_by_email($userObj->email);
+                $p->enroll->add_user_to_course_schedule($userid, $userObj);
+                $this->add_user_to_group($groupid, $userid);
+                $user_detailes = $p->get_user_detailes($userid);
+
+                $userObj->userid = $userid;
+                $userObj->amount = $single_user_amount;
+                $userObj->sum = $single_user_amount;
+                $userObj->pwd = $user_detailes->purepwd;
+                $userObj->payment_amount = $single_user_amount;
+                $userObj->card_holder = $cardholder;
+                $userObj->billing_name = $cardholder;
+                $userObj->signup_first = $userObj->first_name;
+                $userObj->signup_last = $userObj->last_name;
+                $userObj->transid = $transid;
+                $userObj->status = $status;
+                $this->add_success_registration_payment($userObj);
+            } // end foreach
+            $list = "Payment is successful. Thank you! Confirmation email is sent to $billing_email";
+            return $list;
+        } // end if $result->success
+        else {
+            $msg = $result->message;
+            $failObj = new stdClass();
+            $failObj->status = $transaction->status;
+            $failObj->code = $transaction->processorResponseCode;
+            $failObj->program = $program;
+            $failObj->msg = $msg;
+            $failObj->info = $transaction->additionalProcessorResponse;
+            $failObj->amount = $amount;
+            $failObj->firstname = $buyer->firstname;
+            $failObj->lastname = $buyer->lastname;
+            $failObj->email = $buyer->email;
+            $failObj->phone = $buyer->phone;
+            $this->send_any_pay_failed_transaction_info($failObj);
+            $list = "Credit card declined. Please contact your bank for details";
+            return $list;
+        } // end else
+    }
+
+    function add_group_paypal_payment($t) {
+
+        $data = json_decode($t);
+        $billed_person = $data->buyer;
+        $regdata = $data->regdata;
+        $decoded_data = json_decode(base64_decode($regdata));
+
+        $courseObj = json_decode($decoded_data->course);
+        $total = $courseObj->total;
+        $amount = $courseObj->amount;
+
+        $groupObj = json_decode($decoded_data->group);
+        $users = json_decode($decoded_data->users); // array of objects
+
+        $single_user_amount = round($amount / $total);
+        $transactionid = $_SESSION['group_payment_transactionid'];
+
+        $m = new Mailer();
+        $buyer = new stdClass();
+        $buyer->payment_amount = $amount;
+        $buyer->groupname = $groupObj->name;
+        $buyer->total = $courseObj->total;
+        $buyer->courseid = $courseObj->courseid;
+        $buyer->slotid = $courseObj->slotid;
+        $buyer->state = $groupObj->state;
+        $buyer->firstname = $billed_person->firstname;
+        $buyer->lastname = $billed_person->lastname;
+        $buyer->email = $billed_person->email;
+        $buyer->phone = $billed_person->phone;
+        $buyer->ptype = 'paypal';
+
+        $m->send_new_group_payment_confirmation_message($buyer, $users);
+
+        $p = new Payment();
+        $groupid = $this->add_new_group($courseObj->courseid, $groupObj->name);
+        $transid = $transactionid;
+        foreach ($users as $user) {
+            // We need to create object compatible with signup workflow
+            $original_email = $user->email;
+            $username_exists = $this->is_username_exists($original_email);
+            if ($username_exists > 0) {
+                $rnd_string = $this->get_random_string(4);
+                $new_email = $rnd_string . "_" . $user->email;
+                $user->email = $new_email;
+            } // end if $username_exists>0
+
+            $userObj = new stdClass();
+            $userObj->firstname = $user->fname;
+            $userObj->first_name = $user->fname;
+
+            $userObj->lastname = $user->lname;
+            $userObj->last_name = $user->lname;
+
+            $userObj->email = $user->email;
+            $userObj->phone = $user->phone;
+
+            $pwd = $this->get_random_string(12);
+            $userObj->pwd = $pwd;
+            $userObj->courseid = $courseObj->courseid;
+
+            $userObj->addr = $groupObj->addr;
+            $userObj->inst = $groupObj->name;
+
+            $userObj->zip = $groupObj->zip;
+            $userObj->city = $groupObj->city;
+
+            $userObj->state = $groupObj->state;
+            $userObj->country = 'US';
+
+            $userObj->slotid = $courseObj->slotid;
+            $userObj->promo_code = '';
+
+            $p->enroll->single_signup($userObj);
+            $p->confirm_user($userObj->email);
+            $userid = $p->get_user_id_by_email($userObj->email);
+            $p->enroll->add_user_to_course_schedule($userid, $userObj);
+            $this->add_user_to_group($groupid, $userid);
+            $user_detailes = $p->get_user_detailes($userid);
+
+            $userObj->userid = $userid;
+            $userObj->amount = $single_user_amount;
+            $userObj->sum = $single_user_amount;
+            $userObj->pwd = $user_detailes->purepwd;
+            $userObj->transid = $transid;
+            $this->add_paypal_payment($userObj);
+        }
+    }
+
+    function add_paypal_payment($userObj) {
+        $now = time();
+        $query = "insert into mdl_paypal_payments "
+                . "(courseid,"
+                . "userid,"
+                . "psum,"
+                . "trans_id,"
+                . "pdate) "
+                . "values ($userObj->courseid, "
+                . "$userObj->userid,"
+                . "'$userObj->amount',"
+                . "'$userObj->transid',"
+                . "'$now')";
+        $this->db->query($query);
+    }
+
+    function get_state_name_by_id($id) {
+        $query = "select * from mdl_states where id=$id";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        }
+        return $state;
+    }
+
+    function update_user_data($userid, $email, $pwd) {
+        $query = "update mdl_user set email='$email' purepwd='$pwd' where id=$userid";
+        $this->db->query($query);
+    }
+
+    function add_user_to_group($groupid, $userid) {
+        $now = time();
+        $query = "insert into mdl_groups_members "
+                . "(groupid, userid, timeadded) "
+                . "values ($groupid,$userid,'$now')";
+        $this->db->query($query);
+    }
+
+    function is_username_exists($email) {
+        $query = "select * from mdl_user where username='$email'";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_random_string($size) {
+        $alpha_key = '';
+        $keys = range('A', 'Z');
+        for ($i = 0; $i < 2; $i++) {
+            $alpha_key .= $keys[array_rand($keys)];
+        }
+        $length = $size - 2;
+        $key = '';
+        $keys = range(0, 9);
+        for ($i = 0; $i < $length; $i++) {
+            $key .= $keys[array_rand($keys)];
+        }
+        return $alpha_key . $key;
+    }
+
+    function add_new_group($courseid, $name) {
+        $query = "insert into mdl_groups (courseid, name) "
+                . "values($courseid, '$name')";
+        $this->db->query($query);
+        $query = "select * from mdl_groups where name='$name'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $groupid = $row['id'];
+        }
+        return $groupid;
+    }
+
 }

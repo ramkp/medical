@@ -33,6 +33,143 @@ function browser() {
 $(document).ready(function () {
 
     var codeused = 0;
+    var group_users = [];
+
+    function verify_barintree_group_registration() {
+        var courseid = $('#register_courses').val();
+        var slotid = $('#register_cities').val();
+        var total = $('#total_group_users').val();
+        var users = [];
+        if (courseid == 0) {
+            $('#group_err').html('Please select program');
+            return false;
+        } // end if courseid==0
+
+        var addr = $('#group_addr').val();
+        if (addr == '') {
+            $('#group_err').html('Please provide address');
+            return false;
+        }
+
+        var zip = $('#group_zip').val();
+        if (zip == '') {
+            $('#group_err').html('Please provide zip');
+            return false;
+        }
+
+        var city = $('#group_city').val();
+        if (city == '') {
+            $('#group_err').html('Please provide city');
+            return false;
+        }
+
+        var state = $('#state').val();
+        if (state == 0) {
+            $('#group_err').html('Please select state');
+            return false;
+        }
+
+        var name = $('#group_name').val();
+        if (name == '') {
+            $('#group_err').html('Please provide group name');
+            return false;
+        }
+
+        var group_check_url = "https://medical2.com/register2/is_group_exists";
+        $.post(group_check_url, {name: name}).done(function (status) {
+            if (status > 0) {
+                $('#group_err').html('Group name already exists');
+                return false;
+            } // end if status>0
+            else {
+                if (total == 0) {
+                    $('#group_err').html('Please select group participants number');
+                    return false;
+                }
+
+                $('#group_err').html('');
+                var groupObj = {addr: addr, zip: zip, city: city, state: state, name: name, total: total};
+
+                var amount = $('#payment_sum').val();
+                var courseObj = {courseid: courseid, slotid: slotid, total: total, amount: amount};
+
+                for (var i = 1; i <= total; i++) {
+
+                    var fname_elid = '#group_fname_' + i;
+                    var lname_elid = '#group_lname_' + i;
+                    var email_elid = '#group_email_' + i;
+                    var phone_elid = '#group_phone_' + i;
+
+                    var fname = $(fname_elid).val();
+                    if (fname == '') {
+                        $('#group_err').html('Please provide users first name');
+                        break;
+                        return false;
+                    }
+
+                    var lname = $(lname_elid).val();
+                    if (lname == '') {
+                        $('#group_err').html('Please provide users last name');
+                        break;
+                        return false;
+                    }
+
+                    var email = $(email_elid).val();
+                    if (email == '') {
+                        $('#group_err').html('Please provide users email');
+                        break;
+                        return false;
+                    }
+
+                    var email_status = is_username_exists(email);
+                    if (email_status > 0) {
+                        $('#group_err').html('Email ' + email + ' already in use');
+                        break;
+                        return false;
+                    }
+
+                    var phone = $(phone_elid).val();
+                    if (phone == '') {
+                        $('#group_err').html('Please provide users phone');
+                        return false;
+                    }
+                    var user = {fname: fname, lname: lname, email: email, phone: phone};
+                    users.push(user);
+
+                } // end for
+
+                console.log('Course Object: ' + JSON.stringify(courseObj));
+                console.log('Group Object: ' + JSON.stringify(groupObj));
+                console.log('Users array: ' + JSON.stringify(users));
+
+                if (users.length == total) {
+                    var reg = {course: JSON.stringify(courseObj),
+                        group: JSON.stringify(groupObj),
+                        users: JSON.stringify(users)};
+                    var data = Base64.encode(JSON.stringify(reg));
+                    var ptype = $("input:radio[name ='ptype']:checked").val();
+                    if (ptype == 'card') {
+                        url = 'https://medical2.com/register2/group_payment_card/' + data;
+                    } // end if ptype=='card'
+                    else {
+                        url = 'https://medical2.com/register2/group_payment_paypal/' + data;
+                    } // end else when user pays by PayPal
+                    window.location.href = url;
+                } // end if users.length == total
+                else {
+                    $('#group_err').html('Please provide users data');
+                    return false;
+                }
+            } // end else
+        }); // end of post
+    }
+
+    function  is_username_exists(email) {
+        var check_url = 'https://medical2.com/register2/is_username_exists';
+        $.post(check_url, {email: email}).done(function (status) {
+            return status;
+        });
+    }
 
     function supports_local_storage() {
         try {
@@ -232,6 +369,35 @@ $(document).ready(function () {
         } // end else
     });
 
+
+    $("#paypal_group_payment").submit(function (event) {
+        var storage = supports_local_storage();
+        if (storage !== false) {
+            var token = $('#token').val();
+            var fname = $('#fname').val();
+            var lname = $('#lname').val();
+            var email = $('#email').val();
+            var phone = $('#phone').val();
+            if (fname != '' && lname != '' && email != '' && phone != '') {
+                var regdata = $('#register_data').val();
+                var buyer = {firstname: fname, lastname: lname, email: email, phone: phone}
+                $('#paypal_err').html('');
+                var transaction = {buyer: buyer, regdata: regdata};
+                localStorage.setItem(token, JSON.stringify(transaction));
+                var storedItem = localStorage.getItem(token);
+                console.log('Stores item: ' + storedItem);
+            } // end if name != '' && lname != '' && email != '' && phone != ''
+            else {
+                event.preventDefault();
+                $('#paypal_err').html('Please provide user details');
+            } // end else
+        } // end if
+        else {
+            event.preventDefault();
+            $('#paypal_err').html('Your browser is not supported');
+        } // end else
+
+    });
 
     /* ---------- Add class .active to current link ---------- */
     $('ul.main-menu li a').each(function () {
@@ -2383,6 +2549,41 @@ $(document).ready(function () {
         });
     });
 
+    $("#total_group_users").change(function () {
+        var total = $("#total_group_users").val();
+        if (total > 0) {
+            var url = "https://medical2.com/register2/get_group_users_block";
+            var request = {total: total};
+            $.post(url, request).done(function (data) {
+                $('#users_div').html(data);
+                var courseid = $('#register_courses').val();
+                var slotid = $('#register_cities').val();
+                var feeurl = "https://medical2.com/register2/get_group_course_fee";
+                $.post(feeurl, {courseid: courseid, slotid: slotid, total: total}).done(function (data) {
+                    console.log('Server response: ' + data);
+                    var course = JSON.parse(data);
+
+                    var coursedata = "<span id='visible_amount'>$" + course.cost + "</span> ";
+                    $('#group_dyn_course_name').html(course.name);
+                    $('#group_dyn_course_fee').html(coursedata);
+
+                    $('#payment_sum').remove();
+                    $("#group_dyn_course_fee").append("<input type='hidden' id='payment_sum' value='" + course.cost + "'>");
+
+                    $('#selected_course').remove();
+                    $("#group_dyn_course_fee").append("<input type='hidden' id='selected_course' value='" + courseid + "'>");
+
+                    $('#selected_slot').remove();
+                    $("#group_dyn_course_fee").append("<input type='hidden' id='selected_slot' value='" + slotid + "'>");
+
+                    $('#group_course_fee').show();
+
+                    $('#group_err').html('');
+                });
+            });
+        }
+    });
+
 
     $("#programs").change(function () {
         var url = "https://" + domain + "/functionality/php/get_school_programs_slots.php";
@@ -2397,6 +2598,9 @@ $(document).ready(function () {
     $("body").click(function (event) {
         console.log('Element clicked: ' + event.target.id);
 
+        if (event.target.id == 'next_group_payment') {
+            verify_barintree_group_registration();
+        }
 
 
         if (event.target.id == 'make_already_registered_payment') {

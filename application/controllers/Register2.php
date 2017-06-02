@@ -72,6 +72,40 @@ class Register2 extends CI_Controller {
         $this->load->view('footer_view');
     }
 
+    function group_register() {
+        $form = $this->register_model->get_group_register_form();
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('group_register_view1', $data);
+        $this->load->view('footer_view');
+    }
+
+    function get_group_users_block() {
+        $total = $_POST['total'];
+        $users = $this->register_model->get_group_users_block($total);
+        echo $users;
+    }
+
+    function get_group_course_fee() {
+        $courseid = $_POST['courseid'];
+        $slotid = $_POST['slotid'];
+        $total = $_POST['total'];
+        $fee = $this->register_model->get_group_course_fee($courseid, $slotid, $total);
+        echo $fee;
+    }
+
+    function is_group_exists() {
+        $name = $_POST['name'];
+        $status = $this->register_model->is_group_exists($name);
+        echo $status;
+    }
+
+    function is_username_exists() {
+        $email = $_POST['email'];
+        $status = $this->register_model->is_username_exists($email);
+        echo $status;
+    }
+
     function any_pay() {
         $user = new stdClass();
         $user->userid = $this->uri->segment(3);
@@ -84,6 +118,24 @@ class Register2 extends CI_Controller {
         $data = array('form' => $form);
         $this->load->view('header_view');
         $this->load->view('any_pay_view', $data);
+        $this->load->view('footer_view');
+    }
+
+    function group_payment_card() {
+        $regdata = $this->uri->segment(3);
+        $form = $this->register_model->get_braintree_group_payment_form($regdata);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('group_register_view2', $data);
+        $this->load->view('footer_view');
+    }
+
+    function group_payment_paypal() {
+        $regdata = $this->uri->segment(3);
+        $form = $this->register_model->get_paypal_group_payment_form($regdata);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('group_paypal_payment', $data);
         $this->load->view('footer_view');
     }
 
@@ -111,6 +163,15 @@ class Register2 extends CI_Controller {
         $data = array('form' => $form);
         $this->load->view('header_view');
         $this->load->view('register_view', $data);
+        $this->load->view('footer_view');
+    }
+
+    function receive_paypal_group_register_payment() {
+        $payment = $_REQUEST;
+        $form = $this->register_model->process_paypal_group_payment($payment);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('receive_paypal_group_payment', $data);
         $this->load->view('footer_view');
     }
 

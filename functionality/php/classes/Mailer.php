@@ -320,7 +320,7 @@ class Mailer {
             </tr> 
 
             <tr>
-            <td colspan='2' align='left'>This certification has been renewed</td>
+            <td colspan='2' align='left'>This certification have been renewed</td>
             </tr> 
 
             </table></body></html>";
@@ -482,7 +482,7 @@ class Mailer {
             </tr> 
 
             <tr>
-            <td colspan='2' align='left'>This certification has been renewed</td>
+            <td colspan='2' align='left'>This certification have been renewed</td>
             </tr> 
 
             </table></body></html>";
@@ -538,6 +538,155 @@ class Mailer {
         return $list;
     }
 
+    function get_group_students2($users, $groupname) {
+        $list = "";
+
+        $list.="<tr style='font-weight:bold;'>";
+        $list.="<td>Group name:</td><td>$groupname</td>";
+        $list.="</tr>";
+
+        foreach ($users as $user) {
+            $list.="<tr>";
+            $list.="<td>First name</td><td>$user->fname</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td>Last name</td><td>$user->lname</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td>Email</td><td>$user->email</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td>Phone</td><td>$user->phone</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td colspan='2'><br></td>";
+            $list.="</tr>";
+        } // end foreach
+        return $list;
+    }
+
+    function send_new_group_payment_confirmation_message($buyer, $users, $printed_data = null) {
+        $list = "";
+        $venue = $this->get_classs_info($buyer);
+        $students = $this->get_group_students2($users, $buyer->groupname);
+        $course_name = $this->get_course_name($buyer);
+        $course_cost = $this->get_course_cost($buyer);
+        if ($buyer->slotid > 0) {
+            $ws_cost = $this->get_workshop_cost($buyer->slotid);
+        } // end if $user->slotid>0
+        else {
+            $ws_cost = 0;
+        } // end else
+        $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
+        $students_num = $buyer->total;
+        $catid = $this->get_course_category($buyer);
+
+        // **************** Presentation level ***********************
+        $list.= "<!DOCTYPE HTML><html><head><title>Group registration</title>";
+        $list.="</head>";
+        $list.="<body><br/><br/><br/><br/>";
+        $list.="<div class='datagrid'>";
+
+        $list.="<table style='table-layout: fixed;' width='360'>
+        <thead>";
+
+        if ($printed_data == NULL) {
+            if ($catid == 5) {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
+                $list.="</tr>";
+            } // end if
+            else {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+                $list.="</tr>";
+            } // end else
+        } // end if $printed_data == NULL
+
+
+        $list.="</thead>
+        <tbody>";
+
+        $list.=$students;
+
+        $list.="<tr style='background-color:#F5F5F5;'>
+        <td>Total students</td><td>$students_num</td>
+        </tr>
+        
+        <tr style=''>
+        <td colspan='2' style='font-weight:bold;'><br>Billing info</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>First name</td><td>$buyer->firstname</td>
+        </tr>
+        
+        <tr>
+        <td>Last name</td><td>$buyer->lastname</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Email</td><td>$buyer->email</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Phone</td><td>$buyer->phone</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Applied Progarm</td><td>$course_name</td>
+        </tr>
+        
+        <tr>
+        <td>Program fee</td><td>$$cost</td>
+        </tr>";
+
+        if (property_exists($buyer, 'payment_amount')) {
+            date_default_timezone_set("America/New_York");
+            $date = date('m-d-Y h:i:s', time());
+            if ($buyer->ptype == 'card') {
+                $list.="<tr style='background-color:#F5F5F5;'>
+            <td>Payment status: </td><td>Paid by card: $$buyer->payment_amount</td>
+            </tr>";
+            } // end if
+            else {
+                $list.="<tr style='background-color:#F5F5F5;'>
+            <td>Payment status: </td><td>Paid by paypal: $$buyer->payment_amount</td>
+            </tr>";
+            } // end else
+
+            $list.="<tr style='background-color:#F5F5F5;'>";
+            $list.="<td>Order Date:</td><td>$date</td>";
+            $list.="</tr>";
+        } // end if $payment_amount != null
+
+        $list.="<tr>";
+        $list.="<td>Class info</td><td>$venue</td>";
+        $list.="</tr>";
+
+        if ($catid == 2) {
+            $list.="<tr style=''>";
+            $list.="<td colspan='2'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
+            $list.="</tr>";
+        }
+
+        $list.="</tbody>
+        </table>
+        </div>";
+        $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
+        $list.="</body></html>";
+
+        $subject = "Medical2 - Group Registration";
+        $recipient = $buyer->email;
+        $payment_amount = $buyer->payment_amount;
+        $this->send_signup_confirmation_email($subject, $list, $recipient, $payment_amount);
+        return $list;
+    }
+
     function send_group_payment_message($user, $printed_data = null) {
         $list = "";
         $venue = $this->get_classs_info($user);
@@ -545,7 +694,7 @@ class Mailer {
         $students = $this->get_group_students($groupname);
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1121,7 +1270,7 @@ class Mailer {
         $list.="<br/><p>Dear $payment->card_holder!</p>";
         if ($group == null) {
             if ($free == null) {
-                $list.="<p>Payment of $$payment->sum has been received. Thank you. Your account is active now.</p>";
+                $list.="<p>Payment of $$payment->sum have been received. Thank you. Your account is active now.</p>";
             } // end if $free == null
             else {
                 $list.="<p>You got free access to the system. Your account is active now.</p>";
@@ -1129,7 +1278,7 @@ class Mailer {
         } // end if $group==null
         else {
             if ($free == null) {
-                $list.="<p>Payment of $$payment->sum has been received. Thank you. All your group accounts are active now.</p>";
+                $list.="<p>Payment of $$payment->sum have been received. Thank you. All your group accounts are active now.</p>";
             } // end if $free == null
             else {
                 $list.="<p>Your group members got free access to the system. All your group accounts are active now.</p>";
@@ -1206,7 +1355,7 @@ class Mailer {
         </tr> 
         
         <tr>
-        <td colspan='2' align='left'>This certification has been renewed</td>
+        <td colspan='2' align='left'>This certification have been renewed</td>
         </tr> 
         
         </table>";
@@ -1244,7 +1393,7 @@ class Mailer {
         $list = "";
         $list.="<html><body>";
         $list.="<br/><p>Dear $user->firstname $user->lastname!</p>";
-        $list.="<p>Payment for your group membership has been received. Thank you. Your account is active now.</p>";
+        $list.="<p>Payment for your group membership have been received. Thank you. Your account is active now.</p>";
         $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
         $list.="<p>Best regards,</p>";
         $list.="<p>Support team.</p>";
@@ -1482,7 +1631,7 @@ class Mailer {
             return false;
         } // end if !$mail->send()
         else {
-            echo 'Message has been sent to ' . $addressC;
+            echo 'Message have been sent to ' . $addressC;
             return true;
         }
     }
