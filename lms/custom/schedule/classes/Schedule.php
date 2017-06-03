@@ -10,6 +10,9 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/balance/classes/Balance.ph
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/certificates/classes/Certificates.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/PDF_Label.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/twilio/vendor/autoload.php';
+
+use Twilio\Rest\Client;
 
 class Schedule extends Util {
 
@@ -318,6 +321,7 @@ class Schedule extends Util {
             $list.="<span class='span2'><a href='#' id='send' onClick='return false;'>Send certificates</a></span>";
             $list.="<span class='span2'><a href='#' id='add_students' onClick='return false;'>Add students</a></span>";
             $list.="<span class='span2'><a href='#' id='send_bulk_email' onClick='return false;'>Send email</a></span>";
+            $list.="<span class='span2'><a href='#' id='send_bulk_text' onClick='return false;'>Send text message</a></span>";
             $list.="</div>";
             $list.= "<div class='container-fluid' style='text-align:center;'>";
             $list.="<span class='span12' id='sch_err' style='color:red;'></span>";
@@ -1459,6 +1463,42 @@ class Schedule extends Util {
         return $list;
     }
 
+    function get_send_text_message_dialog($userslist) {
+        $list = "";
+        $list.="<div id='myModal' class='modal fade' style='width:675px;left:45%;'>
+        <div class='modal-dialog'>
+            <div class='modal-content' style=''>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Send Text message</h4>
+                </div>
+                <div class='modal-body' style=''>
+                
+                <input type='hidden' id='users' value='$userslist'>
+                
+                <div class='container-fluid' style='text-align:center;'>
+                <textarea id='sms_text' rows='3' style='width:575px;'></textarea>
+                </div>
+                
+                <div class='container-fluid' style='text-align:center;display:none;' id='message_wait'>
+                <span class='span6' ><img src='https://medical2.com/assets/img/ajax.gif' /></span>
+                </div>
+               
+                <div class='container-fluid' style='text-align:center;'>
+                 <span class='span6' id='sms_err'></span>
+                </div>
+               
+                <div class='row-fliud'>
+                <span style='padding-left:15px;'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                <span><button type='button' class='btn btn-primary' id='send_schedule_bulk_text'>OK</button></span>
+                </div>
+               
+             </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
     function send_schedule_bulk_email($msg) {
         $mailer = new Mailer();
         $users_arr = explode(',', $msg->users);
@@ -1473,6 +1513,32 @@ class Schedule extends Util {
                 $mailer->send_schedule_bulk_email($item);
             } // end foreach
         } // end if count($users_arr)>0
+    }
+
+    function send_schedule_bulk_sms($msg) {
+        $text = $msg->text;
+        $users_arr = explode(',', $msg->users);
+        if (count($users_arr) > 0) {
+            foreach ($users_arr as $userid) {
+                $userdata = $this->get_user_address_data($userid);
+                $phone = '+' . $userdata->phone1;
+                $this->send_single_sms_item($userid, $text, $phone);
+            } // end foreach
+        }
+    }
+
+    function send_single_sms_item($id, $body, $to) {
+        $account_sid = 'AC8ac954cf1be212f36af3726fb881c177';
+        $auth_token = 'd7e767e2283c2a6b8e3fae4a134fe458';
+        $client = new Client($account_sid, $auth_token);
+        $client->account->messages->create($to, array(
+            'From' => "+14075025255",
+            'Body' => $body));
+
+        $now = time();
+        $query = "insert into mdl_sms_log (userid, body, added) "
+                . "values ($id, '$body', '$now')";
+        $this->db->query($query);
     }
 
     function get_slot_student_notes($slotid) {
