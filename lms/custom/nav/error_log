@@ -1,0 +1,10 @@
+[04-Apr-2016 02:44:12 Pacific/Wallis] PHP Fatal error:  Call to a member function rowCount() on a non-object in /home/cnausa/public_html/lms/class.pdo.database.php on line 41
+[04-Apr-2016 02:46:00 Pacific/Wallis] PHP Fatal error:  Call to a member function rowCount() on a non-object in /home/cnausa/public_html/lms/class.pdo.database.php on line 38
+[04-Apr-2016 02:46:22 Pacific/Wallis] PHP Fatal error:  Call to a member function rowCount() on a non-object in /home/cnausa/public_html/lms/class.pdo.database.php on line 38
+[01-Jun-2016 05:23:55 Pacific/Wallis] Default exception handler: Coding error detected, it must be fixed by a programmer: PHP catchable fatal error Debug: Object of class stdClass could not be converted to string
+Error code: codingerror
+* line 418 of /lib/setuplib.php: coding_exception thrown
+* line 499 of /custom/nav/classes/navClass.php: call to default_error_handler()
+* line 5 of /custom/nav/renew_certificate.php: call to navClass->renew_certificate()
+
+[01-Jun-2016 18:20:21 Pacific/Wallis] PHP Fatal error:  Function name must be a string in /home/cnausa/public_html/lms/custom/nav/classes/navClass.php on line 471

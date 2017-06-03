@@ -7177,12 +7177,13 @@ $(document).ready(function () {
             if (msg != '') {
                 $('#sms_err').html('');
                 if (confirm('Send text message to current user?')) {
+                    var user = {to: phone, msg: msg};
                     var url = "/lms/custom/twilio/send_sms_to_profile_user.php";
-                    $.post(url, {id: id, to: phone, body: msg}).done(function (data) {
+                    $.post(url, {body: msg, to: phone}).done(function (data) {
                         console.log(data);
-                        $("[data-dismiss=modal]").trigger({type: "click"});
                     });
 
+                    $("[data-dismiss=modal]").trigger({type: "click"});
                 } // end if
             } // endbif msg!=''
             else {
