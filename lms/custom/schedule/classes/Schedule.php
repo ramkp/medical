@@ -1521,7 +1521,7 @@ class Schedule extends Util {
         if (count($users_arr) > 0) {
             foreach ($users_arr as $userid) {
                 $userdata = $this->get_user_address_data($userid);
-                $phone = '+' . $userdata->phone1;
+                $phone = $userdata->phone1;
                 $this->send_single_sms_item($userid, $text, $phone);
             } // end foreach
         }
