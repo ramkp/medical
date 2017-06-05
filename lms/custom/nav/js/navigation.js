@@ -3985,11 +3985,47 @@ $(document).ready(function () {
             });
         }
 
+        if (event.target.id == 'edit_cat') {
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url).done(function () {
+                var url = "https://" + domain + "/lms/custom/faq/get_edit_cat_dialog.php";
+                var request = {id: 1};
+                $.post(url, request).done(function (data) {
+                    $("body").append(data);
+                    $("#myModal").modal('show');
+                });
+            }).fail(function () {
+                console.log('Failed to load bootstrap.min.js');
+            });
+        }
+
+        if (event.target.id == 'update_cat_button') {
+            var catid = $('#faq_categories2').val();
+            var newname = $('#new_cat_name').val();
+            if (catid > 0 && newname != '') {
+                $('#faq_err').html('');
+                if (confirm('Update category name?')) {
+                    var cat = {id: catid, name: newname};
+                    var url = "https://" + domain + "/lms/custom/faq/update_category_name.php";
+                    $.post(url, {cat: JSON.stringify(cat)}).done(function () {
+                        $("[data-dismiss=modal]").trigger({type: "click"});
+                        $('#faq').trigger({type: "click"});
+                    });
+                } // end if confirm
+            } // end if
+            else {
+                $('#faq_err').html('Please select category to edit');
+            }
+
+        }
+
+
+
         if (event.target.id == 'del_cat') {
             var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
             $.getScript(js_url).done(function () {
                 var url = "https://" + domain + "/lms/custom/faq/get_del_cat_dialog.php";
-                var request = {id: id};
+                var request = {id: 1};
                 $.post(url, request).done(function (data) {
                     $("body").append(data);
                     $("#myModal").modal('show');

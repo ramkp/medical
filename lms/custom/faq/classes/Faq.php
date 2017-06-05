@@ -93,6 +93,7 @@ class Faq extends Util {
             $list .= "<span class='span6'>$categories</span>";
             $list.="<span class='span1'><a href='#' onClick='return false;'><img id='faq_add' title='Add question' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/add'></a></span>";
             $list.="<span class='span1'><a href='#' onCLick='return false;'><img id='faq_add_cat' src='https://medical2.com/lms/theme/image.php/lambda/core/1479536192/i/withsubcat' title='Add category'></a></span>";
+            $list.="<span class='span1'><a href='#' onCLick='return false;'><img id='edit_cat' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/edit' title='Edit category'></a></span>";
             $list.="<span class='span1'><a href='#' onClick='return false'><img id='del_cat' src='https://medical2.com/lms/theme/image.php/lambda/core/1468523658/t/delete' title='Delete category'></a></span>";
             $list .= "</div>";
             $list .= "<div class='container-fluid' style='text-align:left;'>";
@@ -209,6 +210,49 @@ class Faq extends Util {
 		<div class='modal-footer'>
 		<span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel_faq_edit'>Cancel</button></span>
 		<span align='center'><button type='button' class='btn btn-primary'  id='add_cat'>Ок</button></span>
+		</div>
+		</div>
+		</div>
+		</div>";
+
+        return $list;
+    }
+
+    function get_edit_cat_dialog() {
+        $list = "";
+
+        $cats = $this->get_categories_list(TRUE);
+
+        $list.="<div id='myModal' class='modal fade'>
+		<div class='modal-dialog modal-lg'>
+		<div class='modal-content'>
+		<div class='modal-header'>
+		<h4 class='modal-title'>Delete FAQ category</h4>
+		</div>
+		<div class='modal-body'>
+		
+		<div class='container-fluid' style='text-align:left;'>
+		<table align='center'>
+		
+		<tr>
+		<td style='padding:15px;'><span class='span1'>Category:*</span><span class='span3'>$cats</span></td>
+		</tr>
+                
+                <tr>
+		<td style='padding:15px;'><span class='span1'>Name:*</span><span class='span3'><input type='text' id='new_cat_name' style='width:265px;'></span></td>
+		</tr>
+		
+		<tr>
+		<td colspan='2' style='padding:15px;'><span style='text-align:center' id='faq_err'></span></td>
+		</tr>
+		
+		</table>
+		
+		</div>
+		
+		<div class='modal-footer'>
+		<span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel_faq_edit'>Cancel</button></span>
+		<span align='center'><button type='button' class='btn btn-primary'  id='update_cat_button'>Ок</button></span>
 		</div>
 		</div>
 		</div>
@@ -355,6 +399,13 @@ class Faq extends Util {
         $this->db->query($query);
         $list = 'ok';
         return $list;
+    }
+
+    function update_category_name($cat) {
+        $id = $cat->id;
+        $name = $cat->name;
+        $query = "update mdl_faq_category set name='$name' where id=$id";
+        $this->db->query($query);
     }
 
 }
