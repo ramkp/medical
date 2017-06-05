@@ -34,6 +34,8 @@ class Dashboard extends Util {
     public $required_fields;
     public $one_year;
     public $three_year;
+    public $free_courses;
+    public $free_users;
 
     function __construct() {
         parent::__construct();
@@ -53,10 +55,14 @@ class Dashboard extends Util {
             'city',
             'zip',
             'state');
+        $this->free_courses = array(73);
+        $this->free_users = array(11772, 11773, 13734);
     }
 
     function is_user_paid() {
-        if ($this->user->id == 11772 || $this->user->id == 11773 || $this->user->id == 13734) {
+        $currencourse = $this->course->id;
+        $currentuser = $this->user->id;
+        if (in_array($currencourse, $this->free_courses) || in_array($currentuser, $this->free_users)) {
             return 1;
         } // end if $this->user->id==11772
         $status = 0;
