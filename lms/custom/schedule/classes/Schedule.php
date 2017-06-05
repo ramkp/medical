@@ -1350,7 +1350,7 @@ class Schedule extends Util {
 
     function get_course_slots2($courseid) {
         $list = "";
-        $now = time() - (86400 * 30);
+        $now = time() - (86400 * 65);
         $schedulerid = $this->get_course_scheduler($courseid);
         $query = "select * from mdl_scheduler_slots "
                 . "where schedulerid=$schedulerid "
@@ -1367,7 +1367,7 @@ class Schedule extends Util {
                 $list.="<div class='container-fluid'>";
                 $list.="<span class='span4'>$location_arr[1], $location_arr[0]</span>";
                 $list.="<span class='span2'>$starttime </span>";
-                $list.="<span class='span2'>Teacher  $teacherdata->firstname $teacherdata->lastname</span>";
+                $list.="<span class='span4'>Teacher:  $teacherdata->firstname $teacherdata->lastname</span>";
                 $list.="</div>";
             } // end wile 
         } // end if $num > 0
