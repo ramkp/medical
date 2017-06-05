@@ -1348,6 +1348,58 @@ class Schedule extends Util {
         return $id;
     }
 
+    function get_course_slots2($courseid) {
+        $list = "";
+        $now = time() - (86400 * 30);
+        $schedulerid = $this->get_course_scheduler($courseid);
+        $query = "select * from mdl_scheduler_slots "
+                . "where schedulerid=$schedulerid "
+                . "and  starttime>=$now order by starttime desc";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $starttime = date('m-d-Y', $row['starttime']);
+                $location = $row['appointmentlocation'];
+                $location_arr = explode('/', $location);
+                $teacherid = $row['teacherid'];
+                $teacherdata = $this->get_user_address_data($teacherid);
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span4'>$location_arr[1], $location_arr[0]</span>";
+                $list.="<span class='span2'>$starttime </span>";
+                $list.="<span class='span2'>Teacher  $teacherdata->firstname $teacherdata->lastname</span>";
+                $list.="</div>";
+            } // end wile 
+        } // end if $num > 0
+        return $list;
+    }
+
+    function get_course_schedule($courseid) {
+        $list = "";
+        $coursename = $this->get_course_name($courseid);
+        $slots = $this->get_course_slots2($courseid);
+        $list.="<div class='panel panel-default'>";
+        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>$coursename</h5></div>";
+        $list.="<div class='panel-body'>";
+        $list.=$slots;
+        $list.="</div>";
+        $list.="</div>";
+        return $list;
+    }
+
+    function get_schedule_page_for_office_manager() {
+        $list = "";
+        $query = "select * from mdl_course where cost>0";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courses[] = $row['id'];
+        }
+        foreach ($courses as $courseid) {
+            $list.=$this->get_course_schedule($courseid);
+        }
+        return $list;
+    }
+
     function get_scheduled_courses() {
 
         $list = "";
@@ -1396,19 +1448,26 @@ class Schedule extends Util {
 
     function get_schedule_page() {
         $list = "";
-        $courses = $this->get_scheduled_courses();
-        $list.="<div class='panel panel-default'>";
-        $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Workshops schedule</h5></div>";
-        $list.="<div class='panel-body'>";
+        $currentuser = $this->user->id;
+        if ($currentuser == 2 || $currentuser == 234) {
+            $courses = $this->get_scheduled_courses();
+            $list.="<div class='panel panel-default'>";
+            $list.="<div class='panel-heading'style='text-align:left;'><h5 class='panel-title'>Workshops schedule</h5></div>";
+            $list.="<div class='panel-body'>";
 
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span12'>$courses</span>";
-        $list.="</div>";
+            $list.="<div class='container-fluid' style='text-align:left;'>";
+            $list.="<span class='span12'>$courses</span>";
+            $list.="</div>";
 
-        $list.="</div>";
-        $list.="</div>";
-
-
+            $list.="</div>";
+            $list.="</div>";
+        } // end if
+        else {
+            $systemrole = $this->get_system_wide_roles($currentuser);
+            if ($systemrole == 9) {
+                $list.=$this->get_schedule_page_for_office_manager();
+            } // end if
+        } // end else
         return $list;
     }
 

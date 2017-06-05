@@ -4016,7 +4016,6 @@ $(document).ready(function () {
             else {
                 $('#faq_err').html('Please select category to edit');
             }
-
         }
 
 
