@@ -113,7 +113,8 @@ $host = $_SERVER['HTTP_HOST'];
         ?>
 
         <title><?php echo $title; ?></title>
-        <link rel="shortcut icon" href="https://<?php echo $host ?>/lms/theme/image.php/lambda/theme/1451892772/favicon" />
+        <!--<link rel="shortcut icon" href="https://<?php echo $host ?>/lms/theme/image.php/lambda/theme/1451892772/favicon" />-->
+        <link rel="shortcut icon" href="https://<?php echo $host ?>/assets/icons/logo3.png" />
         <meta https-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="keywords" content="<?php echo $meta; ?>" />
         <meta name="description" content="<?php echo $desc; ?>" />
