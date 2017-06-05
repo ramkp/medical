@@ -1348,6 +1348,34 @@ class Schedule extends Util {
         return $id;
     }
 
+    function get_course_slot_students($slotid) {
+        $list = "";
+        $query = "select * from mdl_scheduler_appointment where slotid=$slotid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $sutdentid = $row['studentid'];
+                $studentdata = $this->get_user_details($sutdentid);
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span2'>$studentdata->firstname</span>";
+                $list.="<span class='span2'>$studentdata->lastname</span>";
+                $list.="<span class='span3'>$studentdata->email</span>";
+                $list.="<span class='span3'>$studentdata->phone1</span>";
+                $list.="</div>";
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span10'><hr/></span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
+        else {
+            $list.="<div class='container-fluid'>";
+            $list.="<span class='span8'>There are no students registered</span>";
+            $list.="</div>";
+        } // end else
+        return $list;
+    }
+
     function get_course_slots2($courseid) {
         $list = "";
         $now = time() - (86400 * 65);
@@ -1363,11 +1391,17 @@ class Schedule extends Util {
                 $location = $row['appointmentlocation'];
                 $location_arr = explode('/', $location);
                 $teacherid = $row['teacherid'];
+                $slotstudents = $this->get_course_slot_students($row['id']);
                 $teacherdata = $this->get_user_address_data($teacherid);
-                $list.="<div class='container-fluid'>";
+
+                $list.="<div class='container-fluid' style='font-weight:bold;background-color:#f2f2f2;'>";
                 $list.="<span class='span4'>$location_arr[1], $location_arr[0]</span>";
                 $list.="<span class='span2'>$starttime </span>";
                 $list.="<span class='span4'>Teacher:  $teacherdata->firstname $teacherdata->lastname</span>";
+                $list.="</div>";
+
+                $list.="<div class='container-fluid'>";
+                $list.="<span class='span12'>$slotstudents</span>";
                 $list.="</div>";
             } // end wile 
         } // end if $num > 0
