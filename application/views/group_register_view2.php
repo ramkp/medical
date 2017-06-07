@@ -226,8 +226,8 @@ echo $form;
 
                                     $('#err').html('');
                                     $('#ajax_loading_payment').show();
-                                    $('#make_any_pay_payment').prop('disabled', true);
-                                    $('#make_any_pay_payment').text('Processing request');
+                                    $('#make_group_registration_payment').prop('disabled', true);
+                                    $('#make_group_registration_payment').prop('value', 'Processing request');
                                     var url = '/lms/custom/paypal/make_group_registration_payment.php';
                                     var data = $('#register_data').val();
                                     var courseid = $('#courseid').val();
@@ -241,8 +241,8 @@ echo $form;
                                         courseid: courseid};
                                     $.post(url, {trans: JSON.stringify(trans)}).done(function (status) {
                                         $('#ajax_loading_payment').hide();
-                                        $('#make_any_pay_payment').prop('disabled', false);
-                                        $('#make_any_pay_payment').text('I Agree, Submit');
+                                        $('#make_group_registration_payment').prop('disabled', false);
+                                        $('#make_group_registration_payment').prop('value', 'I Agree, Submit');
                                         $('#err').html("<span style='color:red;font-size:bold;'>" + status + "</span>");
                                     }); // end of post
                                 });

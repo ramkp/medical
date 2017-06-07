@@ -215,7 +215,7 @@ echo $form;
                                     $('#err').html('');
                                     $('#ajax_loading_payment').show();
                                     $('#make_register_braintree_pyament').prop('disabled', true);
-                                    $('#make_register_braintree_pyament').text('Processing request');
+                                    $('#make_register_braintree_pyament').prop('value', 'Processing request');
                                     var url = '/lms/custom/paypal/create_transaction.php';
                                     var amount = $('#amount').val();
                                     var user = $('#user').val();
@@ -224,7 +224,7 @@ echo $form;
                                     $.post(url, {trans: JSON.stringify(trans)}).done(function (status) {
                                         $('#ajax_loading_payment').hide();
                                         $('#make_register_braintree_pyament').prop('disabled', false);
-                                        $('#make_register_braintree_pyament').text('I Agree, Submit');
+                                        $('#make_register_braintree_pyament').prop('value', 'I Agree, Submit');
                                         if (status) {
                                             var msg = "Payment is successful. Thank you! You can print your registration data <a href='https://medical2.com/lms/custom/invoices/registrations/" + email + ".pdf' target='_blank'>here.</a>";
                                             $('#err').html("<span style='color:red;font-size:bold;'>" + msg + "</span>");
