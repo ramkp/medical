@@ -3,6 +3,7 @@
 ini_set('display_errors', '1');
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Api/vendor/autoload.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
+require_once ('/home/cnausa/public_html/lms/class.pdo.database.php');
 
 use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
@@ -10,18 +11,20 @@ use net\authorize\api\controller as AnetController;
 class ProcessPayment {
 
     private $AUTHORIZENET_LOG_FILE;
-    //private $LOGIN_ID = '6cUTfQ5238'; // sandbox data
-    //private $TRANSACTION_KEY = '5bN8q5WT3qa257p9'; // sandbox data
+    public $SANDBOX_LOGIN_ID = '6cUTfQ5238'; // sandbox data
+    public $SANDBOX_TRANSACTION_KEY = '5bN8q5WT3qa257p9'; // sandbox data
     private $LOGIN_ID = '83uKk2VcBBsC'; // production data
     private $TRANSACTION_KEY = '23P447taH34H26h5'; // production data
     public $period = 28; // 28 days of installment 
     public $log_file_path;
     public $transaction_log_path;
+    public $db;
 
     function __construct() {
         $this->AUTHORIZENET_LOG_FILE = 'phplog';
         $this->log_file_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/failed_transactions.log';
         $this->transaction_log_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/transactions.log';
+        $this->db = new pdo_db();
     }
 
     function get_failed_transaction_report($respone_object, $order_object) {
@@ -143,7 +146,7 @@ class ProcessPayment {
         return $merchantAuthentication;
     }
 
-    function prepare_order($order) {   
+    function prepare_order($order) {
         $exp_date = $order->cds_cc_exp_year . '-' . $order->cds_cc_exp_month;
         $creditCard = new AnetAPI\CreditCardType();
         $creditCard->setCardNumber($order->cds_cc_number);
@@ -582,22 +585,6 @@ class ProcessPayment {
         $refId = 'ref' . time();
         $date = $this->prepareExpirationDate($exp_date);
 
-        /*
-         * 
-          $transaction = new AuthorizeNetTransaction;
-          $transaction->amount = $amount;
-          $transaction->customerProfileId = $customerProfileId;
-          $transaction->customerPaymentProfileId = $paymentProfileId;
-          $transaction->transId = $transid; // original transaction ID
-
-          $response = $request->createCustomerProfileTransaction("Refund", $transaction);
-          $transactionResponse = $response->getTransactionResponse();
-
-          $transactionId = $transactionResponse->transaction_id;
-         * 
-         */
-
-
         // Create the payment data for a credit card
         $creditCard = new AnetAPI\CreditCardType();
         //$creditCard->setCardNumber(base64_decode($card_last_four));
@@ -641,6 +628,124 @@ class ProcessPayment {
             return FALSE;
         }
         return $response;
+    }
+
+    /*     * ************** Code related to new hosted form *************** */
+
+    function getAnAcceptPaymentPage($userrequest) {
+
+        //$merchantAuthentication = $this->sandbox_authorize();
+        $merchantAuthentication = $this->authorize();
+        $token = $userrequest->token;
+        $fname = $userrequest->first_name;
+        $lname = $userrequest->last_name;
+        $custID = $userrequest->custid;
+        $amount = $userrequest->amount;
+        $addr = $userrequest->addr;
+        $city = $userrequest->city;
+        $stateid = $userrequest->state;  // it is id
+        $state = $this->get_state_name_by_id($stateid);
+        $zip = $userrequest->zip;
+        $email = $userrequest->email;
+        $phone = $userrequest->phone;
+        $item = $userrequest->program;
+
+        //create a transaction
+        $transactionRequestType = new AnetAPI\TransactionRequestType();
+        $transactionRequestType->setTransactionType("authCaptureTransaction");
+        $transactionRequestType->setAmount($amount);
+        $refId = 'ref' . $token;
+        $transactionRequestType->setRefTransId($refId);
+
+        // Order info
+        $order = new AnetAPI\OrderType();
+        $order->setDescription($item);
+        $transactionRequestType->setOrder($order);
+
+        // Ship info
+        $shipTo = new AnetAPI\NameAndAddressType();
+        $shipTo->setFirstName($fname);
+        $shipTo->setLastName($lname);
+        $shipTo->setCompany('Student');
+        $shipTo->setAddress($addr);
+        $shipTo->setState($state);
+        $shipTo->setCity($city);
+        $shipTo->setZip($zip);
+        $transactionRequestType->setShipTo($shipTo);
+
+        // Customer info
+        $customer = new AnetAPI\CustomerDataType();
+        $customer->setEmail($email);
+        $customer->setId($custID);
+        $transactionRequestType->setCustomer($customer);
+
+        // Billing info
+        $billTo = new AnetAPI\CustomerAddressType();
+        $billTo->setCompany('Student');
+        $billTo->setEmail($email);
+        $transactionRequestType->setBillTo($billTo);
+
+        // Set Hosted Form options    
+        $setting1 = new AnetAPI\SettingType();
+        $setting1->setSettingName("hostedPaymentButtonOptions");
+        $setting1->setSettingValue("{\"text\": \"Pay\"}");
+
+        $setting2 = new AnetAPI\SettingType();
+        $setting2->setSettingName("hostedPaymentOrderOptions");
+        $setting2->setSettingValue("{\"show\": true}");
+
+        $setting3 = new AnetAPI\SettingType();
+        $setting3->setSettingName("hostedPaymentReturnOptions");
+        $setting3->setSettingValue("{\"url\": \"https://medical2.com/register2/proceed_auth_card\", \"cancelUrl\": \"https://medical2.com/register2/cancel_auth_card\", \"showReceipt\": false}");
+
+        $setting4 = new AnetAPI\SettingType();
+        $setting4->setSettingName("hostedPaymentIFrameCommunicatorUrl");
+        $setting4->setSettingValue("{\"url\": \"https://medical2.com/communicator.html\"}");
+
+        $setting5 = new AnetAPI\SettingType();
+        $setting5->setSettingName("cardCodeRequired");
+        $setting5->setSettingValue(true);
+        
+        // Build transaction request    
+        $request = new AnetAPI\GetHostedPaymentPageRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setTransactionRequest($transactionRequestType);
+        $request->addToHostedPaymentSettings($setting1);
+        $request->addToHostedPaymentSettings($setting2);
+        $request->addToHostedPaymentSettings($setting3);
+        $request->addToHostedPaymentSettings($setting4);
+        //$request->addToHostedPaymentSettings($setting5);
+
+        //execute request
+        $controller = new AnetController\GetHostedPaymentPageController($request);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+            return $response->getToken();
+        } // end if  
+        else {
+            $errorMessages = $response->getMessages()->getMessage();
+            $err_response = $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText();
+            return $err_response;
+        }
+    }
+
+    function get_customer_payments($customerProfileId) {
+        $merchantAuthentication = $this->sandbox_authorize();
+        $request = new AuthorizeNetCIM();
+
+        $response = $request->getCustomerProfile($customerProfileId);
+        print_r($response);   // Will show you the structure of what comes back
+    }
+
+    function get_state_name_by_id($stateid) {
+        $query = "select * from mdl_states where id=$stateid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $state = $row['state'];
+        }
+        return $state;
     }
 
 }

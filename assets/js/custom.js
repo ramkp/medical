@@ -2747,6 +2747,7 @@ $(document).ready(function () {
                         var ptype = $("input:radio[name ='ptype']:checked").val();
                         if (ptype == 'card') {
                             url = 'https://medical2.com/register2/payment_card/' + encoded_user;
+                            //url = 'https://medical2.com/register2/payment_auth_card/' + encoded_user;
                         } // end if ptype=='card'
                         else {
                             url = 'https://medical2.com/register2/payment_paypal/' + encoded_user;

@@ -148,6 +148,38 @@ class Register2 extends CI_Controller {
         $this->load->view('footer_view');
     }
 
+    function payment_auth_single() {
+        $user = $this->uri->segment(3);
+        $form = $this->register_model->get_auth_card_form($user);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('auth_view', $data);
+        $this->load->view('footer_view');
+    }
+
+    function proceed_auth_card() {
+        $response = $this->uri->segment(3);
+        $form = $this->register_model->process_auth_payment($response);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('auth_register_individual', $data);
+        $this->load->view('footer_view');
+    }
+
+    function cancel_auth_card() {
+        $form = $this->register_model->get_cancel_auth_card_payment_page();
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('register_view', $data);
+        $this->load->view('footer_view');
+    }
+
+    function add_individual_registration() {
+        $token = $_REQUEST['token'];
+        echo "Token: " . $token . "<br>";
+        $this->register_model->add_individual_registration($token);
+    }
+
     function payment_paypal() {
         $user = $this->uri->segment(3);
         $form = $this->register_model->get_brain_paypal_form($user);

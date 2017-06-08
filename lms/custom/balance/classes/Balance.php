@@ -106,14 +106,25 @@ class Balance {
         return $list;
     }
 
+    function is_certificate_expired($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $expired = $row['expired'];
+        }
+        return $expired;
+    }
+
     function is_renew_payment($sum, $courseid, $userid, $pdate) {
         $cert_issue_date = $this->has_certificate($courseid, $userid);
+        $expired = $this->is_certificate_expired($courseid);
+        //echo "Expire: ".$expired."<br>";
         if ($cert_issue_date != null) {
-            if (in_array($courseid, $this->career_courses)) {
+            if (in_array($courseid, $this->career_courses) || $expired == 0) {
                 // carrer courses do not have renew payments - it is part of balance
                 $payment = $sum;
             } /// end if in_array($courseid, $this->career_courses
-            if ($pdate > $cert_issue_date) {
+            if ($pdate > $cert_issue_date && $expired == 1) {
                 $payment = 0; // it is renew payment and should not be part of balance
             } // end if in_array($sum, $this->renew_payments
             else {
@@ -124,6 +135,7 @@ class Balance {
             // Certificate is not yet issued, so payment is part of balance
             $payment = $sum;
         } // end else
+        //echo "Returned payment: " . $payment . "<br>";
         return $payment;
     }
 

@@ -535,6 +535,15 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function is_certificate_expired($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $expired = $row['expired'];
+        }
+        return $expired;
+    }
+
     function get_user_card_payments($userid, $courseid) {
         $list = "";
         $b = new Balance();
@@ -550,8 +559,9 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $already_paid = $already_paid + $row['psum'];
+                $expired =$this->is_certificate_expired($courseid);
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
-                if ($certificate_date != null && $certificate_date < $row['pdate']) {
+                if ($certificate_date != null && $certificate_date < $row['pdate'] && $expired==1) {
                     $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
                 } // end if 
                 else {
@@ -587,13 +597,14 @@ class Dashboard extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $already_paid = $already_paid + $row['psum'];
+                $expired=$this->is_certificate_expired($courseid);
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if (!in_array($row['psum'], $this->renew_payments)) {
                     $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
                 } // end if $row['psum']!=$renew_amount
                 else {
                     // Payments are similar to renew, we need to make additional checks
-                    if ($certificate_date != null && $certificate_date < $row['pdate']) {
+                    if ($certificate_date != null && $certificate_date < $row['pdate'] && $expired==1) {
                         $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
                     } // end if 
                     else {

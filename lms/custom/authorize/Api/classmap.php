@@ -1,4 +1,5 @@
 <?php
+
 spl_autoload_extensions(".php"); // comma-separated list
 spl_autoload_register();
 
@@ -7,14 +8,13 @@ spl_autoload_register();
  *
  * @package AuthorizeNet
  */
-
-$baseDir = __DIR__ ;
+$baseDir = __DIR__;
 $libDir    = $baseDir . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR;
+//$libDir = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Api/lib/';
 $sharedDir = $libDir . 'shared' . DIRECTORY_SEPARATOR;
 $vendorDir = $baseDir . '/vendor';
 
 return array(
-
     'Doctrine\Common\Annotations\Annotation' => $vendorDir . '/doctrine/annotations/lib/Doctrine/Common/Annotations/Annotation.php',
     'Doctrine\Common\Annotations\AnnotationException' => $vendorDir . '/doctrine/annotations/lib/Doctrine/Common/Annotations/AnnotationException.php',
     'Doctrine\Common\Annotations\AnnotationReader' => $vendorDir . '/doctrine/annotations/lib/Doctrine/Common/Annotations/AnnotationReader.php',
@@ -182,38 +182,36 @@ return array(
     'PhpOption\None' => $vendorDir . '/phpoption/phpoption/src/PhpOption/None.php',
     'PhpOption\Option' => $vendorDir . '/phpoption/phpoption/src/PhpOption/Option.php',
     'PhpOption\Some' => $vendorDir . '/phpoption/phpoption/src/PhpOption/Some.php',
-
-    'AuthorizeNetAIM'            => $libDir    . 'AuthorizeNetAIM.php',
-    'AuthorizeNetAIM_Response'   => $libDir    . 'AuthorizeNetAIM.php',
-    'AuthorizeNetARB'            => $libDir    . 'AuthorizeNetARB.php',
-    'AuthorizeNetARB_Response'   => $libDir    . 'AuthorizeNetARB.php',
-    'AuthorizeNetAddress'        => $sharedDir . 'AuthorizeNetTypes.php',
-    'AuthorizeNetBankAccount'    => $sharedDir . 'AuthorizeNetTypes.php',
-    'AuthorizeNetCIM'            => $libDir    . 'AuthorizeNetCIM.php',
-    'AuthorizeNetCIM_Response'   => $libDir    . 'AuthorizeNetCIM.php',
-    'AuthorizeNetCP'             => $libDir    . 'AuthorizeNetCP.php',
-    'AuthorizeNetCP_Response'    => $libDir    . 'AuthorizeNetCP.php',
-    'AuthorizeNetCreditCard'     => $sharedDir . 'AuthorizeNetTypes.php',
-    'AuthorizeNetCustomer'       => $sharedDir . 'AuthorizeNetTypes.php',
-    'AuthorizeNetDPM'            => $libDir    . 'AuthorizeNetDPM.php',
-    'AuthorizeNetException'      => $sharedDir . 'AuthorizeNetException.php',
-    'AuthorizeNetLineItem'       => $sharedDir . 'AuthorizeNetTypes.php',
-    'AuthorizeNetPayment'        => $sharedDir . 'AuthorizeNetTypes.php',
+    'AuthorizeNetAIM' => $libDir . 'AuthorizeNetAIM.php',
+    'AuthorizeNetAIM_Response' => $libDir . 'AuthorizeNetAIM.php',
+    'AuthorizeNetARB' => $libDir . 'AuthorizeNetARB.php',
+    'AuthorizeNetARB_Response' => $libDir . 'AuthorizeNetARB.php',
+    'AuthorizeNetAddress' => $sharedDir . 'AuthorizeNetTypes.php',
+    'AuthorizeNetBankAccount' => $sharedDir . 'AuthorizeNetTypes.php',
+    'AuthorizeNetCIM' => $libDir . 'AuthorizeNetCIM.php',
+    'AuthorizeNetCIM_Response' => $libDir . 'AuthorizeNetCIM.php',
+    'AuthorizeNetCP' => $libDir . 'AuthorizeNetCP.php',
+    'AuthorizeNetCP_Response' => $libDir . 'AuthorizeNetCP.php',
+    'AuthorizeNetCreditCard' => $sharedDir . 'AuthorizeNetTypes.php',
+    'AuthorizeNetCustomer' => $sharedDir . 'AuthorizeNetTypes.php',
+    'AuthorizeNetDPM' => $libDir . 'AuthorizeNetDPM.php',
+    'AuthorizeNetException' => $sharedDir . 'AuthorizeNetException.php',
+    'AuthorizeNetLineItem' => $sharedDir . 'AuthorizeNetTypes.php',
+    'AuthorizeNetPayment' => $sharedDir . 'AuthorizeNetTypes.php',
     'AuthorizeNetPaymentProfile' => $sharedDir . 'AuthorizeNetTypes.php',
-    'AuthorizeNetRequest'        => $sharedDir . 'AuthorizeNetRequest.php',
-    'AuthorizeNetResponse'       => $sharedDir . 'AuthorizeNetResponse.php',
-    'AuthorizeNetSIM'            => $libDir    . 'AuthorizeNetSIM.php',
-    'AuthorizeNetSIM_Form'       => $libDir    . 'AuthorizeNetSIM.php',
-    'AuthorizeNetSOAP'           => $libDir    . 'AuthorizeNetSOAP.php',
-    'AuthorizeNetTD'             => $libDir    . 'AuthorizeNetTD.php',
-    'AuthorizeNetTD_Response'    => $libDir    . 'AuthorizeNetTD.php',
-    'AuthorizeNetTransaction'    => $sharedDir . 'AuthorizeNetTypes.php',
-    'AuthorizeNetXMLResponse'    => $sharedDir . 'AuthorizeNetXMLResponse.php',
-    'AuthorizeNet_Subscription'  => $sharedDir . 'AuthorizeNetTypes.php',
-    'AuthorizeNetGetSubscriptionList'     => $sharedDir . 'AuthorizeNetTypes.php',
+    'AuthorizeNetRequest' => $sharedDir . 'AuthorizeNetRequest.php',
+    'AuthorizeNetResponse' => $sharedDir . 'AuthorizeNetResponse.php',
+    'AuthorizeNetSIM' => $libDir . 'AuthorizeNetSIM.php',
+    'AuthorizeNetSIM_Form' => $libDir . 'AuthorizeNetSIM.php',
+    'AuthorizeNetSOAP' => $libDir . 'AuthorizeNetSOAP.php',
+    'AuthorizeNetTD' => $libDir . 'AuthorizeNetTD.php',
+    'AuthorizeNetTD_Response' => $libDir . 'AuthorizeNetTD.php',
+    'AuthorizeNetTransaction' => $sharedDir . 'AuthorizeNetTypes.php',
+    'AuthorizeNetXMLResponse' => $sharedDir . 'AuthorizeNetXMLResponse.php',
+    'AuthorizeNet_Subscription' => $sharedDir . 'AuthorizeNetTypes.php',
+    'AuthorizeNetGetSubscriptionList' => $sharedDir . 'AuthorizeNetTypes.php',
     'AuthorizeNetSubscriptionListSorting' => $sharedDir . 'AuthorizeNetTypes.php',
-    'AuthorizeNetSubscriptionListPaging'  => $sharedDir . 'AuthorizeNetTypes.php',
-
+    'AuthorizeNetSubscriptionListPaging' => $sharedDir . 'AuthorizeNetTypes.php',
     // Following section contains the new controller model classes needed
     //Utils
     //'net\authorize\util\ObjectToXml' => $libDir . 'net/authorize/util/ObjectToXml.php',
@@ -223,16 +221,18 @@ return array(
     'net\authorize\util\LogFactory' => $libDir . 'net/authorize/util/LogFactory.php',
     'net\authorize\util\ANetSensitiveFields' => $libDir . 'net/authorize/util/ANetSensitiveFields.php',
     'net\authorize\util\SensitiveTag' => $libDir . 'net/authorize/util/SensitiveTag.php',
-	'net\authorize\util\SensitiveDataConfigType' => $libDir . 'net/authorize/util/SensitiveDataConfigType.php',
-
+    'net\authorize\util\SensitiveDataConfigType' => $libDir . 'net/authorize/util/SensitiveDataConfigType.php',
     //constants
     'net\authorize\api\constants\ANetEnvironment' => $libDir . 'net/authorize/api/constants/ANetEnvironment.php',
-
     //base classes
     'net\authorize\api\controller\base\IApiOperation' => $libDir . 'net/authorize/api/controller/base/IApiOperation.php',
     'net\authorize\api\controller\base\ApiOperationBase' => $libDir . 'net/authorize/api/controller/base/ApiOperationBase.php',
-
     //following are generated class mappings
+    
+    
+    'net\authorize\api\contract\v1\GetHostedPaymentPageRequest' => $libDir . 'net/authorize/api/contract/v1/GetHostedPaymentPageRequest.php',
+    'net\authorize\api\contract\v1\GetHostedPaymentPageResponse' => $libDir . 'net/authorize/api/contract/v1/GetHostedPaymentPageResponse.php',
+    
     'net\authorize\api\contract\v1\ANetApiRequestType' => $libDir . 'net/authorize/api/contract/v1/ANetApiRequestType.php',
     'net\authorize\api\contract\v1\ANetApiResponseType' => $libDir . 'net/authorize/api/contract/v1/ANetApiResponseType.php',
     'net\authorize\api\contract\v1\ARBCancelSubscriptionRequest' => $libDir . 'net/authorize/api/contract/v1/ARBCancelSubscriptionRequest.php',
@@ -320,8 +320,10 @@ return array(
     'net\authorize\api\contract\v1\GetCustomerProfileResponse' => $libDir . 'net/authorize/api/contract/v1/GetCustomerProfileResponse.php',
     'net\authorize\api\contract\v1\GetCustomerShippingAddressRequest' => $libDir . 'net/authorize/api/contract/v1/GetCustomerShippingAddressRequest.php',
     'net\authorize\api\contract\v1\GetCustomerShippingAddressResponse' => $libDir . 'net/authorize/api/contract/v1/GetCustomerShippingAddressResponse.php',
+    
     'net\authorize\api\contract\v1\GetHostedProfilePageRequest' => $libDir . 'net/authorize/api/contract/v1/GetHostedProfilePageRequest.php',
     'net\authorize\api\contract\v1\GetHostedProfilePageResponse' => $libDir . 'net/authorize/api/contract/v1/GetHostedProfilePageResponse.php',
+    
     'net\authorize\api\contract\v1\GetSettledBatchListRequest' => $libDir . 'net/authorize/api/contract/v1/GetSettledBatchListRequest.php',
     'net\authorize\api\contract\v1\GetSettledBatchListResponse' => $libDir . 'net/authorize/api/contract/v1/GetSettledBatchListResponse.php',
     'net\authorize\api\contract\v1\GetTransactionDetailsRequest' => $libDir . 'net/authorize/api/contract/v1/GetTransactionDetailsRequest.php',
@@ -411,7 +413,6 @@ return array(
     'net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType' => $libDir . 'net/authorize/api/contract/v1/TransactionResponseType/ErrorsAType/ErrorAType.php',
     'net\authorize\api\contract\v1\TransactionResponseType\MessagesAType\MessageAType' => $libDir . 'net/authorize/api/contract/v1/TransactionResponseType/MessagesAType/MessageAType.php',
     'net\authorize\api\contract\v1\TransactionResponseType\SplitTenderPaymentsAType\SplitTenderPaymentAType' => $libDir . 'net/authorize/api/contract/v1/TransactionResponseType/SplitTenderPaymentsAType/SplitTenderPaymentAType.php',
-
     //Controllers
     'net\authorize\api\controller\ARBCancelSubscriptionController' => $libDir . 'net/authorize/api/controller/ARBCancelSubscriptionController.php',
     'net\authorize\api\controller\ARBCreateSubscriptionController' => $libDir . 'net/authorize/api/controller/ARBCreateSubscriptionController.php',
@@ -451,5 +452,4 @@ return array(
     'net\authorize\api\controller\UpdateCustomerShippingAddressController' => $libDir . 'net/authorize/api/controller/UpdateCustomerShippingAddressController.php',
     'net\authorize\api\controller\UpdateSplitTenderGroupController' => $libDir . 'net/authorize/api/controller/UpdateSplitTenderGroupController.php',
     'net\authorize\api\controller\ValidateCustomerPaymentProfileController' => $libDir . 'net/authorize/api/controller/ValidateCustomerPaymentProfileController.php',
-
 );

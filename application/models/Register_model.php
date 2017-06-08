@@ -6,6 +6,7 @@
  * @author sirromas
  */
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Payment.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Classes/ProcessPayment.php';
 
 class register_model extends CI_Model {
 
@@ -1169,6 +1170,146 @@ class register_model extends CI_Model {
         $list.="</div></div></div>";
 
         return $list;
+    }
+
+    function get_auth_card_form($user) {
+        $list = "";
+        $m2token = random_string('alnum', 8);
+        $userObj = json_decode(base64_decode($user));
+        $userObj->token = $m2token;
+        $_SESSION['personal_auth_payment_token'] = $userObj;
+        $program = $this->get_coure_name_by_id($userObj->courseid);
+        $cost = $userObj->amount;
+        $userObj->program = $program;
+
+        $pr = new ProcessPayment();
+        $order = new stdClass();
+        $order->item = $program;
+        $order->amount = $cost;
+        $token = $pr->getAnAcceptPaymentPage($userObj);
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>";
+        $list.="<form id='send_token' name='send_token' action='https://test.authorize.net/payment/payment' method='post' 
+                target='load_payment'>
+                <input type='hidden' name='token' value='$token' />
+                </form>";
+        $list.="</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span12' style='text-align:center;' id='payment_result'>";
+        $list.="<iframe id='load_payment' name='load_payment' width='100%' height='100%;' style='overflow-x:hidden;' frameborder='0' style='' ></iframe>";
+        $list.="</span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function process_auth_payment($payment) {
+        $studentObject = $_SESSION['personal_auth_payment_token'];
+        $paymentObj = json_decode(base64_decode($payment));
+
+        /*
+          echo "<pre>";
+          print_r($studentObject);
+          echo "</pre>";
+          echo "<br>-----------------------------------------<br>";
+          echo "<pre>";
+          print_r($paymentObj);
+          echo "</pre>";
+         */
+
+
+        $billing_firstname = $paymentObj->billTo->firstName;
+        $billing_lastname = $paymentObj->billTo->lastName;
+
+        // Create compatible class to signup
+        $user = new stdClass();
+        $user->first_name = $studentObject->first_name;
+        $user->last_name = $studentObject->last_name;
+        $user->billing_name = $billing_firstname . " " . $billing_lastname;
+        $user->addr = $studentObject->addr;
+        $user->city = $studentObject->city;
+        $user->state = $studentObject->state;
+        $user->country = $studentObject->country;
+        $user->zip = $studentObject->zip;
+        $user->inst = $studentObject->inst;
+        $user->phone = $studentObject->phone;
+        $user->email = $studentObject->email;
+        $user->cardnumber = $paymentObj->accountNumber;
+        $user->courseid = $studentObject->courseid;
+        $user->promo_code = $studentObject->promo_code;
+        $user->slotid = $studentObject->slotid;
+        $user->amount = $studentObject->amount;
+        $user->program = $studentObject->program;
+        $user->card_no = $paymentObj->accountNumber;
+        $user->sum = $studentObject->amount;
+        $user->transid = $paymentObj->transId;
+        $user->auth_code = $paymentObj->authorization;
+        $user->payment_amount = $studentObject->amount;
+        $user->card_holder = $billing_firstname . " " . $billing_lastname;
+        $user->signup_first = $studentObject->first_name;
+        $user->signup_last = $studentObject->last_name;
+
+        $p = new Payment();
+        $mailer = new Mailer();
+
+        $p->enroll->single_signup($user);
+        $userid = $p->get_user_id_by_email($studentObject->email);
+        $user->userid = $userid;
+        $user_detailes = $p->get_user_detailes($userid);
+        $user->pwd = $user_detailes->purepwd;
+
+        $p->confirm_user($user->email);
+        $p->add_payment_to_db($user); // adds payment result to DB
+        $p->enroll->add_user_to_course_schedule($user->userid, $user);
+
+        $mailer->send_payment_confirmation_message($user);
+
+        $email = $studentObject->email;
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='row-fluid' style='font-weight:bold;'>";
+        $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your registration is confirmed and receipt is sent to $email. &nbsp; <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$email.pdf' target='_blank'>Print registration.</a></span>";
+        $list.="</div>";
+
+        $list.="</div>";
+        $list.="</div>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function get_cancel_auth_card_payment_page() {
+        $list = "";
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span8'>Payment is canceled</span>";
+        $list.="</div>";
+
+        $list.="</div>";
+        $list.="</div>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function add_individual_registration($token) {
+        $data = $_SESSION[$token];
+        $userObj = json_decode(base64_decode($data));
+        echo "<pre>";
+        print_r($userObj);
+        echo "</pre>";
     }
 
     function get_user_detailes($userid) {
