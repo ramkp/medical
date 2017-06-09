@@ -333,15 +333,43 @@ class Students {
         return $courseid;
     }
 
+    function get_braintree_payments($courseid, $userid) {
+        $partials = array();
+        $query = "select * from mdl_card_payments2 "
+                . "where courseid=$courseid "
+                . "and userid=$userid and refunded=0";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $renew_fee = $this->get_renew_fee($courseid);
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $user_payment = $row['psum'];
+                $course_cost = $this->get_course_cost($row['courseid']);
+                $slotid = $this->get_user_slot($row['courseid'], $row['userid']);
+                if ($user_payment != $renew_fee) {
+                    $partial = new stdClass();
+                    $partial->userid = $row['userid'];
+                    $partial->courseid = $row['courseid'];
+                    $partial->payment = $row['psum'];
+                    $partial->cost = $course_cost;
+                    $partial->slotid = $slotid;
+                    $partial->pdate = $row['pdate'];
+                } // end if $user_payment!=$course_cost
+                $partials[] = $partial;
+            } // end while
+        } // end if $num > 0   
+        return $partials;
+    }
+
     function get_student_payments($courseid, $userid) {
 
         $partial1 = array(); // CC payments
         $partial2 = array(); // Other payments
-        // CC payments
+        $partial3 = $this->get_braintree_payments($courseid, $userid); // Braintree payments
 
         $query = "select * from mdl_card_payments "
                 . "where courseid=$courseid "
-                . "and userid=$userid";
+                . "and userid=$userid and refunded=0";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $renew_fee = $this->get_renew_fee($courseid);
@@ -391,7 +419,7 @@ class Students {
                 $partial2[] = $partial;
             } // end while
         } // end if $num > 0
-        $payments = array('p1' => $partial1, 'p2' => $partial2);
+        $payments = array('p1' => $partial1, 'p2' => $partial2, 'p3' => $partial3);
         return $payments;
     }
 
@@ -595,23 +623,11 @@ class Students {
 
                     $payments = $this->get_student_payments($courseid, $p);
                     $cc_payments = $payments['p1'];
+                    $cc2_payments = $payments['p3'];
                     $other_payments = $payments['p2'];
 
                     $fname = $user_data->firstname;
                     $lname = $user_data->lastname;
-                    echo "Student: " . $fname . "&nbsp;" . $lname . "<br>";
-
-                    /*
-                     * 
-                      echo "<pre>";
-                      print_r($cc_payments);
-                      echo "/<pre><br>";
-
-                      echo "<pre>";
-                      print_r($other_payments);
-                      echo "/<pre><br>";
-                     * 
-                     */
 
                     if (count($cc_payments) > 0) {
                         $total_paid = 0;
@@ -637,10 +653,6 @@ class Students {
                                 $list.="</tr>";
                             } // end else
                         } // end foreach
-                        //$list.="<tr>";
-                        //$list.="<td>Total paid :</td>";
-                        //$list.="<td>&nbsp;&nbsp; $" . $total_paid . "  </td>";
-                        //$list.="</tr>";ß
                         if (($partial->cost - $total_paid) >= 0) {
                             $owe_sum = $owe_sum + round($partial->cost - $total_paid);
                         }
@@ -657,6 +669,48 @@ class Students {
                             $list.="</tr>";
                         } // end else
                     } // end if count($cc_payments)>0
+
+                    if (count($cc2_payments) > 0) {
+                        $total_paid = 0;
+                        foreach ($cc2_payments as $partial) {
+                            if (is_object($partial)) {
+                                if ($partial->cost >= $partial->payment) {
+                                    $diff = $partial->cost - $partial->payment;
+                                } // end if $partial->cost>=$partial->payment
+                                else {
+                                    $diff = 0;
+                                } // end else
+                                $list.="<tr>";
+                                $list.="<td>Student paid</td>";
+                                $list.="<td>&nbsp;&nbsp;$" . round($partial->payment) . "</td>";
+                                $list.="</tr>";
+
+                                $total_paid = $total_paid + $partial->payment;
+                            } //end if is_object($partial)
+                            else {
+                                $list.="<tr>";
+                                $list.="<td>Student paid</td>";
+                                $list.="<td>&nbsp;&nbsp;N/A</td>";
+                                $list.="</tr>";
+                            } // end else
+                        } // end foreach
+                        if (($partial->cost - $total_paid) >= 0) {
+                            $owe_sum = $owe_sum + round($partial->cost - $total_paid);
+                        }
+                        if ($owe_sum >= 0 && ($partial->cost - $total_paid) >= 0) {
+                            $list.="<tr>";
+                            $list.="<td>Student owes</td>";
+                            $list.="<td>&nbsp;&nbsp; $" . round($partial->cost - $total_paid) . "  </td>";
+                            $list.="</tr>";
+                        } // end if $owe_sum>=0
+                        else {
+                            $list.="<tr>";
+                            $list.="<td>Student owes</td>";
+                            $list.="<td>&nbsp;&nbsp; $0 </td>";
+                            $list.="</tr>";
+                        } // end else
+                    } // end if count($cc2_payments)>0
+
 
                     if (count($other_payments) > 0) {
                         $total_paid = 0;
@@ -1315,7 +1369,7 @@ class Students {
             $paypal_list.="<th>";
             $paypal_list.="<td style='padding:15px;font-weight:bold;' colspan='2' align='center'>PayPal Payments</td>";
             $paypal_list.="</th>";
-            
+
             foreach ($paypal_payments as $payment) {
                 $renew_fee = $this->get_renew_fee($payment->courseid);
                 $coursename = $this->get_course_name($payment->courseid);
@@ -1325,7 +1379,7 @@ class Students {
                 $firstname = $userdata->firstname;
                 $lastname = $userdata->lastname;
                 $amount = $payment->psum;
-                
+
                 $paypal_list.="<tr>";
                 if ($amount != $renew_fee) {
                     $paypal_list.="<td style='padding:15px;'>Program</td><td style='padding:15px;'>$coursename</td>";
@@ -1346,26 +1400,26 @@ class Students {
                 $paypal_list.="<tr>";
                 $paypal_list.="<td style='padding:15px;'>Student</td><td style='padding:15px;'>$firstname $lastname</td>";
                 $paypal_list.="</tr>";
-                
+
                 $paypal_list.="<tr>";
                 $paypal_list.="<td style='padding:15px;'>Amount paid:</td><td style='padding:15px;'>$$amount</td>";
                 $paypal_list.="</tr>";
-                
+
                 $paypal_list.="<tr>";
                 $paypal_list.="<td style='padding:15px;'>Transaction date:</td><td style='padding:15px;'>$date</td>";
                 $paypal_list.="</tr>";
-                
+
                 $paypal_list.="<tr>";
                 $paypal_list.="<td style='padding:15px;' colspan='2'><hr/></td>";
                 $paypal_list.="</tr>";
-                
+
                 $paypal_subtotal = $paypal_subtotal + $amount;
             } // end foreach
-            
+
             $paypal_list.="<tr>";
             $paypal_list.="<td style='padding:15px;font-weight:bold;'>Subtotal:</td><td style='padding:15px;font-weight:bold;'>$$paypal_subtotal</td>";
             $paypal_list.="</tr>";
-            
+
             $paypal_list.="</table>";
         } // end if count($paypal_payments)>0
 
@@ -1415,7 +1469,6 @@ class Students {
             $refund_list.="</tr>";
             $refund_list.="</table>";
         } // end if count($refund_payments)>0
-        
         // Invoice payments
         if (count($invoice_payments) > 0) {
             $in_list.="<table>";
