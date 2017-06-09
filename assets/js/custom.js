@@ -2550,38 +2550,44 @@ $(document).ready(function () {
     });
 
     $("#total_group_users").change(function () {
-        var total = $("#total_group_users").val();
-        if (total > 0) {
-            var url = "https://medical2.com/register2/get_group_users_block";
-            var request = {total: total};
-            $.post(url, request).done(function (data) {
-                $('#users_div').html(data);
-                var courseid = $('#register_courses').val();
-                var slotid = $('#register_cities').val();
-                var feeurl = "https://medical2.com/register2/get_group_course_fee";
-                $.post(feeurl, {courseid: courseid, slotid: slotid, total: total}).done(function (data) {
-                    console.log('Server response: ' + data);
-                    var course = JSON.parse(data);
+        var courseid = $('#register_courses').val();
+        if (courseid > 0) {
+            $('#group_err').html('');
+            var total = $("#total_group_users").val();
+            if (total > 0) {
+                $('#group_err').html('');
+                var url = "https://medical2.com/register2/get_group_users_block";
+                var request = {total: total};
+                $.post(url, request).done(function (data) {
+                    $('#users_div').html(data);
+                    var courseid = $('#register_courses').val();
+                    var slotid = $('#register_cities').val();
+                    var feeurl = "https://medical2.com/register2/get_group_course_fee";
+                    $.post(feeurl, {courseid: courseid, slotid: slotid, total: total}).done(function (data) {
+                        console.log('Server response: ' + data);
+                        var course = JSON.parse(data);
 
-                    var coursedata = "<span id='visible_amount'>$" + course.cost + "</span> ";
-                    $('#group_dyn_course_name').html(course.name);
-                    $('#group_dyn_course_fee').html(coursedata);
+                        var coursedata = "<span id='visible_amount'>$" + course.cost + "</span> ";
+                        $('#group_dyn_course_name').html(course.name);
+                        $('#group_dyn_course_fee').html(coursedata);
 
-                    $('#payment_sum').remove();
-                    $("#group_dyn_course_fee").append("<input type='hidden' id='payment_sum' value='" + course.cost + "'>");
+                        $('#payment_sum').remove();
+                        $("#group_dyn_course_fee").append("<input type='hidden' id='payment_sum' value='" + course.cost + "'>");
 
-                    $('#selected_course').remove();
-                    $("#group_dyn_course_fee").append("<input type='hidden' id='selected_course' value='" + courseid + "'>");
+                        $('#selected_course').remove();
+                        $("#group_dyn_course_fee").append("<input type='hidden' id='selected_course' value='" + courseid + "'>");
 
-                    $('#selected_slot').remove();
-                    $("#group_dyn_course_fee").append("<input type='hidden' id='selected_slot' value='" + slotid + "'>");
+                        $('#selected_slot').remove();
+                        $("#group_dyn_course_fee").append("<input type='hidden' id='selected_slot' value='" + slotid + "'>");
 
-                    $('#group_course_fee').show();
-
-                    $('#group_err').html('');
-                });
-            });
-        }
+                        $('#group_course_fee').show();
+                    }); // end of $.post
+                }); //  end of $.post
+            } // end if total>0
+        } // end if courseid>0
+        else {
+            $('#group_err').html('Please select program first');
+        } // end else 
     });
 
 
