@@ -217,7 +217,7 @@ echo $form;
                                     $('#err').html('');
                                     $('#ajax_loading_payment').show();
                                     $('#make_any_pay_payment').prop('disabled', true);
-                                    $('#make_any_pay_payment').text('Processing request');
+                                    $('#make_any_pay_payment').prop('value', 'Processing request');
                                     var url = '/lms/custom/paypal/create_any_pay_transaction.php';
                                     var amount = $('#amount').val();
                                     var user = $('#user').val();
@@ -235,7 +235,7 @@ echo $form;
                                     $.post(url, {trans: JSON.stringify(trans)}).done(function (status) {
                                         $('#ajax_loading_payment').hide();
                                         $('#make_any_pay_payment').prop('disabled', false);
-                                        $('#make_any_pay_payment').text('I Agree, Submit');
+                                        $('#make_any_pay_payment').prop('value', 'I Agree, Submit');
                                         if (status) {
                                             var msg;
                                             if (period == 0) {
