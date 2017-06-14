@@ -1376,7 +1376,7 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
-        $list.="<span class='span8' id='err' style='color:red;'></span>";
+        $list.="<span class='span8' id='err' style='color:black;'></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid' style='text-align:left;'>";

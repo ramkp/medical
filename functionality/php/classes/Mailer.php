@@ -22,12 +22,14 @@ class Mailer {
     public $mail_smtp_pwd = 'aK6SKymc';
     public $invoice_path;
     public $registration_path;
+    public $renewal_path;
     public $db;
 
     function __construct() {
         $this->db = new pdo_db();
         $this->invoice_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices';
         $this->registration_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/registrations';
+        $this->renewal_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/invoices/renewal';
     }
 
     function get_workshop_cost($id) {
@@ -694,7 +696,7 @@ class Mailer {
         $students = $this->get_group_students($groupname);
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -2171,6 +2173,16 @@ class Mailer {
         else {
             return true;
         }
+    }
+
+    function create_renewal_pdf_report($list, $email) {
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($list);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        $output = $dompdf->output();
+        $file_path = $this->renewal_path . "/$email.pdf";
+        file_put_contents($file_path, $output);
     }
 
 }
