@@ -3469,6 +3469,9 @@ $(document).ready(function () {
         $.post(url, {id: 1}).done(function (data) {
             console.log('Server response: ' + data);
             $('#region-main').html(data);
+            $.get('/lms/custom/utils/data.json', function (data) {
+                $('#search_user_input').typeahead({source: data, items: 24});
+            }, 'json');
         });
     }
 
