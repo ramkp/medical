@@ -84,6 +84,7 @@ class Cards {
             $billing_lastname = $names[2];
         } // end if
         $this->authorize_production();
+        //$this->authorize_sandbox();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
                     'paymentMethodNonce' => $nonceFromTheClient,
@@ -837,6 +838,124 @@ class Cards {
             $groupid = $row['id'];
         }
         return $groupid;
+    }
+
+    function get_renew_receipt($transObj) {
+        $list = "";
+        $list2 = "";
+        $user = json_decode($transObj->user);
+        $amount = $transObj->amount;
+        $email = $user->email;
+
+        $list.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
+        $list.="</head>";
+        $list.="<body><br/><br/>";
+        $list.="<div class='datagrid'>            
+            <table style='table-layout: fixed;' width='360' align='center'>
+            <thead>";
+
+        $list.="<tr>";
+        $list.="<th colspan='2' align='center'><img src='https://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<th colspan='2' align='center' style='font-weight:bold;'>Renewal received</th>";
+        $list.="</tr>";
+
+        $list.="</thead>
+            <tbody>
+        
+            <tr style='background-color:#F5F5F5;'>
+            <td align='left'>First name</td><td align='left'>$user->firstname</td>
+            </tr>
+
+            <tr>
+            <td align='left'>Last name</td><td align='left'>$user->lastname</td>
+            </tr>
+
+            <tr style='background-color:#F5F5F5;'>
+            <td align='left'>Email</td><td align='left'>$user->email</td>
+            </tr>
+
+            <tr>
+            <td align='left'>Phone</td><td align='left'>$user->phone1</td>
+            </tr>
+
+            <tr style='background-color:#F5F5F5;'>
+            <td align='left'>Applied Program</td><td align='left'>Certification renewal</td>
+            </tr> 
+
+            <tr>
+            <td align='left'>Amount paid</td><td align='left'>$$amount</td>
+            </tr> 
+
+            <tr>
+            <td colspan='2' align='left'>&nbsp;</td>
+            </tr> 
+
+            <tr>
+            <td colspan='2' align='left'>This certification have been renewed</td>
+            </tr> 
+
+            </table>";
+
+
+        $list2.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
+        $list2.="</head>";
+        $list2.="<body><br/><br/><br/><br/>";
+        $list2.="<div class='datagrid'>            
+            <table style='table-layout: fixed;' width='360' align='center'>
+            <thead>";
+
+        $list2.="<tr>";
+        $list2.="<th colspan='2' align='center' style='font-weight:bold;'>Renewal received</th>";
+        $list2.="</tr>";
+
+        $list2.="</thead>
+            <tbody>
+        
+            <tr style='background-color:#F5F5F5;'>
+            <td align='left'>First name</td><td align='left'>$user->firstname</td>
+            </tr>
+
+            <tr>
+            <td align='left'>Last name</td><td align='left'>$user->lastname</td>
+            </tr>
+
+            <tr style='background-color:#F5F5F5;'>
+            <td align='left'>Email</td><td align='left'>$user->email</td>
+            </tr>
+
+            <tr>
+            <td align='left'>Phone</td><td align='left'>$user->phone1</td>
+            </tr>
+
+            <tr style='background-color:#F5F5F5;'>
+            <td align='left'>Applied Program</td><td align='left'>Certification renewal</td>
+            </tr> 
+
+            <tr>
+            <td align='left'>Amount paid</td><td align='left'>$$amount</td>
+            </tr> 
+
+            <tr>
+            <td colspan='2' align='left'>&nbsp;</td>
+            </tr> 
+
+            <tr>
+            <td colspan='2' align='left'>This certification have been renewed</td>
+            </tr> 
+
+            </table>";
+
+        $m = new Mailer();
+        $m->create_renewal_pdf_report($list2, $user->email);
+
+        $list.="<a href='https://medical2.com/lms/custom/invoices/renewal/$email.pdf' target='_blank'><span style='font-size:bold;'>Print</span></a>";
+        $list.="</body>";
+        $list.="</html>";
+
+        return $list;
     }
 
 }

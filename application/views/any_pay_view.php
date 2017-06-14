@@ -113,6 +113,7 @@ echo $form;
         var form = document.querySelector('#checkout-form');
         var submit = document.querySelector('input[type="submit"]');
         var url = '/lms/custom/paypal/get_card_client_token.php';
+        //var url = '/lms/custom/paypal/get_card_client_sandbox_token.php';
         $.post(url, {id: 1}).done(function (token) {
             braintree.client.create({
                 authorization: token
@@ -213,7 +214,7 @@ echo $form;
                                     } // end if card_holder != ''
 
                                     console.log('Nonce: ' + payload.nonce);
-
+                                    var msg;
                                     $('#err').html('');
                                     $('#ajax_loading_payment').show();
                                     $('#make_any_pay_payment').prop('disabled', true);
@@ -237,14 +238,21 @@ echo $form;
                                         $('#make_any_pay_payment').prop('disabled', false);
                                         $('#make_any_pay_payment').prop('value', 'I Agree, Submit');
                                         if (status) {
-                                            var msg;
                                             if (period == 0) {
                                                 msg = "Payment is successful. Thank you! You can print your registration data <a href='https://medical2.com/lms/custom/invoices/registrations/" + email + ".pdf' target='_blank'>here.</a>";
-                                            } // end if
+                                                $('#err').html("<span style='color:red;font-size:bold;'>" + msg + "</span>");
+                                            } // end if period == 0
                                             else {
-                                                msg = "This certification has been renewed";
+                                                //msg = "This certification have been renewed";
+                                                //$('#err').html("<span style='color:red;font-size:bold;'>" + msg + "</span>");
+                                                
+                                                
+                                                var r_url = '/lms/custom/paypal/get_renew_receipt.php';
+                                                $.post(r_url, {trans: JSON.stringify(trans)}).done(function (msg) {
+                                                    $('#err').html("<span style='color:black;font-size:bold;'>" + msg + "</span>");
+                                                });
+                                                
                                             } // end else
-                                            $('#err').html("<span style='color:red;font-size:bold;'>" + msg + "</span>");
                                         } // end if status
                                         else {
                                             $('#err').html("<span style='color:red;font-size:bold;'>Credit card was declined</span>");
