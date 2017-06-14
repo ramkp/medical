@@ -823,9 +823,13 @@ class Dashboard extends Util {
                 $date = date('m-d-Y', $row['refund_date']);
 
                 // Original payment
+                /*
+                 * 
                 $list.="<div class='row-fluid' style=''>";
                 $list.="<span class='span9'>Paid by card $" . $row['psum'] . " ($pdate) $coursename</span>";
                 $list.="</div>";
+                 * 
+                 */
 
                 // Refund info
                 $list.="<div class='row-fluid' style='color:red;font-weigh:bold;'>";
@@ -863,10 +867,14 @@ class Dashboard extends Util {
                 $psum = $original_payment->psum;
                 $fullpsum = $psum + $row['psum'];
                 $date = date('m-d-Y', $row['refund_date']);
-
+                
+                /*
+                 * 
                 $list.="<div class='row-fluid'>";
                 $list.="<span class='span9'>Paid by card $" . $fullpsum . " ($pdate) $coursename</span>";
                 $list.="</div>";
+                 * 
+                 */
 
                 $list.="<div class='row-fluid' style='color:red;font-weigh:bold;'>";
                 $list.="<span class='span9'>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
