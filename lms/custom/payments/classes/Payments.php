@@ -19,6 +19,68 @@ class Payments extends Util {
     function __construct($payment_type) {
         parent::__construct();
         $this->typeid = $payment_type;
+        $this->create_refund_users();
+    }
+
+    function create_refund_users() {
+        $auth_users = $this->get_auth_refund_users();
+        $brain_users = $this->get_brain_refund_users();
+        $partial_users = $this->get_partial_refund_users();
+        $users = array_merge($auth_users, $brain_users, $partial_users);
+        if (count($users) > 0) {
+            $userslist = implode(',', $users);
+            $query = "select * from mdl_user where id in ($userslist)";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $emails[] = mb_convert_encoding($row['email'], 'UTF-8');
+                    $phones[] = mb_convert_encoding($row['phone1'], 'UTF-8');
+                    $users[] = mb_convert_encoding($row['lastname'], 'UTF-8') . " " . mb_convert_encoding($row['firstname'], 'UTF-8');
+                    $data = array_merge($users, $emails, $phones);
+                } // end while
+                file_put_contents('/home/cnausa/public_html/lms/custom/utils/refund_users.json', json_encode($data));
+            } // end if $num > 0
+        } // end if count($users)>0;
+    }
+
+    function get_auth_refund_users() {
+        $users = array();
+        $query = "select distinct userid from mdl_card_payments where refunded=1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $users[] = $row['userid'];
+            } // end while
+        } // end if $num > 0
+        return $users;
+    }
+
+    function get_brain_refund_users() {
+        $users = array();
+        $query = "select distinct userid from mdl_card_payments2 where refunded=1";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $users[] = $row['userid'];
+            } // end while
+        } // end if $num > 0
+        return $users;
+    }
+
+    function get_partial_refund_users() {
+        $users = array();
+        $query = "select distinct userid from mdl_partial_refund_payments";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $users[] = $row['userid'];
+            } // end while
+        } // end if $num > 0
+        return $users;
     }
 
     function get_invoice_payments($payment_type) {
@@ -372,15 +434,23 @@ class Payments extends Util {
 
     function create_refunded_payments_page($payments, $toolbar = true, $search = false) {
         $list = "";
-        $list.="<div class='container-fluid' style='text-align:center;' id='pwd_container'>";
-        $list.="<span class='span3'>Password*: </span><span class='span5'><input type='password' id='refund_pwd'></span><span class='span1'><button class='btn btn-primary' id='show_refund_page' >Ok</button></span>";
-        $list.="</div>";
+        if (!$search) {
+            $list.="<div class='container-fluid' style='text-align:center;' id='pwd_container'>";
+            $list.="<span class='span3'>Password*: </span><span class='span5'><input type='password' id='refund_pwd'></span><span class='span1'><button class='btn btn-primary' id='show_refund_page' >Ok</button></span>";
+            $list.="</div>";
+        }
 
         $list.="<div class='container-fluid' style='text-align:center;' id='pwd_container'>";
         $list.="<span class='span12' id='refund_pwd_err' style='color:red;'></span>";
         $list.="</div>";
 
-        $list.="<div class='container-fluid' style='display:none;' id='refund_container'>";
+        if (!$search) {
+            $list.="<div class='container-fluid' style='display:none;' id='refund_container'>";
+        } // end if
+        else {
+            $list.="<div class='container-fluid' style='display:block;' id='refund_container'>";
+        } // end else
+
         $list.="<span class='span12'>";
         if (count($payments) > 0) {
             if ($toolbar == true) {
@@ -389,7 +459,7 @@ class Payments extends Util {
                 $list.="<span class='span2'><input type='text' id='search_payment' style='width:125px;' /></span>";
                 $list.="<span class='span3'><button class='btn btn-primary' id='search_refund_payment_button'>Search</button></span>";
                 $list.="<span class='span2'><button class='btn btn-primary' id='clear_refund_payment_button'>Clear filter</button></span>";
-                $list.="<span class='span2'><button class='btn btn-primary' id='make_refund_button' style='width:175px;'>Make Refund</button></span>";
+                $list.="<span class='span2'><button class='btn btn-primary' id='make_refund_button' style='width:175px;'>Refund</button></span>";
                 $list.="</div>";
                 $list.="<div class='container-fluid' style='text-align:center;'>";
                 $list.="<span class='span8' style='color:red;' id='payment_err'></span>";
@@ -404,7 +474,7 @@ class Payments extends Util {
                 $total = $this->get_total_refund_payments();
             }
             $list.="<div class='container-fluid' style='text-align:center;font-weight:bold;'>";
-            $list.="<span class='span10'>Total payments: $total</span>";
+            $list.="<span class='span10'>Total refund payments: $total</span>";
             $list.="</div>";
             foreach ($payments as $payment) {
                 $user = $this->get_user_details($payment->userid);
@@ -701,12 +771,53 @@ class Payments extends Util {
         return $list;
     }
 
-    function search_refund_payment($item) {
-        $list = "";
-        $payments = array();
+    function search_courses_users($item) {
         $invoice = new Invoices();
         $users_list = implode(",", $invoice->search_invoice_users($item));
         $courses_list = implode(",", $invoice->search_invoice_courses($item));
+        $data = array('courses' => $courses_list, 'users' => $users_list);
+        return $data;
+    }
+
+    function get_braintree_refund_payments($item) {
+        $payments = array();
+        $data = $this->search_courses_users($item);
+        $courses_list = $data['courses'];
+        $users_list = $data['users'];
+        if ($users_list != '' || $courses_list != '') {
+            if ($users_list != '') {
+                $query = "select * from mdl_card_payments2 "
+                        . "where userid in ($users_list) and refunded=1 order by pdate desc ";
+            } // end if $users_list != ''
+            if ($courses_list != '') {
+                $query = "select * from mdl_card_payments2 "
+                        . "where courseid in ($courses_list) and refunded=1 order by pdate desc ";
+            } // end if $courses_list != ''
+            if ($users_list != '' && $courses_list != '') {
+                $query = "select * from mdl_card_payments2 "
+                        . "where refunded=1 and (courseid in ($courses_list) "
+                        . "or userid in ($users_list))  order by pdate desc ";
+            } // end if $users_list != '' && $courses_list != '' 
+            $num = $this->db->numrows($query);
+        } // end if $users_list!='' || $courses_list!=''
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                }
+                $payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        return $payments;
+    }
+
+    function get_auth_refund_payments($item) {
+        $payments = array();
+        $data = $this->search_courses_users($item);
+        $courses_list = $data['courses'];
+        $users_list = $data['users'];
         if ($users_list != '' || $courses_list != '') {
             if ($users_list != '') {
                 $query = "select * from mdl_card_payments "
@@ -724,9 +835,6 @@ class Payments extends Util {
             //echo "Query: ".$query."<br>";
             $num = $this->db->numrows($query);
         } // end if $users_list!='' || $courses_list!=''
-        else {
-            $num = 0;
-        }
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
@@ -736,13 +844,79 @@ class Payments extends Util {
                 }
                 $payments[] = $payment;
             } // end while
-            $list.=$this->create_refunded_payments_page($payments, false, true);
         } // end if $num > 0
-        else {
-            $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span6'>No refund payments found</span>";
-            $list.="</div>";
-        } // end else 
+        return $payments;
+    }
+
+    function get_partial_refund_payments($item) {
+        $payments = array();
+        $data = $this->search_courses_users($item);
+        $courses_list = $data['courses'];
+        $users_list = $data['users'];
+        if ($users_list != '' || $courses_list != '') {
+            if ($users_list != '') {
+                $query = "select * from mdl_partial_refund_payments "
+                        . "where userid in ($users_list) order by refund_date desc ";
+            } // end if $users_list != ''
+            if ($courses_list != '') {
+                $query = "select * mdl_partial_refund_payments "
+                        . "where courseid in ($courses_list)  order by refund_date desc ";
+            } // end if $courses_list != ''
+            if ($users_list != '' && $courses_list != '') {
+                $query = "select * from mdl_partial_refund_payments "
+                        . "where  courseid in ($courses_list) "
+                        . "or userid in ($users_list))  order by refund_date desc ";
+            } // end if $users_list != '' && $courses_list != ''        
+            //echo "Query: ".$query."<br>";
+            $num = $this->db->numrows($query);
+        } // end if $users_list!='' || $courses_list!=''
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $payment = new stdClass();
+                foreach ($row as $key => $value) {
+                    $payment->$key = $value;
+                }
+                $payments[] = $payment;
+            } // end while
+        } // end if $num > 0
+        return $payments;
+    }
+
+    function search_refund_payment($item) {
+        $list = "";
+        $auth_payments = $this->get_auth_refund_payments($item);
+        /*
+          echo "Auth refunds<pre>";
+          print_r($auth_payments);
+          echo "</pre><br>";
+         */
+
+        $brain_payments = $this->get_braintree_refund_payments($item);
+
+        /*
+          echo "Brain refunds<pre>";
+          print_r($brain_payments);
+          echo "</pre><br>";
+         */
+
+        $partial_refunds = $this->get_partial_refund_payments($item);
+
+        /*
+          echo "Partial refunds<pre>";
+          print_r($partial_refunds);
+          echo "</pre><br>";
+         */
+
+        $payments = array_merge($auth_payments, $brain_payments, $partial_refunds);
+
+        /*
+          echo "All refunds<pre>";
+          print_r($payments);
+          echo "</pre><br>";
+         */
+
+        $list.=$this->create_refunded_payments_page($payments, false, true);
         return $list;
     }
 
@@ -947,10 +1121,10 @@ class Payments extends Util {
                         . "values ($userid,$courseid,'$amount','$date')";
                 $this->db->query($query);
             } // end else when it was partial refund
-            return true;
+            return 1;
         } // end if $status==true
         else {
-            return false;
+            return 0;
         }
     }
 
@@ -999,10 +1173,10 @@ class Payments extends Util {
                         . "values ($userid,$courseid,'$amount','$date')";
                 $this->db->query($query);
             } // end else when it was partial refund
-            return true;
+            return 1;
         } // end if $status==true
         else {
-            return false;
+            return 0;
         }
     }
 

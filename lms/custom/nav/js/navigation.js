@@ -3507,10 +3507,12 @@ $(document).ready(function () {
     }
 
     function get_refund_page() {
-//console.log('It is refund page ...');
         var url = "/lms/custom/payments/get_refund_page.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+            $.post('/lms/custom/utils/refund_users.json', {id: 1}, function (data) {
+                $('#search_payment').typeahead({source: data, items: 240});
+            }, 'json');
         });
     }
 
@@ -4188,6 +4190,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'make_new_refund') {
+            var msg;
             var paymentid = $('#course_payments').val();
             var amount = $('#refund_amount').val();
             console.log('Payment ID: ' + paymentid);
@@ -4197,7 +4200,13 @@ $(document).ready(function () {
                     var url = "/lms/custom/payments/make_refund.php";
                     var request = {paymentid: paymentid, amount: amount};
                     $.post(url, request).done(function (data) {
-                        console.log('Server response: ' + data);
+                        if (data == '1') {
+                            msg = 'Refund of $' + amount + ' is successful';
+                        } // end if
+                        else {
+                            msg = 'System failed to make refund';
+                        }
+                        alert(msg);
                         $("[data-dismiss=modal]").trigger({type: "click"});
                         get_refund_page();
                     });
@@ -4209,6 +4218,7 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'make_new_refund2') {
+            var msg;
             var paymentid = $('#course_payments2').val();
             var amount = $('#refund_amount2').val();
             console.log('Payment ID: ' + paymentid);
@@ -4218,7 +4228,13 @@ $(document).ready(function () {
                     var url = "/lms/custom/payments/make_refund2.php";
                     var request = {paymentid: paymentid, amount: amount};
                     $.post(url, request).done(function (data) {
-                        console.log('Server response: ' + data);
+                        if (data == '1') {
+                            msg = 'Refund of $' + amount + ' is successful';
+                        } // end if
+                        else {
+                            msg = 'System failed to make refund';
+                        }
+                        alert(msg);
                         $("[data-dismiss=modal]").trigger({type: "click"});
                         get_refund_page();
                     });

@@ -699,21 +699,37 @@ class Invoices extends Util {
 
     function search_invoice_users($item) {
         $users = array();
-        $data = explode(' ', $item);
-        $firstname = $data[1];
-        $lastname = $data[0];
-        if ($firstname == '') {
-            $firstname = $data[2];
-        }
-        $query = "select id from mdl_user "
-                . "where (firstname='$firstname' and lastname='$lastname') "
-                . "or email like '%$item%' and deleted=0";
-        $num = $this->db->numrows($query);
-        if ($num == 0) {
+        $data = explode(' ', trim($item));
+        /*
+        echo "<br>---------<br>";
+        print_r($data);
+        echo "<br>---------<br>";
+        */
+        $total = count($data);
+        //echo "Total items: " . $total . "<br>";
+        if ($total == 1) {
             $query = "select id from mdl_user "
-                    . "where (firstname like '%$firstname%') "
-                    . "or email like '%$item%' and deleted=0";
-        }
+                    . "where email like '%$item%' "
+                    . "or phone1 like '%$item%' "
+                    . "and deleted=0";
+            //echo "Query: " . $query . "<br>";
+        } // end if count($data==1) 
+
+        if ($total == 2) {
+            $firstname = $data[1];
+            $lastname = $data[0];
+        } // end if $data == 2
+
+        if ($total == 3) {
+            $firstname = $data[2];
+            $lastname = $data[0];
+        } // end if count($data == 3)
+
+        $query = "select id from mdl_user "
+                . "where firstname='$firstname' "
+                . "and lastname='$lastname' "
+                . "and deleted=0";
+        //echo "Query: " . $query . "<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $result = $this->db->query($query);
