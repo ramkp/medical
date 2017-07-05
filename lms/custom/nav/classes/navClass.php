@@ -680,7 +680,7 @@ class navClass extends Util {
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Register User' id='register_user'>Register User</a></li>
                                     <li><a href='#' title='View User' id='user_cred'>View User</a></li>
-                                    <li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>
+                                    <!--<li><a href='#' title='Partial Payments' id='partial'>Partial Payments</a></li>-->
                                     <li><a href='#' title='Installment Users' id='installment'>Installment Users</a></li>
                                     <li><a href='#' title='Groups' id='groups'>Groups</a></li>
                                     <li><a href='#' title='Instructors' id='instructors'>Instructors</a></li>
