@@ -238,14 +238,16 @@ $host = $_SERVER['HTTP_HOST'];
                                             <li><a href="https://<?php echo $host ?>/index.php/register2/campus" id="campus" title="School Campus Locations">School Campus Locations</a></li>                                            
                                         </ul>
                                     </li>                                    
-
-
-
+                                    
+                                    
+                                    <li><a href="https://<?php echo $host ?>/gallery/photo_gallery"  id="gallery" title="Photo Gallery">Gallery</a></li>     
+                                    
+                                    
                                     <li class="dropdown"><a title="More" class="dropdown-toggle" href="#cm_submenu_2">More<b class="caret"></b></a>
                                         <ul class="dropdown-menu">                                            
                                             <li><a href="https://<?php echo $host ?>/certs/verify_certification"  id="cert" title="Verify Certification">Verify Certification</a></li>
                                             <li><a href="https://<?php echo $host ?>/groups/private_groups"  id="group" title="Private Groups">Private Groups</a></li>
-                                            <li><a href="https://<?php echo $host ?>/gallery/photo_gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>                                            
+                                            <!--<li><a href="https://<?php echo $host ?>/gallery/photo_gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>-->                                            
                                         </ul>
                                     </li>
 
