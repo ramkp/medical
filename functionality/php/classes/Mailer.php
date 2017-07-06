@@ -921,12 +921,55 @@ class Mailer {
         return $list;
     }
 
+    function get_former_user_payments($userid) {
+
+        // 1. Check authorize payments
+        $query = "select * from mdl_card_payments "
+                . "where userid=$userid and refunded=0";
+        $num1 = $this->db->numrows($query);
+
+        // 2. Check braintree payments
+        $query = "select * from mdl_card_payments2 "
+                . "where userid=$userid and refunded=0";
+        $num2 = $this->db->numrows($query);
+
+        // 3. Check cash payments
+        $query = "select * from mdl_partial_payments "
+                . "where userid=$userid";
+        $num3 = $this->db->numrows($query);
+
+        if ($num1 > 1 || $num2 > 1 || $num3 > 1) {
+            return true;
+        } // end if $num1>1 || $num2>1 || $num3>1
+        else {
+            return false;
+        } // end else
+    }
+
+    function get_receipt_preface($catid, $userid) {
+        $list = "";
+        if ($catid < 5) {
+            $list.="Registration";
+        } // end if $catid<5
+        else {
+            // We change receipt header only for college programs
+            $former_payments = $this->get_former_user_payments($userid);
+            if ($former_payments) {
+                $list.="Account payment";
+            } // end if $former_payments
+            else {
+                $list.="Registration";
+            } // end else
+        } // end else
+        return $list;
+    }
+
     function get_account_confirmation_message2($user, $printed_data = null, $paypal = false) {
         $list = "";
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -938,6 +981,7 @@ class Mailer {
         $init_cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $cost = $this->get_course_fee_block($init_cost, $user);
         $catid = $this->get_course_category($user);
+        $receipt_preface = $this->get_receipt_preface($catid, $user->userid);
         $p = new Payment();
         $state = $p->get_state_name_by_id($user->state);
         $userdata = $this->get_user_details($user->userid);
@@ -965,7 +1009,7 @@ class Mailer {
         <tbody>
 
         <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-        <td colspan='2'>Registration</td>
+        <td colspan='2'>$receipt_preface</td>
         </tr>
 
         <tr style=''>
