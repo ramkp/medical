@@ -1,6 +1,7 @@
 <?php
 
 ini_set('memory_limit', '1024M'); // or you could use 1G
+set_time_limit(3600);
 //require_once ('/home/cnausa/public_html/class.pdo.database.php');
 require_once ('/home/cnausa/public_html/functionality/php/classes/mailer/vendor/PHPMailerAutoload.php');
 require_once ('/home/cnausa/public_html/lms/custom/certificates/classes/Renew.php');
