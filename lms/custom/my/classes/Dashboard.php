@@ -1658,14 +1658,82 @@ class Dashboard extends Util {
                     $coursename = $this->get_course_name($courseid);
                     $user = $this->get_user_details($userid);
 
-                    $list.="<br><table align='center'>";
-
+                    $list.="<br><table align='center' border='0' width='100%'>";
+                    
+                    
+                    
                     $list.="<tr>";
-                    $list.="<td colspan='3' style='padding:15px;text-align:center;font-weight:bold;'>$user->firstname $user->lastname</td>";
+                    
+                    $list.="<td colspan='3'>";
+                    
+                    $list.="<table align='center' border='0' width='100%'>
+
+                    <tr>
+
+                        <td style='padding-top:10px;'><img src='https://medical2.com/assets/icons/logo3.png' width='115' height='105'></td>
+                        
+                        <td valign='top'>
+                        
+                        <table style='padding:15px;font-size:12px;' align='left'>
+
+                                <tr>
+                                    <td style='font-size:20px;font-weight:bold;letter-spacing:8px;padding-left:65px;'>Medical2</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td style='font-size:15px;font-weight:bold;letter-spacing:6px;padding-left:40px;'>Career College</td>
+                                </tr>
+
+                                <tr>
+                                    <td style='padding-top:10px;padding-left:75px;'>1830A North Gloster St</td>
+                                </tr>  
+
+                                <tr>
+                                    <td style='padding-left:90px;'>Tupelo, MS 38804</td>
+                                </tr>  
+
+                            </table>  
+                            
+                            </td>
+                     
+                        <td align='right' valign='top'>
+
+                            <table style='padding:15px;font-size:12px;'>
+
+                                <tr>
+                                    <td style='padding-top:5px;'>Phone: 877-741-1996</td>
+                                </tr>  
+
+                                <tr>
+                                    <td>Fax: 1-407-233-1192</td>
+                                </tr> 
+
+                                <tr>
+                                    <td style='padding-top:25px;'>Email: info@medical2.com</td>
+                                </tr> 
+
+                                <tr>
+                                    <td>Web: www.medical2.com</td>
+                                </tr>  
+
+                            </table>    
+
+                        </td>
+
+                        </tr>
+
+                     </table>";
+                    
+                    $list.="</td>";
+                    
                     $list.="</tr>";
 
                     $list.="<tr>";
-                    $list.="<td colspan='3' style='padding:15px;text-align:center;font-weight:bold;'>$coursename</td>";
+                    $list.="<td colspan='3' style='padding:0px;font-size:18px;text-align:center;font-weight:bold;'>$user->firstname $user->lastname</td>";
+                    $list.="</tr>";
+
+                    $list.="<tr>";
+                    $list.="<td colspan='3' style='padding:0px;text-align:center;font-weight:bold;'>$coursename</td>";
                     $list.="</tr>";
 
                     $list.="<tr style='text-align:center;'>";
@@ -1700,7 +1768,7 @@ class Dashboard extends Util {
 
     function create_attendance_report($userid) {
         $list = $this->get_att_report($userid);
-        $pdf = new mPDF('utf-8', 'A4-L');
+        $pdf = new mPDF('utf-8', 'A4-P');
         $pdf->WriteHTML($list);
         $filename = "attendance_$userid.pdf";
         $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/my/$filename";
