@@ -116,7 +116,7 @@ class Mailer {
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
         $userdata = $this->get_user_details($user->userid);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -127,6 +127,7 @@ class Mailer {
         } // end else
         $cost = ($ws_cost > 0) ? $ws_cost : $course_cost;
         $catid = $this->get_course_category($user);
+        $receipt_preface = $this->get_receipt_preface($catid, $user->userid);
         $p = new Payment();
         $state = $p->get_state_name_by_id($user->state);
 
@@ -154,7 +155,7 @@ class Mailer {
             <tbody>
 
             <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-            <td colspan='2'>Registration</td>
+            <td colspan='2'>$receipt_preface</td>
             </tr>
 
             <tr style=''>
@@ -337,7 +338,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * ***************************************************************
+        /* ****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
