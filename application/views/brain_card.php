@@ -226,8 +226,8 @@ echo $form;
                                         $('#make_register_braintree_pyament').prop('disabled', false);
                                         $('#make_register_braintree_pyament').prop('value', 'I Agree, Submit');
                                         if (status) {
-                                            var msg = "Payment is successful. Thank you! You can print your registration data <a href='https://medical2.com/lms/custom/invoices/registrations/" + email + ".pdf' target='_blank'>here.</a>";
-                                            $('#err').html("<span style='color:red;font-size:bold;'>" + msg + "</span>");
+                                            var msg = "Congratulations! Your registration is complete. You can print your registration data <a href='https://medical2.com/lms/custom/invoices/registrations/" + email + ".pdf' target='_blank'>here.</a>";
+                                            $('#err').html("<span style='font-size:bold;'>" + msg + "</span>");
                                         } // end if status
                                         else {
                                             $('#err').html("<span style='color:red;font-size:bold;'>Credit card was declined</span>");

@@ -239,8 +239,8 @@ echo $form;
                                         $('#make_any_pay_payment').prop('value', 'I Agree, Submit');
                                         if (status) {
                                             if (period == 0) {
-                                                msg = "Payment is successful. Thank you! You can print your registration data <a href='https://medical2.com/lms/custom/invoices/registrations/" + email + ".pdf' target='_blank'>here.</a>";
-                                                $('#err').html("<span style='color:red;font-size:bold;'>" + msg + "</span>");
+                                                msg = "Congratulations! Your registration is complete. You can print your registration data <a href='https://medical2.com/lms/custom/invoices/registrations/" + email + ".pdf' target='_blank'>here.</a>";
+                                                $('#err').html("<span style='font-size:bold;'>" + msg + "</span>");
                                             } // end if period == 0
                                             else {
                                                 //msg = "This certification have been renewed";
