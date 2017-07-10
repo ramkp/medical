@@ -6096,9 +6096,18 @@ $(document).ready(function () {
                     type: type
                 };
 
-                var encoded_user = Base64.encode(JSON.stringify(user));
-                var url = 'https://medical2.com/register2/payment_card/' + encoded_user;
-                var oWindow = window.open(url, "pay");
+                var check_email = '/functionality/php/is_email_exists.php';
+                $.post(check_email, {email: email}).done(function (status) {
+                    if (status == 0) {
+                        $('#register_cash_error').html('');
+                        var encoded_user = Base64.encode(JSON.stringify(user));
+                        var url = 'https://medical2.com/register2/payment_card/' + encoded_user;
+                        var oWindow = window.open(url, "pay");
+                    } // end if status==0
+                    else {
+                        $('#register_cash_error').html('Provided email already in use');
+                    } // end else 
+                });
 
             } // end if card checked
 
