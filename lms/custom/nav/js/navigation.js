@@ -6721,6 +6721,123 @@ $(document).ready(function () {
             }
         }
 
+        if (event.target.id == 'show_demographic_form') {
+            $('#profile_form').show();
+        }
+
+        if (event.target.id == 'insert_demographic_info') {
+            var userid = $('#profile_userid').val();
+            var marital = $('#mstatus').val();
+            var sex = $('#sexbox').val();
+            var race = $('#racebox').val();
+            var education = $('#edu_box').val();
+            var income = $('#income_box').val();
+            var start_date = $('#start_date').val();
+            var job_type = $('#job_type').val();
+            var grad_date = $('#grad_date').val();
+            var status = $('#status').val();
+            var status_comment = $('#status_comment').val();
+            var exam_attempt = $('#exam_attempt').val();
+            var exam_passed = $('#exam_passed').val();
+            var employer = $('#employer').val();
+            var employer_state = $('#employer_state').val();
+            var employer_phone = $('#employer_phone').val();
+            var hire_date = $('#hire_date').val();
+            var work_experience = $('#work_experience').val();
+            var position = $('#position').val();
+            var employer_vcontact = $('#employer_vcontact').val();
+            var employer_vdate = $('#employer_vdate').val();
+
+            var demoObj = {userid: userid,
+                marital: marital,
+                race: race,
+                sex: sex,
+                education: education,
+                income: income,
+                start_date: start_date,
+                job_type: job_type,
+                grad_date: grad_date,
+                status: status,
+                status_comment: status_comment,
+                exam_attempt: exam_attempt,
+                exam_passed: exam_passed,
+                employer: employer,
+                employer_state: employer_state,
+                employer_phone: employer_phone,
+                hire_date: hire_date,
+                work_experience: work_experience,
+                position: position,
+                employer_vcontact: employer_vcontact,
+                employer_vdate: employer_vdate};
+
+            //console.log('Demographic object: ' + JSON.stringify(demoObj));
+            $.post('/lms/custom/my/insert_demographic_data.php', {demo: JSON.stringify(demoObj)}, function (data) {
+                console.log('Server response: ' + data);
+                document.location.reload();
+            }); // end of post
+        }
+        
+        
+        if (event.target.id == 'update_demographic_info') {
+            var userid = $('#profile_userid').val();
+            var marital = $('#mstatus').val();
+            var sex = $('#sexbox').val();
+            var race = $('#racebox').val();
+            var education = $('#edu_box').val();
+            var income = $('#income_box').val();
+            var start_date = $('#start_date').val();
+            var job_type = $('#job_type').val();
+            var grad_date = $('#grad_date').val();
+            var status = $('#status').val();
+            var status_comment = $('#status_comment').val();
+            var exam_attempt = $('#exam_attempt').val();
+            var exam_passed = $('#exam_passed').val();
+            var employer = $('#employer').val();
+            var employer_state = $('#employer_state').val();
+            var employer_phone = $('#employer_phone').val();
+            var hire_date = $('#hire_date').val();
+            var work_experience = $('#work_experience').val();
+            var position = $('#position').val();
+            var employer_vcontact = $('#employer_vcontact').val();
+            var employer_vdate = $('#employer_vdate').val();
+
+            var demoObj = {userid: userid,
+                marital: marital,
+                race: race,
+                sex: sex,
+                education: education,
+                income: income,
+                start_date: start_date,
+                job_type: job_type,
+                grad_date: grad_date,
+                status: status,
+                status_comment: status_comment,
+                exam_attempt: exam_attempt,
+                exam_passed: exam_passed,
+                employer: employer,
+                employer_state: employer_state,
+                employer_phone: employer_phone,
+                hire_date: hire_date,
+                work_experience: work_experience,
+                position: position,
+                employer_vcontact: employer_vcontact,
+                employer_vdate: employer_vdate};
+            
+                $.post('/lms/custom/my/update_demographic_data.php', {demo: JSON.stringify(demoObj)}, function (data) {
+                //console.log('Server response: ' + data);
+                document.location.reload();
+            }); // end of post
+        }
+
+        if (event.target.id == 'print_demographic_data') {
+            var userid = $('#profile_userid').val();
+            $.post('/lms/custom/my/print_demographic_data.php', {userid: userid}, function (filepath) {
+                var url2 = "https://medical2.com/lms/custom/my/" + filepath;
+                var oWindow = window.open(url2, "print");
+            }); // end of post
+        }
+
+
         if (event.target.id == 'send_new_codes') {
             var program = $('#camp_program').val();
             var amount = $('#amount').val();

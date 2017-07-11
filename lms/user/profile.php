@@ -225,6 +225,21 @@ echo '</div>';  // Userprofile class.
             dateFormat: "mm/dd/yy"
         });
 
+        $('#start_date').datepicker({
+            dateFormat: "mm/dd/yy"
+        });
+
+        $('#grad_date').datepicker({
+            dateFormat: "mm/dd/yy"
+        });
+
+        $('#hire_date').datepicker({
+            dateFormat: "mm/dd/yy"
+        });
+
+        $('#employer_vdate').datepicker({
+            dateFormat: "mm/dd/yy"
+        });
 
     }); // end of document ready
 
