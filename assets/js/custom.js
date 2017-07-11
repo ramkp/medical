@@ -2648,119 +2648,128 @@ $(document).ready(function () {
                 console.log('Course id: ' + courseid);
                 console.log('Slot id: ' + slotid);
                 console.log('Program fee: ' + amount);
+                var categoryUrl = '/functionality/php/get_course_category.php';
+                $.post(categoryUrl, {courseid: courseid}).done(function (categoryid) {
+                    console.log('Category ID: ' + categoryid);
+                    if (categoryid != 3 && categoryid != 4) {
+                        if (typeof (slotid) === "undefined" || slotid == 0) {
+                            $('#personal_err').html('Please select state and city');
+                            return;
+                        } // end if slotid == 0
+                    } // end if categoryid!=3 && categoryid!=4
 
-                var firstname = $('#first_name').val();
-                var lastname = $('#last_name').val();
-                var addr = $('#addr').val();
-                var city = $('#city').val();
-                var state = $('#state').val();
-                var country = $('#country').val();
-                var zip = $('#zip').val();
-                var phone = $('#phone').val();
-                var email = $('#email').val();
-                var from = $('#come_from').val();
+                    // ********* Rest of code should be put here *********
 
-                if (firstname == '') {
-                    $('#personal_err').html('Please provide firstname');
-                    return;
-                }
+                    var firstname = $('#first_name').val();
+                    var lastname = $('#last_name').val();
+                    var addr = $('#addr').val();
+                    var city = $('#city').val();
+                    var state = $('#state').val();
+                    var country = $('#country').val();
+                    var zip = $('#zip').val();
+                    var phone = $('#phone').val();
+                    var email = $('#email').val();
+                    var from = $('#come_from').val();
 
-                if (lastname == '') {
-                    $('#personal_err').html('Please provide lastname');
-                    return;
-                }
-
-                if (addr == '') {
-                    $('#personal_err').html('Please provide mailing address');
-                    return;
-                }
-
-                if (city == '') {
-                    $('#personal_err').html('Please provide city');
-                    return;
-                }
-
-                if (state == 0) {
-                    $('#personal_err').html('Please select state');
-                    return;
-                }
-
-                if (country == '') {
-                    $('#personal_err').html('Please provide country');
-                    return;
-                }
-
-                if (zip == '') {
-                    $('#personal_err').html('Please provide zip');
-                    return;
-                }
-
-                if (phone == '') {
-                    $('#personal_err').html('Please provide phone');
-                    return;
-                }
-
-                if (email == '') {
-                    $('#personal_err').html('Please provide email');
-                    return;
-                }
-
-                if (email != '') {
-                    if (!validateEmail(email)) {
-                        console.log('Email vetification failure ..');
-                        $('#personal_err').html('Please provide valid email');
+                    if (firstname == '') {
+                        $('#personal_err').html('Please provide firstname');
                         return;
-                    } // end if 
-                    else {
-                        console.log('Email verification passed ...');
                     }
-                }
 
-                var url = "/functionality/php/is_email_exists.php";
-                var request = {email: email};
-                $.post(url, request).done(function (data) {
-                    console.log('Server email exists response: ' + data);
-                    if (data > 0) {
-                        $('#personal_err').html("You already have an account. Please click <a href='https://medical2.com/login'  target='_blank'>here</a> to login into system using your email and password.");
-                    } // end if data>0
-                    else {
-                        var user = {
-                            first_name: firstname,
-                            last_name: lastname,
-                            b_fname: b_fname,
-                            b_lname: b_lname,
-                            addr: addr,
-                            city: city,
-                            state: state,
-                            country: country,
-                            zip: zip,
-                            inst: 'n/a',
-                            phone: phone,
-                            email: email,
-                            come_from: from,
-                            renew: 0,
-                            courseid: courseid,
-                            promo_code: promo_code,
-                            slotid: slotid,
-                            amount: amount
-                        };
-                        console.log('User object: ' + JSON.stringify(user));
-                        var url;
-                        var encoded_user = Base64.encode(JSON.stringify(user));
-                        var ptype = $("input:radio[name ='ptype']:checked").val();
-                        if (ptype == 'card') {
-                            url = 'https://medical2.com/register2/payment_card/' + encoded_user;
-                            //url = 'https://medical2.com/register2/payment_auth_card/' + encoded_user;
-                        } // end if ptype=='card'
+                    if (lastname == '') {
+                        $('#personal_err').html('Please provide lastname');
+                        return;
+                    }
+
+                    if (addr == '') {
+                        $('#personal_err').html('Please provide mailing address');
+                        return;
+                    }
+
+                    if (city == '') {
+                        $('#personal_err').html('Please provide city');
+                        return;
+                    }
+
+                    if (state == 0) {
+                        $('#personal_err').html('Please select state');
+                        return;
+                    }
+
+                    if (country == '') {
+                        $('#personal_err').html('Please provide country');
+                        return;
+                    }
+
+                    if (zip == '') {
+                        $('#personal_err').html('Please provide zip');
+                        return;
+                    }
+
+                    if (phone == '') {
+                        $('#personal_err').html('Please provide phone');
+                        return;
+                    }
+
+                    if (email == '') {
+                        $('#personal_err').html('Please provide email');
+                        return;
+                    }
+
+                    if (email != '') {
+                        if (!validateEmail(email)) {
+                            console.log('Email vetification failure ..');
+                            $('#personal_err').html('Please provide valid email');
+                            return;
+                        } // end if 
                         else {
-                            url = 'https://medical2.com/register2/payment_paypal/' + encoded_user;
-                        } // end else when user pays by PayPal
-                        window.location.href = url;
-                    } // end else when email is not exists and we can continue ...
-                }); // end of post
+                            console.log('Email verification passed ...');
+                        }
+                    }
 
-
-
+                    var url = "/functionality/php/is_email_exists.php";
+                    var request = {email: email};
+                    $.post(url, request).done(function (data) {
+                        console.log('Server email exists response: ' + data);
+                        if (data > 0) {
+                            $('#personal_err').html("You already have an account. Please click <a href='https://medical2.com/login'  target='_blank'>here</a> to login into system using your email and password.");
+                        } // end if data>0
+                        else {
+                            var user = {
+                                first_name: firstname,
+                                last_name: lastname,
+                                b_fname: b_fname,
+                                b_lname: b_lname,
+                                addr: addr,
+                                city: city,
+                                state: state,
+                                country: country,
+                                zip: zip,
+                                inst: 'n/a',
+                                phone: phone,
+                                email: email,
+                                come_from: from,
+                                renew: 0,
+                                courseid: courseid,
+                                promo_code: promo_code,
+                                slotid: slotid,
+                                amount: amount
+                            };
+                            console.log('User object: ' + JSON.stringify(user));
+                            var url;
+                            var encoded_user = Base64.encode(JSON.stringify(user));
+                            var ptype = $("input:radio[name ='ptype']:checked").val();
+                            if (ptype == 'card') {
+                                url = 'https://medical2.com/register2/payment_card/' + encoded_user;
+                                //url = 'https://medical2.com/register2/payment_auth_card/' + encoded_user;
+                            } // end if ptype=='card'
+                            else {
+                                url = 'https://medical2.com/register2/payment_paypal/' + encoded_user;
+                            } // end else when user pays by PayPal
+                            window.location.href = url;
+                        } // end else when email is not exists and we can continue ...
+                    }); // end of post when email check
+                }); // end of post to check course category
             } // end else when program is selected
         }
 

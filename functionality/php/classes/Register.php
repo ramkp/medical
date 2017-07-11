@@ -791,4 +791,13 @@ class Register {
         return $list;
     }
 
+    function get_course_category($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $categoryid = $row['category'];
+        }
+        return $categoryid;
+    }
+
 }
