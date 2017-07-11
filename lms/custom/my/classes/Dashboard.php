@@ -825,9 +825,9 @@ class Dashboard extends Util {
                 // Original payment
                 /*
                  * 
-                $list.="<div class='row-fluid' style=''>";
-                $list.="<span class='span9'>Paid by card $" . $row['psum'] . " ($pdate) $coursename</span>";
-                $list.="</div>";
+                  $list.="<div class='row-fluid' style=''>";
+                  $list.="<span class='span9'>Paid by card $" . $row['psum'] . " ($pdate) $coursename</span>";
+                  $list.="</div>";
                  * 
                  */
 
@@ -867,12 +867,12 @@ class Dashboard extends Util {
                 $psum = $original_payment->psum;
                 $fullpsum = $psum + $row['psum'];
                 $date = date('m-d-Y', $row['refund_date']);
-                
+
                 /*
                  * 
-                $list.="<div class='row-fluid'>";
-                $list.="<span class='span9'>Paid by card $" . $fullpsum . " ($pdate) $coursename</span>";
-                $list.="</div>";
+                  $list.="<div class='row-fluid'>";
+                  $list.="<span class='span9'>Paid by card $" . $fullpsum . " ($pdate) $coursename</span>";
+                  $list.="</div>";
                  * 
                  */
 
@@ -1659,13 +1659,13 @@ class Dashboard extends Util {
                     $user = $this->get_user_details($userid);
 
                     $list.="<br><table align='center' border='0' width='100%'>";
-                    
-                    
-                    
+
+
+
                     $list.="<tr>";
-                    
+
                     $list.="<td colspan='3'>";
-                    
+
                     $list.="<table align='center' border='0' width='100%'>
 
                     <tr>
@@ -1723,9 +1723,9 @@ class Dashboard extends Util {
                         </tr>
 
                      </table>";
-                    
+
                     $list.="</td>";
-                    
+
                     $list.="</tr>";
 
                     $list.="<tr>";
@@ -1907,6 +1907,1173 @@ class Dashboard extends Util {
 
     // ************* Code related to custom profile section  ************** /
 
+    function get_marital_status_box($sel = null) {
+        $list = "";
+        $list.="<select id='mstatus'>";
+        if ($sel == null) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='1'>Single</option>";
+            $list.="<option value='2'>Maried</option>";
+        } // end if
+        else {
+            switch ($sel) {
+                case 0:
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='1'>Single</option>";
+                    $list.="<option value='2'>Maried</option>";
+                    break;
+                case 1:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' selected>Single</option>";
+                    $list.="<option value='2'>Maried</option>";
+                    break;
+                case 2:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' >Single</option>";
+                    $list.="<option value='2' selected>Maried</option>";
+                    break;
+            }
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_race_box($sel = null) {
+        $list = "";
+        $list.="<select id='racebox'>";
+        if ($sel == null) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='1'>White Caucasian</option>";
+            $list.="<option value='2'>Black</option>";
+            $list.="<option value='3'>Asia</option>";
+            $list.="<option value='4'>Mexican</option>";
+            $list.="<option value='5'>Other</option>";
+        } // end if $sel==null
+        else {
+            switch ($sel) {
+                case 0:
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='1'>White Caucasian</option>";
+                    $list.="<option value='2'>Black</option>";
+                    $list.="<option value='3'>Asia</option>";
+                    $list.="<option value='4'>Mexican</option>";
+                    $list.="<option value='5'>Other</option>";
+                    break;
+                case 1:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' selected>White Caucasian</option>";
+                    $list.="<option value='2'>Black</option>";
+                    $list.="<option value='3'>Asia</option>";
+                    $list.="<option value='4'>Mexican</option>";
+                    $list.="<option value='5'>Other</option>";
+                    break;
+                case 2:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>White Caucasian</option>";
+                    $list.="<option value='2' selected>Black</option>";
+                    $list.="<option value='3'>Asia</option>";
+                    $list.="<option value='4'>Mexican</option>";
+                    $list.="<option value='5'>Other</option>";
+                    break;
+                case 3:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>White Caucasian</option>";
+                    $list.="<option value='2'>Black</option>";
+                    $list.="<option value='3' selected>Asia</option>";
+                    $list.="<option value='4'>Mexican</option>";
+                    $list.="<option value='5'>Other</option>";
+                    break;
+                case 4:
+                    $list.="<option value='0'>Please select</option>";
+                    $list.="<option value='1'>White Caucasian</option>";
+                    $list.="<option value='2'>Black</option>";
+                    $list.="<option value='3'>Asia</option>";
+                    $list.="<option value='4' selected>Mexican</option>";
+                    $list.="<option value='5'>Other</option>";
+                    break;
+                case 5:
+                    $list.="<option value='0'>Please select</option>";
+                    $list.="<option value='1'>White Caucasian</option>";
+                    $list.="<option value='2'>Black</option>";
+                    $list.="<option value='3'>Asia</option>";
+                    $list.="<option value='4'>Mexican</option>";
+                    $list.="<option value='5' selected>Other</option>";
+                    break;
+            }
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_sex_box($sel = null) {
+        $list = "";
+        $list.="<select id='sexbox'>";
+        if ($sel == null) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='1'>Female</option>";
+            $list.="<option value='2'>Male</option>";
+        } // end if $sel == null
+        else {
+            switch ($sel) {
+                case 0:
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='1'>Female</option>";
+                    $list.="<option value='2'>Male</option>";
+                    break;
+                case 1:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' selected>Female</option>";
+                    $list.="<option value='2'>Male</option>";
+                    break;
+                case 2:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>Female</option>";
+                    $list.="<option value='2' selected>Male</option>";
+                    break;
+            }
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_edu_box($sel = null) {
+        $list = "";
+        $list.="<select id='edu_box'>";
+        if ($sel == null) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='1'>Attended high school</option>";
+            $list.="<option value='2'>GED</option>";
+            $list.="<option value='3'>High school diploma</option>";
+            $list.="<option value='4'>College</option>";
+            $list.="<option value='5'>College certification</option>";
+            $list.="<option value='6'>College diploma</option>";
+        } // end if
+        else {
+            switch ($sel) {
+                case 0:
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='1'>Attended high school</option>";
+                    $list.="<option value='2'>GED</option>";
+                    $list.="<option value='3'>High school diploma</option>";
+                    $list.="<option value='4'>College</option>";
+                    $list.="<option value='5'>College certification</option>";
+                    $list.="<option value='6'>College diploma</option>";
+                    break;
+
+                case 1:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' selected>Attended high school</option>";
+                    $list.="<option value='2'>GED</option>";
+                    $list.="<option value='3'>High school diploma</option>";
+                    $list.="<option value='4'>College</option>";
+                    $list.="<option value='5'>College certification</option>";
+                    $list.="<option value='6'>College diploma</option>";
+                    break;
+
+                case 2:
+                    $list.="<option value='0' s>Please select</option>";
+                    $list.="<option value='1'>Attended high school</option>";
+                    $list.="<option value='2' selected>GED</option>";
+                    $list.="<option value='3'>High school diploma</option>";
+                    $list.="<option value='4'>College</option>";
+                    $list.="<option value='5'>College certification</option>";
+                    $list.="<option value='6'>College diploma</option>";
+                    break;
+
+                case 3:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>Attended high school</option>";
+                    $list.="<option value='2'>GED</option>";
+                    $list.="<option value='3' selected>High school diploma</option>";
+                    $list.="<option value='4'>College</option>";
+                    $list.="<option value='5'>College certification</option>";
+                    $list.="<option value='6'>College diploma</option>";
+                    break;
+
+                case 4:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>Attended high school</option>";
+                    $list.="<option value='2'>GED</option>";
+                    $list.="<option value='3'>High school diploma</option>";
+                    $list.="<option value='4' selected>College</option>";
+                    $list.="<option value='5'>College certification</option>";
+                    $list.="<option value='6'>College diploma</option>";
+                    break;
+
+                case 5:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>Attended high school</option>";
+                    $list.="<option value='2'>GED</option>";
+                    $list.="<option value='3'>High school diploma</option>";
+                    $list.="<option value='4'>College</option>";
+                    $list.="<option value='5' selected>College certification</option>";
+                    $list.="<option value='6'>College diploma</option>";
+                    break;
+
+                case 6:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>Attended high school</option>";
+                    $list.="<option value='2'>GED</option>";
+                    $list.="<option value='3'>High school diploma</option>";
+                    $list.="<option value='4'>College</option>";
+                    $list.="<option value='5'>College certification</option>";
+                    $list.="<option value='6' selected>College diploma</option>";
+                    break;
+            }
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_income_box($sel = null) {
+        $list = "";
+        $list.="<select id='income_box'>";
+        if ($sel == null) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='1'>$0-$25000</option>";
+            $list.="<option value='2'>$25000 - $50000</option>";
+            $list.="<option value=3>$50000 - $10000</option>";
+            $list.="<option value='4'>Above $100000</option>";
+        } // end if
+        else {
+            switch ($sel) {
+                case 0:
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='1'>$0-$25000</option>";
+                    $list.="<option value='2'>$25000 - $50000</option>";
+                    $list.="<option value=3>$50000 - $10000</option>";
+                    $list.="<option value='4'>Above $100000</option>";
+                    break;
+
+                case 1:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' selected>$0-$25000</option>";
+                    $list.="<option value='2'>$25000 - $50000</option>";
+                    $list.="<option value=3>$50000 - $10000</option>";
+                    $list.="<option value='4'>Above $100000</option>";
+                    break;
+
+                case 2:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>$0-$25000</option>";
+                    $list.="<option value='2' selected>$25000 - $50000</option>";
+                    $list.="<option value=3>$50000 - $10000</option>";
+                    $list.="<option value='4'>Above $100000</option>";
+                    break;
+
+                case 3:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>$0-$25000</option>";
+                    $list.="<option value='2'>$25000 - $50000</option>";
+                    $list.="<option value=3 selected>$50000 - $10000</option>";
+                    $list.="<option value='4'>Above $100000</option>";
+                    break;
+
+                case 4:
+                    $list.="<option value='0'>Please select</option>";
+                    $list.="<option value='1'>$0-$25000</option>";
+                    $list.="<option value='2'>$25000 - $50000</option>";
+                    $list.="<option value=3>$50000 - $10000</option>";
+                    $list.="<option value='4' selected>Above $100000</option>";
+                    break;
+            }
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_medical2_start_date($sel = null) {
+        $list = "";
+        if ($sel == null) {
+            $list.="<input type='text' id='start_date'>";
+        } // end if
+        else {
+            $list.="<input type='text' id='start_date' value='$sel'>";
+        } // end else
+        return $list;
+    }
+
+    function get_job_type_box($sel = null) {
+        $list = "";
+        $list.="<select id='job_type'>";
+        if ($sel == null) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='1'>Part Time</option>";
+            $list.="<option value='2'>Full Time</option>";
+        } // end if
+        else {
+            switch ($sel) {
+                case 0:
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='1'>Part Time</option>";
+                    $list.="<option value='2'>Full Time</option>";
+                    break;
+
+                case 1:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' selected>Part Time</option>";
+                    $list.="<option value='2'>Full Time</option>";
+                    break;
+
+                case 2:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>Part Time</option>";
+                    $list.="<option value='2' selected>Full Time</option>";
+                    break;
+            }
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_medical_graduation_date($sel) {
+        $list = "";
+        if ($sel == null) {
+            $list.="<input type='text' id='grad_date'>";
+        } // end if
+        else {
+            $list.="<input type='text' id='grad_date' value='$sel'>";
+        } // end else
+        return $list;
+    }
+
+    function get_status_box($sel) {
+        //echo "Param: ".$sel."<br>";
+        $list = "";
+        $list.="<select id='status'>";
+        if ($sel == null) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='A'>Attending</option>";
+            $list.="<option value='G'>Graduate</option>";
+            $list.="<option value='W'>Withdrawal</option>";
+            $list.="<option value='T'>Termonation</option>";
+            $list.="<option value='F'>Failed out</option>";
+        } // end if
+        else {
+            //echo "Inside else ...<br>";
+            //echo "case $sel ";
+            switch ($sel) {
+                case '0':
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='A'>Attending</option>";
+                    $list.="<option value='G'>Graduate</option>";
+                    $list.="<option value='W'>Withdrawal</option>";
+                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='F'>Failed out</option>";
+                    break;
+
+                case 'A':
+                    $list.="<option value='0'>Please select</option>";
+                    $list.="<option value='A' selected>Attending</option>";
+                    $list.="<option value='G'>Graduate</option>";
+                    $list.="<option value='W'>Withdrawal</option>";
+                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='F'>Failed out</option>";
+                    break;
+
+                case 'G':
+
+                    $list.="<option value='0'>Please select</option>";
+                    $list.="<option value='A'>Attending</option>";
+                    $list.="<option value='G' selected>Graduate</option>";
+                    $list.="<option value='W'>Withdrawal</option>";
+                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='F'>Failed out</option>";
+                    break;
+
+                case 'W':
+                    $list.="<option value='0'>Please select</option>";
+                    $list.="<option value='A'>Attending</option>";
+                    $list.="<option value='G'>Graduate</option>";
+                    $list.="<option value='W' selected>Withdrawal</option>";
+                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='F'>Failed out</option>";
+                    break;
+
+                case 'T':
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='A'>Attending</option>";
+                    $list.="<option value='G'>Graduate</option>";
+                    $list.="<option value='W'>Withdrawal</option>";
+                    $list.="<option value='T' selected>Termonation</option>";
+                    $list.="<option value='F'>Failed out</option>";
+                    break;
+
+                case 'F':
+                    $list.="<option value='0'>Please select</option>";
+                    $list.="<option value='A'>Attending</option>";
+                    $list.="<option value='G'>Graduate</option>";
+                    $list.="<option value='W'>Withdrawal</option>";
+                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='F' selected>Failed out</option>";
+                    break;
+            }
+        } // end else
+
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_attempted_exam_box($sel = null) {
+        $list = "";
+        $list.="<select id='exam_attempt'>";
+        if ($sel == nul) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='1'>Yes</option>";
+            $list.="<option value='2'>No</option>";
+        } // end if
+        else {
+            switch ($sel) {
+                case 0:
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='1'>Yes</option>";
+                    $list.="<option value='2'>No</option>";
+                    break;
+
+                case 1:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' selected>Yes</option>";
+                    $list.="<option value='2'>No</option>";
+                    break;
+
+                case 2:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>Yes</option>";
+                    $list.="<option value='2' selected>No</option>";
+                    break;
+            }
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_passed_box($sel) {
+        $list = "";
+        $list.="<select id='exam_passed'>";
+        if ($sel == nul) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='1'>Yes</option>";
+            $list.="<option value='2'>No</option>";
+        } // end if
+        else {
+            switch ($sel) {
+                case 0:
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='1'>Yes</option>";
+                    $list.="<option value='2'>No</option>";
+                    break;
+
+                case 1:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' selected>Yes</option>";
+                    $list.="<option value='2'>No</option>";
+                    break;
+
+                case 2:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>Yes</option>";
+                    $list.="<option value='2' selected>No</option>";
+                    break;
+            }
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_work_box($sel) {
+        $list = "";
+        $list.="<select id='work_experience'>";
+        if ($sel == nul) {
+            $list.="<option value='0' selected>Please select</option>";
+            $list.="<option value='1'>Yes</option>";
+            $list.="<option value='2'>No</option>";
+        } // end if
+        else {
+            switch ($sel) {
+                case 0:
+                    $list.="<option value='0' selected>Please select</option>";
+                    $list.="<option value='1'>Yes</option>";
+                    $list.="<option value='2'>No</option>";
+                    break;
+
+                case 1:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1' selected>Yes</option>";
+                    $list.="<option value='2'>No</option>";
+                    break;
+
+                case 2:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>Yes</option>";
+                    $list.="<option value='2' selected>No</option>";
+                    break;
+            }
+        } // end else
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_empty_demographic_form($userid) {
+        $list = "";
+        $mbox = $this->get_marital_status_box();
+        $rbox = $this->get_race_box();
+        $sbox = $this->get_sex_box();
+        $edubox = $this->get_edu_box();
+        $incomebox = $this->get_income_box();
+        $startdate = $this->get_medical2_start_date();
+        $job_box = $this->get_job_type_box();
+        $graduationdate = $this->get_medical_graduation_date();
+        $status = $this->get_status_box();
+        $exambox = $this->get_attempted_exam_box();
+        $passedbox = $this->get_passed_box();
+        $workbox = $this->get_work_box();
+
+        $list.="<input type='hidden' id='profile_userid' value='$userid'>";
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Marital status</span>";
+        $list.="<span class='span2'>$mbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Race</span>";
+        $list.="<span class='span2'>$rbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Sex</span>";
+        $list.="<span class='span2'>$sbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Education level</span>";
+        $list.="<span class='span2'>$edubox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Income level</span>";
+        $list.="<span class='span2'>$incomebox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Medical2 Start Date</span>";
+        $list.="<span class='span2'>$startdate</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Part or full time</span>";
+        $list.="<span class='span2'>$job_box</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Medical2 graduation Date</span>";
+        $list.="<span class='span2'>$graduationdate</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Status</span>";
+        $list.="<span class='span2'>$status</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Status Comment</span>";
+        $list.="<span class='span2'><textarea id='status_comment' rows='5'></textarea></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Attempted Exam</span>";
+        $list.="<span class='span2'>$exambox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Passed Exam</span>";
+        $list.="<span class='span2'>$passedbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer</span>";
+        $list.="<span class='span2'><input type='text' id='employer'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer City/State</span>";
+        $list.="<span class='span2'><input type='text' id='employer_state'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer Phone</span>";
+        $list.="<span class='span2'><input type='text' id='employer_phone'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Hire Date</span>";
+        $list.="<span class='span2'><input type='text' id='hire_date'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Work 15 days</span>";
+        $list.="<span class='span2'>$workbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Position</span>";
+        $list.="<span class='span2'><input type='text' id='position'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer contact</span>";
+        $list.="<span class='span2'><input type='text' id='employer_vcontact'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer verification date</span>";
+        $list.="<span class='span2'><input type='text' id='employer_vdate'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'></span>";
+        $list.="<span class='span2'><button id='insert_demographic_info'>Add</button></span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function get_filled_demographic_form($userid) {
+        $list = "";
+
+        $list.="<input type='hidden' id='profile_userid' value='$userid'>";
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span3'><button id='print_demographic_data'>Print</button></span>";
+        $list.="</div>";
+
+        $query = "select * from mdl_demographic where userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $demo = new stdClass();
+            foreach ($row as $key => $value) {
+                $demo->$key = $value;
+            }
+        } // end while
+        //echo "<pre>";
+        //print_r($demo);
+        //echo "</pre>";
+
+        $mbox = $this->get_marital_status_box($demo->mstatus);
+        $rbox = $this->get_race_box($demo->race);
+        $sbox = $this->get_sex_box($demo->sex);
+        $edubox = $this->get_edu_box($demo->edlevel);
+        $incomebox = $this->get_income_box($demo->incomelevel);
+        $startdate = $this->get_medical2_start_date($demo->startdate);
+        $job_box = $this->get_job_type_box($demo->job_type);
+        $graduationdate = $this->get_medical_graduation_date($demo->graduatedate);
+        $status = $this->get_status_box(trim($demo->school_status));
+        $exambox = $this->get_attempted_exam_box($demo->attemptexam);
+        $passedbox = $this->get_passed_box($demo->passedexam);
+        $workbox = $this->get_work_box($demo->work15);
+
+        $list.="<input type='hidden' id='profile_userid' value='$userid'>";
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Marital status</span>";
+        $list.="<span class='span2'>$mbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Race</span>";
+        $list.="<span class='span2'>$rbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Sex</span>";
+        $list.="<span class='span2'>$sbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Education level</span>";
+        $list.="<span class='span2'>$edubox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Income level</span>";
+        $list.="<span class='span2'>$incomebox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Medical2 Start Date</span>";
+        $list.="<span class='span2'>$startdate</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Part or full time</span>";
+        $list.="<span class='span2'>$job_box</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Medical2 graduation Date</span>";
+        $list.="<span class='span2'>$graduationdate</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Status</span>";
+        $list.="<span class='span2'>$status</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Status Comment</span>";
+        $list.="<span class='span2'><textarea id='status_comment' rows='5'>$demo->comments</textarea></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Attempted Exam</span>";
+        $list.="<span class='span2'>$exambox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Passed Exam</span>";
+        $list.="<span class='span2'>$passedbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer</span>";
+        $list.="<span class='span2'><input type='text' id='employer' value='$demo->employer'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer City/State</span>";
+        $list.="<span class='span2'><input type='text' id='employer_state' value='$demo->employerstate'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer Phone</span>";
+        $list.="<span class='span2'><input type='text' id='employer_phone' value='$demo->employerphone'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Hire Date</span>";
+        $list.="<span class='span2'><input type='text' id='hire_date' value='$demo->hiredate'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Work 15 days</span>";
+        $list.="<span class='span2'>$workbox</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Position</span>";
+        $list.="<span class='span2'><input type='text' id='position' value='$demo->position'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer contact</span>";
+        $list.="<span class='span2'><input type='text' id='employer_vcontact' value='$demo->employervcontact'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Employer verification date</span>";
+        $list.="<span class='span2'><input type='text' id='employer_vdate' value='$demo->employervdate'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'></span>";
+        $list.="<span class='span2'><button id='update_demographic_info'>Update</button></span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function get_race_report_data($id) {
+        $list = "";
+        switch ($id) {
+            case 0:
+                $list.="N/A";
+                break;
+            case 1:
+                $list.="White Caucasian";
+                break;
+            case 2:
+                $list.="Black";
+                break;
+            case 3:
+                $list.="Asia";
+                break;
+            case 4:
+                $list.="Mexican";
+                break;
+            case 5:
+                $list.="Other";
+                break;
+        }
+        return $list;
+    }
+
+    function get_education_report_data($id) {
+        $list = "";
+        switch ($id) {
+            case 0:
+                $list.="N/A";
+                break;
+            case 1:
+                $list.="Attended High School";
+                break;
+            case 2:
+                $list.="GED";
+                break;
+            case 3:
+                $list.="High School Diploma";
+                break;
+            case 4:
+                $list.="College";
+                break;
+            case 5:
+                $list.="College Certification";
+                break;
+            case 6:
+                $list.="College Diploma";
+                break;
+        }
+        return $list;
+    }
+
+    function get_income_report_data($id) {
+        $list = "";
+        switch ($id) {
+            case 0:
+                $list.="N/A";
+                break;
+            case 1:
+                $list.="$0 - $25000";
+                break;
+            case 2:
+                $list.="$25000 - $50000";
+                break;
+            case 3:
+                $list.="$50000 - $100000";
+                break;
+            case 4:
+                $list.="Above $100000";
+                break;
+        }
+        return $list;
+    }
+
+    function get_status_report_data($id) {
+        $list = "";
+        switch ($id) {
+            case '0':
+                $list.="N/A";
+                break;
+            case 'A':
+                $list.="Attending";
+                break;
+            case 'G':
+                $list.="Graduate";
+                break;
+            case 'W':
+                $list.="Withdrawal";
+                break;
+            case 'T':
+                $list.="Termination";
+                break;
+            case 'F':
+                $list.="Failed out";
+                break;
+        }
+        return $list;
+    }
+
+    function print_demographic_data($userid) {
+        $list = "";
+        $query = "select * from  mdl_demographic where userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $demo = new stdClass();
+            foreach ($row as $key => $value) {
+                $demo->$key = $value;
+            } // end foreach
+        } // end while
+
+
+        $list.="<table align='center'>";
+
+        $list.="<tr>";
+
+        $list.="<td colspan='2'>";
+
+        $list.="<table align='center' border='0' width='100%'>
+
+                    <tr>
+
+                        <td style='padding-top:10px;'><img src='https://medical2.com/assets/icons/logo3.png' width='115' height='105'></td>
+                        
+                        <td valign='top'>
+                        
+                        <table style='padding:15px;font-size:12px;' align='left'>
+
+                                <tr>
+                                    <td style='font-size:20px;font-weight:bold;letter-spacing:8px;padding-left:65px;'>Medical2</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td style='font-size:15px;font-weight:bold;letter-spacing:6px;padding-left:40px;'>Career College</td>
+                                </tr>
+
+                                <tr>
+                                    <td style='padding-top:10px;padding-left:75px;'>1830A North Gloster St</td>
+                                </tr>  
+
+                                <tr>
+                                    <td style='padding-left:90px;'>Tupelo, MS 38804</td>
+                                </tr>  
+
+                            </table>  
+                            
+                            </td>
+                     
+                        <td align='right' valign='top'>
+
+                            <table style='padding:15px;font-size:12px;'>
+
+                                <tr>
+                                    <td style='padding-top:5px;'>Phone: 877-741-1996</td>
+                                </tr>  
+
+                                <tr>
+                                    <td>Fax: 1-407-233-1192</td>
+                                </tr> 
+
+                                <tr>
+                                    <td style='padding-top:25px;'>Email: info@medical2.com</td>
+                                </tr> 
+
+                                <tr>
+                                    <td>Web: www.medical2.com</td>
+                                </tr>  
+
+                            </table>    
+
+                        </td>
+
+                        </tr>
+
+                     </table>";
+
+        $list.="</td>";
+
+        $list.="</tr>";
+
+        $list.="<tr>";
+
+        $list.="<td colspan='2' style='padding-left:15px;'>";
+
+        $marital_status = ($demo->mstatus == 1) ? 'Single' : 'Maried';
+        $race = $this->get_race_report_data($demo->race);
+        $sex = ($demo->sex == 1) ? 'Female' : 'Male';
+        $edlevel = $this->get_education_report_data($demo->edlevel);
+        $income = $this->get_income_report_data($demo->incomelevel);
+        $startdate = $demo->startdate;
+        $job_type = ($demo->job_type == 1) ? 'Part Time' : 'Full Time';
+        $grad_date = $demo->graduatedate;
+        $status = $this->get_status_report_data($demo->school_status);
+        $attempted_exam = ($demo->attemptexam == 1) ? 'Yes' : 'No';
+        $passed_exam = ($demo->passedexam == 1) ? 'Yes' : 'No';
+        $comments = $demo->comments;
+        $employer = $demo->employer;
+        $employerphone = $demo->employerphone;
+        $employerstate = $demo->employerstate;
+        $hiredate = $demo->hiredate;
+        $work_experience = ($demo->work15 == 1) ? 'Yes' : 'No';
+        $position = $demo->position;
+        $employervcontact = $demo->employervcontact;
+        $employervdate = $demo->employervdate;
+
+        $list.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<table align='center' border='0' width='100%' style=''>";
+
+        $list.="<tr>";
+        $list.="<td>Mariage status</td><td>$marital_status</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Race</td><td>$race</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Sex</td><td>$sex</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Education level</td><td>$edlevel</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Income level</td><td>$income</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Medical2 Start Date</td><td>$startdate</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Part or full time</td><td>$job_type</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Medical2 Graduation Date</td><td>$grad_date</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Status</td><td>$status</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Comment for status</td><td>$comments</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Attempted Certification Exam</td><td>$attempted_exam</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Passed Certification Exam</td><td>$passed_exam</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Employer</td><td>$employer</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Employer City/State</td><td>$employerstate</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Employer phone</td><td>$employerphone</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Hire Date</td><td>$hiredate</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Worked at least 15 days</td><td>$work_experience</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Position</td><td>$position</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Employer Verification Contact</td><td>$employervcontact</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Employer Verification Date</td><td>$employervdate</td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+
+        $list.="</td>";
+
+        $list.="</tr>";
+
+        $list.="</table>";
+
+        $dir = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/my';
+        $file = $userid . "_demographic_report.pdf";
+        $path = $dir . "/$file";
+        $pdf = new mPDF('utf-8', 'A4-P');
+        $pdf->WriteHTML($list);
+        $pdf->Output($path, 'F');
+        return $file;
+    }
+
+    function get_demographic_info($userid) {
+        $list = "";
+        $query = "select * from mdl_demographic where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $filled_form = $this->get_filled_demographic_form($userid);
+            $list.=$filled_form;
+        } // end if $num > 0
+        else {
+            $empty_demo_form = $this->get_empty_demographic_form($userid);
+            $list.="<div class='row-fluid' id='profile_form' style='display:block;'>";
+            $list.="<span class='span12'>$empty_demo_form</span>";
+            $list.="</div>";
+        } // end else
+        return $list;
+    }
+
+    function insert_demographic_data($data) {
+        $query = "insert into mdl_demographic "
+                . "(userid,"
+                . "mstatus,"
+                . "race,"
+                . "sex,"
+                . "edlevel,"
+                . "incomelevel,"
+                . "startdate,"
+                . "job_type,"
+                . "graduatedate,"
+                . "school_status,"
+                . "comments,"
+                . "attemptexam,"
+                . "passedexam,"
+                . "employer,"
+                . "employerphone,"
+                . "employerstate,"
+                . "hiredate,"
+                . "work15,"
+                . "position,"
+                . "employervcontact,"
+                . "employervdate) "
+                . "values ('$data->userid', "
+                . "'$data->marital', "
+                . "'$data->race',"
+                . "'$data->sex',"
+                . "'$data->education',"
+                . "'$data->income',"
+                . "'$data->start_date',"
+                . "'$data->job_type',"
+                . "'$data->grad_date',"
+                . "'$data->status',"
+                . "'$data->status_comment',"
+                . "'$data->exam_attempt',"
+                . "'$data->exam_passed',"
+                . "'$data->employer',"
+                . "'$data->employer_phone', "
+                . "'$data->employer_state', "
+                . "'$data->hire_date', "
+                . "'$data->work_experience',"
+                . "'$data->position', "
+                . "'$data->employer_vcontact',"
+                . "'$data->employer_vdate')";
+        //echo "Query: ".$query."<br>";
+        $this->db->query($query);
+    }
+
+    function update_demographic_data($data) {
+        $query = "update mdl_demographic "
+                . "set mstatus='$data->marital', "
+                . "race='$data->race', "
+                . "sex='$data->sex', "
+                . "edlevel='$data->education',"
+                . "incomelevel='$data->income',"
+                . "startdate='$data->start_date',"
+                . "job_type='$data->job_type',"
+                . "graduatedate='$data->grad_date',"
+                . "	school_status='$data->status',"
+                . "comments='$data->status_comment',"
+                . "attemptexam='$data->exam_attempt',"
+                . "passedexam='$data->exam_passed',"
+                . "employer='$data->employer',"
+                . "employerphone='$data->employer_phone',"
+                . "employerstate='$data->employer_state',"
+                . "hiredate='$data->hire_date',"
+                . "work15='$data->work_experience',"
+                . "position='$data->position',"
+                . "employervcontact='$data->employer_vcontact',"
+                . "employervdate='$data->employer_vdate' where userid=$data->userid";
+        //echo "Query: ".$query."<br>";
+        $this->db->query($query);
+    }
+
     function get_user_profile_custom_sections($id) {
         $list = "";
         $current_user_id = $this->user->id;
@@ -1915,6 +3082,7 @@ class Dashboard extends Util {
         $certficates = $this->get_user_certificates($id);
         $grades = $this->get_user_grades($id);
         $attend = $this->get_student_attendance($id);
+        $info = $this->get_demographic_info($id);
         $other = $this->get_other_tab($id);
         $system_role = $this->get_system_wide_roles($current_user_id);
         if ($current_user_id == 2 || $current_user_id == 234 || $system_role == 9) {
@@ -1924,6 +3092,7 @@ class Dashboard extends Util {
               <li><a data-toggle='tab' href='#menu2'>Certificates</a></li>
               <li><a data-toggle='tab' href='#grades'>Grades</a></li>
               <li><a data-toggle='tab' href='#attend'>Attendance</a></li>
+              <li><a data-toggle='tab' href='#info'>Info</a></li>
               <li><a data-toggle='tab' href='#menu3'>Other</a></li>";
 
             $list.="<input type='hidden' id='userid' value='$id'>  
@@ -1950,6 +3119,10 @@ class Dashboard extends Util {
                 <h3>Attendance &nbsp;&nbsp;<button id='print_att'>Print</button></h3>
                 <p>$attend</p>
               </div>
+              <div id='info' class='tab-pane fade'>
+                <h3>Demographic info</h3>
+                <p>$info</p>
+              </div>  
               <div id='menu3' class='tab-pane fade'>
                 <h3>Other</h3>
                 <p>$other</p>
