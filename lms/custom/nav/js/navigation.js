@@ -6226,10 +6226,19 @@ $(document).ready(function () {
                 sum: sum,
                 type: type
             };
-            //console.log('User object: ' + JSON.stringify(user));
-            var url = "/lms/custom/register/add_register_cash_payment.php";
-            $.post(url, {user: JSON.stringify(user)}).done(function (data) {
-                $('#register_cash_error').html("<span style='color:black'>" + data + "</span>");
+
+            var check_email = '/functionality/php/is_email_exists.php';
+            $.post(check_email, {email: email}).done(function (status) {
+                if (status == 0) {
+                    $('#register_cash_error').html('');
+                    var url = "/lms/custom/register/add_register_cash_payment.php";
+                    $.post(url, {user: JSON.stringify(user)}).done(function (data) {
+                        $('#register_cash_error').html("<span style='color:black'>" + data + "</span>");
+                    });
+                } // end if
+                else {
+                    $('#register_cash_error').html('Provided email already exists');
+                } // end else
             });
         }
 
@@ -6776,8 +6785,8 @@ $(document).ready(function () {
                 document.location.reload();
             }); // end of post
         }
-        
-        
+
+
         if (event.target.id == 'update_demographic_info') {
             var userid = $('#profile_userid').val();
             var marital = $('#mstatus').val();
@@ -6822,8 +6831,8 @@ $(document).ready(function () {
                 position: position,
                 employer_vcontact: employer_vcontact,
                 employer_vdate: employer_vdate};
-            
-                $.post('/lms/custom/my/update_demographic_data.php', {demo: JSON.stringify(demoObj)}, function (data) {
+
+            $.post('/lms/custom/my/update_demographic_data.php', {demo: JSON.stringify(demoObj)}, function (data) {
                 //console.log('Server response: ' + data);
                 document.location.reload();
             }); // end of post
