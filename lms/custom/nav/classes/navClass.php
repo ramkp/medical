@@ -320,11 +320,10 @@ class navClass extends Util {
         $list = "<li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>";
         return $list;
     }
-    
+
     function get_mpermissions_item() {
-        $list="<li><a href='https://medical2.com/lms/admin/roles/manage.php' title='Permissions' target='_blank'>Define Roles</a></li>";
+        $list = "<li><a href='https://medical2.com/lms/admin/roles/manage.php' title='Permissions' target='_blank'>Define Roles</a></li>";
         return $list;
-        
     }
 
     function get_deposit_item() {
@@ -385,6 +384,9 @@ class navClass extends Util {
                 switch ($p) {
                     case 'certificates':
                         $list.=$this->get_certificates_item();
+                        break;
+                    case 'demographic':
+                        $list.=$this->get_demographic_item();
                         break;
                     case 'bulk messaging':
                         $list.=$this->get_bulk_messaging_item();
@@ -677,6 +679,7 @@ class navClass extends Util {
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='user_tab'>User<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>
+                                    <li><a href='#' title='Demographic' id='demographic'>Demographic Info</a></li>
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Register User' id='register_user'>Register User</a></li>
                                     <li><a href='#' title='View User' id='user_cred'>View User</a></li>
@@ -728,6 +731,11 @@ class navClass extends Util {
 
     function get_courses_management_item() {
         $list = "<li><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/course/management.php' id='course_management' target='_blank'>Courses Management</a></li>";
+        return $list;
+    }
+
+    function get_demographic_item() {
+        $list = "<li><a href='#' title='Demographic' id='demographic'>Demographic Info</a></li>";
         return $list;
     }
 

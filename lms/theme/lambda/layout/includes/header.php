@@ -36,7 +36,7 @@ echo "<script src='https://releases.flowplayer.org/hlsjs/flowplayer.hlsjs.min.js
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/jquery.simplePagination.js'></script>";
 echo "<script type = 'text/javascript' src = 'https://www.gstatic.com/charts/loader.js' ></script>";
 echo "<script src='https://js.braintreegateway.com/js/braintree-2.32.0.min.js'></script>";
-
+echo "<script src='https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js'></script>";
 echo "<script type = 'text/javascript'>";
 echo "google.charts.load('current', {'packages': ['corechart']})";
 echo "</script>";
@@ -45,6 +45,7 @@ echo "</script>";
 echo "<link rel='stylesheet' href='//releases.flowplayer.org/7.0.1/commercial/skin/skin.css'>";
 echo"<link rel='stylesheet' href='//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>";
 echo "<link rel='stylesheet' href='//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css'>";
+echo "<link rel='stylesheet' type='text/css' href='https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css'>";
 echo "<link type='text/css' rel='stylesheet' href='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/simplePagination.css'/>";
 ?>
 

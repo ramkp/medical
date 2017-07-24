@@ -3586,6 +3586,17 @@ $(document).ready(function () {
         });
     }
 
+    function get_demographic_page() {
+        var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+        $.getScript(js_url).done(function () {
+            var url = "/lms/custom/demographic/list.php";
+            $.post(url, {id: 1}).done(function (data) {
+                $('#region-main').html(data);
+                $('#myTable').DataTable();
+            }); // end of post function
+        }); // end of done function
+    }
+
     /************************************************************************
      * 
      *                   Menu processing items
@@ -3644,6 +3655,10 @@ $(document).ready(function () {
     $("#Certificates").click(function (event) {
         update_navigation_status__menu('Certificates');
         get_certificates_page();
+    });
+    $("#demographic").click(function (event) {
+        update_navigation_status__menu('Demographic Info');
+        get_demographic_page();
     });
     $("#hotels").click(function (event) {
         update_navigation_status__menu('Hotels');
