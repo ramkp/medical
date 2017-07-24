@@ -148,6 +148,15 @@ class Register2 extends CI_Controller {
         $this->load->view('footer_view');
     }
 
+    function new_payment_card() {
+        $user = $this->uri->segment(3);
+        $form = $this->register_model->get_brain_card_form($user);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('brain_card_test', $data);
+        $this->load->view('footer_view');
+    }
+
     function payment_auth_single() {
         $user = $this->uri->segment(3);
         $form = $this->register_model->get_auth_card_form($user);

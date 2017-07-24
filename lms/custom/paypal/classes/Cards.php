@@ -62,6 +62,30 @@ class Cards {
         return $name;
     }
 
+    function get_user_details($transObj) {
+
+        $amount = $transObj->amount;
+        $userObj = json_decode($transObj->user);
+        $cardholder = $transObj->cardholder;
+
+        $m = new Mailer();
+        $p = new Payment();
+        $userid = $p->get_user_id_by_email($userObj->email);
+        $user_detailes = $p->get_user_detailes($userid);
+
+        $userObj->userid = $userid;
+        $userObj->sum = $amount;
+        $userObj->pwd = $user_detailes->purepwd;
+        $userObj->payment_amount = $amount;
+        $userObj->card_holder = $cardholder;
+        $userObj->billing_name = $cardholder;
+        $userObj->signup_first = $userObj->first_name;
+        $userObj->signup_last = $userObj->last_name;
+
+        $data = $m->get_account_confirmation_message2($userObj, null, false);
+        return $data;
+    }
+
     function create_any_pay_transaction($transObj) {
         $amount = $transObj->amount;
         $period = $transObj->period;
@@ -200,6 +224,81 @@ class Cards {
             $billing_lastname = $names[2];
         } // end if
         $this->authorize_production();
+        $result = Braintree\Transaction::sale([
+                    'amount' => $amount,
+                    'paymentMethodNonce' => $nonceFromTheClient,
+                    'customer' => [
+                        'firstName' => $userObj->first_name,
+                        'lastName' => $userObj->last_name,
+                        'phone' => $userObj->phone,
+                        'email' => $userObj->email
+                    ],
+                    'creditCard' => [
+                        'cardholderName' => $cardholder
+                    ],
+                    'options' => [
+                        'submitForSettlement' => True
+                    ]
+        ]);
+
+        $transaction = $result->transaction;
+
+        if ($result->success) {
+            $m = new Mailer();
+            $p = new Payment();
+            $p->enroll->single_signup($userObj);
+            $p->confirm_user($userObj->email);
+            $userid = $p->get_user_id_by_email($userObj->email);
+            $p->enroll->add_user_to_course_schedule($userid, $userObj);
+            $transid = $transaction->id;
+            $status = $transaction->status;
+            $user_detailes = $p->get_user_detailes($userid);
+
+            $userObj->userid = $userid;
+            $userObj->sum = $userObj->amount;
+            $userObj->pwd = $user_detailes->purepwd;
+            $userObj->payment_amount = $userObj->amount;
+            $userObj->card_holder = $cardholder;
+            $userObj->billing_name = $cardholder;
+            $userObj->signup_first = $userObj->first_name;
+            $userObj->signup_last = $userObj->last_name;
+            $userObj->transid = $transid;
+            $userObj->status = $status;
+            $this->add_success_registration_payment($userObj);
+            $m->send_payment_confirmation_message($userObj);
+            return true;
+        } // end if 
+        else {
+            $msg = $result->message;
+            $failObj = new stdClass();
+            $failObj->status = $transaction->status;
+            $failObj->code = $transaction->processorResponseCode;
+            $failObj->msg = $msg;
+            $failObj->info = $transaction->additionalProcessorResponse;
+            $failObj->user = $userObj;
+            $this->send_failed_transaction_info($failObj);
+            return false;
+        }
+    }
+
+    function create_transaction_test($transObj) {
+        // Everything is in sandboxed mode
+        $amount = $transObj->amount;
+        $nonceFromTheClient = $transObj->nonce;
+        $userObj = json_decode($transObj->user);
+
+        $cardholder = $transObj->cardholder;
+        $names = explode(" ", $cardholder);
+        if (count($names) == 2) {
+            $billing_fisrtname = $names[0];
+            $billing_lastname = $names[1];
+        } // end if
+
+        if (count($names) == 3) {
+            $billing_fisrtname = $names[0] . " " . $names[1];
+            $billing_lastname = $names[2];
+        } // end if
+        $this->authorize_sandbox();
         $result = Braintree\Transaction::sale([
                     'amount' => $amount,
                     'paymentMethodNonce' => $nonceFromTheClient,

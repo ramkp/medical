@@ -111,7 +111,8 @@ echo $form;
 
         var form = document.querySelector('#checkout-form');
         var submit = document.querySelector('input[type="submit"]');
-        var url = '/lms/custom/paypal/get_card_client_token.php';
+        //var url = '/lms/custom/paypal/get_card_client_token.php';
+        var url = '/lms/custom/paypal/get_card_client_sandbox_token.php';
         $.post(url, {id: 1}).done(function (token) {
             braintree.client.create({
                 authorization: token
@@ -216,7 +217,7 @@ echo $form;
                                     $('#ajax_loading_payment').show();
                                     $('#make_register_braintree_pyament').prop('disabled', true);
                                     $('#make_register_braintree_pyament').prop('value', 'Processing request');
-                                    var url = '/lms/custom/paypal/create_transaction.php';
+                                    var url = '/lms/custom/paypal/create_transaction_test.php';
                                     var amount = $('#amount').val();
                                     var user = $('#user').val();
                                     var email = $('#email').val();
@@ -251,5 +252,6 @@ echo $form;
 
 
 </script>
+
 
 

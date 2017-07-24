@@ -988,20 +988,20 @@ class Mailer {
         $userdata = $this->get_user_details($user->userid);
         $list.= "<!DOCTYPE HTML><html><head><title>Account Confirmation</title>";
         $list.="</head>";
-        $list.="<body><br/><br/><br/><br/>";
-        $list.="<div class='datagrid'>            
-        <table style='table-layout: fixed;' width='375'>
+        $list.="<body><br/>";
+        $list.="<div>            
+        <table style='table-layout: fixed;' width='375' align='center'>
         <thead>";
 
         if ($printed_data == null) {
             if ($catid == 5) {
                 $list.="<tr>";
-                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
+                $list.="<th colspan='2' align='left'><img src='https://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
                 $list.="</tr>";
             } // end if
             else {
                 $list.="<tr>";
-                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+                $list.="<th colspan='2' align='left'><img src='https://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
                 $list.="</tr>";
             } // end else
         } // end if $printed_data == NULL
@@ -1010,96 +1010,96 @@ class Mailer {
         <tbody>
 
         <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-        <td colspan='2'>$receipt_preface</td>
+        <td colspan='2' align='left'>$receipt_preface</td>
         </tr>
 
         <tr style=''>
-        <td>First name</td><td>$userdata->firstname</td>
+        <td align='left'>First name</td><td align='left'>$userdata->firstname</td>
         </tr>
         
         <tr>
-        <td>Last name</td><td>$userdata->lastname</td>
+        <td align='left'>Last name</td><td align='left'>$userdata->lastname</td>
         </tr>
         
         <tr>
-        <td>Username</td><td>$userdata->email</td>
+        <td align='left'>Username</td><td align='left'>$userdata->email</td>
         </tr>
         
         <tr>
-        <td>Password</td><td>$userdata->purepwd</td>
+        <td align='left'>Password</td><td align='left'>$userdata->purepwd</td>
         </tr>
         
         <tr>
-        <td>Phone</td><td>$userdata->phone1</td>
+        <td align='left'>Phone</td><td align='left'>$userdata->phone1</td>
         </tr>
         
         <tr>
-        <td>Address</td><td>$userdata->address</td>
+        <td align='left'>Address</td><td align='left'>$userdata->address</td>
         </tr>
         
         <tr>
-        <td>City</td><td>$userdata->city</td>
+        <td align='left'>City</td><td align='left'>$userdata->city</td>
         </tr>
         
         <tr>
-        <td>State</td><td>$userdata->state</td>
+        <td align='left'>State</td><td align='left'>$userdata->state</td>
         </tr>
         
         <tr>
-        <td>Zip</td><td>$userdata->zip</td>
+        <td align='left'>Zip</td><td align='left'>$userdata->zip</td>
         </tr>
         
         </table>
         
-        <br><table style='table-layout: fixed;' width='375'>
+        <br><table style='table-layout: fixed;' width='375' align='center'>
         
         <tr style='font-weight:bold;text-align:left;background-color:#F5F5F5;'>
-        <td colspan='2'>Billing<br></td>
+        <td colspan='2' align='left'>Billing<br></td>
         </tr>";
 
         $list.="<tr>";
         if ($user->billing_name != '') {
-            $list.="<td>Billing Name</td><td>$user->billing_name</td>";
+            $list.="<td align='left'>Billing Name</td><td align='left'>$user->billing_name</td>";
         } // end if
         else {
-            $list.="<td>Billing Name</td><td>$userdata->firstname $userdata->lastname</td>";
+            $list.="<td align='left'>Billing Name</td><td align='left'>$userdata->firstname $userdata->lastname</td>";
         } // end else
         $list.="</tr>";
 
         if ($user->receipt_email != 'n/a' && $user->receipt_email != '') {
             $list.="<tr style=''>
-            <td>Email</td><td>$user->receipt_email</td>
+            <td align='left'>Email</td><td align='left'>$user->receipt_email</td>
             </tr>";
         } // end if
         else {
             $list.="<tr style=''>
-            <td>Email</td><td>$userdata->email</td>
+            <td align='left'>Email</td><td align='left'>$userdata->email</td>
             </tr>";
         }
 
         $list.="<tr>
-        <td>Phone</td><td>$user->phone</td>
+        <td align='left'>Phone</td><td align='left'>$user->phone</td>
         </tr>
        
         <tr style=''>
-        <td>Address</td><td>$userdata->address</td>
+        <td align='left'>Address</td><td align='left'>$userdata->address</td>
         </tr>
         <tr >
-        <td>City</td><td>$user->city</td>
+        <td align='left'>City</td><td align='left'>$user->city</td>
         </tr>        
         <tr style=''>
-        <td>State</td><td>$state</td>
+        <td align='left'>State</td><td align='left'>$state</td>
         </tr>
         <tr >
-        <td>Zip</td><td>$user->zip</td>
+        <td align='left'>Zip</td><td align='left'>$user->zip</td>
         </tr>
         
         <tr style=''>
-        <td>Program</td><td>$course_name</td>
+        <td align='left'>Program</td><td align='left'>$course_name</td>
         </tr>
         
         <tr >
-        <td>Program Fee</td><td>$$cost</td>
+        <td align='left'>Program Fee</td><td align='left'>$$cost</td>
         </tr>";
 
         if (property_exists($user, 'payment_amount')) {
@@ -1107,34 +1107,35 @@ class Mailer {
             $date = date('m-d-Y h:i:s', time());
             if ($paypal) {
                 $list.="<tr style=''>
-                <td>Payment: </td><td>Paid by PayPal: $$user->payment_amount</td>
+                <td align='left'>Payment: </td><td align='left'>Paid by PayPal: $$user->payment_amount</td>
                 </tr>";
             } // end if $paypal
             else {
                 $list.="<tr style=''>
-                <td>Payment: </td><td>Paid by card: $$user->payment_amount</td>
+                <td align='left'>Payment: </td><td align='left'>Paid by card: $$user->payment_amount</td>
                 </tr>";
             } // end else
 
             $list.="<tr style=''>";
-            $list.="<td>Date Order:</td><td>$date</td>";
+            $list.="<td align='left'>Date Order:</td><td align='left'>$date</td>";
             $list.="</tr>";
         } // end if $payment_amount != null
 
         $list.="<tr style=''>
-        <td>Class info</td><td>$class_info</td>
+        <td align='left'>Class info</td><td align='left'>$class_info</td>
         </tr>";
 
         if ($catid == 2) {
             $list.="<tr style=''>";
-            $list.="<td colspan='2'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
+            $list.="<td colspan='2' align='left'>Dress is casual with close toe shoes. Bring a photo ID. Arrive 10 minutes early.</td>";
             $list.="</tr>";
         } // end if $catid == 2
 
         $list.="</tbody>
         </table>
         </div>";
-        $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
+        $list.="<p style='text-align:center;'>You can print your registration data <a href='https://medical2.com/lms/custom/invoices/registrations/$userdata->email.pdf' target='_blank'>here.</a></p>";
+        $list.="<p style='text-align:center;'>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
         $list.="</body></html>";
 
         return $list;
