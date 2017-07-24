@@ -2153,8 +2153,8 @@ class Mailer {
         $addrB = 'info@medical2.com';
         $addrC = 'help@medical2.com';
         $mail->AddAddress($addrA);
-        $mail->addCC($addrB);
-        $mail->addCC($addrC);
+        $mail->AddAddress($addrB);
+        $mail->AddAddress($addrC);
         if (!$mail->send()) {
             return false;
         } // end if !$mail->send()

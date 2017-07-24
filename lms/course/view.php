@@ -289,18 +289,32 @@ if ($roleid == 5 && $category == 2 && $completed > 0 && $has_application > 0) {
     }
 } // end if
 
+/* Career college demographic info */
+if ($roleid == 5) {
+    //if ($USER->id == 13734) {
+    $category = $ds->get_course_category($COURSE->id);
+    if ($category >= 5) {
+        $status = $ds->demo_info_applicable($USER->id);
+        if ($status == 0) {
+            $list = $ds->get_college_student_demographic_questionare($COURSE->id, $USER->id);
+            echo $list;
+            die();
+        } // end if $status == 0
+    } // end if $category>=5
+    //} // end if $USER->id == 13734
+} // end if $roleid == 5
 
 /* Career college survey */
 if ($roleid == 5) {
     // Put survey here if student is applicable
     //if ($USER->id == 13734) {
-        $s = new Survey();
-        $applicable = $s->survey_applicable();
-        if ($applicable) {
-            $list = $s->get_career_collge_survey();
-            echo $list;
-            die();
-        } // end if $applicable
+    $s = new Survey();
+    $applicable = $s->survey_applicable();
+    if ($applicable) {
+        $list = $s->get_career_collge_survey();
+        echo $list;
+        die();
+    } // end if $applicable
     //} // end if $USER->id==13734
 } // end if $roleid == 5
 

@@ -4189,6 +4189,37 @@ $(document).ready(function () {
             dialog_loaded = false;
         }
 
+        if (event.target.id == 'add_college_user_demographic_info') {
+            var userid = $('#college_student_id').val();
+            var date = $('#enrollment_date').val();
+            var mstatus = $('#mstatus').val();
+            var race = $('#racebox').val();
+            var sex = $('#sexbox').val();
+            var edu = $('#edu_box').val();
+            var income = $('#income_box').val();
+            var job_type = $('#job_type').val();
+
+            if (mstatus == 0 || race == 0 || sex == 0 || edu == 0 || income == 0 || job_type == 0) {
+                $('#questionare_err').html('Please provide all required fields');
+            } // end if
+            else {
+                $('#questionare_err').html('');
+                var demo = {userid: userid,
+                    date: date,
+                    mstatus: mstatus,
+                    race: race,
+                    sex: sex,
+                    edu: edu,
+                    income: income,
+                    job_type: job_type};
+                console.log('Demo object: ' + JSON.stringify(demo));
+                var url = '/lms/custom/my/add_college_student_info.php';
+                $.post(url, {data: JSON.stringify(demo)}).done(function () {
+                    document.location.reload();
+                });
+            } // end else
+        }
+
         if (event.target.id == 'make_new_refund') {
             var msg;
             var paymentid = $('#course_payments').val();

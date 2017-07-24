@@ -5437,4 +5437,111 @@ class Dashboard extends Util {
         return $categoryid;
     }
 
+    /* Code related to college demographic info */
+
+    function get_course_enroll_ids($courseid) {
+        $query = "select * from mdl_enrol where courseid=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $enrolls[] = $row['id'];
+        }
+        $enrolls_list = implode(',', $enrolls);
+        return $enrolls_list;
+    }
+
+    function get_user_enrollment_date($courseid, $userid) {
+        $enrolls_list = $this->get_course_enroll_ids($courseid);
+        $query = "select * from mdl_user_enrolments "
+                . "where userid=$userid and enrolid in ($enrolls_list)";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $start_date = date('m/d/Y', $row['timestart']);
+        }
+        return $start_date;
+    }
+
+    function demo_info_applicable($userid) {
+        $query = "select * from mdl_demographic where userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_college_student_demographic_questionare($courseid, $userid) {
+        $list = "";
+        $num = $this->demo_info_applicable($userid);
+        if ($num == 0) {
+            $enrollment_date = $this->get_user_enrollment_date($courseid, $userid);
+            $marriage_box = $this->get_marital_status_box();
+            $race_box = $this->get_race_box();
+            $sex_box = $this->get_sex_box();
+            $edu_box = $this->get_edu_box();
+            $income_box = $this->get_income_box();
+            $job_type_box = $this->get_job_type_box();
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'>Marriage status*:</span>";
+            $list.="<span class='span2'>$marriage_box</span>";
+            $list.="</div>";
+
+            $list.="<input type='hidden' id='college_student_id' value='$userid'>";
+            $list.="<input type='hidden' id='enrollment_date' value='$enrollment_date'>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'>Race*</span>";
+            $list.="<span class='span2'>$race_box</span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'>Sex*</span>";
+            $list.="<span class='span2'>$sex_box</span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'>Education level*</span>";
+            $list.="<span class='span2'>$edu_box</span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'>Income level*</span>";
+            $list.="<span class='span2'>$income_box</span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'>Part or Full Time*</span>";
+            $list.="<span class='span2'>$job_type_box</span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span5' id='questionare_err' style='color:red;'></span>";
+            $list.="</div>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'>&nbsp;</span>";
+            $list.="<span class='span2'><button id='add_college_user_demographic_info'>Update</button></span>";
+            $list.="</div>";
+        } // end if $num==0
+        return $list;
+    }
+
+    function add_college_student_basic_data($data) {
+        $query = "insert into mdl_demographic "
+                . "(userid,"
+                . "mstatus,"
+                . "race,"
+                . "sex,"
+                . "edlevel,"
+                . "incomelevel,"
+                . "startdate,"
+                . "job_type) "
+                . "values('$data->userid',"
+                . "'$data->mstatus',"
+                . "'$data->race',"
+                . "'$data->sex',"
+                . "'$data->edu',"
+                . "'$data->income',"
+                . "'$data->date',"
+                . "'$data->job_type')";
+        $this->db->query($query);
+    }
+
 }
