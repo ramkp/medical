@@ -239,7 +239,7 @@ class Demographic extends Util {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user = $this->get_user_details($row['userid']);
-                $name = $user->firstname . ' ' . $user->lastname;
+                $name = "<a href='https://medical2.com/lms/user/profile.php?id=" . $row['userid'] . "' target='_blank'>" . $user->firstname . ' ' . $user->lastname . "</a>";
                 $marriage = $this->get_marriage_status($row['mstatus']);
                 $race = $this->get_race($row['race']);
                 $sex = $this->get_sex($row['sex']);
