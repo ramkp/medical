@@ -668,7 +668,7 @@ class Dashboard extends Util {
         $b = new Balance();
         $certificate_date = $b->has_certificate($courseid, $userid);
         $query = "select * from mdl_partial_payments  "
-                . "where courseid=$courseid and userid=$userid";
+                . "where courseid=$courseid and userid=$userid and refunded=0";
         $num = $this->db->numrows($query);
         if ($num > 0) {
             $coursename = $this->get_course_name($courseid);
@@ -853,7 +853,28 @@ class Dashboard extends Util {
                 $list.="</div>";
             } // end while
         } // end if $num > 0
-        // 3. Get partial refunds
+        // 3. Get cash full refunds
+        $query = "select * from mdl_partial_payments where refunded=1 and refund_date<>''";
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $coursename = $this->get_course_name($row['courseid']);
+                $date = date('m-d-Y', $row['refund_date']);
+
+                /*
+                 * 
+                  $list.="<div class='row-fluid'>";
+                  $list.="<span class='span9'>Paid by card $" . $fullpsum . " ($pdate) $coursename</span>";
+                  $list.="</div>";
+                 * 
+                 */
+
+                $list.="<div class='row-fluid' style='color:red;font-weigh:bold;'>";
+                $list.="<span class='span9'>Refunded $" . $row['psum'] . " ($date) $coursename</span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
+        // 4. Get partial refunds
         $query = "select * from mdl_partial_refund_payments "
                 . "where userid=$userid";
         //echo "Query: " . $query . "<br>";
@@ -4039,9 +4060,36 @@ class Dashboard extends Util {
                 break;
             case 'p':
                 // partial payments (cash/cheque)
-                $query = "delete from mdl_partial_payments "
-                        . "where id=$pid";
-                $this->db->query($query);
+                $query = "select * from mdl_partial_payments  where id=$pid";
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $db_amount = $row['psum'];
+                    $courseid = $row['courseid'];
+                    $userid = $row['userid'];
+                }
+                if ($amount == $db_amount) {
+                    $refund_date = time();
+                    $query = "update mdl_partial_payments set refunded=1, refund_date='$refund_date' "
+                            . "where id=$pid";
+                    //echo "Query0: ".$query."<br>";
+                    $this->db->query($query);
+                } // end if $amount == $db_amount             
+                else {
+                    // Update partial payments amount
+                    $rest_sum = $db_amount - $amount;
+                    $query = "update mdl_partial_payments set psum='$rest_sum' "
+                            . "where id=$pid";
+                    $this->db->query($query);
+                    // Add data to partial refunds table
+                    $date = time();
+                    $query = "INSERT INTO mdl_partial_refund_payments "
+                            . "(userid,"
+                            . "courseid,"
+                            . "psum,"
+                            . "refund_date) "
+                            . "values ($userid,$courseid,'$amount','$date')";
+                    $this->db->query($query);
+                } // end else when it was partial refund
                 break;
         } //  end of switch
     }
