@@ -120,6 +120,30 @@ class Register2 extends CI_Controller {
         $this->load->view('any_pay_view', $data);
         $this->load->view('footer_view');
     }
+    
+    function any_auth_pay () {
+        $user = new stdClass();
+        $user->userid = $this->uri->segment(3);
+        $user->courseid = $this->uri->segment(4);
+        $user->slotid = $this->uri->segment(5);
+        $user->amount = $this->uri->segment(6);
+        $user->period = $this->uri->segment(7);
+
+        $form = $this->register_model->get_any_auth_pay_form($user);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('any_auth_pay', $data);
+        $this->load->view('footer_view');
+    }
+    
+    function proceed_any_auth_payment () {
+        $response = $this->uri->segment(3);
+        $form = $this->register_model->process_any_auth_payment($response);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('auth_add_any_payment', $data);
+        $this->load->view('footer_view');
+    }
 
     function group_payment_card() {
         $regdata = $this->uri->segment(3);

@@ -1207,6 +1207,47 @@ class register_model extends CI_Model {
         return $list;
     }
 
+    function get_any_auth_pay_form($user) {
+        $list = "";
+
+        $userdata = $this->get_user_detailes($user->userid);
+        $email = $userdata->email;
+        $coursename = $this->get_coure_name_by_id($user->courseid);
+        $amount = $user->amount;
+        $slotid = $user->slotid;
+        $period = $user->period;
+        $program = ($period == 0) ? $coursename : 'Certificate renewal';
+
+        $userdata->amount = $amount;
+        $userdata->courseid = $user->courseid;
+        $userdata->program = $program;
+        $userdata->period = $period;
+        $userdata->slotid = $slotid;
+        $userdata->payment_slotid = $slotid;
+
+        $_SESSION[$email] = $userdata;
+
+        $pr = new ProcessPayment();
+        $token = $pr->getAnyPayAceptForm($userdata);
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>";
+        $list.="<form id='send_token' name='send_token' action='https://test.authorize.net/payment/payment' method='post' 
+                target='load_payment'>
+                <input type='hidden' name='token' value='$token' />
+                </form>";
+        $list.="</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span12' style='text-align:center;' id='payment_result'>";
+        $list.="<iframe id='load_payment' name='load_payment' width='100%' height='100%;' style='overflow-x:hidden;' frameborder='0' style='' ></iframe>";
+        $list.="</span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
     function process_auth_payment($payment) {
 
         $paymentObj = json_decode(base64_decode($payment));
@@ -1295,6 +1336,120 @@ class register_model extends CI_Model {
         $list.="</div>";
 
         return $list;
+    }
+
+    function get_user_userdata_by_email($email) {
+        $query = "select * from mdl_user where username='$email'";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $data = $row;
+        }
+        return $data;
+    }
+
+    function process_any_auth_payment($payment) {
+        $list = "";
+
+        $paymentObj = json_decode(base64_decode($payment));
+
+        /*
+          echo "<pre>";
+          print_r($paymentObj);
+          echo "</pre><br>--------------------------------<br>";
+         */
+
+
+        $email = $paymentObj->billTo->email;
+        $userdata = $_SESSION[$email];
+
+        $card_no = $paymentObj->accountNumber;
+        $transid = $paymentObj->transId;
+        $status = $paymentObj->responseCode;
+        $auth_code = $paymentObj->authorization;
+        $sum = $paymentObj->totalAmount;
+        $period = $userdata->period;
+        $cardholder = $userdata->firstname . " " . $userdata->lastname;
+
+        $userdata->userid = $userdata->id;
+        $userdata->slotid = $userdata->payment_slotid;
+        $userdata->sum = $sum;
+        $userdata->card_no = $card_no;
+        $userdata->auth_code = $auth_code;
+        $userdata->transid = $transid;
+        $userdata->payment_amount = $sum;
+        $userdata->pwd = $userdata->purepwd;
+        $userdata->card_holder = $cardholder;
+        $userdata->billing_name = $cardholder;
+        $userdata->signup_first = $userdata->firstname;
+        $userdata->signup_last = $userdata->lastname;
+        $userdata->phone = $userdata->phone1;
+
+        $userdata->status = $status;
+        $userdata->renew = $period;
+        $userdata->period = $period;
+        $userdata->promo_code = '';
+        $userdata->bill_email = $userdata->email;
+        $this->add_any_payment_to_db($userdata);
+
+        $m = new Mailer();
+        $m->send_payment_confirmation_message($userdata);
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        if ($userdata->period == 0) {
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your registration is confirmed and receipt is sent to $email. &nbsp; <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$email.pdf' target='_blank'>Print registration.</a></span>";
+            $list.="</div>";
+        } // end if
+        else {
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span12' id='auth_payment_status'>Congratulations! This certification have been renewed</span>";
+            $list.="</div>";
+        } // end else
+
+        $list.="</div>";
+        $list.="</div>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function add_any_payment_to_db($userObj) {
+        $cardnum = $userObj->card_no;
+        $card_last_four = substr($cardnum, -4);
+        $now = time();
+        $query = "insert into mdl_card_payments "
+                . "(userid,"
+                . "renew,"
+                . "courseid,"
+                . "card_last_four,"
+                . "psum,"
+                . "trans_id,"
+                . "auth_code,"
+                . "promo_code,"
+                . "pdate) "
+                . "values ($userObj->userid,"
+                . "$userObj->renew,"
+                . "$userObj->courseid,"
+                . "'" . base64_encode($card_last_four) . "',"
+                . "'$userObj->sum',"
+                . "'$userObj->transid',"
+                . "'$userObj->auth_code',"
+                . "'$userObj->promo_code','$now')";
+        //echo "Query: " . $query . "<br>";
+        $this->db->query($query);
+
+        if ($userObj->period > 0) {
+            $cert = new Certificates2();
+            $cert->renew_certificate($userObj->courseid, $userObj->userid, $userObj->period);
+        } // end if 
+        else {
+            $p = new Payment();
+            $p->enroll->add_user_to_course_schedule($userObj->userid, $userObj);
+        } // end else
     }
 
     function get_random_string($size) {

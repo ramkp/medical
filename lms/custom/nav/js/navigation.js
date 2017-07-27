@@ -6148,6 +6148,7 @@ $(document).ready(function () {
                         $('#register_cash_error').html('');
                         var encoded_user = Base64.encode(JSON.stringify(user));
                         var url = 'https://medical2.com/register2/payment_card/' + encoded_user;
+                        var new_url='https://medical2.com/register2/payment_auth_single/' + encoded_user;
                         var oWindow = window.open(url, "pay");
                     } // end if status==0
                     else {
