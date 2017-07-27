@@ -182,10 +182,37 @@ class Register2 extends CI_Controller {
         $this->load->view('register_view', $data);
         $this->load->view('footer_view');
     }
+    
+    function payment_auth_group() {
+        $regdata = $this->uri->segment(3);
+        $form = $this->register_model->get_authorize_group_payment_form_step1($regdata);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('auth_register_group', $data);
+        $this->load->view('footer_view');
+    }
+    
+    function proceed_group_auth_card () {
+        $response = $this->uri->segment(3);
+        $form = $this->register_model->process_group_auth_payment($response);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('auth_register_group_complete', $data);
+        $this->load->view('footer_view');
+    }
+    
+    function get_auth_group_hosted_form () {
+        $regdata = $this->uri->segment(3);
+        $form = $this->register_model->get_authorize_group_payment_form_step2($regdata);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('auth_register_group', $data);
+        $this->load->view('footer_view');
+    }
 
     function add_individual_registration() {
         $token = $_REQUEST['token'];
-        echo "Token: " . $token . "<br>";
+        //echo "Token: " . $token . "<br>";
         $this->register_model->add_individual_registration($token);
     }
 

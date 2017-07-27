@@ -1177,7 +1177,8 @@ class register_model extends CI_Model {
         $m2token = random_string('alnum', 8);
         $userObj = json_decode(base64_decode($user));
         $userObj->token = $m2token;
-        $_SESSION['personal_auth_payment_token'] = $userObj;
+        $email = $userObj->email;
+        $_SESSION[$email] = $userObj;
         $program = $this->get_coure_name_by_id($userObj->courseid);
         $cost = $userObj->amount;
         $userObj->program = $program;
@@ -1207,8 +1208,9 @@ class register_model extends CI_Model {
     }
 
     function process_auth_payment($payment) {
-        $studentObject = $_SESSION['personal_auth_payment_token'];
+
         $paymentObj = json_decode(base64_decode($payment));
+        $studentObject = $_SESSION[$paymentObj->billTo->email];
 
         /*
           echo "<pre>";
@@ -1218,17 +1220,20 @@ class register_model extends CI_Model {
           echo "<pre>";
           print_r($paymentObj);
           echo "</pre>";
+          die();
          */
-
 
         $billing_firstname = $paymentObj->billTo->firstName;
         $billing_lastname = $paymentObj->billTo->lastName;
+        $billing_email = $paymentObj->billTo->email;
 
         // Create compatible class to signup
         $user = new stdClass();
         $user->first_name = $studentObject->first_name;
         $user->last_name = $studentObject->last_name;
         $user->billing_name = $billing_firstname . " " . $billing_lastname;
+        $user->receipt_email = $billing_email;
+        $user->bill_email = $paymentObj->$billing_email;
         $user->addr = $studentObject->addr;
         $user->city = $studentObject->city;
         $user->state = $studentObject->state;
@@ -1252,8 +1257,15 @@ class register_model extends CI_Model {
         $user->signup_first = $studentObject->first_name;
         $user->signup_last = $studentObject->last_name;
 
+        /*
+          echo "<pre>";
+          print_r($user);
+          echo "</pre>";
+          die();
+         */
+
         $p = new Payment();
-        $mailer = new Mailer();
+        //$mailer = new Mailer();
 
         $p->enroll->single_signup($user);
         $userid = $p->get_user_id_by_email($studentObject->email);
@@ -1265,7 +1277,7 @@ class register_model extends CI_Model {
         $p->add_payment_to_db($user); // adds payment result to DB
         $p->enroll->add_user_to_course_schedule($user->userid, $user);
 
-        $mailer->send_payment_confirmation_message($user);
+        //$mailer->send_payment_confirmation_message($user);
 
         $email = $studentObject->email;
 
@@ -1276,6 +1288,171 @@ class register_model extends CI_Model {
 
         $list.="<div class='row-fluid' style='font-weight:bold;'>";
         $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your registration is confirmed and receipt is sent to $email. &nbsp; <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$email.pdf' target='_blank'>Print registration.</a></span>";
+        $list.="</div>";
+
+        $list.="</div>";
+        $list.="</div>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function get_random_string($size) {
+        $alpha_key = '';
+        $keys = range('A', 'Z');
+        for ($i = 0; $i < 2; $i++) {
+            $alpha_key .= $keys[array_rand($keys)];
+        }
+        $length = $size - 2;
+        $key = '';
+        $keys = range(0, 9);
+        for ($i = 0; $i < $length; $i++) {
+            $key .= $keys[array_rand($keys)];
+        }
+        return $alpha_key . $key;
+    }
+
+    function add_new_group($courseid, $name) {
+        $query = "insert into mdl_groups (courseid, name) "
+                . "values($courseid, '$name')";
+        $this->db->query($query);
+        $query = "select * from mdl_groups where name='$name'";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $groupid = $row->id;
+        }
+        return $groupid;
+    }
+
+    function add_user_to_group($groupid, $userid) {
+        $now = time();
+        $query = "insert into mdl_groups_members "
+                . "(groupid, userid, timeadded) "
+                . "values ($groupid,$userid,'$now')";
+        $this->db->query($query);
+    }
+
+    function process_group_auth_payment($payment) {
+        $list = "";
+
+        $paymentObj = json_decode(base64_decode($payment));
+        $buyer_email = $paymentObj->billTo->email;
+        $studentsObject = $_SESSION[$buyer_email];
+        $rawregdata = $studentsObject->regdata;
+        $regdata = json_decode(base64_decode($rawregdata));
+
+        $course = $regdata->course;
+        $courseObj = json_decode($course); // object
+
+        $group = $regdata->group;
+        $groupObj = json_decode($group); // object
+
+        $usersdata = $regdata->users;
+        $users = json_decode($usersdata); // array
+
+        /*
+          echo "Payment object<pre>";
+          print_r($paymentObj);
+          echo "</pre><br>------------------------------------------------<br>";
+
+          echo "Course object<pre>";
+          print_r($courseObj);
+          echo "</pre><br>------------------------------------------------<br>";
+
+
+          echo "Group object<pre>";
+          print_r($groupObj);
+          echo "</pre><br>------------------------------------------------<br>";
+
+          echo "Users array<pre>";
+          print_r($users);
+          echo "</pre><br>------------------------------------------------<br>";
+         * 
+         */
+
+        $single_user_amount = round($courseObj->amount / $courseObj->total);
+
+        $buyer = new stdClass();
+        $buyer->payment_amount = $courseObj->amount;
+        $buyer->groupname = $groupObj->name;
+        $buyer->total = $courseObj->total;
+        $buyer->courseid = $courseObj->courseid;
+        $buyer->slotid = $courseObj->slotid;
+        $buyer->state = $groupObj->state; // integer
+        $buyer->firstname = $paymentObj->billTo->firstName;
+        $buyer->lastname = $paymentObj->billTo->lastName;
+        $buyer->email = $paymentObj->billTo->email;
+        $buyer->phone = $paymentObj->billTo->phoneNumber;
+        $buyer->ptype = 'card';
+
+        $p = new Payment();
+
+        $groupid = $this->add_new_group($courseObj->courseid, $groupObj->name);
+        $authcode = $paymentObj->authorization;
+        $transid = $paymentObj->transId;
+        $status = $paymentObj->responseCode;
+
+        foreach ($users as $user) {
+            // We need to create object compatible with signup workflow
+            $original_email = $user->email;
+            $username_exists = $this->is_username_exists($original_email);
+            if ($username_exists > 0) {
+                $rnd_string = $this->get_random_string(4);
+                $new_email = $rnd_string . "_" . $user->email;
+                $user->email = $new_email;
+            } // end if $username_exists>0
+
+            $userObj = new stdClass();
+            $userObj->firstname = $user->fname;
+            $userObj->first_name = $user->fname;
+
+            $userObj->lastname = $user->lname;
+            $userObj->last_name = $user->lname;
+
+            $userObj->email = $user->email;
+            $userObj->phone = $user->phone;
+
+            $pwd = $this->get_random_string(12);
+            $userObj->pwd = $pwd;
+            $userObj->courseid = $courseObj->courseid;
+
+            $userObj->addr = $groupObj->addr;
+            $userObj->inst = $groupObj->name;
+
+            $userObj->zip = $groupObj->zip;
+            $userObj->city = $groupObj->city;
+
+            $userObj->state = $groupObj->state; // integer
+            $userObj->country = 'US';
+
+            $userObj->slotid = $courseObj->slotid;
+            $userObj->promo_code = '';
+
+            $p->enroll->single_signup($userObj);
+            $p->confirm_user($userObj->email);
+            $userid = $p->get_user_id_by_email($userObj->email);
+            $p->enroll->add_user_to_course_schedule($userid, $userObj);
+            $this->add_user_to_group($groupid, $userid);
+
+            $userObj->userid = $userid;
+            $userObj->card_no = $paymentObj->accountNumber;
+            $userObj->sum = $single_user_amount;
+            $userObj->transid = $transid;
+            $userObj->status = $status;
+            $userObj->auth_code = $authcode;
+            $p->add_payment_to_db($userObj);
+        } // end foreach
+
+        $m = new Mailer();
+        $m->send_new_group_payment_confirmation_message($buyer, $users);
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+        $list.="<div class='panel-body'>";
+
+        $list.="<div class='row-fluid' style='font-weight:bold;'>";
+        $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your group registration is confirmed and receipt is sent to $buyer_email. </span>";
         $list.="</div>";
 
         $list.="</div>";
@@ -1300,6 +1477,120 @@ class register_model extends CI_Model {
         $list.="</div>";
         $list.="</div>";
         $list.="</div>";
+
+        return $list;
+    }
+
+    function get_authorize_group_payment_form_step1($regdata) {
+
+        $list = "";
+        $countries = $this->get_countries_list();
+        $states = $this->get_states_list();
+
+        $raw_data = json_decode(base64_decode($regdata));
+
+        /*
+          echo "<pre>";
+          print_r($raw_data);
+          echo "</pre>";
+         */
+
+        $courseObj = json_decode($raw_data->course);
+        $courseid = $courseObj->courseid;
+        $coursename = 'Group registration  ' . $this->get_course_name($courseid);
+        $pure_amount = $courseObj->amount;
+        $amount = '$' . $courseObj->amount;
+
+        /*
+          echo "Courseid: " . $courseid . "<br>";
+          echo "Course name: " . $coursename . "<br>";
+          echo "Amount:" . $amount . "<br>";
+         */
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='billing_info' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Billing info</h5></div>";
+        $list.="<div class='panel-body' style='text-align:center;'>";
+
+        $list.="<input type='hidden' id='group_registration_data' value='$regdata'>";
+        $list.="<input type='hidden' id='program_name' value='$coursename'>";
+        $list.="<input type='hidden' id='amount' value='$pure_amount'>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Selected program:</span>";
+        $list.="<span class='span2'>$coursename</span>";
+        $list.="<span class='span2'>Program fee</span>";
+        $list.="<span class='span2'>$amount</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>First Name*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_fn'></span>";
+        $list.="<span class='span2'>Last Name*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_ln'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Email*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_email'></span>";
+        $list.="<span class='span2'>Phone*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_phone'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>State*</span>";
+        $list.="<span class='span2'>$states</span>";
+        $list.="<span class='span2'>Country*</span>";
+        $list.="<span class='span2'>$countries</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Address*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_addr'></span>";
+        $list.="<span class='span2'>City*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_city'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='color:red;' id='group_billing_err'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;'><button class='btn btn-primary' id='authorize_next_group_payment_form'>Next</button></span>";
+        $list.="</div>";
+
+        $list.="</div>";
+        $list.="</div>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function get_authorize_group_payment_form_step2($data) {
+        $list = "";
+        $group_registration_data = json_decode(base64_decode($data));
+        $user = $group_registration_data->billing_info;
+        $email = $user->email;
+        $_SESSION[$email] = $group_registration_data; // put whole data into session
+
+        $pr = new ProcessPayment();
+        $token = $pr->getGroupAnAcceptPaymentPage($user);
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>";
+        $list.="<form id='send_token' name='send_token' action='https://test.authorize.net/payment/payment' method='post'
+          target='load_payment'>
+          <input type='hidden' name='token' value='$token' />
+          </form>";
+        $list.="</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span12' style='text-align:center;' id='payment_result'>";
+        $list.="<iframe id='load_payment' name='load_payment' width='100%' height='100%;' style='overflow-x:hidden;' frameborder='0' style='' ></iframe>";
+        $list.="</span>";
+        $list.="</div>";
+
 
         return $list;
     }

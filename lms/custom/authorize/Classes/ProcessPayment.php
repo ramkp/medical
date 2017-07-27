@@ -632,6 +632,15 @@ class ProcessPayment {
 
     /*     * ************** Code related to new hosted form *************** */
 
+    function get_country_by_id($countryid) {
+        $query = "select * from mdl_countries where id=$countryid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $country = $row['name'];
+        }
+        return $country;
+    }
+
     function getAnAcceptPaymentPage($userrequest) {
 
         $merchantAuthentication = $this->sandbox_authorize();
@@ -649,6 +658,7 @@ class ProcessPayment {
         $email = $userrequest->email;
         $phone = $userrequest->phone;
         $item = $userrequest->program;
+        $country = $this->get_country_by_id($userrequest->country);
 
         //create a transaction
         $transactionRequestType = new AnetAPI\TransactionRequestType();
@@ -683,6 +693,15 @@ class ProcessPayment {
         $billTo = new AnetAPI\CustomerAddressType();
         $billTo->setCompany('Student');
         $billTo->setEmail($email);
+        $billTo->setPhoneNumber($phone);
+        $billTo->setFirstName($fname);
+        $billTo->setLastName($lname);
+        $billTo->setState($state);
+        $billTo->setCity($city);
+        $billTo->setAddress($addr);
+        $billTo->setCountry($country);
+        $billTo->setZip($zip);
+        $billTo->setFaxNumber($phone);
         $transactionRequestType->setBillTo($billTo);
 
         // Set Hosted Form options    
@@ -703,9 +722,22 @@ class ProcessPayment {
         $setting4->setSettingValue("{\"url\": \"https://medical2.com/communicator.html\"}");
 
         $setting5 = new AnetAPI\SettingType();
-        $setting5->setSettingName("cardCodeRequired");
-        $setting5->setSettingValue(true);
-        
+        $setting5->setSettingName("hostedPaymentPaymentOptions");
+        $setting5->setSettingValue("{\"cardCodeRequired\": true}");
+
+        $setting6 = new AnetAPI\SettingType();
+        $setting6->setSettingName("hostedPaymentBillingAddressOptions");
+        $setting6->setSettingValue("{\"show\": true, \"required\":true}");
+
+        $setting7 = new AnetAPI\SettingType();
+        $setting7->setSettingName("hostedPaymentCustomerOptions");
+        $setting7->setSettingValue("{\"showEmail\": true, \"requiredEmail\":true}");
+
+        $setting8 = new AnetAPI\SettingType();
+        $setting8->setSettingName("hostedPaymentOrderOptions");
+        $setting8->setSettingValue("{\"show\": true, \"merchantName\": \"G and S Questions Inc.\"}");
+
+
         // Build transaction request    
         $request = new AnetAPI\GetHostedPaymentPageRequest();
         $request->setMerchantAuthentication($merchantAuthentication);
@@ -714,8 +746,133 @@ class ProcessPayment {
         $request->addToHostedPaymentSettings($setting2);
         $request->addToHostedPaymentSettings($setting3);
         $request->addToHostedPaymentSettings($setting4);
-        //$request->addToHostedPaymentSettings($setting5);
+        $request->addToHostedPaymentSettings($setting5);
+        $request->addToHostedPaymentSettings($setting6);
+        //$request->addToHostedPaymentSettings($setting7);
+        //$request->addToHostedPaymentSettings($setting8);
+        //execute request
+        $controller = new AnetController\GetHostedPaymentPageController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
 
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+            return $response->getToken();
+        } // end if  
+        else {
+            $errorMessages = $response->getMessages()->getMessage();
+            $err_response = $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText();
+            return $err_response;
+        }
+    }
+
+    function getGroupAnAcceptPaymentPage($userrequest) {
+        $merchantAuthentication = $this->sandbox_authorize();
+        //$merchantAuthentication = $this->authorize();
+
+        $token = time();
+        $custid = rand(12, 10000);
+
+        $fname = $userrequest->fname;
+        $lname = $userrequest->lname;
+        $custID = $custid;
+        $amount = $userrequest->amount;
+        $addr = $userrequest->addr;
+        $city = $userrequest->city;
+        $stateid = $userrequest->state;  // it is id
+        $state = $this->get_state_name_by_id($stateid);
+        $email = $userrequest->email;
+        $phone = $userrequest->phone;
+        $item = $userrequest->program_name;
+        $country = $this->get_country_by_id($userrequest->country);
+
+        //create a transaction
+        $transactionRequestType = new AnetAPI\TransactionRequestType();
+        $transactionRequestType->setTransactionType("authCaptureTransaction");
+        $transactionRequestType->setAmount($amount);
+        $refId = 'ref' . $token;
+        $transactionRequestType->setRefTransId($refId);
+
+        // Order info
+        $order = new AnetAPI\OrderType();
+        $order->setDescription($item);
+        $transactionRequestType->setOrder($order);
+
+        // Ship info
+        $shipTo = new AnetAPI\NameAndAddressType();
+        $shipTo->setFirstName($fname);
+        $shipTo->setLastName($lname);
+        $shipTo->setCompany('Student');
+        $shipTo->setAddress($addr);
+        $shipTo->setState($state);
+        $shipTo->setCity($city);
+        $transactionRequestType->setShipTo($shipTo);
+
+        // Customer info
+        $customer = new AnetAPI\CustomerDataType();
+        $customer->setEmail($email);
+        $customer->setId($custID);
+        $transactionRequestType->setCustomer($customer);
+
+        // Billing info
+        $billTo = new AnetAPI\CustomerAddressType();
+        $billTo->setCompany('Student');
+        $billTo->setEmail($email);
+        $billTo->setPhoneNumber($phone);
+        $billTo->setFirstName($fname);
+        $billTo->setLastName($lname);
+        $billTo->setState($state);
+        $billTo->setCity($city);
+        $billTo->setAddress($addr);
+        $billTo->setCountry($country);
+        $billTo->setFaxNumber($phone);
+        $transactionRequestType->setBillTo($billTo);
+
+        // Set Hosted Form options    
+        $setting1 = new AnetAPI\SettingType();
+        $setting1->setSettingName("hostedPaymentButtonOptions");
+        $setting1->setSettingValue("{\"text\": \"Pay\"}");
+
+        $setting2 = new AnetAPI\SettingType();
+        $setting2->setSettingName("hostedPaymentOrderOptions");
+        $setting2->setSettingValue("{\"show\": true}");
+
+        $setting3 = new AnetAPI\SettingType();
+        $setting3->setSettingName("hostedPaymentReturnOptions");
+        $setting3->setSettingValue("{\"url\": \"https://medical2.com/register2/proceed_group_auth_card\", \"cancelUrl\": \"https://medical2.com/register2/cancel_auth_card\", \"showReceipt\": false}");
+
+        $setting4 = new AnetAPI\SettingType();
+        $setting4->setSettingName("hostedPaymentIFrameCommunicatorUrl");
+        $setting4->setSettingValue("{\"url\": \"https://medical2.com/communicator.html\"}");
+
+        $setting5 = new AnetAPI\SettingType();
+        $setting5->setSettingName("hostedPaymentPaymentOptions");
+        $setting5->setSettingValue("{\"cardCodeRequired\": true}");
+
+        $setting6 = new AnetAPI\SettingType();
+        $setting6->setSettingName("hostedPaymentBillingAddressOptions");
+        $setting6->setSettingValue("{\"show\": true, \"required\":true}");
+
+        $setting7 = new AnetAPI\SettingType();
+        $setting7->setSettingName("hostedPaymentCustomerOptions");
+        $setting7->setSettingValue("{\"showEmail\": true, \"requiredEmail\":true}");
+
+        $setting8 = new AnetAPI\SettingType();
+        $setting8->setSettingName("hostedPaymentOrderOptions");
+        $setting8->setSettingValue("{\"show\": true, \"merchantName\": \"G and S Questions Inc.\"}");
+
+
+        // Build transaction request    
+        $request = new AnetAPI\GetHostedPaymentPageRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setTransactionRequest($transactionRequestType);
+        $request->addToHostedPaymentSettings($setting1);
+        $request->addToHostedPaymentSettings($setting2);
+        $request->addToHostedPaymentSettings($setting3);
+        $request->addToHostedPaymentSettings($setting4);
+        $request->addToHostedPaymentSettings($setting5);
+        $request->addToHostedPaymentSettings($setting6);
+        //$request->addToHostedPaymentSettings($setting7);
+        //$request->addToHostedPaymentSettings($setting8);
         //execute request
         $controller = new AnetController\GetHostedPaymentPageController($request);
         $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);

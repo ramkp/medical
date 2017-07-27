@@ -7,7 +7,7 @@ echo $form;
 
     $(document).ready(function () {
 
-        $('#send_token').submit();
+        //$('#send_token').submit();
        
 
         /*
