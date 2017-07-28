@@ -854,7 +854,8 @@ class Dashboard extends Util {
             } // end while
         } // end if $num > 0
         // 3. Get cash full refunds
-        $query = "select * from mdl_partial_payments where refunded=1 and refund_date<>''";
+        $query = "select * from mdl_partial_payments "
+                . "where userid=$userid and refunded=1 and refund_date<>''";
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
