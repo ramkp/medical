@@ -2071,9 +2071,9 @@ class Students {
                     <hr>	
 			<p style='font-weight:bold;font-size:15px;'><span style='color:red;'>Make money orders out to</span> Medical2 Inc.</p> 
 			<hr>
-                        <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/register2/any_pay/$user_data->id/$user_data->courseid/0/75/1' target='_blank'>$75 Recertification Fee </a></p>
-			<p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/register2/any_pay/$user_data->id/$user_data->courseid/0/100/1' target='_blank'>$100 Recertification Fee (Over 10 Days Expired)</a></p>
-                        <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/register2/any_pay/$user_data->id/$user_data->courseid/0/125/1' target='_blank'>$125 Recertification Fee (Over 90 Days Expired)</a></p>
+                        <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/register2/any_auth_pay/$user_data->id/$user_data->courseid/0/75/1' target='_blank'>$75 Recertification Fee </a></p>
+			<p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/register2/any_auth_pay/$user_data->id/$user_data->courseid/0/100/1' target='_blank'>$100 Recertification Fee (Over 10 Days Expired)</a></p>
+                        <p style='align:left;font-weight:bold;font-size:15px;'><a href='https://medical2.com/index.php/register2/any_auth_pay/$user_data->id/$user_data->courseid/0/125/1' target='_blank'>$125 Recertification Fee (Over 90 Days Expired)</a></p>
                         
                         <p style='align:left;font-size:15px;'>Notice: Your username to login to your account at <a href='https://www.medical2.com' target='_blank'>www.medical2.com</a>
                         is your email address and if you don't remember your password please use Recover Password link to retrieve your password.</p>

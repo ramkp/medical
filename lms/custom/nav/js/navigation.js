@@ -3940,7 +3940,7 @@ $(document).ready(function () {
         if (amount != '' && $.isNumeric(amount)) {
             $('#partial_err').html('');
             var url = "http://medical2.com/index.php/payments/payment/" + userid + "/" + courseid + "/" + slotid + "/" + amount;
-            var new_url = "http://medical2.com/index.php/register2/any_pay/" + userid + "/" + courseid + "/" + slotid + "/" + amount + '/0';
+            var new_url = "http://medical2.com/index.php/register2/any_auth_pay/" + userid + "/" + courseid + "/" + slotid + "/" + amount + '/0';
             window.open(new_url, "Payment");
         } // end if amount!='' &&  $.isNumeric(amount)
         else {
@@ -5169,7 +5169,7 @@ $(document).ready(function () {
                                     var url = "/lms/custom/my/enroll_user.php";
                                     $.post(url, {userid: userid, courseid: program.courseid}).done(function () {
                                         var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
-                                        var new_url = "https://medical2.com/index.php/register2/any_pay/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount + "/0";
+                                        var new_url = "https://medical2.com/index.php/register2/any_auth_pay/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount + "/0";
                                         $("[data-dismiss=modal]").trigger({type: "click"});
                                         window.open(new_url, '_blank');
                                     });
@@ -6149,7 +6149,7 @@ $(document).ready(function () {
                         var encoded_user = Base64.encode(JSON.stringify(user));
                         var url = 'https://medical2.com/register2/payment_card/' + encoded_user;
                         var new_url='https://medical2.com/register2/payment_auth_single/' + encoded_user;
-                        var oWindow = window.open(url, "pay");
+                        var oWindow = window.open(new_url, "pay");
                     } // end if status==0
                     else {
                         $('#register_cash_error').html('Provided email already in use');

@@ -1202,15 +1202,15 @@ class navClass extends Util {
         // To be done: new authorize.net any_auth_pay
         
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
+        $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_auth_pay/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Two years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span>";
+        $list.="<span class='span9'>Two years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_auth_pay/$userid/$courseid/0/$two_year_payment/2' target='_blank'>$$two_year_payment</a></span>";
         $list.="</div>";
 
         $list.="<div class='container-fluid'>";
-        $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
+        $list.="<span class='span9'>Three years renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_auth_pay/$userid/$courseid/0/$three_year_payment/3' target='_blank'>$$three_year_payment</a></span>";
         $list.="</div>";
 
 

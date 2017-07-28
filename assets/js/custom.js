@@ -163,7 +163,7 @@ $(document).ready(function () {
                         var data = Base64.encode(JSON.stringify(reg));
                         var ptype = $("input:radio[name ='ptype']:checked").val();
                         if (ptype == 'card') {
-                            url = 'https://medical2.com/register2/group_payment_card/' + data;
+                            url = 'https://medical2.com/register2/payment_auth_group/' + data;
                         } // end if ptype=='card'
                         else {
                             url = 'https://medical2.com/register2/group_payment_paypal/' + data;
@@ -2775,8 +2775,8 @@ $(document).ready(function () {
                             var encoded_user = Base64.encode(JSON.stringify(user));
                             var ptype = $("input:radio[name ='ptype']:checked").val();
                             if (ptype == 'card') {
-                                url = 'https://medical2.com/register2/payment_card/' + encoded_user;
-                                //url = 'https://medical2.com/register2/payment_auth_card/' + encoded_user;
+                                //url = 'https://medical2.com/register2/payment_card/' + encoded_user;
+                                url = 'https://medical2.com/register2/payment_auth_single/' + encoded_user;
                             } // end if ptype=='card'
                             else {
                                 url = 'https://medical2.com/register2/payment_paypal/' + encoded_user;
