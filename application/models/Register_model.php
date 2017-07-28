@@ -1191,7 +1191,7 @@ class register_model extends CI_Model {
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span8'>";
-        $list.="<form id='send_token' name='send_token' action='https://test.authorize.net/payment/payment' method='post' 
+        $list.="<form id='send_token' name='send_token' action='https://accept.authorize.net/payment/payment' method='post' 
                 target='load_payment'>
                 <input type='hidden' name='token' value='$token' />
                 </form>";
@@ -1232,7 +1232,7 @@ class register_model extends CI_Model {
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span8'>";
-        $list.="<form id='send_token' name='send_token' action='https://test.authorize.net/payment/payment' method='post' 
+        $list.="<form id='send_token' name='send_token' action='https://accept.authorize.net/payment/payment' method='post' 
                 target='load_payment'>
                 <input type='hidden' name='token' value='$token' />
                 </form>";
@@ -1733,7 +1733,7 @@ class register_model extends CI_Model {
 
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span8'>";
-        $list.="<form id='send_token' name='send_token' action='https://test.authorize.net/payment/payment' method='post'
+        $list.="<form id='send_token' name='send_token' action='https://accept.authorize.net/payment/payment' method='post'
           target='load_payment'>
           <input type='hidden' name='token' value='$token' />
           </form>";

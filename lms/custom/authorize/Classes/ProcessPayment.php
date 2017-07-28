@@ -642,8 +642,8 @@ class ProcessPayment {
     }
 
     function getAnyPayAceptForm($userrequest) {
-        $merchantAuthentication = $this->sandbox_authorize();
-        //$merchantAuthentication = $this->authorize();
+        //$merchantAuthentication = $this->sandbox_authorize();
+        $merchantAuthentication = $this->authorize();
 
         $token = time();
         $fname = $userrequest->firstname;
@@ -749,8 +749,8 @@ class ProcessPayment {
         //$request->addToHostedPaymentSettings($setting8);
         //execute request
         $controller = new AnetController\GetHostedPaymentPageController($request);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
-        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
 
         if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
             return $response->getToken();
@@ -764,8 +764,9 @@ class ProcessPayment {
 
     function getAnAcceptPaymentPage($userrequest) {
 
-        $merchantAuthentication = $this->sandbox_authorize();
-        //$merchantAuthentication = $this->authorize();
+        //$merchantAuthentication = $this->sandbox_authorize();
+        $merchantAuthentication = $this->authorize();
+        
         $token = $userrequest->token;
         $fname = $userrequest->first_name;
         $lname = $userrequest->last_name;
@@ -873,8 +874,8 @@ class ProcessPayment {
         //$request->addToHostedPaymentSettings($setting8);
         //execute request
         $controller = new AnetController\GetHostedPaymentPageController($request);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
-        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
 
         if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
             return $response->getToken();
@@ -887,8 +888,8 @@ class ProcessPayment {
     }
 
     function getGroupAnAcceptPaymentPage($userrequest) {
-        $merchantAuthentication = $this->sandbox_authorize();
-        //$merchantAuthentication = $this->authorize();
+        //$merchantAuthentication = $this->sandbox_authorize();
+        $merchantAuthentication = $this->authorize();
 
         $token = time();
         $custid = rand(12, 10000);
@@ -996,8 +997,8 @@ class ProcessPayment {
         //$request->addToHostedPaymentSettings($setting8);
         //execute request
         $controller = new AnetController\GetHostedPaymentPageController($request);
-        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
-        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+        //$response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
 
         if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
             return $response->getToken();

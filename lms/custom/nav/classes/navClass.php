@@ -1198,7 +1198,9 @@ class navClass extends Util {
          */
 
         /*         * **************** New URLS for renew payments ***************** */
-
+        
+        // To be done: new authorize.net any_auth_pay
+        
         $list.="<div class='container-fluid'>";
         $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_pay/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
         $list.="</div>";
