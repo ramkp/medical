@@ -2148,12 +2148,13 @@ $(document).ready(function () {
             var courseid = $('#invoice_courses').val();
             var client = $('#invoice_client').val();
             var amount = $('#invoice_amount').val();
+            var item = $('#invoice_item').val();
             var email = $('#invoice_email').val();
-            if (courseid > 0 && amount != '' && email != '' && client != '') {
+            if (courseid > 0 && amount != '' && email != '' && client != '' && item != '') {
                 $('#any_invoice_status').html('');
                 if (confirm('Send invoice?')) {
                     var url = "/lms/custom/invoices/send_any_invoice.php";
-                    $.post(url, {courseid: courseid, amount: amount, email: email, client: client}).done(function (data) {
+                    $.post(url, {courseid: courseid, amount: amount, email: email, client: client, item: item}).done(function (data) {
                         $('#any_invoice_status').html(data);
                     });
                 }
@@ -6148,7 +6149,7 @@ $(document).ready(function () {
                         $('#register_cash_error').html('');
                         var encoded_user = Base64.encode(JSON.stringify(user));
                         var url = 'https://medical2.com/register2/payment_card/' + encoded_user;
-                        var new_url='https://medical2.com/register2/payment_auth_single/' + encoded_user;
+                        var new_url = 'https://medical2.com/register2/payment_auth_single/' + encoded_user;
                         var oWindow = window.open(new_url, "pay");
                     } // end if status==0
                     else {

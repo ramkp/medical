@@ -293,7 +293,7 @@ class Invoice {
         return $invoice_num;
     }
 
-    function create_any_invoice($courseid, $amount, $client) {
+    function create_any_invoice($courseid, $amount, $client, $item) {
 
         $invoice_credentials = $this->get_invoice_credentials();
         $invoice_num = $this->get_invoice_num();
@@ -332,7 +332,7 @@ class Invoice {
         $list.="</tr>";
 
         $list.="<tr bgcolor='#FAF7F5'>";
-        $list.="<td style='text-align:center;color:black;' width='10%' height='55'>1</td><td style='padding-left:15px;text-align:left;color:black' width='60%'>$client <br> payment for $item_name</td><td style='text-align:left;color:black;padding-left:15px;' width='5%'>$$amount </td>";
+        $list.="<td style='text-align:center;color:black;' width='10%' height='55'>1</td><td style='padding-left:15px;text-align:left;color:black' width='60%'>$client <br> payment for $item</td><td style='text-align:left;color:black;padding-left:15px;' width='5%'>$$amount </td>";
         $list.="</tr>";
 
         $list.="<tr>";

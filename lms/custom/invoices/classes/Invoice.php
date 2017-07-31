@@ -97,6 +97,10 @@ class Invoices extends Util {
             $list.="<div class='container-fluid' id='invoice_amount_row' style='display:none;'>";
             $list.="<span class='span1' style=''>Amount* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_amount' style='width:265px;'></span>";
             $list.="</div>";
+            
+            $list.="<div class='container-fluid' id='invoice_item_row' style=''>";
+            $list.="<span class='span1' style=''>Item* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_item' style='width:265px;'></span>";
+            $list.="</div>";
 
             $list.="<div class='container-fluid' id='invoice_email_row' style='display:none;'>";
             $list.="<span class='span1'>Email* </span><span class='span4' style='margin-left:52px;'><input type='text' id='invoice_email' style='width:265px;'></span>";
@@ -800,10 +804,10 @@ class Invoices extends Util {
         return $list;
     }
 
-    function send_any_invoice($courseid, $amount, $email, $client) {
+    function send_any_invoice($courseid, $amount, $email, $client, $item) {
         $file_invoice = new Invoice();
         $mailer = new Mailer();
-        $invoice_data = $file_invoice->create_any_invoice($courseid, $amount, $client);
+        $invoice_data = $file_invoice->create_any_invoice($courseid, $amount, $client, $item);
         $invoice_file_name = $invoice_data['file'];
         $invoice_num = $invoice_data['num'];
         // userid is 0 because user does not exist in the system for now
