@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -21,16 +22,16 @@
  * @copyright 1999 Martin Dougiamas  http://dougiamas.com
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 require_once("../config.php");
-require_once($CFG->dirroot.'/user/profile/lib.php');
-require_once($CFG->dirroot.'/user/lib.php');
-require_once($CFG->dirroot.'/tag/lib.php');
+require_once($CFG->dirroot . '/user/profile/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
+require_once($CFG->dirroot . '/tag/lib.php');
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->libdir . '/badgeslib.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/profile/classes/Profile.php';
 
-$id             = optional_param('id', 0, PARAM_INT); // User id.
-$courseid       = optional_param('course', SITEID, PARAM_INT); // course id (defaults to Site).
+$id = optional_param('id', 0, PARAM_INT); // User id.
+$courseid = optional_param('course', SITEID, PARAM_INT); // course id (defaults to Site).
 $showallcourses = optional_param('showallcourses', 0, PARAM_INT);
 
 // See your own profile by default.
@@ -40,7 +41,7 @@ if (empty($id)) {
 }
 
 if ($courseid == SITEID) {   // Since Moodle 2.0 all site-level profiles are shown by profile.php.
-    redirect($CFG->wwwroot.'/user/profile.php?id='.$id);  // Immediate redirect.
+    redirect($CFG->wwwroot . '/user/profile.php?id=' . $id);  // Immediate redirect.
 }
 
 $PAGE->set_url('/user/view.php', array('id' => $id, 'course' => $courseid));
@@ -51,7 +52,7 @@ $currentuser = ($user->id == $USER->id);
 
 $systemcontext = context_system::instance();
 $coursecontext = context_course::instance($course->id);
-$usercontext   = context_user::instance($user->id, IGNORE_MISSING);
+$usercontext = context_user::instance($user->id, IGNORE_MISSING);
 
 // Check we are not trying to view guest's profile.
 if (isguestuser($user)) {
@@ -63,13 +64,10 @@ $PAGE->set_context($coursecontext);
 
 if (!empty($CFG->forceloginforprofiles)) {
     require_login(); // We can not log in to course due to the parent hack below.
-
     // Guests do not have permissions to view anyone's profile if forceloginforprofiles is set.
     if (isguestuser()) {
         echo $OUTPUT->header();
-        echo $OUTPUT->confirm(get_string('guestcantaccessprofiles', 'error'),
-                              get_login_url(),
-                              $CFG->wwwroot);
+        echo $OUTPUT->confirm(get_string('guestcantaccessprofiles', 'error'), get_login_url(), $CFG->wwwroot);
         echo $OUTPUT->footer();
         die;
     }
@@ -86,9 +84,9 @@ $PAGE->set_docs_path('user/profile');
 
 $isparent = false;
 
-if (!$currentuser and !$user->deleted
-  and $DB->record_exists('role_assignments', array('userid' => $USER->id, 'contextid' => $usercontext->id))
-  and has_capability('moodle/user:viewdetails', $usercontext)) {
+if (!$currentuser and ! $user->deleted
+        and $DB->record_exists('role_assignments', array('userid' => $USER->id, 'contextid' => $usercontext->id))
+        and has_capability('moodle/user:viewdetails', $usercontext)) {
     // TODO: very ugly hack - do not force "parents" to enrol into course their child is enrolled in,
     //       this way they may access the profile where they get overview of grades and child activity in course,
     //       please note this is just a guess!
@@ -120,7 +118,6 @@ if ($currentuser) {
         echo $OUTPUT->footer();
         die;
     }
-
 } else {
     // Somebody else.
     $PAGE->set_title("$strpersonalprofile: ");
@@ -166,7 +163,7 @@ $PAGE->set_pagelayout('standard');
 // This MUST be done after we've set up the page as it is going to cause theme and output to initialise.
 if (!$currentuser) {
     $PAGE->navigation->extend_for_user($user);
-    if ($node = $PAGE->settingsnav->get('userviewingsettings'.$user->id)) {
+    if ($node = $PAGE->settingsnav->get('userviewingsettings' . $user->id)) {
         $node->forceopen = true;
     }
 } else if ($node = $PAGE->settingsnav->get('usercurrentsettings', navigation_node::TYPE_CONTAINER)) {
@@ -218,4 +215,26 @@ echo $renderer->render($tree);
 
 echo '</div>';  // Userprofile class.
 
+// Addtional tabs for CNA tutors to add attendance, grades & payment
+$pr = new Profile();
+$courseid = $_REQUEST['course'];
+$userid = $_REQUEST['id'];
+$list = $pr->get_cna_user_additional_tabs($courseid, $userid);
+echo $list;
+
+?>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.at_calendar').datepicker({
+            dateFormat: "mm/dd/yy"
+        });
+
+    }); // end of document ready
+
+</script>
+
+<?php
 echo $OUTPUT->footer();

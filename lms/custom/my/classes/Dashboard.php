@@ -36,6 +36,7 @@ class Dashboard extends Util {
     public $three_year;
     public $free_courses;
     public $free_users;
+    public $CNA_COURSE = 41;
 
     function __construct() {
         parent::__construct();
@@ -1619,13 +1620,14 @@ class Dashboard extends Util {
         } // end else
 
         $dates = $this->get_student_calendar_dates($courseid, $userid);
+        $status = $this->is_cna_instructor($courseid, $current_userid);
 
         $list.="<div class='row-fluid'>";
         $list.="<span class='span8'>Please select calendar dates to add students attendance</span>";
         $list.="</div>";
 
         $list.="<div class='row-fluid'>";
-        if ($roleid == 3) {
+        if ($roleid == 3 || $status == 1) {
             $list.="<span class='span3'><div class='at_calendar' data-userid='$userid' data-courseid='$courseid'></div></span>";
         } // end if $roleid==3
         $list.="<span class='span9' style='padding-left:175px;'>$dates</span>";
@@ -3378,12 +3380,23 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function is_cna_instructor($courseid, $currentuser) {
+        $contextid = $this->get_course_context($courseid);
+        $query = "select * from mdl_role_assignments "
+                . "where contextid=$contextid "
+                . "and roleid=3 "
+                . "and userid=$currentuser";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
     function get_user_payments_block($id) {
         $list = "";
         $current_userid = $this->user->id;
         $courses = $this->get_user_courses($id);
         $system_role = $this->get_system_wide_roles($current_userid);
-        if ($current_userid == 2 || $current_userid == 234 || $system_role == 9) {
+        $status = $this->is_cna_instructor($this->CNA_COURSE, $current_userid);
+        if ($current_userid == 2 || $current_userid == 234 || $system_role == 9 || $status == 1) {
             $list.="<div class='container-fluid' style=''>";
             $list.="<span class='span3'><button class='profile_add_payment' style='width:175px;' data-userid='$id'>Add payment</button></span>";
             $list.="</div><br><br>";
@@ -3401,9 +3414,11 @@ class Dashboard extends Util {
                     $list.="<div class='container-fluid' style=''>";
                     $list.="<span class='span6'><hr/></span>";
                     $list.="</div>";
-                    $list.="<div class='container-fluid' style=''>";
-                    $list.="<span class='span12'>$balance</span>";
-                    $list.="</div>";
+                    if ($current_userid == 2 || $current_userid == 234 || $system_role == 9) {
+                        $list.="<div class='container-fluid' style=''>";
+                        $list.="<span class='span12'>$balance</span>";
+                        $list.="</div>";
+                    }
                     $list.="<div class='container-fluid' style=''>";
                     $list.="<span class='span6'><br></span>";
                     $list.="</div>";
