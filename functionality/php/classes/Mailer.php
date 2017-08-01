@@ -697,7 +697,7 @@ class Mailer {
         $students = $this->get_group_students($groupname);
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1077,6 +1077,10 @@ class Mailer {
             </tr>";
         }
 
+        $list.="<tr style=''>
+            <td align='left'>Authorization code</td><td align='left'>$user->auth_code</td>
+            </tr>";
+
         $list.="<tr>
         <td align='left'>Phone</td><td align='left'>$user->phone</td>
         </tr>
@@ -1146,7 +1150,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1359,6 +1363,7 @@ class Mailer {
 
     function get_renew_certificate_message($user) {
         $list = "";
+        $now = date('m-d-Y H:i:s', time());
         $userdata = $this->get_user_data($user);
         $list.= "<!DOCTYPE HTML><html><head><title>Certificate Renew Confirmation</title>";
         $list.="</head>";
@@ -1392,11 +1397,19 @@ class Mailer {
         
         <tr style='background-color:#F5F5F5;'>
         <td>Applied Progarm</td><td>Certification renewal</td>
-        </tr> 
+        </tr>
+        
+        <tr>
+        <td>Authorizartion code</td><td>$user->auth_code</td>
+        </tr>
         
         <tr>
         <td>Amount paid</td><td>$$user->sum</td>
         </tr> 
+        
+        <tr>
+        <td>Order date</td><td>$now</td>
+        </tr>
         
         <tr>
         <td colspan='2' align='left'>&nbsp;</td>

@@ -1305,35 +1305,54 @@ class register_model extends CI_Model {
           die();
          */
 
-        $p = new Payment();
-        //$mailer = new Mailer();
+        $is_payment_already_exists = $this->is_payment_exists_in_db($paymentObj->transId);
 
-        $p->enroll->single_signup($user);
-        $userid = $p->get_user_id_by_email($studentObject->email);
-        $user->userid = $userid;
-        $user_detailes = $p->get_user_detailes($userid);
-        $user->pwd = $user_detailes->purepwd;
+        if ($is_payment_already_exists == 0) {
 
-        $p->confirm_user($user->email);
-        $p->add_payment_to_db($user); // adds payment result to DB
-        $p->enroll->add_user_to_course_schedule($user->userid, $user);
+            $p = new Payment();
+            //$mailer = new Mailer();
 
-        //$mailer->send_payment_confirmation_message($user);
+            $p->enroll->single_signup($user);
+            $userid = $p->get_user_id_by_email($studentObject->email);
+            $user->userid = $userid;
+            $user_detailes = $p->get_user_detailes($userid);
+            $user->pwd = $user_detailes->purepwd;
 
-        $email = $studentObject->email;
+            $p->confirm_user($user->email);
+            $p->add_payment_to_db($user); // adds payment result to DB
+            $p->enroll->add_user_to_course_schedule($user->userid, $user);
 
-        $list.="<br/><div  class='form_div'>";
-        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
-        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
-        $list.="<div class='panel-body'>";
+            //$mailer->send_payment_confirmation_message($user);
 
-        $list.="<div class='row-fluid' style='font-weight:bold;'>";
-        $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your registration is confirmed and receipt is sent to $email. &nbsp; <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$email.pdf' target='_blank'>Print registration.</a></span>";
-        $list.="</div>";
+            $email = $studentObject->email;
 
-        $list.="</div>";
-        $list.="</div>";
-        $list.="</div>";
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your registration is confirmed and receipt is sent to $email. &nbsp; <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$email.pdf' target='_blank'>Print registration.</a></span>";
+            $list.="</div>";
+
+            $list.="</div>";
+            $list.="</div>";
+            $list.="</div>";
+        } // end if $is_payment_already_exists==0
+        else {
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span12' id='auth_payment_status'>Duplicate payment detected</span>";
+            $list.="</div>";
+
+            $list.="</div>";
+            $list.="</div>";
+            $list.="</div>";
+        } // end else
 
         return $list;
     }
@@ -1345,6 +1364,13 @@ class register_model extends CI_Model {
             $data = $row;
         }
         return $data;
+    }
+
+    function is_payment_exists_in_db($transactionid) {
+        $query = "select * from mdl_card_payments "
+                . "where trans_id=$transactionid";
+        $num = $this->db->numrows($query);
+        return $num;
     }
 
     function process_any_auth_payment($payment) {
@@ -1389,30 +1415,51 @@ class register_model extends CI_Model {
         $userdata->period = $period;
         $userdata->promo_code = '';
         $userdata->bill_email = $userdata->email;
-        $this->add_any_payment_to_db($userdata);
 
-        $m = new Mailer();
-        $m->send_payment_confirmation_message($userdata);
+        $already_exists = $this->is_payment_exists_in_db($transid);
 
-        $list.="<br/><div  class='form_div'>";
-        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
-        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
-        $list.="<div class='panel-body'>";
+        if ($already_exists == 0) {
 
-        if ($userdata->period == 0) {
-            $list.="<div class='row-fluid' style='font-weight:bold;'>";
-            $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your registration is confirmed and receipt is sent to $email. &nbsp; <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$email.pdf' target='_blank'>Print registration.</a></span>";
+            $m = new Mailer();
+            $this->add_any_payment_to_db($userdata);
+            $m->send_payment_confirmation_message($userdata);
+
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            if ($userdata->period == 0) {
+                $list.="<div class='row-fluid' style='font-weight:bold;'>";
+                $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your registration is confirmed and receipt is sent to $email. &nbsp; <a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/invoices/registrations/$email.pdf' target='_blank'>Print registration.</a></span>";
+                $list.="</div>";
+            } // end if
+            else {
+                $list.="<div class='row-fluid' style='font-weight:bold;'>";
+                $list.="<span class='span12' id='auth_payment_status'>Congratulations! This certification have been renewed</span>";
+                $list.="</div>";
+            } // end else
+
             $list.="</div>";
-        } // end if
+            $list.="</div>";
+            $list.="</div>";
+        } // end if $already_exists==0
         else {
-            $list.="<div class='row-fluid' style='font-weight:bold;'>";
-            $list.="<span class='span12' id='auth_payment_status'>Congratulations! This certification have been renewed</span>";
-            $list.="</div>";
-        } // end else
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+            $list.="<div class='panel-body'>";
 
-        $list.="</div>";
-        $list.="</div>";
-        $list.="</div>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span12' id='auth_payment_status' style='text-align:center;'>Duplicate transaction detected</span>";
+            $list.="</div>";
+
+
+            $list.="</div>";
+            $list.="</div>";
+            $list.="</div>";
+        }
 
         return $list;
     }
@@ -1540,79 +1587,99 @@ class register_model extends CI_Model {
         $buyer->phone = $paymentObj->billTo->phoneNumber;
         $buyer->ptype = 'card';
 
-        $p = new Payment();
 
-        $groupid = $this->add_new_group($courseObj->courseid, $groupObj->name);
-        $authcode = $paymentObj->authorization;
-        $transid = $paymentObj->transId;
-        $status = $paymentObj->responseCode;
+        $is_payment_already_exists = $this->is_payment_exists_in_db($paymentObj->transId);
 
-        foreach ($users as $user) {
-            // We need to create object compatible with signup workflow
-            $original_email = $user->email;
-            $username_exists = $this->is_username_exists($original_email);
-            if ($username_exists > 0) {
-                $rnd_string = $this->get_random_string(4);
-                $new_email = $rnd_string . "_" . $user->email;
-                $user->email = $new_email;
-            } // end if $username_exists>0
+        if ($is_payment_already_exists == 0) {
 
-            $userObj = new stdClass();
-            $userObj->firstname = $user->fname;
-            $userObj->first_name = $user->fname;
+            $p = new Payment();
 
-            $userObj->lastname = $user->lname;
-            $userObj->last_name = $user->lname;
+            $groupid = $this->add_new_group($courseObj->courseid, $groupObj->name);
+            $authcode = $paymentObj->authorization;
+            $transid = $paymentObj->transId;
+            $status = $paymentObj->responseCode;
 
-            $userObj->email = $user->email;
-            $userObj->phone = $user->phone;
+            foreach ($users as $user) {
+                // We need to create object compatible with signup workflow
+                $original_email = $user->email;
+                $username_exists = $this->is_username_exists($original_email);
+                if ($username_exists > 0) {
+                    $rnd_string = $this->get_random_string(4);
+                    $new_email = $rnd_string . "_" . $user->email;
+                    $user->email = $new_email;
+                } // end if $username_exists>0
 
-            $pwd = $this->get_random_string(12);
-            $userObj->pwd = $pwd;
-            $userObj->courseid = $courseObj->courseid;
+                $userObj = new stdClass();
+                $userObj->firstname = $user->fname;
+                $userObj->first_name = $user->fname;
 
-            $userObj->addr = $groupObj->addr;
-            $userObj->inst = $groupObj->name;
+                $userObj->lastname = $user->lname;
+                $userObj->last_name = $user->lname;
 
-            $userObj->zip = $groupObj->zip;
-            $userObj->city = $groupObj->city;
+                $userObj->email = $user->email;
+                $userObj->phone = $user->phone;
 
-            $userObj->state = $groupObj->state; // integer
-            $userObj->country = 'US';
+                $pwd = $this->get_random_string(12);
+                $userObj->pwd = $pwd;
+                $userObj->courseid = $courseObj->courseid;
 
-            $userObj->slotid = $courseObj->slotid;
-            $userObj->promo_code = '';
+                $userObj->addr = $groupObj->addr;
+                $userObj->inst = $groupObj->name;
 
-            $p->enroll->single_signup($userObj);
-            $p->confirm_user($userObj->email);
-            $userid = $p->get_user_id_by_email($userObj->email);
-            $p->enroll->add_user_to_course_schedule($userid, $userObj);
-            $this->add_user_to_group($groupid, $userid);
+                $userObj->zip = $groupObj->zip;
+                $userObj->city = $groupObj->city;
 
-            $userObj->userid = $userid;
-            $userObj->card_no = $paymentObj->accountNumber;
-            $userObj->sum = $single_user_amount;
-            $userObj->transid = $transid;
-            $userObj->status = $status;
-            $userObj->auth_code = $authcode;
-            $p->add_payment_to_db($userObj);
-        } // end foreach
+                $userObj->state = $groupObj->state; // integer
+                $userObj->country = 'US';
 
-        $m = new Mailer();
-        $m->send_new_group_payment_confirmation_message($buyer, $users);
+                $userObj->slotid = $courseObj->slotid;
+                $userObj->promo_code = '';
 
-        $list.="<br/><div  class='form_div'>";
-        $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
-        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
-        $list.="<div class='panel-body'>";
+                $p->enroll->single_signup($userObj);
+                $p->confirm_user($userObj->email);
+                $userid = $p->get_user_id_by_email($userObj->email);
+                $p->enroll->add_user_to_course_schedule($userid, $userObj);
+                $this->add_user_to_group($groupid, $userid);
 
-        $list.="<div class='row-fluid' style='font-weight:bold;'>";
-        $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your group registration is confirmed and receipt is sent to $buyer_email. </span>";
-        $list.="</div>";
+                $userObj->userid = $userid;
+                $userObj->card_no = $paymentObj->accountNumber;
+                $userObj->sum = $single_user_amount;
+                $userObj->transid = $transid;
+                $userObj->status = $status;
+                $userObj->auth_code = $authcode;
+                $p->add_payment_to_db($userObj);
+            } // end foreach
 
-        $list.="</div>";
-        $list.="</div>";
-        $list.="</div>";
+            $m = new Mailer();
+            $m->send_new_group_payment_confirmation_message($buyer, $users);
+
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span12' id='auth_payment_status'>Congratulations! Your group registration is confirmed and receipt is sent to $buyer_email. </span>";
+            $list.="</div>";
+
+            $list.="</div>";
+            $list.="</div>";
+            $list.="</div>";
+        } // end if $is_payment_already_exists
+        else {
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span12' id='auth_payment_status'>Duplicate payment detected</span>";
+            $list.="</div>";
+
+            $list.="</div>";
+            $list.="</div>";
+            $list.="</div>";
+        }
 
         return $list;
     }
