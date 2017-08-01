@@ -1369,7 +1369,8 @@ class register_model extends CI_Model {
     function is_payment_exists_in_db($transactionid) {
         $query = "select * from mdl_card_payments "
                 . "where trans_id=$transactionid";
-        $num = $this->db->numrows($query);
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
         return $num;
     }
 
