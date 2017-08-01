@@ -1078,7 +1078,7 @@ class Mailer {
         }
 
         $list.="<tr style=''>
-            <td align='left'>Authorization code</td><td align='left'>$user->auth_code</td>
+            <td align='left'>Auth Code</td><td align='left'>$user->auth_code</td>
             </tr>";
 
         $list.="<tr>
@@ -1400,7 +1400,7 @@ class Mailer {
         </tr>
         
         <tr>
-        <td>Authorizartion code</td><td>$user->auth_code</td>
+        <td>Auth Code</td><td>$user->auth_code</td>
         </tr>
         
         <tr>
