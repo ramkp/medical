@@ -1397,13 +1397,15 @@ class Mailer {
         
         <tr style='background-color:#F5F5F5;'>
         <td>Applied Progarm</td><td>Certification renewal</td>
-        </tr>
+        </tr>";
         
-        <tr>
+        if ($user->auth_code!='') {
+        $list.="<tr>
         <td>Auth Code</td><td>$user->auth_code</td>
-        </tr>
+        </tr>";
+        }
         
-        <tr>
+        $list.="<tr>
         <td>Amount paid</td><td>$$user->sum</td>
         </tr> 
         
