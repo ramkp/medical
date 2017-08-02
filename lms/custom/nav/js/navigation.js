@@ -4454,6 +4454,17 @@ $(document).ready(function () {
             } // end if confirm
         }
 
+        if (event.target.id == 'show_filer_bar') {
+            if ($('#filer_bar').is(":visible")) {
+                $('#filer_bar').hide();
+            } // end if
+            else {
+                $('#filer_bar').show();
+            } // end else
+        }
+
+
+
         if ($(event.target).attr('class') == 'at_calendar hasDatepicker') {
             console.log('Attendance calendar clicked ...');
             var courseid = $('.at_calendar').data('courseid');
@@ -5898,6 +5909,86 @@ $(document).ready(function () {
         }
 
         console.log('Event ID: ' + event.target.id);
+
+        if (event.target.id == 'show_filer_bar') {
+            if ($('#filer_bar1').is(":visible")) {
+                $('#filer_bar1').hide();
+                $('#filer_bar2').hide();
+            } // end if
+            else {
+                $('#filer_bar1').show();
+                $('#filer_bar2').show();
+            } // end else
+        }
+
+
+
+        if (event.target.id == 'get_demo_data') {
+            var date1 = $('#start_d').val();
+            var date2 = $('#end_d').val();
+            var mstatus = $('#mstatus').val();
+            var racebox = $('#racebox').val();
+            var sexbox = $('#sexbox').val();
+            var income = $('#income_box').val();
+            var edu_box = $('#edu_box').val();
+            var job_type = $('#job_type').val();
+            var school_status = $('#status').val();
+            var exam_attempt = $('#exam_attempt').val();
+            var exam_passed = $('#exam_passed').val();
+            var worked15 = $('#work_experience').val();
+
+            var criteria = {date1: date1,
+                date2: date2,
+                mstatus: mstatus,
+                racebox: racebox,
+                income: income,
+                sexbox: sexbox,
+                edu_box: edu_box,
+                job_type: job_type,
+                school_status: school_status,
+                exam_attempt: exam_attempt,
+                exam_passed: exam_passed,
+                worked15: worked15};
+
+            $('#ajax_loader').show();
+            var url = '/lms/custom/demographic/get_demo_data.php';
+            $.post(url, {criteria: JSON.stringify(criteria)}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#report_data').html(data);
+                $('#myTable').DataTable();
+            });
+        }
+
+        if (event.target.id == 'reset_filer_bar') {
+            $('#mstatus').val(0);
+            $('#racebox').val(0);
+            $('#sexbox').val(0);
+            $('#edu_box').val(0);
+            $('#income_box').val(0);
+            $('#job_type').val(0);
+            $('#status').val(0);
+            $('#exam_attempt').val(0);
+            $('#exam_passed').val(0);
+            $('#work_experience').val(0);
+            $('#start_d').val('');
+            $('#end_d').val('');
+            var criteria = {};
+            $('#ajax_loader').show();
+            var url = '/lms/custom/demographic/get_demo_data.php';
+            $.post(url, {criteria: JSON.stringify(criteria)}).done(function (data) {
+                $('#ajax_loader').hide();
+                $('#report_data').html(data);
+                $('#myTable').DataTable();
+            });
+        }
+
+        if (event.target.id == 'print_demographic_report') {
+            var url = '/lms/custom/demographic/print_demo_report.php';
+            $.post(url, {id: 1}).done(function (path) {
+                var filepath = 'https://medical2.com/lms/custom/demographic/' + path;
+                var oWindow = window.open(filepath, "print");
+            });
+        }
 
         if (event.target.id == 'make_authorize_refund') {
             var ptype = $('#ptype').val();
@@ -7478,6 +7569,8 @@ $(document).ready(function () {
                 $('#sms_err').html('Please provide message text');
             } // end else 
         }
+
+
 
 
     }); // end of body click event
