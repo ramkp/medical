@@ -513,6 +513,7 @@ class ProcessPayment {
 
     function makeRefund($amount, $card_last_four, $exp_date, $trans_id) {
         $merchantAuthentication = $this->authorize();
+        //$merchantAuthentication=$this->sandbox_authorize();
         $refId = 'ref' . time();
         $date = $this->prepareExpirationDate($exp_date);
 
