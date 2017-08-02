@@ -990,7 +990,7 @@ class Report extends Util {
 
         $authorize_payments = $this->get_authorize_payments($courseid, $from, $to, $state, $city);
         $braintree_payments = $this->get_braintree_card_payments($courseid, $from, $to, $state, $city);
-        $payments = array_merge($authorize_payments, $braintree_payments);
+        $payments = array_merge((array) $authorize_payments, (array) $braintree_payments);
 
         if (count($payments) > 0) {
             $this->create_csv_file($this->card_report_csv_file, $payments);
@@ -1232,9 +1232,11 @@ class Report extends Util {
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
+            //echo "Num: ".$num."<br>";
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $user_status = $this->is_user_deleted($row['userid']);
+                //echo "User status: ".$user_status."<br>";
                 if ($user_status == 0) {
 
                     if ($state == '' && $city == '') {
@@ -1269,7 +1271,11 @@ class Report extends Util {
                 } // end if $user_status == 0
             } // end while
         } // end if $num > 0
-        $all_refunds = array_merge($payments, $cash_payments, $partial_payments);
+        //print_r($partial_payments);
+
+        $all_refunds = array_merge((array) $partial_payments, (array) $payments, (array) $cash_payments);
+        //echo "Whole refunds array: ";
+        //print_r($all_refunds);
         if (count($all_refunds) > 0) {
 
             $this->create_csv_file($this->refund_report_csv_file, $all_refunds);
