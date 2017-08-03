@@ -18,12 +18,14 @@ class ProcessPayment {
     public $period = 28; // 28 days of installment 
     public $log_file_path;
     public $transaction_log_path;
+    public $hook_log_file;
     public $db;
 
     function __construct() {
         $this->AUTHORIZENET_LOG_FILE = 'phplog';
         $this->log_file_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/failed_transactions.log';
         $this->transaction_log_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/transactions.log';
+        $this->hook_log_file = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/hooks.log';
         $this->db = new pdo_db();
     }
 
@@ -114,6 +116,14 @@ class ProcessPayment {
 
     function save_transaction_log($data) {
         $fp = fopen($this->transaction_log_path, 'a');
+        $date = date('m-d-Y h:i:s', time());
+        fwrite($fp, $date . "\n");
+        fwrite($fp, print_r($data, TRUE));
+        fclose($fp);
+    }
+
+    function save_hook_log($data) {
+        $fp = fopen($this->hook_log_file, 'a');
         $date = date('m-d-Y h:i:s', time());
         fwrite($fp, $date . "\n");
         fwrite($fp, print_r($data, TRUE));
@@ -515,12 +525,13 @@ class ProcessPayment {
         $merchantAuthentication = $this->authorize();
         //$merchantAuthentication=$this->sandbox_authorize();
         $refId = 'ref' . time();
-        $date = $this->prepareExpirationDate($exp_date);
+        //$date = $this->prepareExpirationDate($exp_date);
+        $expdate = 'XXXX';
 
         // Create the payment data for a credit card
         $creditCard = new AnetAPI\CreditCardType();
         $creditCard->setCardNumber(base64_decode($card_last_four));
-        $creditCard->setExpirationDate($date);
+        $creditCard->setExpirationDate($expdate);
         $paymentOne = new AnetAPI\PaymentType();
         $paymentOne->setCreditCard($creditCard);
 
@@ -552,6 +563,83 @@ class ProcessPayment {
         else {
             return FALSE;
         }
+    }
+
+    function test_refund($amount, $card_last_four, $trans_id) {
+
+        $merchantAuthentication = $this->sandbox_authorize();
+        $refId = 'ref' . time();
+        $fd = base64_decode($card_last_four);
+        $expdate = 'XXXX'; // it is always masked, should it work?
+        echo "Card last four " . $fd . "<br>";
+
+        // Create the payment data for a credit card
+        $creditCard = new AnetAPI\CreditCardType();
+        $creditCard->setCardNumber($fd);
+        $creditCard->setExpirationDate($expdate);
+
+        $paymentOne = new AnetAPI\PaymentType();
+        $paymentOne->setCreditCard($creditCard);
+
+        //create a transaction
+        $transactionRequest = new AnetAPI\TransactionRequestType();
+        $transactionRequest->setTransactionType("refundTransaction");
+        $transactionRequest->setAmount($amount);
+        $transactionRequest->setRefTransId($trans_id);
+        $transactionRequest->setPayment($paymentOne);
+
+        $request = new AnetAPI\CreateTransactionRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setRefId($refId);
+        $request->setTransactionRequest($transactionRequest);
+        $controller = new AnetController\CreateTransactionController($request);
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
+        echo "<pre>";
+        print_r($response);
+        echo "</pre>";
+
+        $this->save_transaction_log($response);
+        if ($response != null) {
+            $tresponse = $response->getTransactionResponse();
+            $this->save_transaction_log($tresponse);
+            if (($tresponse != null) && ($tresponse->getResponseCode() == "1" )) {
+                return TRUE;
+            } // end if ($tresponse != null) && ($tresponse->getResponseCode() == \SampleCode\Constants::RESPONSE_OK)            
+            else {
+                return FALSE;
+            }
+        } // end if $response != null 
+        else {
+            return FALSE;
+        }
+    }
+
+    function getTransactionDetails($transactionId) {
+
+        $merchantAuthentication = $this->sandbox_authorize();
+
+
+        $request = new AnetAPI\GetTransactionDetailsRequest();
+        $request->setMerchantAuthentication($merchantAuthentication);
+        $request->setTransId($transactionId);
+
+        $controller = new AnetController\GetTransactionDetailsController($request);
+
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+
+        if (($response != null) && ($response->getMessages()->getResultCode() == "Ok")) {
+            echo "SUCCESS: Transaction Status:" . $response->getTransaction()->getTransactionStatus() . "\n";
+            echo "                Auth Amount:" . $response->getTransaction()->getAuthAmount() . "\n";
+            //echo "                Expiration dates ".$response->Transaction()-> 
+            echo "                   Trans ID:" . $response->getTransaction()->getTransId() . "\n";
+        } else {
+            echo "ERROR :  Invalid response\n";
+            $errorMessages = $response->getMessages()->getMessage();
+            echo "Response : " . $errorMessages[0]->getCode() . "  " . $errorMessages[0]->getText() . "\n";
+        }
+
+        return $response;
     }
 
     function getCustomerProfileIds() {
@@ -767,7 +855,7 @@ class ProcessPayment {
 
         //$merchantAuthentication = $this->sandbox_authorize();
         $merchantAuthentication = $this->authorize();
-        
+
         $token = $userrequest->token;
         $fname = $userrequest->first_name;
         $lname = $userrequest->last_name;
