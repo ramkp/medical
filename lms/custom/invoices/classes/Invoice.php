@@ -14,7 +14,7 @@ class Invoices extends Util {
 
     public $limit = 3;
 
-    /*     * ******************************************************
+    /* *******************************************************
      * 
      *             Invoice credentials
      * 
@@ -77,7 +77,7 @@ class Invoices extends Util {
             // Send invoice to company or non-existing user
             $list.="<div class='container-fluid'>";
             $list.="<div class='container-fluid' style='font-weight:bold;'>";
-            $list.="<span class='span6'>Send invoice to company or new user</span>";
+            $list.="<span class='span6'>Send invoice to group or individuals</span>";
             $list.="</div>";
             $list.="<div class='container-fluid'>";
             $list.="<span class='span9' id='any_invoice_status'></span>";
@@ -116,6 +116,7 @@ class Invoices extends Util {
             $list.="</div><br><br>";
 
             // Send invoice to existing user
+            /*
             $list.="<div class='container-fluid'>";
             $list.="<div class='container-fluid' style='font-weight:bold;'>";
             $list.="<span class='span6'>Send invoice to existing user</span>";
@@ -135,7 +136,9 @@ class Invoices extends Util {
             $list.="<div class='container-fluid'>";
             $list.="<span class='span2'><button type='button' id='send_invoice' class='btn btn-primary'>Send</button></span>";
             $list.="</div>";
+            */
             $list.="</div>";
+            
         } // end if  $this->session->justloggedin == 1
         else {
             $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
@@ -226,7 +229,7 @@ class Invoices extends Util {
         return $list;
     }
 
-    /*     * ******************************************************
+    /* *******************************************************
      * 
      *             Open invoices
      * 

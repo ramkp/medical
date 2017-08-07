@@ -3979,6 +3979,7 @@ $(document).ready(function () {
                 $.post(url, {dates: JSON.stringify(dates)}).done(function (data) {
                     $('#ajax_loader').hide();
                     $('#ws_data_container').html(data);
+                    $('#myTable').DataTable();
                 });
             } // end if
             else {
