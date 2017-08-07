@@ -385,20 +385,20 @@ class Certificates2 {
         $src = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf";
         $dir = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/certificates/$userid/$courseid/copy";
         if (!is_dir($dir)) {
-            echo "Directory $dir is not exists ... <br>";
+            //echo "Directory $dir is not exists ... <br>";
             $dir_status = mkdir($dir, 0777, true);
             if ($dir_status) {
-                echo "Directory $dir was successfully created ... <br>";
+                //echo "Directory $dir was successfully created ... <br>";
                 $dest = $dir . '/certificate.pdf';
                 if (!copy($src, $dest)) {
-                    echo "File $src was not successfully copied ...<br>";
+                    //echo "File $src was not successfully copied ...<br>";
                 } // end if
                 else {
-                    echo "File $src was successfully copied ...<br>";
+                    //echo "File $src was successfully copied ...<br>";
                 } // end else
             } // end if $dir_status
             else {
-                echo "Directory $dir was not created ... <br>";
+                //echo "Directory $dir was not created ... <br>";
             } // end else
         } // end if !is_dir($dir)
     }

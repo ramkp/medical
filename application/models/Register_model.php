@@ -1248,6 +1248,130 @@ class register_model extends CI_Model {
         return $list;
     }
 
+    function get_group_renew_payment_form($group) {
+        $list = "";
+
+        $data = json_decode(base64_decode($group));
+        $email = $data->email;
+        $_SESSION[$email] = $data;
+        $program = $this->get_coure_name_by_id($data->courseid);
+        $item = "Group certificate renewal - $program";
+        $data->item = $item;
+
+        $pr = new ProcessPayment();
+        $token = $pr->getAuthGroupRenewalPaymentForm($data);
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span8'>";
+        $list.="<form id='send_token' name='send_token' action='https://accept.authorize.net/payment/payment' method='post' 
+                target='load_payment'>
+                <input type='hidden' name='token' value='$token' />
+                </form>";
+        $list.="</span>";
+        $list.="</div>";
+
+        $list.="<div class='container-fluid' style='text-align:center;'>";
+        $list.="<span class='span12' style='text-align:center;' id='payment_result'>";
+        $list.="<iframe id='load_payment' name='load_payment' width='100%' height='100%;' style='overflow-x:hidden;' frameborder='0' style='' ></iframe>";
+        $list.="</span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function process_group_renew_payment($payment) {
+        $paymentObj = json_decode(base64_decode($payment));
+        $studentObject = $_SESSION[$paymentObj->billTo->email];
+        $auth_code = $paymentObj->authorization;
+        $card_last_four = substr($paymentObj->accountNumber, -4);
+        $transid = $paymentObj->transId;
+        $courseid = $studentObject->courseid;
+        $period = $studentObject->period;
+        $userslist = $studentObject->userslist;
+        $total = count(explode(',', $userslist));
+        $single_user_amount = round($studentObject->amount / $total);
+
+        $gpayment = new stdClass();
+        $gpayment->courseid = $courseid;
+        $gpayment->amount = $single_user_amount;
+        $gpayment->period = $period;
+        $gpayment->last_four = base64_encode($card_last_four);
+        $gpayment->transid = $transid;
+        $gpayment->userslist = $userslist;
+        $gpayment->auth_code = $auth_code;
+        $gpayment->fname = $paymentObj->billTo->firstName;
+        $gpayment->lname = $paymentObj->billTo->lastName;
+        $gpayment->email = $paymentObj->billTo->email;
+        $gpayment->phone = $paymentObj->billTo->phoneNumber;
+        $gpayment->addr = $paymentObj->billTo->address;
+        $gpayment->city = $paymentObj->billTo->city;
+        $gpayment->state = $paymentObj->billTo->state;
+        $gpayment->zip = $paymentObj->billTo->zip;
+        $gpayment->full_amount = $studentObject->amount;
+        $is_payment_already_exists = $this->is_payment_exists_in_db($transid);
+        if ($is_payment_already_exists == 0) {
+            $this->add_group_renew_payment($gpayment);
+            $m = new Mailer();
+            $m->send_group_renew_payment_confirmation_message($gpayment);
+            $email = $paymentObj->billTo->email;
+
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span12' id='auth_payment_status'>Congratulations! Group certificates are renewed. Confirmation email is sent to $email</span>";
+            $list.="</div>";
+
+            $list.="</div>";
+            $list.="</div>";
+            $list.="</div>";
+        } // end if $is_payment_already_exists==0
+        else {
+            $list.="<br/><div  class='form_div'>";
+            $list.="<div class='panel panel-default' id='program_section' style='margin-bottom:0px;'>";
+            $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Payment status</h5></div>";
+            $list.="<div class='panel-body'>";
+
+            $list.="<div class='row-fluid' style='font-weight:bold;'>";
+            $list.="<span class='span12' id='auth_payment_status'>Duplicate payment detected</span>";
+            $list.="</div>";
+
+            $list.="</div>";
+            $list.="</div>";
+            $list.="</div>";
+        } // end else
+        return $list;
+    }
+
+    function add_group_renew_payment($data) {
+        $usersarr = explode(',', $data->userslist);
+        $now = time();
+        $cert = new Certificates2();
+        foreach ($usersarr as $userid) {
+            $query = "insert into mdl_card_payments "
+                    . "(userid,"
+                    . "renew,"
+                    . "courseid,"
+                    . "card_last_four,"
+                    . "psum,"
+                    . "trans_id,"
+                    . "auth_code,"
+                    . "pdate) "
+                    . "values($userid,"
+                    . "$data->period,"
+                    . "$data->courseid,"
+                    . "'$data->last_four','"
+                    . "$data->amount',"
+                    . "'$data->transid',"
+                    . "'$data->auth_code','$now')";
+            //echo "Query: " . $query . "<br>";
+            $this->db->query($query);
+            $cert->renew_certificate($data->courseid, $userid, $data->period);
+        } // end foreach
+    }
+
     function process_auth_payment($payment) {
 
         $paymentObj = json_decode(base64_decode($payment));
@@ -1780,6 +1904,77 @@ class register_model extends CI_Model {
 
         $list.="<div class='row-fluid' style='text-align:left;'>";
         $list.="<span class='span8' style='text-align:center;'><button class='btn btn-primary' id='authorize_next_group_payment_form'>Next</button></span>";
+        $list.="</div>";
+
+        $list.="</div>";
+        $list.="</div>";
+        $list.="</div>";
+
+        return $list;
+    }
+
+    function get_group_renew_payer_form($group) {
+        $countries = $this->get_countries_list();
+        $states = $this->get_states_list();
+        $courseid = $group->courseid;
+        $period = $group->period;
+        $coursename = 'Group certificate renewal  ' . $this->get_course_name($courseid);
+        $userslist = base64_decode($group->users);
+        $total = count(explode(',', $userslist));
+        $amount = $this->get_group_renewal_fee($courseid, $period, $total);
+
+        $list.="<br/><div  class='form_div'>";
+        $list.="<div class='panel panel-default' id='billing_info' style='margin-bottom:0px;'>";
+        $list.="<div class='panel-heading' style='text-align:left;'><h5 class='panel-title'>Billing info</h5></div>";
+        $list.="<div class='panel-body' style='text-align:center;'>";
+
+        $list.="<input type='hidden' id='courseid' value='$courseid'>";
+        $list.="<input type='hidden' id='period' value='$period'>";
+        $list.="<input type='hidden' id='userslist' value='$userslist'>";
+        $list.="<input type='hidden' id='amount' value='$amount'>";
+
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Selected program:</span>";
+        $list.="<span class='span2'>$coursename</span>";
+        $list.="<span class='span2'>Program fee</span>";
+        $list.="<span class='span2'>$$amount</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>First Name*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_fn'></span>";
+        $list.="<span class='span2'>Last Name*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_ln'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Email*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_email'></span>";
+        $list.="<span class='span2'>Phone*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_phone'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>State*</span>";
+        $list.="<span class='span2'>$states</span>";
+        $list.="<span class='span2'>Country*</span>";
+        $list.="<span class='span2'>$countries</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span2'>Address*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_addr'></span>";
+        $list.="<span class='span2'>City*</span>";
+        $list.="<span class='span2'><input type='text' id='gr_city'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='color:red;' id='group_billing_err'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:left;'>";
+        $list.="<span class='span8' style='text-align:center;'><button class='btn btn-primary' id='authorize_next_group_renewal_form'>Next</button></span>";
         $list.="</div>";
 
         $list.="</div>";

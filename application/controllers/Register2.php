@@ -120,8 +120,39 @@ class Register2 extends CI_Controller {
         $this->load->view('any_pay_view', $data);
         $this->load->view('footer_view');
     }
+
+    function auth_group_renew() {
+        $group = new stdClass();
+        $group->courseid = $this->uri->segment(3);
+        $group->period = $this->uri->segment(4);
+        $group->users = $this->uri->segment(5);
+        $form = $this->register_model->get_group_renew_payer_form($group);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('group_auth_view_a', $data);
+        $this->load->view('footer_view');
+    }
+
+    function auth_group_renew_pay() {
+        $group= $this->uri->segment(3);
+        $form = $this->register_model->get_group_renew_payment_form($group);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('auth_group_renew', $data);
+        $this->load->view('footer_view');
+    }
     
-    function any_auth_pay () {
+    function proceed_group_renew_payment () {
+        $payment=$this->uri->segment(3);
+        $form = $this->register_model->process_group_renew_payment($payment);
+        $data = array('form' => $form);
+        $this->load->view('header_view');
+        $this->load->view('process_group_renew', $data);
+        $this->load->view('footer_view');
+       
+    }
+
+    function any_auth_pay() {
         $user = new stdClass();
         $user->userid = $this->uri->segment(3);
         $user->courseid = $this->uri->segment(4);
@@ -135,8 +166,8 @@ class Register2 extends CI_Controller {
         $this->load->view('any_auth_pay', $data);
         $this->load->view('footer_view');
     }
-    
-    function proceed_any_auth_payment () {
+
+    function proceed_any_auth_payment() {
         $response = $this->uri->segment(3);
         $form = $this->register_model->process_any_auth_payment($response);
         $data = array('form' => $form);
@@ -206,7 +237,7 @@ class Register2 extends CI_Controller {
         $this->load->view('register_view', $data);
         $this->load->view('footer_view');
     }
-    
+
     function payment_auth_group() {
         $regdata = $this->uri->segment(3);
         $form = $this->register_model->get_authorize_group_payment_form_step1($regdata);
@@ -215,8 +246,8 @@ class Register2 extends CI_Controller {
         $this->load->view('auth_register_group', $data);
         $this->load->view('footer_view');
     }
-    
-    function proceed_group_auth_card () {
+
+    function proceed_group_auth_card() {
         $response = $this->uri->segment(3);
         $form = $this->register_model->process_group_auth_payment($response);
         $data = array('form' => $form);
@@ -224,8 +255,8 @@ class Register2 extends CI_Controller {
         $this->load->view('auth_register_group_complete', $data);
         $this->load->view('footer_view');
     }
-    
-    function get_auth_group_hosted_form () {
+
+    function get_auth_group_hosted_form() {
         $regdata = $this->uri->segment(3);
         $form = $this->register_model->get_authorize_group_payment_form_step2($regdata);
         $data = array('form' => $form);

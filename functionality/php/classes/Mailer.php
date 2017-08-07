@@ -116,7 +116,7 @@ class Mailer {
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
         $userdata = $this->get_user_details($user->userid);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -338,7 +338,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ****************************************************************
+        /*         * ***************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -697,7 +697,7 @@ class Mailer {
         $students = $this->get_group_students($groupname);
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -970,7 +970,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1150,7 +1150,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /* ******************************************************************
+        /*         * *****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1398,13 +1398,13 @@ class Mailer {
         <tr style='background-color:#F5F5F5;'>
         <td>Applied Progarm</td><td>Certification renewal</td>
         </tr>";
-        
-        if ($user->auth_code!='') {
-        $list.="<tr>
+
+        if ($user->auth_code != '') {
+            $list.="<tr>
         <td>Auth Code</td><td>$user->auth_code</td>
         </tr>";
         }
-        
+
         $list.="<tr>
         <td>Amount paid</td><td>$$user->sum</td>
         </tr> 
@@ -2244,6 +2244,196 @@ class Mailer {
         $output = $dompdf->output();
         $file_path = $this->renewal_path . "/$email.pdf";
         file_put_contents($file_path, $output);
+    }
+
+    function get_group_renewal_students($usersarr, $groupname) {
+        $list = "";
+
+        $list.="<tr style='font-weight:bold;'>";
+        $list.="<td>Group name:</td><td>$groupname</td>";
+        $list.="</tr>";
+
+        foreach ($usersarr as $userid) {
+            $userdata = $this->get_user_details($userid);
+            $list.="<tr>";
+            $list.="<td>First name</td><td>$userdata->firstname</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td>Last name</td><td>$userdata->lastname</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td>Email</td><td>$userdata->email</td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td colspan='2'><br></td>";
+            $list.="</tr>";
+        } // end foreach
+
+        return $list;
+    }
+
+    function get_user_group_name($userid) {
+        $query = "select * from mdl_groups_members where userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $groupid = $row['groupid'];
+        }
+        $query = "select * from mdl_groups where id=$groupid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $groupname = $row['name'];
+        }
+        return $groupname;
+    }
+
+    function send_group_renew_payment_confirmation_message($data, $printed_data = null) {
+        $list = "";
+
+        //print_r($data);
+        //die();
+        $usersarr = explode(',', $data->userslist);
+        $total = count($usersarr);
+        $course_name = $this->get_course_name($data);
+        $catid = $this->get_course_category($data);
+        $groupname = $this->get_user_group_name($usersarr[0]);
+        $students = $this->get_group_renewal_students($usersarr, $groupname);
+        $state = $data->state;
+        $recipient = $data->email;
+        $auth_code=$data->auth_code;
+        $list.= "<!DOCTYPE HTML><html><head><title>Group Certificate Renewal Confirmation</title>";
+        $list.="</head>";
+        $list.="<body><br/><br/><br/><br/>";
+        $list.="<div class='datagrid'>";
+
+        $list.="<table style='table-layout: fixed;' width='360'>
+        <thead>";
+
+        if ($printed_data == NULL) {
+            if ($catid == 5) {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_college.png' width='360' height='130'></th>";
+                $list.="</tr>";
+            } // end if
+            else {
+                $list.="<tr>";
+                $list.="<th colspan='2' align='left'><img src='http://medical2.com/assets/logo/receipt_agency.png' width='360' height='120'></th>";
+                $list.="</tr>";
+            } // end else
+        } // end if $printed_data == NULL
+
+
+        $list.="</thead>
+        <tbody>";
+
+        $list.=$students;
+
+        $list.="<tr style='background-color:#F5F5F5;'>
+        <td>Total students</td><td>$total</td>
+        </tr>
+        
+        <tr style=''>
+        <td colspan='2' style='font-weight:bold;'><br>Billing info</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>First name</td><td>$data->fname</td>
+        </tr>
+        
+        <tr>
+        <td>Last name</td><td>$data->lname</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Email</td><td>$data->email</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Address</td><td>$data->addr</td>
+        </tr>
+        
+        <tr>
+        <td>City</td><td>$data->city</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>State</td><td>$state</td>
+        </tr>
+        
+        <tr>
+        <td>Zip</td><td>$data->zip</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Applied Progarm</td><td>Group certificates renewal - $course_name</td>
+        </tr>
+        
+        <tr>
+        <td>Program fee</td><td>$$data->full_amount</td>
+        </tr>
+        
+        <tr style='background-color:#F5F5F5;'>
+        <td>Auth Code</td><td>$auth_code</td>
+        </tr>";
+
+        if (property_exists($data, 'full_amount')) {
+            date_default_timezone_set("America/New_York");
+            $date = date('m-d-Y h:i:s', time());
+
+            $list.="<tr style='background-color:#F5F5F5;'>
+            <td>Payment status: </td><td>Paid by card: $$data->full_amount</td>
+            </tr>";
+
+            $list.="<tr style='background-color:#F5F5F5;'>";
+            $list.="<td>Order Date:</td><td>$date</td>";
+            $list.="</tr>";
+        } // end if $payment_amount != null
+
+        $list.="</tbody>
+        </table>
+        </div>";
+        $list.="<p>If you need assistance please contact us by email <a href='mailto:help@medical2.com'>help@medical2.com</a> or call us 877-741-1996</p>";
+        $list.="</body></html>";
+        $subject = "Medical2 - Group Certificate Renewal Payment Confirmation";
+
+        $mail = new PHPMailer;
+        $addressA = 'info@medical2.com';
+        $addressB = 'help@medical2.com';
+        $addressC = 'sirromas@gmail.com';
+
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addAddress($addressA);
+        $mail->addAddress($addressB);
+        $mail->addAddress($addressC);
+
+        if ($recipient != null) {
+            $mail->addAddress($recipient);
+        }
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $list;
+
+        if (!$mail->send()) {
+            //echo 'Message could not be sent.';
+            //echo 'Mailer Error: ' . $mail->ErrorInfo;
+            return false;
+        } // end if !$mail->send()
+        else {
+            //echo 'Message has been sent to ' . $recipient;
+            return true;
+        }
     }
 
 }

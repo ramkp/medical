@@ -282,6 +282,9 @@ class navClass extends Util {
                     case 'hotels book':
                         $list.=$this->get_hotels_book_item();
                         break;
+                    case 'workshops data':
+                        $list.=$this->get_wsdata_item();
+                        break;
                     case 'hotels expenses':
                         $list.=$this->get_hotels_expenses_item();
                         break;
@@ -313,6 +316,11 @@ class navClass extends Util {
             $list.="</li>";
         } // end if $num > 0
 
+        return $list;
+    }
+
+    function get_wsdata_item() {
+        $list = "<li><a href='#' title='Workshops data' id='wsdata'>Workshops Data</a></li>";
         return $list;
     }
 
@@ -665,6 +673,7 @@ class navClass extends Util {
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>
+                                    <li><a href='#' title='Workshops data' id='wsdata'>Workshops Data</a></li>
                                     <li><a href='#' title='Moodle Permissions' id='mpermission' onClick='return false;'>Define Roles</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
@@ -1198,9 +1207,9 @@ class navClass extends Util {
          */
 
         /*         * **************** New URLS for renew payments ***************** */
-        
+
         // To be done: new authorize.net any_auth_pay
-        
+
         $list.="<div class='container-fluid'>";
         $list.="<span class='span9'>One year renewal - <a href='https://" . $_SERVER['SERVER_NAME'] . "/index.php/register2/any_auth_pay/$userid/$courseid/0/$one_year_payment/1' target='_blank'>$$one_year_payment</a></span>";
         $list.="</div>";

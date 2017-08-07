@@ -575,6 +575,15 @@ $(document).ready(function () {
         });
     }
 
+    function get_workshop_data_page() {
+        var url = "/lms/custom/wsdata/list.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+            $('#date1').datepicker();
+            $('#date2').datepicker();
+        });
+    }
+
     function get_state_taxes_list() {
         var url = "/lms/custom/taxes/index.php";
         $.post(url, {id: 1}).done(function (data) {
@@ -3673,6 +3682,10 @@ $(document).ready(function () {
         update_navigation_status__menu('Hotel Expenses');
         get_hotel_expenses_page()
     });
+    $("#wsdata").click(function (event) {
+        update_navigation_status__menu('Workshops Data');
+        get_workshop_data_page();
+    });
 
     $("#promote").click(function (event) {
         update_navigation_status__menu('Promotions');
@@ -3952,6 +3965,27 @@ $(document).ready(function () {
     $("body").click(function (event) {
 
         //console.log('Element clicked: ' + event.target.id);
+
+
+        if (event.target.id == 'get_ws_data_btn') {
+            var course = $('#wslist').val();
+            var date1 = $('#date1').val();
+            var date2 = $('#date2').val();
+            if (course != 0 && date1 != '' && date2 != '') {
+                $('#ajax_loader').show();
+                $('#wsdata_err').html('');
+                var url = '/lms/custom/wsdata/get_data.php';
+                var dates = {date1: date1, date2: date2, course: course};
+                $.post(url, {dates: JSON.stringify(dates)}).done(function (data) {
+                    $('#ajax_loader').hide();
+                    $('#ws_data_container').html(data);
+                });
+            } // end if
+            else {
+                $('#wsdata_err').html('Please select program and dates');
+            }
+        }
+
 
         if (event.target.id.indexOf("faq_edit_") >= 0) {
             var id = event.target.id.replace("faq_edit_", "");
@@ -5221,7 +5255,7 @@ $(document).ready(function () {
                                     var url = "/lms/custom/my/enroll_user.php";
                                     $.post(url, {userid: userid, courseid: program.courseid}).done(function () {
                                         var url = "https://medical2.com/index.php/payments/payment/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount;
-                                        var new_url = "https://medical2.com/index.php/register2/any_pay/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount + "/0";
+                                        var new_url = "https://medical2.com/index.php/register2/any_auth_pay/" + userid + "/" + program.courseid + "/" + program.slotid + "/" + amount + "/0";
                                         $("[data-dismiss=modal]").trigger({type: "click"});
                                         window.open(new_url, '_blank');
                                     });
@@ -5437,7 +5471,7 @@ $(document).ready(function () {
                     if (ptype == 0) {
                         $("[data-dismiss=modal]").trigger({type: "click"});
                         var url = "http://medical2.com/index.php/payments/payment/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
-                        var new_url = "http://medical2.com/index.php/register2/any_pay/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
+                        var new_url = "http://medical2.com/index.php/register2/any_auth_pay/" + fullcert.userid + "/" + fullcert.courseid + "/0/" + fullcert.amount + "/" + fullcert.period;
                         var oWindow = window.open(new_url, "renew");
                     } // end if ptype == 0
                     else {
@@ -7439,7 +7473,7 @@ $(document).ready(function () {
                 billing_zip: billing_zip};
             if (ptype == 0) {
                 $("[data-dismiss=modal]").trigger({type: "click"})
-                var url2 = "https://medical2.com/register2/group_renew/" + courseid + "/" + period + "/" + users + "/card";
+                var url2 = "https://medical2.com/register2/auth_group_renew/" + courseid + "/" + period + "/" + users + "/card";
                 var oWindow = window.open(url2, "print");
             } // end if ptype==0
             if (ptype == 1) {
@@ -7462,6 +7496,80 @@ $(document).ready(function () {
                     $('#group_err').html('Please provide all required fields');
                 } // end else
             } // end else
+        }
+
+        if (event.target.id == 'authorize_next_group_renewal_form') {
+            var courseid = $('#courseid').val();
+            var period = $('#period').val();
+            var userslist = $('#userslist').val();
+            var amount = $('#amount').val();
+            var gr_fn = $('#gr_fn').val();
+            var gr_ln = $('#gr_ln').val();
+            var gr_email = $('#gr_email').val();
+            var gr_phone = $('#gr_phone').val();
+            var state = $('#state').val();
+            var country = $('#country').val();
+            var gr_addr = $('#gr_addr').val();
+            var gr_city = $('#gr_city').val();
+
+            if (gr_fn == '') {
+                $('#group_billing_err').html('Please provide firstname');
+                return false;
+            }
+
+            if (gr_ln == '') {
+                $('#group_billing_err').html('Please provide lastname');
+                return false;
+            }
+
+            if (gr_email == '') {
+                $('#group_billing_err').html('Please provide email');
+                return false;
+            }
+
+            if (gr_phone == '') {
+                $('#group_billing_err').html('Please provide phone');
+                return false;
+            }
+
+            if (state == 0) {
+                $('#group_billing_err').html('Please select state');
+                return false;
+            }
+
+            if (country == 0) {
+                $('#group_billing_err').html('Please select country');
+                return false;
+            }
+
+            if (gr_addr == '') {
+                $('#group_billing_err').html('Please provide address');
+                return false;
+            }
+
+            if (gr_city == '') {
+                $('#group_billing_err').html('Please provide city');
+                return false;
+            }
+
+            $('#group_billing_err').html('');
+
+            var group = {courseid: courseid,
+                period: period,
+                userslist: userslist,
+                amount: amount,
+                fname: gr_fn,
+                lname: gr_ln,
+                email: gr_email,
+                phone: gr_phone,
+                state: state,
+                country: country,
+                addr: gr_addr,
+                city: gr_city};
+
+            var renewal = Base64.encode(JSON.stringify(group));
+            var url = "https://medical2.com/register2/auth_group_renew_pay/" + renewal;
+            var oWindow = window.open(url, "renew");
         }
 
         if (event.target.id == 'submit_career_survey') {

@@ -2620,6 +2620,81 @@ $(document).ready(function () {
             verify_barintree_group_registration();
         }
 
+        if (event.target.id == 'authorize_next_group_renewal_form') {
+            var courseid = $('#courseid').val();
+            var period = $('#period').val();
+            var userslist = $('#userslist').val();
+            var amount = $('#amount').val();
+            var gr_fn = $('#gr_fn').val();
+            var gr_ln = $('#gr_ln').val();
+            var gr_email = $('#gr_email').val();
+            var gr_phone = $('#gr_phone').val();
+            var state = $('#state').val();
+            var country = $('#country').val();
+            var gr_addr = $('#gr_addr').val();
+            var gr_city = $('#gr_city').val();
+
+            if (gr_fn == '') {
+                $('#group_billing_err').html('Please provide firstname');
+                return false;
+            }
+
+            if (gr_ln == '') {
+                $('#group_billing_err').html('Please provide lastname');
+                return false;
+            }
+
+            if (gr_email == '') {
+                $('#group_billing_err').html('Please provide email');
+                return false;
+            }
+
+            if (gr_phone == '') {
+                $('#group_billing_err').html('Please provide phone');
+                return false;
+            }
+
+            if (state == 0) {
+                $('#group_billing_err').html('Please select state');
+                return false;
+            }
+
+            if (country == 0) {
+                $('#group_billing_err').html('Please select country');
+                return false;
+            }
+
+            if (gr_addr == '') {
+                $('#group_billing_err').html('Please provide address');
+                return false;
+            }
+
+            if (gr_city == '') {
+                $('#group_billing_err').html('Please provide city');
+                return false;
+            }
+
+            $('#group_billing_err').html('');
+
+            var group = {courseid: courseid,
+                period: period,
+                userslist: userslist,
+                amount: amount,
+                fname: gr_fn,
+                lname: gr_ln,
+                email: gr_email,
+                phone: gr_phone,
+                state: state,
+                country: country,
+                addr: gr_addr,
+                city: gr_city};
+
+            var renewal = Base64.encode(JSON.stringify(group));
+            //var renewal =JSON.stringify(group);
+            var url = "https://medical2.com/register2/auth_group_renew_pay/" + renewal;
+            window.location=url;
+            ///var oWindow = window.open(url, "renew");
+        }
 
         if (event.target.id == 'make_already_registered_payment') {
             make_already_registered_payment();
@@ -3150,7 +3225,7 @@ $(document).ready(function () {
                 program_name: program_name,
                 amount: amount,
                 city: city};
-            
+
             //console.log('Billing object: '+JSON.stringify(billing));
             var registration = {regdata: group_reg_data, billing_info: billing};
             var rawdata = JSON.stringify(registration);
