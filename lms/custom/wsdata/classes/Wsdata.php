@@ -1,6 +1,7 @@
 <?php
 
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/utils/classes/Util.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
 
 class Wsdata extends Util {
 
@@ -225,9 +226,7 @@ class Wsdata extends Util {
         $users = array();
         $schedulerid = $this->get_schedulerid($courseid);
         $workshops = $this->get_workshops_list($schedulerid, $udate);
-
         $slotstudents = $this->normalize_students_data($workshops);
-        //echo "Total students found both graduate and non-graduate (date1) :" . count($slotstudents);
         $grad = 0;
         $total = 0;
         foreach ($slotstudents as $userid) {
@@ -242,7 +241,7 @@ class Wsdata extends Util {
         } // end foreach
         //echo "<br>Total open enrolled students date1: " . $total . "<br>";
         //echo "Total graduate students date1: " . $grad . "<br>";
-        return $users;
+        return array_unique($users);
     }
 
     function get_open_enrolled_students_date2($courseid, $udate) {
@@ -266,7 +265,7 @@ class Wsdata extends Util {
         } // end foreach
         //echo "<br>Total open enrolled students date2 " . $total . "<br>";
         //echo "Total graduate students date2: " . $grad . "<br>";
-        return $users;
+        return array_unique($users);
     }
 
     function get_students_graduated_between_dates($courseid, $udate1, $udate2) {
@@ -437,8 +436,12 @@ class Wsdata extends Util {
         $list.="</div>";
 
         $schedulerid = $this->get_schedulerid($courseid);
+
         $workshops = $this->get_workshops_list($schedulerid, $udate1, $udate2);
-        $students = $this->normalize_students_data($workshops);
+        $students_between = $this->normalize_students_data($workshops);
+        $students_open_enrolled = $this->get_open_enrolled_students_date1($courseid, $udate1);
+        $students_with_dupes = array_merge((array) $students_between, (array) $students_open_enrolled);
+        $students = array_unique($students_with_dupes);
 
         if (count($students) > 0) {
             $usersdata = $this->get_full_user_data($courseid, $students);
@@ -480,11 +483,11 @@ class Wsdata extends Util {
             $list.="</div>";
 
             $list.="<div class='row-fluid'>";
-            $list.="<span class='span6'>Students enrolled between $date1 and $date1</span><span class='span1'>$enrolled_between_dates</span>";
+            $list.="<span class='span6'>Students enrolled between $date1 and $date2</span><span class='span1'>$enrolled_between_dates</span>";
             $list.="</div>";
 
             $list.="<div class='row-fluid'>";
-            $list.="<span class='span6'>Students graduated between  $date1 and $date1</span><span class='span1'>$graduated_between_dates</span>";
+            $list.="<span class='span6'>Students graduated between  $date1 and $date2</span><span class='span1'>$graduated_between_dates</span>";
             $list.="</div>";
 
             $list.="<div class='row-fluid'>";
@@ -495,6 +498,10 @@ class Wsdata extends Util {
             $list.="<span class='span2'>Percentage of retention:</span>";
             $list.="<span class='span1'>$summary %</span>";
             $list.="</div>";
+
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span3'><button id='print_ws_data'>Print</button></span>";
+            $list.="</div>";
         } // end if count($students)>0
         else {
             $list.="<div class='row-fluid'>";
@@ -502,6 +509,167 @@ class Wsdata extends Util {
             $list.="</div>";
         } // end else
         return $list;
+    }
+
+    function get_report_table($data) {
+        $list = "";
+
+        $date1 = $data->date1;
+        $date2 = $data->date2;
+        $udate1 = strtotime($data->date1);
+        $udate2 = strtotime($data->date2);
+        $courseid = $data->courseid;
+        $coursename = $this->get_course_name($courseid);
+
+        $list.="<div class='row-fluid' style='font-weight:bold;text-align:center;'>";
+        $list.="<span class='span12'>$coursename</span>";
+        $list.="</div>";
+
+        $schedulerid = $this->get_schedulerid($courseid);
+        $workshops = $this->get_workshops_list($schedulerid, $udate1, $udate2);
+        $students_between = $this->normalize_students_data($workshops);
+        $students_open_enrolled = $this->get_open_enrolled_students_date1($courseid, $udate1);
+        $students_with_dupes = array_merge((array) $students_between, (array) $students_open_enrolled);
+        $students = array_unique($students_with_dupes);
+
+        $opened_date1 = count($this->get_open_enrolled_students_date1($courseid, $udate1));
+        $opened_date2 = count($this->get_open_enrolled_students_date2($courseid, $udate2));
+        $enrolled_between_dates = count($this->get_students_enrolled_between_dates($courseid, $udate1, $udate2));
+        $graduated_between_dates = count($this->get_students_graduated_between_dates($courseid, $udate1, $udate2));
+
+        $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
+        $list.="<span class='span6'>Students openly enrolled on $date1</span><span class='span1'>&nbsp; $opened_date1</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
+        $list.="<span class='span6'>Students enrolled between $date1 and $date2</span><span class='span1'>&nbsp; $enrolled_between_dates</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
+        $list.="<span class='span6'>Students graduated between  $date1 and $date2</span><span class='span1'> &nbsp; $graduated_between_dates</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
+        $list.="<span class='span6'>Students openly enrolled at end of $date2</span><span class='span1'>&nbsp; $opened_date2</span>";
+        $list.="</div>";
+        $summary = $this->calculate_retention($opened_date1, $enrolled_between_dates, $graduated_between_dates, $opened_date2);
+        $list.="<div class='row-fluid' style='font-wieght:bold;text-align:center;font-weight:bold;'>";
+        $list.="<span class='span2'>Percentage of retention:</span>";
+        $list.="<span class='span1'>&nbsp; $summary %</span>";
+        $list.="</div><br><br>";
+
+        if (count($students) > 0) {
+            $usersdata = $this->get_full_user_data($courseid, $students);
+            $list.="<table id='myTable' class='display' cellspacing='0' width='100%' align='center;' border='1' style='align:center;'>";
+            $list.="<thead>";
+            $list.="<tr>";
+            $list.="<th>Name</th>";
+            $list.="<th>Attending</th>";
+            $list.="<th>Enrolled</th>";
+            $list.="<th>Graduated</th>";
+            $list.="<th>Attending</th>";
+            $list.="</tr>";
+            $list.="</thead>";
+            $list.="<tbody>";
+            foreach ($usersdata as $item) {
+                $names = $item->fname . ' ' . $item->lname;
+                $url = $item->url;
+                $attend1 = $item->attend1;
+                $attend2 = $item->attend2;
+                $graduate = $item->graduate;
+                $list.="<tr>";
+                $list.="<td>$names</td>";
+                $list.="<td>$attend1</td>";
+                $list.="<td>1</td>";
+                $list.="<td>$graduate</td>";
+                $list.="<td>$attend2</td>";
+                $list.="</tr>";
+            } // end foreach 
+            $list.="</tbody>";
+            $list.="</table>";
+        }
+        return $list;
+    }
+
+    function get_pdf_report($criteria) {
+        $list = "";
+
+        $table = $this->get_report_table($criteria);
+
+        $list.="<html>";
+
+        $list.="<head>";
+
+        $list.="<script  src='https://code.jquery.com/jquery-1.12.4.js'></script>";
+
+        $list.="<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' >";
+
+        $list.="<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css' >";
+
+        $list.="<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js' ></script>";
+
+        $list.="<link rel='stylesheet' type='text/css' href='//cdn.datatables.net/1.10.15/css/jquery.dataTables.css'>";
+
+        $list.="<script type='text/javascript' charset='utf8' src='//cdn.datatables.net/1.10.15/js/jquery.dataTables.js'></script>";
+
+        $list.="</head>";
+
+        $list.="<body>";
+
+        $list.="<div style='80%;margin:auto;'>";
+        $list.="<br><table align='center' border='0' width='100%' >
+
+                    <tr>
+
+                        <td style='padding-top:10px;text-align:right;'><img src='https://medical2.com/assets/icons/logo3.png' width='115' height='105'></td>
+                        
+                        <td valign='center' style='text-align:left;'>
+                        
+                        <table style='padding:15px;font-size:12px;' align='center'>
+
+                                <tr>
+                                    <td style='font-size:20px;font-weight:bold;letter-spacing:8px;padding-left:65px;'>Medical2</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td style='font-size:15px;font-weight:bold;letter-spacing:6px;padding-left:40px;'>Career College</td>
+                                </tr>
+
+                                <tr>
+                                    <td style='padding-top:10px;padding-left:75px;'>1830A North Gloster St</td>
+                                </tr>  
+
+                                <tr>
+                                    <td style='padding-left:90px;'>Tupelo, MS 38804</td>
+                                </tr>  
+
+                            </table>";
+        $list.="</td>";
+        $list.="</tr>";
+        $list.="</table>";
+
+        $list.="<br><div class='row-fluid;text-align:center;'>";
+        $list.="<span class='span12'>$table</span>";
+        $list.="</div>";
+
+        $list.="</div>";
+
+        $list.="</body>";
+
+        $list.="</html>";
+
+
+        $now = time();
+        $file = "report_$now.pdf";
+        $file2 = "report.html";
+
+        $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/wsdata/$file";
+        $path2 = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/wsdata/$file2";
+        file_put_contents($path2, $list);
+        $pdf = new mPDF('utf-8', 'A4-L');
+        $pdf->WriteHTML($list);
+        $pdf->Output($path, 'F');
+        return $file2;
     }
 
 }

@@ -6767,6 +6767,20 @@ $(document).ready(function () {
             } //else  
         }
 
+
+        if (event.target.id == 'print_ws_data') {
+            var courseid = $('#wslist').val();
+            var date1 = $('#date1').val();
+            var date2 = $('#date2').val();
+            var request = {courseid: courseid, date1: date1, date2: date2};
+            var url = "/lms/custom/wsdata/print_ws_data.php";
+            $.post(url, {request: JSON.stringify(request)}).done(function (file) {
+                var path = "https://medical2.com/lms/custom/wsdata/report.html";
+                var oWindow = window.open(path, "print");
+            });
+
+        }
+
         if (event.target.id == 'add_new_campaign_button') {
             var users = [];
             $('input:checkbox.camp_users:checked').each(function () {
