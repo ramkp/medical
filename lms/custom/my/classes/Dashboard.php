@@ -976,7 +976,7 @@ class Dashboard extends Util {
             $prohibit = $this->get_user_roles($userid);
             if ($prohibit == 0) {
                 $user_detailes = $this->get_user_details($userid);
-                $list.="Grpoup name: " . $groupname . "<br>";
+                $list.="Group name: " . $groupname . "<br>";
                 $list.="$user_detailes->firstname $user_detailes->lastname<br>";
                 $list.="Phone: $user_detailes->phone1<br>";
                 $list.="Email: $user_detailes->email<br>";
@@ -986,7 +986,7 @@ class Dashboard extends Util {
         } // end if $currentuser != 2 && $userid != $currentuser
         else {
             $user_detailes = $this->get_user_details($userid);
-            $list.="Grpoup name: " . $groupname . "<br>";
+            $list.="Group name: " . $groupname . "<br>";
             $list.="$user_detailes->firstname $user_detailes->lastname<br>";
             $list.="Phone: $user_detailes->phone1<br>";
             $list.="Email: $user_detailes->email<br>";
@@ -1937,24 +1937,24 @@ class Dashboard extends Util {
         if ($sel == null) {
             $list.="<option value='0' selected>Please select</option>";
             $list.="<option value='1'>Single</option>";
-            $list.="<option value='2'>Maried</option>";
+            $list.="<option value='2'>Married</option>";
         } // end if
         else {
             switch ($sel) {
                 case 0:
                     $list.="<option value='0' selected>Please select</option>";
                     $list.="<option value='1'>Single</option>";
-                    $list.="<option value='2'>Maried</option>";
+                    $list.="<option value='2'>Married</option>";
                     break;
                 case 1:
                     $list.="<option value='0' >Please select</option>";
                     $list.="<option value='1' selected>Single</option>";
-                    $list.="<option value='2'>Maried</option>";
+                    $list.="<option value='2'>Married</option>";
                     break;
                 case 2:
                     $list.="<option value='0' >Please select</option>";
                     $list.="<option value='1' >Single</option>";
-                    $list.="<option value='2' selected>Maried</option>";
+                    $list.="<option value='2' selected>Married</option>";
                     break;
             }
         } // end else
@@ -2270,7 +2270,7 @@ class Dashboard extends Util {
             $list.="<option value='A'>Attending</option>";
             $list.="<option value='G'>Graduate</option>";
             $list.="<option value='W'>Withdrawal</option>";
-            $list.="<option value='T'>Termonation</option>";
+            $list.="<option value='T'>Terminated</option>";
             $list.="<option value='F'>Failed out</option>";
         } // end if
         else {
@@ -2282,7 +2282,7 @@ class Dashboard extends Util {
                     $list.="<option value='A'>Attending</option>";
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
-                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='T'>Terminated</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2291,7 +2291,7 @@ class Dashboard extends Util {
                     $list.="<option value='A' selected>Attending</option>";
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
-                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='T'>Terminated</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2301,7 +2301,7 @@ class Dashboard extends Util {
                     $list.="<option value='A'>Attending</option>";
                     $list.="<option value='G' selected>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
-                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='T'>Terminated</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2310,7 +2310,7 @@ class Dashboard extends Util {
                     $list.="<option value='A'>Attending</option>";
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W' selected>Withdrawal</option>";
-                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='T'>Terminated</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2319,7 +2319,7 @@ class Dashboard extends Util {
                     $list.="<option value='A'>Attending</option>";
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
-                    $list.="<option value='T' selected>Termonation</option>";
+                    $list.="<option value='T' selected>Terminated</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2328,7 +2328,7 @@ class Dashboard extends Util {
                     $list.="<option value='A'>Attending</option>";
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
-                    $list.="<option value='T'>Termonation</option>";
+                    $list.="<option value='T'>Terminated</option>";
                     $list.="<option value='F' selected>Failed out</option>";
                     break;
             }

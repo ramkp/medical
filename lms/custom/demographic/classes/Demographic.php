@@ -26,7 +26,7 @@ class Demographic extends Util {
                 $list.="Single";
                 break;
             case 2:
-                $list.="Maried";
+                $list.="Married";
                 break;
         }
         return $list;
@@ -155,7 +155,7 @@ class Demographic extends Util {
                 $list.="Withdrawal";
                 break;
             case 'T':
-                $list.="Termination";
+                $list.="Terminated";
                 break;
             case 'F':
                 $list.="Failed out";
