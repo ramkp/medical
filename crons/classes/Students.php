@@ -2284,6 +2284,218 @@ class Students {
         }
     }
 
+    /*     * ********* Code related to profile completness ********** */
+
+    function get_college_courses() {
+        $query = "select * from mdl_course where category>=5";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courses[] = $row['id'];
+        }
+        return $courses;
+    }
+
+    function get_college_schedulers() {
+        $courses = $this->get_college_courses();
+        $courseslist = implode(',', $courses);
+        $query = "select * from mdl_scheduler where course in ($courseslist)";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $schedulers[] = $row['id'];
+        }
+        return $schedulers;
+    }
+
+    function get_college_slots() {
+        $schedulers = $this->get_college_schedulers();
+        $schedulerslist = implode(',', $schedulers);
+        $query = "select * from mdl_scheduler_slots "
+                . "where schedulerid in ($schedulerslist)";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slots[] = $row['id'];
+        }
+        return $slots;
+    }
+
+    function get_slot_details($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $slot = new stdClass();
+            foreach ($row as $key => $value) {
+                $slot->$key = $value;
+            }
+        }
+        return $slot;
+    }
+
+    function update_student_start_date($userid, $udate) {
+        $hdate = date('m/d/Y', $udate);
+        $query = "update mdl_demographic set startdate='$hdate' "
+                . "where userid=$userid";
+        $this->db->query($query);
+    }
+
+    function update_user_graduate_date($userid, $udate) {
+        $hdate = date('m/d/Y', $udate);
+        $query = "update mdl_demographic set graduatedate='$hdate' "
+                . "where userid=$userid";
+        $this->db->query($query);
+    }
+
+    function update_student_status($userid, $status) {
+        $query = "update mdl_demographic set school_status='$status' "
+                . "where userid=$userid";
+        $this->db->query($query);
+    }
+
+    function update_job_type($type, $userid) {
+        $query = "update mdl_demographic set job_type='$type' "
+                . "where userid=$userid";
+        $this->db->query($query);
+    }
+
+    function is_demographic_record_exists($userid) {
+        $query = "select * from mdl_demographic where userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_demographic_user_data($userid) {
+        $query = "select * from mdl_demographic where userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $demo = new stdClass();
+            foreach ($row as $key => $value) {
+                $demo->$key = $value;
+            }
+        }
+        return $demo;
+    }
+
+    function get_user_details($userid) {
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $data = new stdClass();
+            foreach ($row as $key => $value) {
+                $data->$key = $value;
+            }
+        }
+        return $data;
+    }
+
+    function get_certificate_issue_date($courseid, $userid) {
+        $query = "select * from  mdl_certificates "
+                . "where courseid=$courseid and userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $date = $row['issue_date'];
+        }
+        return $date;
+    }
+
+    function get_courseid_by_slotid($slotid) {
+        $query = "select * from mdl_scheduler_slots where id=$slotid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $schedulerid = $row['schedulerid'];
+        }
+
+        $query = "select * from mdl_scheduler where id=$schedulerid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $courseid = $row['course'];
+        }
+        return $courseid;
+    }
+
+    function is_student_passed($slotid, $userid) {
+        $courseid = $this->get_courseid_by_slotid($slotid);
+        $query = "select * from mdl_certificates "
+                . "where courseid=$courseid and userid=$userid ";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_college_students() {
+        $students = array();
+        $slots = $this->get_college_slots();
+        $slotslist = implode(',', $slots);
+        $query = "select * from mdl_scheduler_appointment "
+                . "where slotid in ($slotslist)";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $student = new stdClass();
+            $student->userid = $row['studentid'];
+            $student->slotid = $row['slotid'];
+            $students[] = $student;
+        }
+        $total = count($students);
+        foreach ($students as $item) {
+            $userid = $item->userid;
+            $is_record_exists = $this->is_demographic_record_exists($userid);
+            if ($is_record_exists > 0) {
+                $demoObj = $this->get_demographic_user_data($item->userid);
+                $userObj = $this->get_user_details($item->userid);
+                $fname = $userObj->firstname;
+                $lname = $userObj->lastname;
+                $status = $demoObj->school_status;
+                $slotObj = $this->get_slot_details($item->slotid);
+                $classStart = date('m/d/Y', $slotObj->starttime);
+                $classLocation = $slotObj->appointmentlocation;
+                $className = $slotObj->notes;
+                $courseid = $this->get_courseid_by_slotid($item->slotid);
+
+                echo "User id " . $userid . " $fname $lname Courseid $courseid Status $status<br>";
+                echo "Class $classStart $classLocation $className <br>";
+
+                if ($demoObj->startdate == null || $demoObj->startdate == '') {
+                    echo "User $fname $lname has not start date - data being updated ...";
+                    $this->update_student_start_date($userid, $slotObj->starttime);
+                } // end if
+
+                if ($demoObj->school_status == null || $demoObj->school_status == '' || $demoObj->school_status = 0) {
+                    $is_passed = $this->is_student_passed($item->slotid, $userid);
+                    if ($is_passed > 0) {
+                        $courseid = $this->get_courseid_by_slotid($item->slotid);
+                        $udate = $this->get_certificate_issue_date($courseid, $userid);
+                        $this->update_user_graduate_date($userid, $udate);
+                        $status = 'G';
+                        $this->update_student_status($userid, $status);
+                    } // end if
+                    else {
+                        $status = 'A';
+                        $this->update_student_status($userid, $status);
+                    } // end else
+                    echo "User $fname $lname has not school status - data being updated ...";
+                }
+
+                if ($demoObj->graduatedate == null || $demoObj->graduatedate == '') {
+                    $is_passed = $this->is_student_passed($item->slotid, $userid);
+                    if ($is_passed > 0) {
+                        $courseid = $this->get_courseid_by_slotid($item->slotid);
+                        $udate = $this->get_certificate_issue_date($courseid, $userid);
+                        $this->update_user_graduate_date($userid, $udate);
+                        $status = 'G';
+                        $this->update_student_status($userid, $status);
+                        echo "User $fname $lname has not graduate date - data being updated ...";
+                    } // end if
+                } // end if $demoObj->graduatedate == null || $demoObj->graduatedate == ''
+
+                if ($demoObj->job_type == null || $demoObj->job_type == '' || $demoObj->job_type == 0) {
+                    $type = 1; // Part time
+                    $this->update_job_type($type, $userid);
+                    echo "User $fname $lname has not job type - data being updated ...";
+                }
+
+                echo "<br>-------------------------------------------------<br>";
+            } // end if $is_record_exists>0
+        }
+        echo "Total students found: " . $total . "<br>";
+    }
+
 }
 
 // end of class

@@ -228,6 +228,10 @@ echo '</div>';  // Userprofile class.
         $('#start_date').datepicker({
             dateFormat: "mm/dd/yy"
         });
+        
+        $('#last_date').datepicker({
+            dateFormat: "mm/dd/yy"
+        });
 
         $('#grad_date').datepicker({
             dateFormat: "mm/dd/yy"

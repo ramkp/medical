@@ -48,10 +48,16 @@ class Demographic extends Util {
                 $list.="Asia";
                 break;
             case 4:
-                $list.="Mexican";
+                $list.="Hispanic";
                 break;
             case 5:
                 $list.="Other";
+                break;
+            case 6:
+                $list.="American Indian";
+                break;
+            case 7:
+                $list.="Aisan Indian";
                 break;
         }
         return $list;
@@ -541,5 +547,7 @@ class Demographic extends Util {
         $pdf->Output($path, 'F');
         return $filename;
     }
+
+    
 
 }

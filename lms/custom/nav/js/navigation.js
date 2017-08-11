@@ -6931,6 +6931,7 @@ $(document).ready(function () {
             var income = $('#income_box').val();
             var start_date = $('#start_date').val();
             var job_type = $('#job_type').val();
+            var m2_last_date = $('#last_date').val();
             var grad_date = $('#grad_date').val();
             var status = $('#status').val();
             var status_comment = $('#status_comment').val();
@@ -6953,6 +6954,7 @@ $(document).ready(function () {
                 income: income,
                 start_date: start_date,
                 job_type: job_type,
+                m2_last_date: m2_last_date,
                 grad_date: grad_date,
                 status: status,
                 status_comment: status_comment,
@@ -6969,7 +6971,7 @@ $(document).ready(function () {
 
             //console.log('Demographic object: ' + JSON.stringify(demoObj));
             $.post('/lms/custom/my/insert_demographic_data.php', {demo: JSON.stringify(demoObj)}, function (data) {
-                console.log('Server response: ' + data);
+                //console.log('Server response: ' + data);
                 document.location.reload();
             }); // end of post
         }
@@ -6984,6 +6986,7 @@ $(document).ready(function () {
             var income = $('#income_box').val();
             var start_date = $('#start_date').val();
             var job_type = $('#job_type').val();
+            var m2_last_date = $('#last_date').val();
             var grad_date = $('#grad_date').val();
             var status = $('#status').val();
             var status_comment = $('#status_comment').val();
@@ -7006,6 +7009,7 @@ $(document).ready(function () {
                 income: income,
                 start_date: start_date,
                 job_type: job_type,
+                m2_last_date: m2_last_date,
                 grad_date: grad_date,
                 status: status,
                 status_comment: status_comment,

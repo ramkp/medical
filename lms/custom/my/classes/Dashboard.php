@@ -2217,6 +2217,17 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_medical2_late_time_box($sel = null) {
+        $list = "";
+        if ($sel == null) {
+            $list.="<input type='text' id='last_date'>";
+        } // end if
+        else {
+            $list.="<input type='text' id='last_date' value='$sel'>";
+        } // end else
+        return $list;
+    }
+
     function get_job_type_box($sel = null) {
         $list = "";
         $list.="<select id='job_type'>";
@@ -2271,6 +2282,7 @@ class Dashboard extends Util {
             $list.="<option value='G'>Graduate</option>";
             $list.="<option value='W'>Withdrawal</option>";
             $list.="<option value='T'>Terminated</option>";
+            $list.="<option value='L'>Leave of Absence</option>";
             $list.="<option value='F'>Failed out</option>";
         } // end if
         else {
@@ -2283,6 +2295,7 @@ class Dashboard extends Util {
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
                     $list.="<option value='T'>Terminated</option>";
+                    $list.="<option value='L'>Leave of Absence</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2292,6 +2305,7 @@ class Dashboard extends Util {
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
                     $list.="<option value='T'>Terminated</option>";
+                    $list.="<option value='L'>Leave of Absence</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2302,6 +2316,7 @@ class Dashboard extends Util {
                     $list.="<option value='G' selected>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
                     $list.="<option value='T'>Terminated</option>";
+                    $list.="<option value='L'>Leave of Absence</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2311,6 +2326,7 @@ class Dashboard extends Util {
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W' selected>Withdrawal</option>";
                     $list.="<option value='T'>Terminated</option>";
+                    $list.="<option value='L'>Leave of Absence</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2320,6 +2336,17 @@ class Dashboard extends Util {
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
                     $list.="<option value='T' selected>Terminated</option>";
+                    $list.="<option value='L'>Leave of Absence</option>";
+                    $list.="<option value='F'>Failed out</option>";
+                    break;
+
+                case 'L':
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='A'>Attending</option>";
+                    $list.="<option value='G'>Graduate</option>";
+                    $list.="<option value='W'>Withdrawal</option>";
+                    $list.="<option value='T'>Terminated</option>";
+                    $list.="<option value='L' selected>Leave of Absence</option>";
                     $list.="<option value='F'>Failed out</option>";
                     break;
 
@@ -2329,6 +2356,7 @@ class Dashboard extends Util {
                     $list.="<option value='G'>Graduate</option>";
                     $list.="<option value='W'>Withdrawal</option>";
                     $list.="<option value='T'>Terminated</option>";
+                    $list.="<option value='L'>Leave of Absence</option>";
                     $list.="<option value='F' selected>Failed out</option>";
                     break;
             }
@@ -2446,6 +2474,7 @@ class Dashboard extends Util {
         $incomebox = $this->get_income_box();
         $startdate = $this->get_medical2_start_date();
         $job_box = $this->get_job_type_box();
+        $medical2_last = $this->get_medical2_late_time_box();
         $graduationdate = $this->get_medical_graduation_date();
         $status = $this->get_status_box();
         $exambox = $this->get_attempted_exam_box();
@@ -2486,6 +2515,11 @@ class Dashboard extends Util {
         $list.="<div class='row-fluid'>";
         $list.="<span class='span2'>Part or full time</span>";
         $list.="<span class='span2'>$job_box</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Medical2 Last Date</span>";
+        $list.="<span class='span2'>$medical2_last</span>";
         $list.="</div>";
 
         $list.="<div class='row-fluid'>";
@@ -2588,6 +2622,7 @@ class Dashboard extends Util {
         $incomebox = $this->get_income_box($demo->incomelevel);
         $startdate = $this->get_medical2_start_date($demo->startdate);
         $job_box = $this->get_job_type_box($demo->job_type);
+        $medical2_late = $this->get_medical2_late_time_box($demo->m2_last_date);
         $graduationdate = $this->get_medical_graduation_date($demo->graduatedate);
         $status = $this->get_status_box(trim($demo->school_status));
         $exambox = $this->get_attempted_exam_box($demo->attemptexam);
@@ -2628,6 +2663,11 @@ class Dashboard extends Util {
         $list.="<div class='row-fluid'>";
         $list.="<span class='span2'>Part or full time</span>";
         $list.="<span class='span2'>$job_box</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Medical2 Last Date</span>";
+        $list.="<span class='span2'>$medical2_late</span>";
         $list.="</div>";
 
         $list.="<div class='row-fluid'>";
@@ -3033,7 +3073,7 @@ class Dashboard extends Util {
                 . "edlevel,"
                 . "incomelevel,"
                 . "startdate,"
-                . "job_type,"
+                . "job_type, m2_last_date,"
                 . "graduatedate,"
                 . "school_status,"
                 . "comments,"
@@ -3054,7 +3094,7 @@ class Dashboard extends Util {
                 . "'$data->education',"
                 . "'$data->income',"
                 . "'$data->start_date',"
-                . "'$data->job_type',"
+                . "'$data->job_type', '$data->m2_last_date',"
                 . "'$data->grad_date',"
                 . "'$data->status',"
                 . "'$data->status_comment',"
@@ -3080,7 +3120,7 @@ class Dashboard extends Util {
                 . "edlevel='$data->education',"
                 . "incomelevel='$data->income',"
                 . "startdate='$data->start_date',"
-                . "job_type='$data->job_type',"
+                . "job_type='$data->job_type', m2_last_date='$data->m2_last_date',"
                 . "graduatedate='$data->grad_date',"
                 . "	school_status='$data->status',"
                 . "comments='$data->status_comment',"

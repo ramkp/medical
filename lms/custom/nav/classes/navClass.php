@@ -64,6 +64,7 @@ class navClass extends Util {
         $courses_items = $this->get_courses_tab_items($roleid);
         $invoice_itmes = $this->get_invoices_tab_items($roleid);
         $payments_items = $this->get_payments_tab_items($roleid);
+        $report_items = $this->get_report_tab_items($roleid);
         $tools_items = $this->get_tools_tab_items($roleid);
         $user_items = $this->get_user_tab_items($roleid);
         $site_items = $this->get_site_pages_tab_items($roleid);
@@ -89,6 +90,7 @@ class navClass extends Util {
         $list.=$courses_items;
         $list.=$invoice_itmes;
         $list.=$payments_items;
+        $list.=$report_items;
         $list.=$tools_items;
         $list.=$user_items;
         $list.=$site_items;
@@ -220,6 +222,11 @@ class navClass extends Util {
         return $list;
     }
 
+    function get_rentention_item() {
+        $list = "<li><a href='#' title='Course retension' id='wsdata'>Course Retension</a></li>";
+        return $list;
+    }
+
     function get_payments_tab_items($roleid) {
         $list = "";
 
@@ -258,6 +265,40 @@ class navClass extends Util {
         return $list;
     }
 
+    function get_report_tab_items($roleid) {
+        $list="";
+        $query = "select p.id, p.category, p.item, r.permid, r.roleid "
+                . "from mdl_special_permissions p, mdl_role2perm r "
+                . "where p.category='reports' "
+                . "and p.id=r.permid "
+                . "and r.roleid=$roleid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $perms[] = $row['item'];
+            } // end while
+
+            $list.="<li class='dropdown'><a title='Reports' class='dropdown-toggle' href='#' id='report'>Reports<b class='caret'></b></a>";
+            $list.="<ul class='dropdown-menu'>";
+
+            foreach ($perms as $p) {
+                switch ($p) {
+                    case 'demographic':
+                        $list.=$this->get_demographic_item();
+                        break;
+                    case 'retension':
+                        $list.=$this->get_rentention_item();
+                        break;
+                } // end of switch
+            } // end foreach
+
+            $list.="</ul>";
+            $list.="</li>";
+        }
+        return $list;
+    }
+
     function get_tools_tab_items($roleid) {
         $list = "";
 
@@ -281,9 +322,6 @@ class navClass extends Util {
                 switch ($p) {
                     case 'hotels book':
                         $list.=$this->get_hotels_book_item();
-                        break;
-                    case 'workshops data':
-                        $list.=$this->get_wsdata_item();
                         break;
                     case 'hotels expenses':
                         $list.=$this->get_hotels_expenses_item();
@@ -392,9 +430,6 @@ class navClass extends Util {
                 switch ($p) {
                     case 'certificates':
                         $list.=$this->get_certificates_item();
-                        break;
-                    case 'demographic':
-                        $list.=$this->get_demographic_item();
                         break;
                     case 'bulk messaging':
                         $list.=$this->get_bulk_messaging_item();
@@ -667,13 +702,15 @@ class navClass extends Util {
                                     <li><a href='#' id='user_report' title='Users stats'>Users stats</a></li>
                                     <!--<li><a href='#' id='payments_report' title='Payments log'>Payments log</a></li>-->                                    
                                     <li><a href='#' id='revenue_reports' title='Revenue report'>Revenue report</a></li>
+                                    <li><a href='#' title='Workshops data' id='wsdata'>Course Retension</a></li>
+                                     <li><a href='#' title='Demographic' id='demographic'>Demographic Info</a></li>
+                                    
                                     <!--<li><a href='#' id='survey_reports' title='Survey report'>Survey report</a></li>-->
                                 </ul>
                             </li>                            
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='more'>Tools<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>
-                                    <li><a href='#' title='Workshops data' id='wsdata'>Workshops Data</a></li>
                                     <li><a href='#' title='Moodle Permissions' id='mpermission' onClick='return false;'>Define Roles</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
@@ -688,7 +725,6 @@ class navClass extends Util {
                             <li class='dropdown'><a title='More' class='dropdown-toggle' href='#' id='user_tab'>User<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Certificates' id='Certificates'>Certificates</a></li>
-                                    <li><a href='#' title='Demographic' id='demographic'>Demographic Info</a></li>
                                     <li><a href='#' title='Promotions' id='promote'>Bulk Messaging</a></li>
                                     <li><a href='#' title='Register User' id='register_user'>Register User</a></li>
                                     <li><a href='#' title='View User' id='user_cred'>View User</a></li>
