@@ -45,19 +45,16 @@ class Demographic extends Util {
                 $list.="Black";
                 break;
             case 3:
-                $list.="Asia";
-                break;
-            case 4:
                 $list.="Hispanic";
                 break;
-            case 5:
-                $list.="Other";
-                break;
-            case 6:
+            case 4:
                 $list.="American Indian";
                 break;
-            case 7:
-                $list.="Aisan Indian";
+            case 5:
+                $list.="Asian";
+                break;
+            case 6:
+                $list.="Other";
                 break;
         }
         return $list;

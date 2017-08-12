@@ -1969,9 +1969,10 @@ class Dashboard extends Util {
             $list.="<option value='0' selected>Please select</option>";
             $list.="<option value='1'>White Caucasian</option>";
             $list.="<option value='2'>Black</option>";
-            $list.="<option value='3'>Asia</option>";
-            $list.="<option value='4'>Mexican</option>";
-            $list.="<option value='5'>Other</option>";
+            $list.="<option value='3'>Hispanic</option>";
+            $list.="<option value='4'>American Indian</option>";
+            $list.="<option value='5'>Asian</option>";
+            $list.="<option value='6'>Other</option>";
         } // end if $sel==null
         else {
             switch ($sel) {
@@ -1979,50 +1980,63 @@ class Dashboard extends Util {
                     $list.="<option value='0' selected>Please select</option>";
                     $list.="<option value='1'>White Caucasian</option>";
                     $list.="<option value='2'>Black</option>";
-                    $list.="<option value='3'>Asia</option>";
-                    $list.="<option value='4'>Mexican</option>";
-                    $list.="<option value='5'>Other</option>";
+                    $list.="<option value='3'>Hispanic</option>";
+                    $list.="<option value='4'>American Indian</option>";
+                    $list.="<option value='5'>Asian</option>";
+                    $list.="<option value='6'>Other</option>";
                     break;
                 case 1:
                     $list.="<option value='0' >Please select</option>";
                     $list.="<option value='1' selected>White Caucasian</option>";
                     $list.="<option value='2'>Black</option>";
-                    $list.="<option value='3'>Asia</option>";
-                    $list.="<option value='4'>Mexican</option>";
-                    $list.="<option value='5'>Other</option>";
+                    $list.="<option value='3'>Hispanic</option>";
+                    $list.="<option value='4'>American Indian</option>";
+                    $list.="<option value='5'>Asian</option>";
+                    $list.="<option value='6'>Other</option>";
                     break;
                 case 2:
-                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='0'>Please select</option>";
                     $list.="<option value='1'>White Caucasian</option>";
                     $list.="<option value='2' selected>Black</option>";
-                    $list.="<option value='3'>Asia</option>";
-                    $list.="<option value='4'>Mexican</option>";
-                    $list.="<option value='5'>Other</option>";
+                    $list.="<option value='3'>Hispanic</option>";
+                    $list.="<option value='4'>American Indian</option>";
+                    $list.="<option value='5'>Asian</option>";
+                    $list.="<option value='6'>Other</option>";
                     break;
                 case 3:
-                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='0'>Please select</option>";
                     $list.="<option value='1'>White Caucasian</option>";
                     $list.="<option value='2'>Black</option>";
-                    $list.="<option value='3' selected>Asia</option>";
-                    $list.="<option value='4'>Mexican</option>";
-                    $list.="<option value='5'>Other</option>";
+                    $list.="<option value='3' selected>Hispanic</option>";
+                    $list.="<option value='4'>American Indian</option>";
+                    $list.="<option value='5'>Asian</option>";
+                    $list.="<option value='6'>Other</option>";
                     break;
                 case 4:
                     $list.="<option value='0'>Please select</option>";
                     $list.="<option value='1'>White Caucasian</option>";
                     $list.="<option value='2'>Black</option>";
-                    $list.="<option value='3'>Asia</option>";
-                    $list.="<option value='4' selected>Mexican</option>";
-                    $list.="<option value='5'>Other</option>";
+                    $list.="<option value='3'>Hispanic</option>";
+                    $list.="<option value='4' selected>American Indian</option>";
+                    $list.="<option value='5'>Asian</option>";
+                    $list.="<option value='6'>Other</option>";
                     break;
                 case 5:
-                    $list.="<option value='0'>Please select</option>";
+                    $list.="<option value='0' >Please select</option>";
                     $list.="<option value='1'>White Caucasian</option>";
                     $list.="<option value='2'>Black</option>";
-                    $list.="<option value='3'>Asia</option>";
-                    $list.="<option value='4'>Mexican</option>";
-                    $list.="<option value='5' selected>Other</option>";
-                    break;
+                    $list.="<option value='3'>Hispanic</option>";
+                    $list.="<option value='4'>American Indian</option>";
+                    $list.="<option value='5' selected>Asian</option>";
+                    $list.="<option value='6'>Other</option>";
+                case 6:
+                    $list.="<option value='0' >Please select</option>";
+                    $list.="<option value='1'>White Caucasian</option>";
+                    $list.="<option value='2'>Black</option>";
+                    $list.="<option value='3'>Hispanic</option>";
+                    $list.="<option value='4'>American Indian</option>";
+                    $list.="<option value='5'>Asian</option>";
+                    $list.="<option value='6' selected>Other</option>";
             }
         } // end else
         $list.="</select>";
