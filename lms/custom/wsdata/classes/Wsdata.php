@@ -422,15 +422,13 @@ class Wsdata extends Util {
                 $certdate = $this->get_certificate_issue_date($courseid, $userid, true);
                 $lastdate = $this->get_student_last_date($userid);
 
-                
-                  //echo "Begin date : " . $udate1 . "<br>";
-                  //echo "End date: " . $udate2 . "<br>";
-                  //echo "User ID: " . $userid . "<br>";
-                  //echo "Class date (unixtime)  $classdate" . "<br>";
-                  //echo "Cert date (unixtime) $certdate <br>";
-                  //echo "Last date (unixtime) $lastdate <br>";
-                 
 
+                //echo "Begin date : " . $udate1 . "<br>";
+                //echo "End date: " . $udate2 . "<br>";
+                //echo "User ID: " . $userid . "<br>";
+                //echo "Class date (unixtime)  $classdate" . "<br>";
+                //echo "Cert date (unixtime) $certdate <br>";
+                //echo "Last date (unixtime) $lastdate <br>";
                 //$userdata = $this->get_user_details($userid);
                 //echo "User $userdata->firstname $userdata->lastname class date : " . date('m/d/Y', $classdate) . " certificate date: " . date('m/d/Y', $certdate) . " last date: " . date('m/d/Y', $lastdate) . "";
                 //echo "<br>---------------------------------------------------------------------<br>";
@@ -523,12 +521,12 @@ class Wsdata extends Util {
                 $userObj->enrolled = $enrolled;
                 $userObj->graduate = $graduated;
 
-                /*    
-                echo "<pre>";
-                print_r($userObj);
-                echo "</pre>";
-                echo "<br>-------------------------------------------------<br>";
-                */
+                /*
+                  echo "<pre>";
+                  print_r($userObj);
+                  echo "</pre>";
+                  echo "<br>-------------------------------------------------<br>";
+                 */
                 $report_users[] = $userObj;
             } // end if $userdata->firstname != '' && $userdata->lastname != ''
         } // end foreach
@@ -810,6 +808,7 @@ class Wsdata extends Util {
 
         $total_attend1 = 0;
         $total_attend2 = 0;
+        $total_enrolled = 0;
         $total_graduate = 0;
 
         $list.="<div class='row-fluid' style='font-weight:bold;text-align:center;'>";
@@ -817,22 +816,25 @@ class Wsdata extends Util {
         $list.="</div>";
 
         $schedulerid = $this->get_schedulerid($courseid);
-        $workshops = $this->get_workshops_list($schedulerid, $udate1, $udate2);
-        $students_between = $this->normalize_students_data($workshops);
-        $students = array_unique($students_between);
-
-        $enrolled_between_dates = count($this->get_students_enrolled_between_dates($courseid, $udate1, $udate2));
+        $students_before = $this->get_students_before_beginning_date($courseid, $schedulerid, $udate1);
+        $students_between = $this->get_students_between_dates($schedulerid, $udate1, $udate2);
+        $raw_students = array_merge((array) $students_before, (array) $students_between);
+        $students = array_unique($raw_students);
 
         if (count($students) > 0) {
-            $usersdata = $this->get_full_user_data($courseid, $students);
+            $usersdata = $this->get_full_user_data($courseid, $students, $udate1, $udate2);
             foreach ($usersdata as $item) {
-                $names = $item->fname . ' ' . $item->lname;
                 $attend1 = $item->attend1;
+                $enrolled = $item->enrolled;
                 $attend2 = $item->attend2;
                 $graduate = $item->graduate;
 
                 if ($attend1 == 1) {
                     $total_attend1++;
+                }
+
+                if ($enrolled == 1) {
+                    $total_enrolled++;
                 }
 
                 if ($attend2 == 1) {
@@ -843,31 +845,30 @@ class Wsdata extends Util {
                     $total_graduate++;
                 }
             } // end foreach
-        } // end if count
 
-        $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
-        $list.="<span class='span6'>Students openly enrolled on $date1</span><span class='span1'>&nbsp; $total_attend1</span>";
-        $list.="</div>";
 
-        $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
-        $list.="<span class='span6'>Students enrolled between $date1 and $date2</span><span class='span1'>&nbsp; $enrolled_between_dates</span>";
-        $list.="</div>";
+            $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
+            $list.="<span class='span6'>Students openly enrolled on $date1</span><span class='span1'>&nbsp; $total_attend1</span>";
+            $list.="</div>";
 
-        $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
-        $list.="<span class='span6'>Students graduated between  $date1 and $date2</span><span class='span1'> &nbsp; $total_attend2</span>";
-        $list.="</div>";
+            $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
+            $list.="<span class='span6'>Students enrolled between $date1 and $date2</span><span class='span1'>&nbsp; $total_enrolled</span>";
+            $list.="</div>";
 
-        $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
-        $list.="<span class='span6'>Students openly enrolled at end of $date2</span><span class='span1'>&nbsp; $total_attend2</span>";
-        $list.="</div>";
-        $summary = $this->calculate_retention($total_attend1, $enrolled_between_dates, $total_graduate, $total_attend2);
-        $list.="<div class='row-fluid' style='font-wieght:bold;text-align:center;font-weight:bold;'>";
-        $list.="<span class='span2'>Percentage of retention:</span>";
-        $list.="<span class='span1'>&nbsp; $summary %</span>";
-        $list.="</div><br><br>";
+            $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
+            $list.="<span class='span6'>Students graduated between  $date1 and $date2</span><span class='span1'> &nbsp; $total_graduate</span>";
+            $list.="</div>";
 
-        if (count($students) > 0) {
-            $usersdata = $this->get_full_user_data($courseid, $students);
+            $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
+            $list.="<span class='span6'>Students openly enrolled at end of $date2</span><span class='span1'>&nbsp; $total_attend2</span>";
+            $list.="</div>";
+
+            $summary = $this->calculate_retention($total_attend1, $total_enrolled, $total_graduate, $total_attend2);
+            $list.="<div class='row-fluid' style='font-wieght:bold;text-align:center;font-weight:bold;'>";
+            $list.="<span class='span2'>Percentage of retention:</span>";
+            $list.="<span class='span1'>&nbsp; $summary %</span>";
+            $list.="</div><br><br>";
+
             $list.="<table id='myTable' class='display' cellspacing='0' width='100%' align='center;' border='1' style='align:center;'>";
             $list.="<thead>";
             $list.="<tr>";
@@ -879,23 +880,25 @@ class Wsdata extends Util {
             $list.="</tr>";
             $list.="</thead>";
             $list.="<tbody>";
+
             foreach ($usersdata as $item) {
                 $names = $item->fname . ' ' . $item->lname;
                 $attend1 = $item->attend1;
+                $enrolled = $item->enrolled;
                 $attend2 = $item->attend2;
                 $graduate = $item->graduate;
 
                 $list.="<tr>";
                 $list.="<td>$names</td>";
                 $list.="<td>$attend1</td>";
-                $list.="<td>1</td>";
+                $list.="<td>$enrolled</td>";
                 $list.="<td>$graduate</td>";
                 $list.="<td>$attend2</td>";
                 $list.="</tr>";
             } // end foreach 
             $list.="</tbody>";
             $list.="</table>";
-        }
+        } // end if count($students>0)
         return $list;
     }
 
@@ -955,11 +958,16 @@ class Wsdata extends Util {
         $list.="</html>";
 
         $file = "report.pdf";
+        $file2 = 'report.html';
 
         $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/wsdata/$file";
+        $path2 = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/wsdata/$file2";
+        file_put_contents($path2, $list);
+
         $pdf = new mPDF('utf-8', 'A4-P');
         $pdf->WriteHTML($list);
         $pdf->Output($path, 'F');
+
         return $file;
     }
 
