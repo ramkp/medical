@@ -216,7 +216,7 @@ class Demographic extends Util {
 
         $list.="<div class='row-fluid'>";
         $list.="<span class='span12'>";
-        $list.="<table id='myTable' class='display' cellspacing='0' width='100%'>";
+        $list.="<table id='myTable' class='display' cellspacing='0' width='100%' border='1'>";
 
         $list.="<thead>";
         $list.="<tr>";
@@ -502,11 +502,15 @@ class Demographic extends Util {
         $list.=$this->create_demographic_table($items);
         return $list;
     }
+    
+    function demo_report_pdf_table () {
+        
+    }
 
     function create_demographic_pdf_report() {
         $list = "";
         $items = array();
-        $demograhic_data = "";
+       
         $query = $_SESSION['demographic_query'];
         //echo "Current query: " . $query;
         $num = $this->db->numrows($query);
@@ -520,21 +524,57 @@ class Demographic extends Util {
                 $items[] = $item;
             }
         }
-        $demograhic_data.=$this->create_demographic_table($items);
+        $table=$this->create_demographic_table($items);
+        
+        $list.="<html>";
 
-        $list.="<br><table align='center' border='0' width='100%'>";
+        $list.="<head>";
 
-        $list.="<tr>";
+        $list.="</head>";
 
-        $list.="<td>";
+        $list.="<body>";
+        
+        $list.="<div style='80%;margin:auto;'>";
+        $list.="<br><table align='center' border='0' width='100%' >
 
-        $list.=$demograhic_data;
+                    <tr>
 
+                        <td style='padding-top:10px;text-align:right;'><img src='https://medical2.com/assets/icons/logo3.png' width='115' height='105'></td>
+                        
+                        <td valign='center' style='text-align:left;'>
+                        
+                        <table style='padding:15px;font-size:12px;' align='center'>
+
+                                <tr>
+                                    <td style='font-size:20px;font-weight:bold;letter-spacing:8px;padding-left:65px;'>Medical2</td>
+                                </tr>
+                                
+                                <tr>
+                                    <td style='font-size:15px;font-weight:bold;letter-spacing:6px;padding-left:40px;'>Career College</td>
+                                </tr>
+
+                                <tr>
+                                    <td style='padding-top:10px;padding-left:75px;'>1830A North Gloster St</td>
+                                </tr>  
+
+                                <tr>
+                                    <td style='padding-left:90px;'>Tupelo, MS 38804</td>
+                                </tr>  
+
+                            </table>";
         $list.="</td>";
-
         $list.="</tr>";
-
         $list.="</table>";
+        
+        $list.="<br><div class='row-fluid;text-align:center;'>";
+        $list.="<span class='span12'>$table</span>";
+        $list.="</div>";
+
+        $list.="</div>";
+
+        $list.="</body>";
+
+        $list.="</html>";
 
         $now = time();
         $pdf = new mPDF('utf-8', 'A4-L');

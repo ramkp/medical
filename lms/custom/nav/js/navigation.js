@@ -6774,8 +6774,9 @@ $(document).ready(function () {
             var date2 = $('#date2').val();
             var request = {courseid: courseid, date1: date1, date2: date2};
             var url = "/lms/custom/wsdata/print_ws_data.php";
-            $.post(url, {request: JSON.stringify(request)}).done(function (file) {
-                var path = "https://medical2.com/lms/custom/wsdata/report.html";
+            $.post(url, {request: JSON.stringify(request)}).done(function () {
+                //var path = "https://medical2.com/lms/custom/wsdata/report.html";
+                var path = "https://medical2.com/lms/custom/wsdata/report.pdf";
                 var oWindow = window.open(path, "print");
             });
 

@@ -45,8 +45,7 @@ class Wsdata extends Util {
         $this->db->query($query);
     }
 
-    function get_certificate_issue_date($courseid, $userid) {
-        $date = null;
+    function get_certificate_issue_date($courseid, $userid, $unix = false) {
         $query = "select * from mdl_certificates "
                 . "where courseid=$courseid "
                 . "and userid=$userid";
@@ -54,9 +53,17 @@ class Wsdata extends Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $date = date('m/d/Y', $row['issue_date']);
+                if ($unix) {
+                    $date = $row['issue_date'];
+                } // end if
+                else {
+                    $date = date('m/d/Y', $row['issue_date']);
+                } // end else
             } // end while
         } // end if $num > 0
+        else {
+            $date = 0;
+        }
         return $date;
     }
 
@@ -171,7 +178,7 @@ class Wsdata extends Util {
         if ($udate2 != null) {
             $query = "select * from mdl_scheduler_slots "
                     . "where schedulerid=$schedulerid "
-                    . "and starttime between $udate1 and $udate2";
+                    . "and starttime>=$udate1 and starttime<=$udate2";
         } // end if
         else {
             $query = "select * from mdl_scheduler_slots "
@@ -183,6 +190,7 @@ class Wsdata extends Util {
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                //echo "Workshop id: " . $row['id'] . " workshop date: " . date('m/d/Y', $row['starttime']) . " <br>";
                 $items[] = $row['id'];
             } // end while
         } // end if $num > 0
@@ -211,7 +219,20 @@ class Wsdata extends Util {
         return $methods;
     }
 
+    function is_graduate_date_after_beginning($courseid, $userid, $udate) {
+        $query = "select * from mdl_certificates "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $dbdate = $row['issue_date'];
+        }
+        $status = ($dbdate >= $udate) ? 1 : 0;
+        return $status;
+    }
+
     function is_user_graduated($courseid, $userid) {
+        $num = 0;
         $query = "select * from mdl_certificates "
                 . "where courseid=$courseid "
                 . "and userid=$userid";
@@ -227,20 +248,37 @@ class Wsdata extends Util {
         $schedulerid = $this->get_schedulerid($courseid);
         $workshops = $this->get_workshops_list($schedulerid, $udate);
         $slotstudents = $this->normalize_students_data($workshops);
-        $grad = 0;
-        $total = 0;
+
+        //echo "Total number students enrolled before with all statuses:  ".date('m/d/Y', $udate).": " . count($slotstudents);
+
+        $graduate = 0;
+        $other_status = 0;
+        $after_last_date = 0;
         foreach ($slotstudents as $userid) {
-            $graduated = $this->is_user_graduated($courseid, $userid);
-            if ($graduated == 0) {
-                $total++;
+            $gr = $this->is_user_graduated($courseid, $userid);
+            if ($gr > 0) {
+                $graduated = $this->is_graduate_date_after_beginning($courseid, $userid, $udate);
+                if ($graduated > 0) {
+                    $graduate++;
+                }
+            } // end if $gr > 0
+            $has_other_statuses = $this->has_other_statuses($userid);
+            if ($has_other_statuses == 1) {
+                $other_status++;
+            }
+            $before_last_date = $this->is_before_last_date($userid, $udate);
+            if ($before_last_date == 0) {
+                $after_last_date++;
+            }
+            //echo "User id: $userid has other status: $has_other_statuses enroll before last date $before_last_date <br>";
+            //echo "<br>--------------------------------------------------------------<br>";
+            if ($has_other_statuses == 0 && $before_last_date == 1 && $gr > 0) {
                 $users[] = $userid;
             } // end if 
-            else {
-                $grad++;
-            }
         } // end foreach
-        //echo "<br>Total open enrolled students date1: " . $total . "<br>";
-        //echo "Total graduate students date1: " . $grad . "<br>";
+        //echo "Total with other status: " . $other_status . "<br>";
+        //echo "Total Graduate: " . $graduate . "<br>";
+        //echo "Total enrolled after last date: " . $after_last_date . "<br>";
         return array_unique($users);
     }
 
@@ -248,23 +286,15 @@ class Wsdata extends Util {
         $users = array();
         $schedulerid = $this->get_schedulerid($courseid);
         $workshops = $this->get_workshops_list($schedulerid, $udate);
-
         $slotstudents = $this->normalize_students_data($workshops);
-        //echo "Total students found both graduate and non-graduate (date2) :" . count($slotstudents);
-        $grad = 0;
-        $total = 0;
         foreach ($slotstudents as $userid) {
             $graduated = $this->is_user_graduated($courseid, $userid);
-            if ($graduated == 0) {
-                $total++;
+            $has_other_statuses = $this->has_other_statuses($userid);
+            $before_last_date = $this->is_before_last_date($userid, $udate);
+            if ($graduated == 0 && $has_other_statuses == 0 && $before_last_date == 1) {
                 $users[] = $userid;
             } // end if 
-            else {
-                $grad++;
-            }
         } // end foreach
-        //echo "<br>Total open enrolled students date2 " . $total . "<br>";
-        //echo "Total graduate students date2: " . $grad . "<br>";
         return array_unique($users);
     }
 
@@ -341,32 +371,147 @@ class Wsdata extends Util {
         return $status;
     }
 
-    function get_full_user_data($courseid, $users) {
+    function get_student_class_date($courseid, $userid) {
+        $query = "select * from mdl_demographic where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $date = strtotime($row['startdate']);
+                //echo "User ID $userid class date from mdl_demographic: $date <br>";
+                if ($date == '') {
+                    $date_arr = explode('-', $row['startdate']);
+                    $newdate = "$date_arr[0]/$date_arr[1]/$date_arr[2]";
+                    //echo "User ID $userid class new date: $newdate <br>";
+                    $date = strtotime($newdate);
+                }
+            } // end while
+        } // end if $num > 0   
+        else {
+            $schedulerid = $this->get_schedulerid($courseid);
+            $slotslist = $this->get_course_slots($schedulerid);
+            $query = "select * from mdl_scheduler_appointment "
+                    . "where slotid in ($slotslist) "
+                    . "and studentid=$userid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $slotid = $row['slotid'];
+            }
+
+            $query = "select * from mdl_scheduler_slots where id=$slotid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $date = $row['starttime'];
+            }
+        } // end else
+
+        return $date;
+    }
+
+    function get_full_user_data($courseid, $users, $udate1, $udate2) {
         $report_users = array();
         $attend1 = 0;
         $attend2 = 0;
+        $enrolled = 0;
+        $graduated = 0;
+
         foreach ($users as $userid) {
             $userdata = $this->get_user_details($userid);
             if ($userdata->firstname != '' && $userdata->lastname != '') {
-                $graduate = $this->is_user_graduated($courseid, $userid);
-                $status = trim($this->get_student_status($courseid, $userid));
-                //echo "User id: " . $userid . "<br>";
-                //echo "User status: " . $status . "<br>";
-                if ($status == 'A') {
-                    //echo "Case A, attend2 should be 1 <br>";
-                    $attend1 = 1;
-                    $attend2 = 1;
-                }
-                if ($status == 'G') {
-                    $attend1 = 1;
-                    $attend2 = 0;
-                    //echo "Case G, attend2 should be 0 <br>";
-                }
-                if ($status != 'A' && $status != 'G') {
-                    //echo "Case not A or G, attend2 should be 0 <br>";
-                    $attend1 = 0;
-                    $attend2 = 0;
-                }
+                $classdate = $this->get_student_class_date($courseid, $userid);
+                $certdate = $this->get_certificate_issue_date($courseid, $userid, true);
+                $lastdate = $this->get_student_last_date($userid);
+
+                
+                  //echo "Begin date : " . $udate1 . "<br>";
+                  //echo "End date: " . $udate2 . "<br>";
+                  //echo "User ID: " . $userid . "<br>";
+                  //echo "Class date (unixtime)  $classdate" . "<br>";
+                  //echo "Cert date (unixtime) $certdate <br>";
+                  //echo "Last date (unixtime) $lastdate <br>";
+                 
+
+                //$userdata = $this->get_user_details($userid);
+                //echo "User $userdata->firstname $userdata->lastname class date : " . date('m/d/Y', $classdate) . " certificate date: " . date('m/d/Y', $certdate) . " last date: " . date('m/d/Y', $lastdate) . "";
+                //echo "<br>---------------------------------------------------------------------<br>";
+
+                if ($lastdate == 0) {
+                    if ($certdate == 0) {
+                        if ($classdate <= $udate1) {
+                            $attend1 = 1;
+                            $attend2 = 1;
+                            $enrolled = 0;
+                            $graduated = 0;
+                        }
+
+                        if ($classdate > $udate1 && $classdate <= $udate2) {
+                            $attend1 = 0;
+                            $attend2 = 1;
+                            $enrolled = 1;
+                            $graduated = 0;
+                        }
+                    } // end if $certdate == 0
+
+                    if ($certdate != 0) {
+                        if ($classdate <= $udate1 && $certdate < $udate2) {
+                            $attend1 = 1;
+                            $attend2 = 0;
+                            $enrolled = 0;
+                            $graduated = 1;
+                        }
+
+                        if ($classdate <= $udate1 && $certdate > $udate2) {
+                            $attend1 = 1;
+                            $attend2 = 1;
+                            $enrolled = 0;
+                            $graduated = 0;
+                        }
+
+                        if ($classdate > $udate1 && $classdate <= $udate2 && $certdate < $udate2) {
+                            $attend1 = 0;
+                            $attend2 = 0;
+                            $enrolled = 1;
+                            $graduated = 1;
+                        }
+
+                        if ($classdate > $udate1 && $classdate <= $udate2 && $certdate > $udate2) {
+                            $attend1 = 0;
+                            $attend2 = 1;
+                            $enrolled = 1;
+                            $graduated = 0;
+                        }
+                    } // end if $certdate != 0
+                } // end if $lastdate == 0
+                else {
+                    // Case when we have last medical2 date
+                    if ($classdate <= $udate1 && $lastdate < $udate2) {
+                        $attend1 = 1;
+                        $attend2 = 0;
+                        $enrolled = 0;
+                        $graduated = 0;
+                    }
+
+                    if ($classdate <= $udate1 && $lastdate > $udate2) {
+                        $attend1 = 1;
+                        $attend2 = 1;
+                        $enrolled = 0;
+                        $graduated = 0;
+                    }
+
+                    if ($classdate > $udate1 && $classdate <= $udate2 && $lastdate < $udate2) {
+                        $attend1 = 0;
+                        $attend2 = 0;
+                        $enrolled = 1;
+                        $graduated = 0;
+                    }
+
+                    if ($classdate > $udate1 && $classdate <= $udate2 && $lastdate > $udate2) {
+                        $attend1 = 0;
+                        $attend2 = 1;
+                        $enrolled = 1;
+                        $graduated = 0;
+                    }
+                } // end else when last date is not empty
                 //echo "<br>-------------------------------------------------<br>";
                 $userObj = new stdClass();
                 $userObj->id = $userid;
@@ -375,11 +520,66 @@ class Wsdata extends Util {
                 $userObj->lname = $userdata->lastname;
                 $userObj->attend1 = $attend1;
                 $userObj->attend2 = $attend2;
-                $userObj->graduate = $graduate;
+                $userObj->enrolled = $enrolled;
+                $userObj->graduate = $graduated;
+
+                /*    
+                echo "<pre>";
+                print_r($userObj);
+                echo "</pre>";
+                echo "<br>-------------------------------------------------<br>";
+                */
                 $report_users[] = $userObj;
             } // end if $userdata->firstname != '' && $userdata->lastname != ''
         } // end foreach
         return $report_users;
+    }
+
+    function is_before_last_date($userid, $udate) {
+        $status = 1;
+        $query = "select * from mdl_demographic where userid=$userid ";
+        $num = $this->db->numrows($query);
+        //echo "Before last date num: " . $num . "<br>";
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $m2date = $row['m2_last_date']; // m/d/Y
+            } // end while
+            if ($m2date != '') {
+                $um2date = strtotime($m2date);
+                //echo "Unix time stamp of last date (if any) .$um2date" . "<br>";
+                $status = ($udate < $um2date) ? 1 : 0;
+            } // end if 
+            else {
+                $status = 1;
+            } // end else
+        } // end if $num > 0
+        else {
+            $status = 1; // we assume student is still attending school
+        }
+        return $status;
+    }
+
+    function has_other_statuses($userid) {
+        $status = 0;
+        $query = "select * from mdl_demographic where userid=$userid ";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $dbstatus = $row['school_status'];
+            }
+            if ($dbstatus == 'A' || $dbstatus == 'G') {
+                $status = 0;
+            } // end if 
+            else {
+                $status = 1;
+            } // end else
+        } // end if $num > 0
+        else {
+            $status = 0; // we assume student is still attending school
+        }
+        return $status;
     }
 
     function normalize_students_data($workshops) {
@@ -407,10 +607,80 @@ class Wsdata extends Util {
 
     function calculate_retention($opened_date1, $enrolled_between_dates, $graduated_between_dates, $opened_date2) {
         $total_attending = $opened_date1 + $enrolled_between_dates - $opened_date2;
-        $percentage = ($graduated_between_dates / $total_attending) * 100;
+        $percentage = round(($graduated_between_dates / $total_attending) * 100);
         //echo "Total enrolled: " . $total_attending . "<br>";
         //echo "Toal graduated: " . $graduated_between_dates . "<br>";
         return $percentage;
+    }
+
+    function get_student_last_date($userid) {
+        $query = "select * from mdl_demographic where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $m2date = $row['m2_last_date'];
+                if ($m2date != '') {
+                    $date = strtotime($m2date);
+                } // end if
+                else {
+                    $date = 0;
+                } // end else
+            } // end while
+        } // end if $num > 0
+        else {
+            $date = 0;
+        }
+        return $date;
+    }
+
+    function get_students_before_beginning_date($courseid, $schedulerid, $udate1) {
+        $students = array();
+        $workshops = $this->get_workshops_list($schedulerid, $udate1);
+        $raw_student_before = $this->normalize_students_data($workshops);
+        foreach ($raw_student_before as $userid) {
+            $graduated = $this->is_user_graduated($courseid, $userid);
+            if ($graduated > 0) {
+                $certdate = $this->get_certificate_issue_date($courseid, $userid, true);
+            } // end if
+            else {
+                $certdate = 0;
+            } // end else
+            $lastdate = $this->get_student_last_date($userid);
+            $classdate = $this->get_student_class_date($courseid, $userid);
+            //echo "User id: $userid <br>";
+            //echo "Cert date: $certdate <br>";
+            //echo "class date $classdate <br>";
+            //echo  "Last date $lastdate <br>";
+            if ($lastdate == 0) {
+                if ($classdate <= $udate1 && $certdate > $udate1) {
+                    $students[] = $userid;
+                }
+            } // end if
+            else {
+                // No certificate at all
+                if ($classdate <= $udate1 && $lastdate > $udate1) {
+                    $students[] = $userid;
+                }
+            } // end else
+        } // end foreach
+        //echo "Students before : <br>";
+        //print_r($students);
+        //echo "<br>--------------------------------------------------------<br>";
+
+        return $students;
+    }
+
+    function get_students_between_dates($schedulerid, $udate1, $udate2) {
+        $workshops = $this->get_workshops_list($schedulerid, $udate1, $udate2);
+        $students = $this->normalize_students_data($workshops);
+
+        /*
+          echo "Students between dates : <br>";
+          print_r($students);
+          echo "<br>--------------------------------------------------------<br>";
+         */
+        return $students;
     }
 
     function get_workshop_data($data) {
@@ -421,6 +691,11 @@ class Wsdata extends Util {
         $udate2 = strtotime($data->date2);
         $courseid = $data->course;
         $coursename = $this->get_course_name($courseid);
+
+        $total_attend1 = 0;
+        $total_attend2 = 0;
+        $total_enrolled = 0;
+        $total_graduate = 0;
 
         $list.="<div class='row-fluid' style='font-weight:bold;'>";
         $list.="<span class='span12'>$coursename</span>";
@@ -436,15 +711,13 @@ class Wsdata extends Util {
         $list.="</div>";
 
         $schedulerid = $this->get_schedulerid($courseid);
-
-        $workshops = $this->get_workshops_list($schedulerid, $udate1, $udate2);
-        $students_between = $this->normalize_students_data($workshops);
-        $students_open_enrolled = $this->get_open_enrolled_students_date1($courseid, $udate1);
-        $students_with_dupes = array_merge((array) $students_between, (array) $students_open_enrolled);
-        $students = array_unique($students_with_dupes);
+        $students_before = $this->get_students_before_beginning_date($courseid, $schedulerid, $udate1);
+        $students_between = $this->get_students_between_dates($schedulerid, $udate1, $udate2);
+        $raw_students = array_merge((array) $students_before, (array) $students_between);
+        $students = array_unique($raw_students);
 
         if (count($students) > 0) {
-            $usersdata = $this->get_full_user_data($courseid, $students);
+            $usersdata = $this->get_full_user_data($courseid, $students, $udate1, $udate2);
             $list.="<table id='myTable' class='display' cellspacing='0' width='100%'>";
             $list.="<thead>";
             $list.="<tr>";
@@ -460,40 +733,54 @@ class Wsdata extends Util {
                 $names = $item->fname . ' ' . $item->lname;
                 $url = $item->url;
                 $attend1 = $item->attend1;
+                $enrolled = $item->enrolled;
                 $attend2 = $item->attend2;
                 $graduate = $item->graduate;
+
+                if ($attend1 == 1) {
+                    $total_attend1++;
+                }
+
+                if ($attend2 == 1) {
+                    $total_attend2++;
+                }
+
+                if ($graduate == 1) {
+                    $total_graduate++;
+                }
+
+                if ($enrolled == 1) {
+                    $total_enrolled++;
+                }
+
                 $list.="<tr>";
                 $list.="<td><a href='$url' target='_blank'>$names</td>";
                 $list.="<td>$attend1</td>";
-                $list.="<td>1</td>";
+                $list.="<td>$enrolled</td>";
                 $list.="<td>$graduate</td>";
                 $list.="<td>$attend2</td>";
                 $list.="</tr>";
             } // end foreach 
+
             $list.="</tbody>";
             $list.="</table>";
 
-            $opened_date1 = count($this->get_open_enrolled_students_date1($courseid, $udate1));
-            $opened_date2 = count($this->get_open_enrolled_students_date2($courseid, $udate2));
-            $enrolled_between_dates = count($this->get_students_enrolled_between_dates($courseid, $udate1, $udate2));
-            $graduated_between_dates = count($this->get_students_graduated_between_dates($courseid, $udate1, $udate2));
-
             $list.="<div class='row-fluid'>";
-            $list.="<span class='span6'>Students openly enrolled on $date1</span><span class='span1'>$opened_date1</span>";
+            $list.="<span class='span6'>Students openly enrolled on $date1</span><span class='span1'>$total_attend1</span>";
             $list.="</div>";
 
             $list.="<div class='row-fluid'>";
-            $list.="<span class='span6'>Students enrolled between $date1 and $date2</span><span class='span1'>$enrolled_between_dates</span>";
+            $list.="<span class='span6'>Students enrolled between $date1 and $date2</span><span class='span1'>$total_enrolled</span>";
             $list.="</div>";
 
             $list.="<div class='row-fluid'>";
-            $list.="<span class='span6'>Students graduated between  $date1 and $date2</span><span class='span1'>$graduated_between_dates</span>";
+            $list.="<span class='span6'>Students graduated between  $date1 and $date2</span><span class='span1'>$total_graduate</span>";
             $list.="</div>";
 
             $list.="<div class='row-fluid'>";
-            $list.="<span class='span6'>Students openly enrolled at end of $date2</span><span class='span1'>$opened_date2</span>";
+            $list.="<span class='span6'>Students openly enrolled at end of $date2</span><span class='span1'>$total_attend2</span>";
             $list.="</div>";
-            $summary = $this->calculate_retention($opened_date1, $enrolled_between_dates, $graduated_between_dates, $opened_date2);
+            $summary = $this->calculate_retention($total_attend1, $total_enrolled, $total_graduate, $total_attend2);
             $list.="<div class='row-fluid' style='font-wieght:bold;'>";
             $list.="<span class='span2'>Percentage of retention:</span>";
             $list.="<span class='span1'>$summary %</span>";
@@ -521,6 +808,10 @@ class Wsdata extends Util {
         $courseid = $data->courseid;
         $coursename = $this->get_course_name($courseid);
 
+        $total_attend1 = 0;
+        $total_attend2 = 0;
+        $total_graduate = 0;
+
         $list.="<div class='row-fluid' style='font-weight:bold;text-align:center;'>";
         $list.="<span class='span12'>$coursename</span>";
         $list.="</div>";
@@ -528,17 +819,34 @@ class Wsdata extends Util {
         $schedulerid = $this->get_schedulerid($courseid);
         $workshops = $this->get_workshops_list($schedulerid, $udate1, $udate2);
         $students_between = $this->normalize_students_data($workshops);
-        $students_open_enrolled = $this->get_open_enrolled_students_date1($courseid, $udate1);
-        $students_with_dupes = array_merge((array) $students_between, (array) $students_open_enrolled);
-        $students = array_unique($students_with_dupes);
+        $students = array_unique($students_between);
 
-        $opened_date1 = count($this->get_open_enrolled_students_date1($courseid, $udate1));
-        $opened_date2 = count($this->get_open_enrolled_students_date2($courseid, $udate2));
         $enrolled_between_dates = count($this->get_students_enrolled_between_dates($courseid, $udate1, $udate2));
-        $graduated_between_dates = count($this->get_students_graduated_between_dates($courseid, $udate1, $udate2));
+
+        if (count($students) > 0) {
+            $usersdata = $this->get_full_user_data($courseid, $students);
+            foreach ($usersdata as $item) {
+                $names = $item->fname . ' ' . $item->lname;
+                $attend1 = $item->attend1;
+                $attend2 = $item->attend2;
+                $graduate = $item->graduate;
+
+                if ($attend1 == 1) {
+                    $total_attend1++;
+                }
+
+                if ($attend2 == 1) {
+                    $total_attend2++;
+                }
+
+                if ($graduate == 1) {
+                    $total_graduate++;
+                }
+            } // end foreach
+        } // end if count
 
         $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
-        $list.="<span class='span6'>Students openly enrolled on $date1</span><span class='span1'>&nbsp; $opened_date1</span>";
+        $list.="<span class='span6'>Students openly enrolled on $date1</span><span class='span1'>&nbsp; $total_attend1</span>";
         $list.="</div>";
 
         $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
@@ -546,13 +854,13 @@ class Wsdata extends Util {
         $list.="</div>";
 
         $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
-        $list.="<span class='span6'>Students graduated between  $date1 and $date2</span><span class='span1'> &nbsp; $graduated_between_dates</span>";
+        $list.="<span class='span6'>Students graduated between  $date1 and $date2</span><span class='span1'> &nbsp; $total_attend2</span>";
         $list.="</div>";
 
         $list.="<div class='row-fluid' style='text-align:center;font-weight:bold;'>";
-        $list.="<span class='span6'>Students openly enrolled at end of $date2</span><span class='span1'>&nbsp; $opened_date2</span>";
+        $list.="<span class='span6'>Students openly enrolled at end of $date2</span><span class='span1'>&nbsp; $total_attend2</span>";
         $list.="</div>";
-        $summary = $this->calculate_retention($opened_date1, $enrolled_between_dates, $graduated_between_dates, $opened_date2);
+        $summary = $this->calculate_retention($total_attend1, $enrolled_between_dates, $total_graduate, $total_attend2);
         $list.="<div class='row-fluid' style='font-wieght:bold;text-align:center;font-weight:bold;'>";
         $list.="<span class='span2'>Percentage of retention:</span>";
         $list.="<span class='span1'>&nbsp; $summary %</span>";
@@ -563,7 +871,7 @@ class Wsdata extends Util {
             $list.="<table id='myTable' class='display' cellspacing='0' width='100%' align='center;' border='1' style='align:center;'>";
             $list.="<thead>";
             $list.="<tr>";
-            $list.="<th>Name</th>";
+            $list.="<th style='text-align:left;'>Name</th>";
             $list.="<th>Attending</th>";
             $list.="<th>Enrolled</th>";
             $list.="<th>Graduated</th>";
@@ -573,10 +881,10 @@ class Wsdata extends Util {
             $list.="<tbody>";
             foreach ($usersdata as $item) {
                 $names = $item->fname . ' ' . $item->lname;
-                $url = $item->url;
                 $attend1 = $item->attend1;
                 $attend2 = $item->attend2;
                 $graduate = $item->graduate;
+
                 $list.="<tr>";
                 $list.="<td>$names</td>";
                 $list.="<td>$attend1</td>";
@@ -599,18 +907,6 @@ class Wsdata extends Util {
         $list.="<html>";
 
         $list.="<head>";
-
-        $list.="<script  src='https://code.jquery.com/jquery-1.12.4.js'></script>";
-
-        $list.="<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' >";
-
-        $list.="<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css' >";
-
-        $list.="<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js' ></script>";
-
-        $list.="<link rel='stylesheet' type='text/css' href='//cdn.datatables.net/1.10.15/css/jquery.dataTables.css'>";
-
-        $list.="<script type='text/javascript' charset='utf8' src='//cdn.datatables.net/1.10.15/js/jquery.dataTables.js'></script>";
 
         $list.="</head>";
 
@@ -658,18 +954,13 @@ class Wsdata extends Util {
 
         $list.="</html>";
 
-
-        $now = time();
-        $file = "report_$now.pdf";
-        $file2 = "report.html";
+        $file = "report.pdf";
 
         $path = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/wsdata/$file";
-        $path2 = $_SERVER['DOCUMENT_ROOT'] . "/lms/custom/wsdata/$file2";
-        file_put_contents($path2, $list);
-        $pdf = new mPDF('utf-8', 'A4-L');
+        $pdf = new mPDF('utf-8', 'A4-P');
         $pdf->WriteHTML($list);
         $pdf->Output($path, 'F');
-        return $file2;
+        return $file;
     }
 
 }

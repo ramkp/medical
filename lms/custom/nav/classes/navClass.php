@@ -223,7 +223,7 @@ class navClass extends Util {
     }
 
     function get_rentention_item() {
-        $list = "<li><a href='#' title='Course retension' id='wsdata'>Course Retension</a></li>";
+        $list = "<li><a href='#' title='Course retension' id='wsdata'>Course Retention</a></li>";
         return $list;
     }
 
@@ -702,7 +702,7 @@ class navClass extends Util {
                                     <li><a href='#' id='user_report' title='Users stats'>Users stats</a></li>
                                     <!--<li><a href='#' id='payments_report' title='Payments log'>Payments log</a></li>-->                                    
                                     <li><a href='#' id='revenue_reports' title='Revenue report'>Revenue report</a></li>
-                                    <li><a href='#' title='Workshops data' id='wsdata'>Course Retension</a></li>
+                                    <li><a href='#' title='Workshops data' id='wsdata'>Course Retention</a></li>
                                      <li><a href='#' title='Demographic' id='demographic'>Demographic Info</a></li>
                                     
                                     <!--<li><a href='#' id='survey_reports' title='Survey report'>Survey report</a></li>-->
