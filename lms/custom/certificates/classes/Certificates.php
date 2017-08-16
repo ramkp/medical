@@ -1221,7 +1221,7 @@ class Certificates extends Util {
 
         $query = "SELECT * FROM `mdl_user` 
             WHERE firstname = '" . trim($fname) . "'
-            AND lastname = '" . trim($lname) . "'";
+            AND lastname = '" . trim($lname) . "' and deleted=0";
         //echo "Query: ".$query."<br>";
         $num = $this->db->numrows($query);
         if ($num > 0) {
@@ -1233,6 +1233,7 @@ class Certificates extends Util {
             $query = "select * from mdl_certificates where userid=$id";
             //echo "Query: ".$query."<br>";
             $num = $this->db->numrows($query);
+            //echo "Num: ".$num."<br>";
             if ($num > 0) {
                 $result = $this->db->query($query);
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
