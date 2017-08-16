@@ -211,12 +211,17 @@ class Demographic extends Util {
         }
     }
 
-    function create_demographic_table($items) {
+    function create_demographic_table($items, $print = false) {
         $list = "";
 
         $list.="<div class='row-fluid'>";
         $list.="<span class='span12'>";
-        $list.="<table id='myTable' class='display' cellspacing='0' width='100%' border='1'>";
+        if ($print) {
+            $list.="<table id='myTable' class='display' cellspacing='0' width='100%' border='1'>";
+        } // end if
+        else {
+            $list.="<table id='myTable' class='display' cellspacing='0' width='100%' border='0'>";
+        } // end else
 
         $list.="<thead>";
         $list.="<tr>";
@@ -499,18 +504,18 @@ class Demographic extends Util {
             }
         }
 
-        $list.=$this->create_demographic_table($items);
+        $list.=$this->create_demographic_table($items, $print = false);
         return $list;
     }
-    
-    function demo_report_pdf_table () {
+
+    function demo_report_pdf_table() {
         
     }
 
     function create_demographic_pdf_report() {
         $list = "";
         $items = array();
-       
+
         $query = $_SESSION['demographic_query'];
         //echo "Current query: " . $query;
         $num = $this->db->numrows($query);
@@ -524,8 +529,8 @@ class Demographic extends Util {
                 $items[] = $item;
             }
         }
-        $table=$this->create_demographic_table($items);
-        
+        $table = $this->create_demographic_table($items, true);
+
         $list.="<html>";
 
         $list.="<head>";
@@ -533,7 +538,7 @@ class Demographic extends Util {
         $list.="</head>";
 
         $list.="<body>";
-        
+
         $list.="<div style='80%;margin:auto;'>";
         $list.="<br><table align='center' border='0' width='100%' >
 
@@ -565,7 +570,7 @@ class Demographic extends Util {
         $list.="</td>";
         $list.="</tr>";
         $list.="</table>";
-        
+
         $list.="<br><div class='row-fluid;text-align:center;'>";
         $list.="<span class='span12'>$table</span>";
         $list.="</div>";
@@ -584,7 +589,5 @@ class Demographic extends Util {
         $pdf->Output($path, 'F');
         return $filename;
     }
-
-    
 
 }
