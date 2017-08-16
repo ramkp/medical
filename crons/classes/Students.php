@@ -1083,6 +1083,7 @@ class Students {
         $content = $this->get_campaign_content($camid);
         $user_details = $this->get_user_data($userid);
         $addressA = 'sirromas@gmail.com';
+        $addressB = 'info@medical2.com';
         $message = $this->get_user_message($user_details, $content);
         $unsubscribe = $this->get_unsubscribe_block($userid);
         $message.=$unsubscribe;
@@ -1097,6 +1098,7 @@ class Students {
         $mail->Port = $this->mail_smtp_port;
         $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
         $mail->addAddress($addressA);
+        $mail->addAddress($addressB);
         $mail->addAddress($user_details->email);
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
         $mail->isHTML(true);
