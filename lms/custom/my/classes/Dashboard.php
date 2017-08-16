@@ -512,15 +512,15 @@ class Dashboard extends Util {
                 $already_paid = $already_paid + $row['psum'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if (!in_array($row['psum'], $this->renew_payments)) {
-                    $list.="<span class='span8'>Paid by PayPal $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    $list.="<span class='span8'>Paid by PayPal $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
                 } // end if $row['psum']!=$renew_amount
                 else {
                     // Payments are similar to renew, we need to make additional checks
                     if ($certificate_date != null && $certificate_date < $row['pdate']) {
-                        $list.="<span class='span8'>Paid by PayPal $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                        $list.="<span class='span8'>Paid by PayPal $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
                     } // end if 
                     else {
-                        $list.="<span class='span8'>Paid by PayPal $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                        $list.="<span class='span8'>Paid by PayPal $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y h:i:sß', $row['pdate']) . ") &nbsp; $coursename </span>";
                     }
                 } // end else
                 if ($status == 0) {
@@ -561,12 +561,13 @@ class Dashboard extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $already_paid = $already_paid + $row['psum'];
                 $expired = $this->is_certificate_expired($courseid);
+                $transactionid=$row['trans_id'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if ($certificate_date != null && $certificate_date < $row['pdate'] && $expired == 1) {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(Authorize.net TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
                 } // end if 
                 else {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(Authorize.net TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
                 }
                 if ($status == 0) {
                     $prohibit = $this->get_user_roles($userid);
@@ -599,17 +600,18 @@ class Dashboard extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $already_paid = $already_paid + $row['psum'];
                 $expired = $this->is_certificate_expired($courseid);
+                $transactionid=$row['trans_id'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if (!in_array($row['psum'], $this->renew_payments)) {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
                 } // end if $row['psum']!=$renew_amount
                 else {
                     // Payments are similar to renew, we need to make additional checks
                     if ($certificate_date != null && $certificate_date < $row['pdate'] && $expired == 1) {
-                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
                     } // end if 
                     else {
-                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
                     }
                 } // end else
                 if ($status == 0) {
@@ -640,15 +642,15 @@ class Dashboard extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if (!in_array($row['i_sum'], $this->renew_payments)) {
-                    $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_date']) . ") &nbsp; $coursename </span>";
+                    $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y h:i:s', $row['i_date']) . ") &nbsp; $coursename </span>";
                 } // end if 
                 else {
                     // Payments are similar to renew, we need additional cahecking
                     if ($certificate_date != null && $certificate_date < $row['i_date']) {
-                        $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_date']) . ") &nbsp; Certificate Renew ($coursename) </span>";
+                        $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y h:i:s', $row['i_date']) . ") &nbsp; Certificate Renew ($coursename) </span>";
                     } // end if
                     else {
-                        $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y', $row['i_date']) . ") &nbsp; $coursename </span>";
+                        $list.="<span class='span8'>Paid by invoice $" . round($row['i_sum']) . "&nbsp;(" . date('m-d-Y h:i:s', $row['i_date']) . ") &nbsp; $coursename </span>";
                     } // end else
                 } // end else
                 if ($status == 0 && ($current_user_id == 2 || $current_user_id == 234)) {
@@ -679,14 +681,14 @@ class Dashboard extends Util {
                 $already_paid = $already_paid + $row['psum'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if (!in_array($row['psum'], $this->renew_payments)) {
-                    $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
                 } // end if 
                 else {
                     if ($certificate_date != null && $certificate_date < $row['pdate']) {
-                        $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                        $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
                     } // end if 
                     else {
-                        $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y', $row['pdate']) . ") &nbsp; $coursename </span>";
+                        $list.="<span class='span8'>Paid by cash/cheque $" . round($row['psum']) . "&nbsp;(" . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
                     } // end else
                 } // end else
                 if ($status == 0 && ($current_user_id == 2 || $current_user_id == 234)) {
