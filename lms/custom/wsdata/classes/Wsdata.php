@@ -651,8 +651,15 @@ class Wsdata extends Util {
             //echo "class date $classdate <br>";
             //echo  "Last date $lastdate <br>";
             if ($lastdate == 0) {
-                if ($classdate <= $udate1 && $certdate > $udate1) {
-                    $students[] = $userid;
+                if ($certdate != 0) {
+                    if ($classdate <= $udate1 && $certdate > $udate1) {
+                        $students[] = $userid;
+                    }
+                } // end if $certdate!=0
+                else {
+                    if ($classdate <= $udate1) {
+                        $students[] = $userid;
+                    }
                 }
             } // end if
             else {
