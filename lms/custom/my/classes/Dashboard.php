@@ -561,7 +561,7 @@ class Dashboard extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $already_paid = $already_paid + $row['psum'];
                 $expired = $this->is_certificate_expired($courseid);
-                $transactionid=$row['trans_id'];
+                $transactionid = $row['trans_id'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if ($certificate_date != null && $certificate_date < $row['pdate'] && $expired == 1) {
                     $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(Authorize.net TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
@@ -600,7 +600,7 @@ class Dashboard extends Util {
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $already_paid = $already_paid + $row['psum'];
                 $expired = $this->is_certificate_expired($courseid);
-                $transactionid=$row['trans_id'];
+                $transactionid = $row['trans_id'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if (!in_array($row['psum'], $this->renew_payments)) {
                     $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
@@ -2244,6 +2244,17 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function get_user_birth_date($sel = null) {
+        $list = "";
+        if ($sel == null) {
+            $list.="<input type='text' id='birth'>";
+        } // end if
+        else {
+            $list.="<input type='text' id='birth' value='$sel'>";
+        } // end else
+        return $list;
+    }
+
     function get_job_type_box($sel = null) {
         $list = "";
         $list.="<select id='job_type'>";
@@ -2487,6 +2498,7 @@ class Dashboard extends Util {
         $rbox = $this->get_race_box();
         $sbox = $this->get_sex_box();
         $edubox = $this->get_edu_box();
+        $birthdate=$this->get_user_birth_date();
         $incomebox = $this->get_income_box();
         $startdate = $this->get_medical2_start_date();
         $job_box = $this->get_job_type_box();
@@ -2498,6 +2510,13 @@ class Dashboard extends Util {
         $workbox = $this->get_work_box();
 
         $list.="<input type='hidden' id='profile_userid' value='$userid'>";
+        
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Birth date</span>";
+        $list.="<span class='span2'>$birthdate</span>";
+        $list.="</div>";
+
+        
         $list.="<div class='row-fluid'>";
         $list.="<span class='span2'>Marital status</span>";
         $list.="<span class='span2'>$mbox</span>";
@@ -2633,6 +2652,7 @@ class Dashboard extends Util {
 
         $mbox = $this->get_marital_status_box($demo->mstatus);
         $rbox = $this->get_race_box($demo->race);
+        $birthdate=$this->get_user_birth_date($demo->birth);
         $sbox = $this->get_sex_box($demo->sex);
         $edubox = $this->get_edu_box($demo->edlevel);
         $incomebox = $this->get_income_box($demo->incomelevel);
@@ -2646,6 +2666,12 @@ class Dashboard extends Util {
         $workbox = $this->get_work_box($demo->work15);
 
         $list.="<input type='hidden' id='profile_userid' value='$userid'>";
+        
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Birth date</span>";
+        $list.="<span class='span2'>$birthdate</span>";
+        $list.="</div>";
+        
         $list.="<div class='row-fluid'>";
         $list.="<span class='span2'>Marital status</span>";
         $list.="<span class='span2'>$mbox</span>";
@@ -3083,7 +3109,7 @@ class Dashboard extends Util {
     function insert_demographic_data($data) {
         $query = "insert into mdl_demographic "
                 . "(userid,"
-                . "mstatus,"
+                . "mstatus, birth,"
                 . "race,"
                 . "sex,"
                 . "edlevel,"
@@ -3104,7 +3130,7 @@ class Dashboard extends Util {
                 . "employervcontact,"
                 . "employervdate) "
                 . "values ('$data->userid', "
-                . "'$data->marital', "
+                . "'$data->marital', '$data->birth', "
                 . "'$data->race',"
                 . "'$data->sex',"
                 . "'$data->education',"
@@ -3130,7 +3156,7 @@ class Dashboard extends Util {
 
     function update_demographic_data($data) {
         $query = "update mdl_demographic "
-                . "set mstatus='$data->marital', "
+                . "set mstatus='$data->marital', birth='$data->birth', "
                 . "race='$data->race', "
                 . "sex='$data->sex', "
                 . "edlevel='$data->education',"
@@ -3192,7 +3218,7 @@ class Dashboard extends Util {
                 <p>$certficates</p>
               </div>
               <div id='grades' class='tab-pane fade'>
-                <h3>Grades &nbsp;&nbsp;<button id='print_grades'>Print</button></h3>
+                <h3>Grades &nbsp;&nbsp;<button id='print_grades'>Print</button><button id='print_transctipt_grades'>Print Transcript</button></h3>
                 <p>$grades</p>
               </div>
              <div id='attend' class='tab-pane fade'>

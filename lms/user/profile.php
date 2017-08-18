@@ -244,6 +244,11 @@ echo '</div>';  // Userprofile class.
         $('#employer_vdate').datepicker({
             dateFormat: "mm/dd/yy"
         });
+        
+         $('#birth').datepicker({
+            dateFormat: "mm/dd/yy"
+        });
+
 
     }); // end of document ready
 

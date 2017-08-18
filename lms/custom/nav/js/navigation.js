@@ -7039,6 +7039,7 @@ $(document).ready(function () {
         if (event.target.id == 'insert_demographic_info') {
             var userid = $('#profile_userid').val();
             var marital = $('#mstatus').val();
+            var birth=$('#birth').val();
             var sex = $('#sexbox').val();
             var race = $('#racebox').val();
             var education = $('#edu_box').val();
@@ -7063,6 +7064,7 @@ $(document).ready(function () {
             var demoObj = {userid: userid,
                 marital: marital,
                 race: race,
+                birth: birth,
                 sex: sex,
                 education: education,
                 income: income,
@@ -7096,6 +7098,7 @@ $(document).ready(function () {
             var marital = $('#mstatus').val();
             var sex = $('#sexbox').val();
             var race = $('#racebox').val();
+            var birth=$('#birth').val();
             var education = $('#edu_box').val();
             var income = $('#income_box').val();
             var start_date = $('#start_date').val();
@@ -7118,6 +7121,7 @@ $(document).ready(function () {
             var demoObj = {userid: userid,
                 marital: marital,
                 race: race,
+                birth: birth,
                 sex: sex,
                 education: education,
                 income: income,
