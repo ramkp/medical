@@ -15,7 +15,7 @@ class Aid_model extends CI_Model {
             $page = $row->content;
         }
         $list.="<div class='row-fluid'>";
-        $list.="<div class='form_div'><br><span style='text-align:justify'>$page></span></div>";
+        $list.="<div class='form_div'><br><span style='text-align:justify'>$page</span></div>";
         $list.="</div>";
         return $list;
     }
@@ -28,7 +28,7 @@ class Aid_model extends CI_Model {
             $page = $row->content;
         }
         $list.="<div class='row-fluid'>";
-        $list.="<div class='form_div'><br><span style='text-align:justify'>$page></span></div>";
+        $list.="<div class='form_div'><br><span style='text-align:justify'>$page</span></div>";
         $list.="</div>";
         return $list;
     }
