@@ -2130,6 +2130,16 @@ $(document).ready(function () {
 
     /***************************************************************************
      * 
+     * Show Renew certification page after click
+     * 
+     **************************************************************************/
+    $('#rencert').click(function () {
+        self.location = $('#rencert').attr('href');
+    });
+
+
+    /***************************************************************************
+     * 
      * Show Testimonial page after click
      * 
      **************************************************************************/
@@ -2139,9 +2149,34 @@ $(document).ready(function () {
     });
     /***************************************************************************
      * 
-     * Show priviate group page after click
+     * Show Jobs instructors page after click
      * 
      **************************************************************************/
+    $('#jobs_instructor').click(function () {
+        self.location = $('#jobs_instructor').attr('href');
+    });
+    /***************************************************************************
+     * 
+     * Show Jobs student page after click
+     * 
+     **************************************************************************/
+    $('#jobs_student').click(function () {
+        self.location = $('#jobs_student').attr('href');
+    });
+
+    /***************************************************************************
+     * 
+     * Show Financial aid pages after click
+     * 
+     **************************************************************************/
+
+    $('#aid_workshop').click(function () {
+        self.location = $('#aid_workshop').attr('href');
+    });
+
+    $('#aid_college').click(function () {
+        self.location = $('#aid_college').attr('href');
+    });
 
     $('#group').click(function () {
         self.location = $('#group').attr('href');
@@ -2692,7 +2727,7 @@ $(document).ready(function () {
             var renewal = Base64.encode(JSON.stringify(group));
             //var renewal =JSON.stringify(group);
             var url = "https://medical2.com/register2/auth_group_renew_pay/" + renewal;
-            window.location=url;
+            window.location = url;
             ///var oWindow = window.open(url, "renew");
         }
 

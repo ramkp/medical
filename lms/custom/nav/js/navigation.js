@@ -2402,6 +2402,44 @@ $(document).ready(function () {
             clear_user_filter();
         }
 
+
+        if (event.target.id == 'save_renew_cert_page') {
+            var oEditor = FCKeditorAPI.GetInstance('editor');
+            var data = oEditor.GetHTML();
+            update_renew_certification_page(data);
+        }
+
+        if (event.target.id == 'update_aid') {
+            var oEditor = FCKeditorAPI.GetInstance('editor');
+            var data = oEditor.GetHTML();
+            update_financial_aid_page(data);
+        }
+
+        if (event.target.id == 'save_aid_workshop') {
+            var oEditor = FCKeditorAPI.GetInstance('editor1');
+            var data = oEditor.GetHTML();
+            update_financial_aid_workshop(data);
+        }
+
+        if (event.target.id == 'save_aid_college') {
+            var oEditor = FCKeditorAPI.GetInstance('editor2');
+            var data = oEditor.GetHTML();
+            update_financial_aid_college(data);
+        }
+
+
+        if (event.target.id == 'save_jobs_instructor') {
+            var oEditor = FCKeditorAPI.GetInstance('editor1');
+            var data = oEditor.GetHTML();
+            update_jobs_instructor(data);
+        }
+
+        if (event.target.id == 'save_jobs_student') {
+            var oEditor = FCKeditorAPI.GetInstance('editor2');
+            var data = oEditor.GetHTML();
+            update_jobs_student(data);
+        }
+
         if (event.target.id == 'filter') {
             filter();
         }
@@ -3414,6 +3452,69 @@ $(document).ready(function () {
         });
     }
 
+    function get_renew_certification_page() {
+        var url = "/lms/custom/certificates/get_renew_certification_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function update_renew_certification_page(data) {
+        var url = "/lms/custom/certificates/update_renew_certification_page.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully updated. </p>");
+        });
+    }
+
+    function get_financial_aid_page() {
+        var url = "/lms/custom/aid/get_financial_aid_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function update_financial_aid_page(data) {
+        var url = "/lms/custom/aid/update_financial_page.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully updated. </p>");
+        });
+    }
+
+    function update_financial_aid_workshop(data) {
+        var url = "/lms/custom/aid/update_financial_workshop.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully updated. </p>");
+        });
+    }
+
+    function update_financial_aid_college(data) {
+        var url = "/lms/custom/aid/update_financial_college.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully updated. </p>");
+        });
+    }
+
+    function get_jobs_page() {
+        var url = "/lms/custom/jobs/get_jobs_page.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
+        });
+    }
+
+    function update_jobs_instructor(data) {
+        var url = "/lms/custom/jobs/update_jobs_instructor.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully updated. </p>");
+        });
+    }
+
+    function update_jobs_student(data) {
+        var url = "/lms/custom/jobs/update_jobs_student.php";
+        $.post(url, {data: data}).done(function () {
+            $('#region-main').html("<p align='center'>Data successfully updated. </p>");
+        });
+    }
+
     function get_late_fee_page() {
         var url = "/lms/custom/late/index.php";
         $.post(url, {id: 1}).done(function (data) {
@@ -3796,6 +3897,18 @@ $(document).ready(function () {
     $("#contact_page").click(function (event) {
         update_navigation_status__menu('Contact page');
         get_contact_page();
+    });
+    $("#renew_cert_page").click(function (event) {
+        update_navigation_status__menu('Renew Certification');
+        get_renew_certification_page();
+    });
+    $("#aid").click(function (event) {
+        update_navigation_status__menu('Financial Aid');
+        get_financial_aid_page();
+    });
+    $("#jobs").click(function (event) {
+        update_navigation_status__menu('Jobs page');
+        get_jobs_page();
     });
     $("#late_fee").click(function (event) {
         update_navigation_status__menu('Late Fee Settings');

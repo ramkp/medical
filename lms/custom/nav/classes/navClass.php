@@ -266,7 +266,7 @@ class navClass extends Util {
     }
 
     function get_report_tab_items($roleid) {
-        $list="";
+        $list = "";
         $query = "select p.id, p.category, p.item, r.permid, r.roleid "
                 . "from mdl_special_permissions p, mdl_role2perm r "
                 . "where p.category='reports' "
@@ -503,7 +503,9 @@ class navClass extends Util {
                                      <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
                                     <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
                                     <li><a href='#' title='FAQ' id='faq'>FAQ</a></li>
-                                    
+                                    <li><a href='#' title='Renew Certification Page' id='renew_cert_page'>Renew Certification</a></li> 
+                                    <li><a href='#' title='jobs' id='jobs'>Jobs Page</a></li> 
+                                    <li><a href='#' title='Financial Aid Page' id='aid'>Financial Aid</a></li>
                                     <li><a href='#' title='Photo Gallery' id='Photo_Gallery'>Photo Gallery</a></li>
                                     <li><a href='#' title='Terms' id='terms'>Terms & Conditions</a></li> 
                                 </ul>
@@ -739,7 +741,10 @@ class navClass extends Util {
                             <li class='dropdown'><a title='Invoices' class='dropdown-toggle' href='#'>Manage Site Pages<b class='caret'></b></a>
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='About' id='about'>About page</a></li>
-                                     <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
+                                    <li><a href='#' title='Contact Page' id='contact_page'>Contact Page</a></li>
+                                    <li><a href='#' title='Renew Certification Page' id='renew_cert_page'>Renew Certification</a></li> 
+                                    <li><a href='#' title='Financial Aid Page' id='aid'>Financial Aid</a></li> 
+                                    <li><a href='#' title='jobs' id='jobs'>Jobs Page</a></li> 
                                     <li><a href='#' title='Testimonial' id='Testimonial'>Clients</a></li> 
                                     <li><a href='#' title='FAQ' id='faq'>FAQ</a></li>
                                     <li><a href='#' title='Index page' id='index'>Index page</a></li>
