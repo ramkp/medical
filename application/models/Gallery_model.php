@@ -188,7 +188,7 @@ class Gallery_model extends CI_Model {
     
     function get_galllery_thumbs2($state = null, $month = null, $year = null, $full = false) {
         $list = "";
-        $list.="<link rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+        $list.="
                 <link rel='stylesheet' href='//blueimp.github.io/Gallery/css/blueimp-gallery.min.css'>
                 <link rel='stylesheet' href='http://mdeical2.com/css/bootstrap-image-gallery.min.css'>";
         
