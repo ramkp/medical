@@ -11,7 +11,7 @@
                     </a> Powered  By Z&S &nbsp;&nbsp;                                                                
                     <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/about">About Us</a>&nbsp;
                     <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/map">Site Map</a>&nbsp;
-                    <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/contact">Contact</a>&nbsp;
+                    <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/contact/contact">Contact</a>&nbsp;
 
                     <!-- Social sharing buttons -->
                     <span class='st_facebook_large' displayText='Facebook'></span>

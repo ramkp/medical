@@ -2564,40 +2564,9 @@ class register_model extends CI_Model {
 
     function get_map_data() {
         $list = "";
-        $locations = $this->get_location_dropdown();
         $list.="<div class='container-fluid' style='text-align:center;'>";
         $list.="<span class='span4'><img src='https://medical2.com/assets/img/m2.jpg' class='img-rounded' width='100%' height='100%'></span>";
         $list.="</div><br>";
-
-
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span4'>Phone: 877-741-1996</span>";
-        $list.="</div><br>";
-
-        $query = "select * from mdl_campus";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $list.="<div class='container-fluid' style='text-align:left;'>";
-            $list.="<span class='span4'>$row->campus_desc</span>";
-            $list.="</div><br>";
-        }
-
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span4' style='padding-left:6px;'><input type='text'id='start'  placeholder='Your Location ...' style='width:282px;'></span>";
-        $list.="</div>";
-
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span4' style='padding-left:6px;'>$locations</span>";
-        $list.="</div>";
-
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span4' style='padding-left:4px;color:red;' id='map_err'></span>";
-        $list.="</div>";
-
-        $list.="<div class='container-fluid' style='text-align:left;'>";
-        $list.="<span class='span4'><button class='btn btn-primary' id='get_driver_directions' style='width:300px;'>Get Driving Directions</button></span>";
-        $list.="</div>";
-
         return $list;
     }
 
@@ -2611,7 +2580,13 @@ class register_model extends CI_Model {
 
         $list.="<div class='container-fluid' style='1px solid #ccc;'>";
         $list.="<div class='span4' style=''>$map</div>";
-        $list.="<div class='span6' id='map' style='border: 1px solid #ccc;height:475px'></div>";
+        $list.="<span class='span8'><iframe
+            width='100%'
+            height='465px'
+            frameborder='0' style='border:0'
+            src='https://www.google.com/maps/embed/v1/place?key=AIzaSyAo9XGd-Ss75Cnfqqu41SdDvlwRu1WYKB0
+            &q=Medical2+Inc, Tupelo+MS' allowfullscreen>
+            </iframe></span>";
         $list.="</div>";
 
         $list.="</div>"; // end of panel-body

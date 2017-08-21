@@ -159,11 +159,6 @@ $host = $_SERVER['HTTP_HOST'];
 
         </noscript>
 
-        <!--
-        <link rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
-        <link rel='stylesheet' href='//blueimp.github.io/Gallery/css/blueimp-gallery.min.css'>
-        <link rel='stylesheet' href='//assets/gallery/css/bootstrap-image-gallery.min.css'>
-        -->
         <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     </head>
 
@@ -213,25 +208,26 @@ $host = $_SERVER['HTTP_HOST'];
 
                                     <li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Certification Workshops+<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
-                                        <!--<li><a class="dropdown-toggle" href="http://<?php echo $host ?>/index.php/programs/program/5" id="ws"  title="">Healthcare Career Courses </a></li>-->
-                                            <!--
-                                            <li><a href="http://<?php echo $host ?>/programs/program/2" id="cs" title="">Hands-On Certification Workshops</a></li>                                            
-                                            <li><a href="http://<?php echo $host ?>/programs/program/3/" id="exam" title="">CEUs & Online Courses</a></li>
-                                            <li><a href="http://<?php echo $host ?>/programs/program/4/" id="college" title="">Online Certification Exams</a></li>                     
-                                            -->
-                                            <li><a href="https://<?php echo $host ?>/programs/program/certification-workshops" id="cs" title="">Workshops & Schedule</a></li>                                            
+                                            <li><a href="https://<?php echo $host ?>/programs/program/certification-workshops" id="cs" title="">Workshops & Schedule</a></li>
+                                            <li><a href="https://<?php echo $host ?>/groups/private_groups"  id="group" title="Private Groups">Private Groups</a></li>
+                                            <li><a href="https://<?php echo $host ?>/certs/renew_certification"  id="rencert" title="Renew Certification">Renew Certification</a></li>
+                                            <li><a href="https://<?php echo $host ?>/certs/verify_certification"  id="cert" title="Verify Certification">Verify Certification</a></li>
+                                            <li><a href="https://<?php echo $host ?>/programs/program/certification-exams/" id="college" title="">Online Certification Exams</a></li>
                                             <li><a href="https://<?php echo $host ?>/programs/program/online-courses/" id="exam" title="">CEUs & Online Courses</a></li>
-                                            <li><a href="https://<?php echo $host ?>/programs/program/certification-exams/" id="college" title="">Online Certification Exams</a></li>                     
                                         </ul>
                                     </li>                                    
                                     <li><a href="https://<?php echo $host ?>/register2/brain_register"  id="register_item" title="Register">Register</a></li> 
-                                    <!-- <li><a href="https://<?php echo $host ?>/register2/index"  id="register_item" title="Register">Register</a></li> -->
                                     <li><a href="https://<?php echo $host ?>/clients"  id="testimonial" title="Clients">Clients</a></li>
-                                    <li><a href="https://<?php echo $host ?>/faq"  id="faq_item" title="FAQ’s">FAQ’s</a></li>
+                                    <li>
+                                    
+                                    <li class="dropdown"><a title="Financial Aid"  class="dropdown-toggle" href="#">Financial Aid<b class="caret"></b></a>
+                                        <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
+                                            <li><a href="https://<?php echo $host ?>/index.php/aid/workshop" id="aid_workshop" title="Workshop">For Workshops</a></li>                                            
+                                            <li><a href="https://<?php echo $host ?>/index.php/aid/college" id="aid_college" title="College">For College</a></li>                                            
+                                        </ul>
+                                    </li>
 
-                                    <li id='login_link'><a href="https://<?php echo $host ?>/login" title="Login">Login</a></li>    
-
-                                    <li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">Career College Courses<b class="caret"></b></a>
+                                    <li class="dropdown"><a title="Programs"  class="dropdown-toggle" href="#">College Courses<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
                                             <li><a class="dropdown-toggle" href="https://<?php echo $host ?>/programs/program/career-courses" id="ws"  title="">Healthcare Career Courses </a></li>
                                             <li><a href="https://<?php echo $host ?>/index.php/register2/school_app" id="sch" title="School Application">School Application</a></li>                                            
@@ -239,18 +235,22 @@ $host = $_SERVER['HTTP_HOST'];
                                         </ul>
                                     </li>                                    
                                     
+                                     
+                                    <li><a href="https://<?php echo $host ?>/gallery/photo_gallery"  id="gallery" title="Photo Gallery">Gallery</a></li>
+                                  
                                     
-                                    <li><a href="https://<?php echo $host ?>/gallery/photo_gallery"  id="gallery" title="Photo Gallery">Gallery</a></li>     
                                     
-                                    
-                                    <li class="dropdown"><a title="More" class="dropdown-toggle" href="#cm_submenu_2">More<b class="caret"></b></a>
+                                    <li class="dropdown"><a title="Jobs" class="dropdown-toggle" href="#cm_submenu_2">Jobs<b class="caret"></b></a>
                                         <ul class="dropdown-menu">                                            
-                                            <li><a href="https://<?php echo $host ?>/certs/verify_certification"  id="cert" title="Verify Certification">Verify Certification</a></li>
-                                            <li><a href="https://<?php echo $host ?>/groups/private_groups"  id="group" title="Private Groups">Private Groups</a></li>
-                                            <!--<li><a href="https://<?php echo $host ?>/gallery/photo_gallery"  id="gallery" title="Photo Gallery">Photo Gallery</a></li>-->                                            
+                                            <li><a href="https://<?php echo $host ?>/jobs/instructor"  id="jobs_instructor" title="Instructor Opportunity">Instructor Opportunity</a></li>
+                                            <li><a href="https://<?php echo $host ?>/jobs/find"  id="jobs_student" title="Find Job">Find Job</a></li>
+                                                                                     
                                         </ul>
                                     </li>
-
+                                     
+                                     <li><a href="https://<?php echo $host ?>/faq"  id="faq_item" title="FAQ’s">Help</a></li>
+                                     <li id='login_link'><a href="https://<?php echo $host ?>/login" title="Login">Login</a></li>
+                                     
                                 </ul>
                                 <div class="nav-divider-right"></div>                                
                             </div>                      

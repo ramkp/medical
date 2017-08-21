@@ -5,7 +5,8 @@ echo $data;
 <script type="text/javascript">
 
     $(document).ready(function () {
-
+        
+        /*
         var url = "https://medical2.com/index.php/register2/get_campus_data";
         $.post(url, {id: 1}).done(function (data) {
             var $obj_data = jQuery.parseJSON(data);
@@ -46,7 +47,7 @@ echo $data;
             document.getElementById('get_driver_directions').addEventListener('click', onChangeHandler);
 
         }); // end if post
-
+        */
 
 
         function calculateAndDisplayRoute(directionsService, directionsDisplay) {
