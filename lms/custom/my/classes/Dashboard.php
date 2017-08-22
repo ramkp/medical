@@ -37,6 +37,7 @@ class Dashboard extends Util {
     public $free_courses;
     public $free_users;
     public $CNA_COURSE = 41;
+    public $CNA_HOURS = 96;
 
     function __construct() {
         parent::__construct();
@@ -2498,7 +2499,7 @@ class Dashboard extends Util {
         $rbox = $this->get_race_box();
         $sbox = $this->get_sex_box();
         $edubox = $this->get_edu_box();
-        $birthdate=$this->get_user_birth_date();
+        $birthdate = $this->get_user_birth_date();
         $incomebox = $this->get_income_box();
         $startdate = $this->get_medical2_start_date();
         $job_box = $this->get_job_type_box();
@@ -2510,13 +2511,13 @@ class Dashboard extends Util {
         $workbox = $this->get_work_box();
 
         $list.="<input type='hidden' id='profile_userid' value='$userid'>";
-        
+
         $list.="<div class='row-fluid'>";
         $list.="<span class='span2'>Birth date</span>";
         $list.="<span class='span2'>$birthdate</span>";
         $list.="</div>";
 
-        
+
         $list.="<div class='row-fluid'>";
         $list.="<span class='span2'>Marital status</span>";
         $list.="<span class='span2'>$mbox</span>";
@@ -2652,7 +2653,7 @@ class Dashboard extends Util {
 
         $mbox = $this->get_marital_status_box($demo->mstatus);
         $rbox = $this->get_race_box($demo->race);
-        $birthdate=$this->get_user_birth_date($demo->birth);
+        $birthdate = $this->get_user_birth_date($demo->birth);
         $sbox = $this->get_sex_box($demo->sex);
         $edubox = $this->get_edu_box($demo->edlevel);
         $incomebox = $this->get_income_box($demo->incomelevel);
@@ -2666,12 +2667,12 @@ class Dashboard extends Util {
         $workbox = $this->get_work_box($demo->work15);
 
         $list.="<input type='hidden' id='profile_userid' value='$userid'>";
-        
+
         $list.="<div class='row-fluid'>";
         $list.="<span class='span2'>Birth date</span>";
         $list.="<span class='span2'>$birthdate</span>";
         $list.="</div>";
-        
+
         $list.="<div class='row-fluid'>";
         $list.="<span class='span2'>Marital status</span>";
         $list.="<span class='span2'>$mbox</span>";
@@ -5688,6 +5689,265 @@ class Dashboard extends Util {
                 . "'$data->date',"
                 . "'$data->job_type')";
         $this->db->query($query);
+    }
+
+    function get_course_enrollment_methods($courseid) {
+        $query = "select * from mdl_enrol where courseid=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $enrolls[] = $row['id'];
+        }
+        $enrols_list = implode(',', $enrolls);
+        return $enrols_list;
+    }
+
+    function is_student_certified($courseid, $userid) {
+        $query = "select * from mdl_certificates "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_student_course_average_grades($courseid, $userid) {
+        //echo "Course id: " . $courseid . "<br>";
+        //echo "User id: " . $userid . "<br>";
+        $average = 0;
+        $enrolls_list = $this->get_course_enrollment_methods($courseid);
+        //echo "Enrolls list: ".$enrolls_list."<br>";
+        $query = "select * from mdl_user_enrolments "
+                . "where userid=$userid "
+                . "and enrolid in ($enrolls_list)";
+        $num = $this->db->numrows($query);
+        //echo "Num: ".$num."<br>";
+        if ($num > 0) {
+            $is_certified = $this->is_student_certified($courseid, $userid);
+            if ($is_certified > 0) {
+                $total_grade = 0;
+                $total_grade_max = 0;
+                $gr = new Grades;
+                $grades = $gr->get_student_grades($courseid, $userid);
+
+                /*
+                  echo "<pre>";
+                  print_r($grades);
+                  echo "</pre>";
+                 */
+
+                if (count($grades) > 0) {
+                    foreach ($grades as $gradeitem) {
+                        $total_grade = $total_grade + $gradeitem->grade;
+                        $total_grade_max = $total_grade_max + $gradeitem->max;
+                    } // end foreach
+                    $average = round(($total_grade / $total_grade_max) * 100);
+                } // end if count($grades) > 0
+            } // end if $is_certified>0
+        } // end if $num>0
+        return $average;
+    }
+
+    function get_grade_letter($grade) {
+        if ($grade >= 95 && $grade <= 100) {
+            $letter = 'A';
+        }
+        if ($grade >= 88 && $grade <= 94) {
+            $letter = 'B';
+        }
+        if ($grade >= 80 && $grade <= 87) {
+            $letter = 'C';
+        }
+        return $letter;
+    }
+
+    function get_student_demographic_data($userid) {
+        $query = "select * from mdl_demographic where userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $user = new stdClass();
+            foreach ($row as $key => $value) {
+                $user->$key = $value;
+            } // end fofeach
+        } // end while
+        return $user;
+    }
+
+    function get_cna_student_block($userid) {
+        $list = "";
+        $grade = $this->get_student_course_average_grades($this->CNA_COURSE, $userid);
+        $cnahours = $this->CNA_HOURS;
+        $letter = $this->get_grade_letter($grade);
+        $hours = $this->CNA_HOURS;
+        $data = $this->get_student_demographic_data($userid);
+        $start = $data->startdate;
+        $graduate = $data->graduatedate;
+        $list.="<br><table border='0' width='100%'>";
+        $list.="<tr>";
+        $list.="<td colspan='3' style='text-align:left;font-weight:bold;'>Program of Study: Certified Nurse Assistant</td>";
+        $list.="<td colspan='3' style='text-align:right;font-weight:bold;'>Credential: Certificate</td>";
+        $list.="</tr>";
+
+        $list.="<tr style='background-color:#DFDDDD;'>";
+        $list.="<td>Code</td>";
+        $list.="<td>Course</td>";
+        $list.="<td>Title</td>";
+        $list.="<td>Grade</td>";
+        $list.="<td>Letter</td>";
+        $list.="<td>Hours</td>";
+        $list.="</tr>";
+
+        $list.="<tr style='background-color:#FBFBFB;'>";
+        $list.="<td>CNA</td>";
+        $list.="<td>CNA</td>";
+        $list.="<td>Certified Nurse Assistant</td>";
+        $list.="<td>$grade</td>";
+        $list.="<td>$letter</td>";
+        $list.="<td>$hours</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td style='font-weight:bold;'>Start: $start</td>";
+        $list.="<td style='font-weight:bold;'>Graduation: $graduate</td>";
+        $list.="<td style='font-weight:bold;'>Total Hours: $cnahours</td>";
+        $list.="<td style='font-weight:bold;'>CGPA: $grade</td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+
+
+        return $list;
+    }
+
+    function get_transcript_report_logo_part() {
+        $list = "";
+        $list.="<table align='center' border='0' width='100%'>
+                    <tr>
+                        <td style='text-align:center;'><img src='https://medical2.com/assets/logo/5.png' width='350' height='90'></td>
+                    </tr>
+                    <tr>
+                    <td>
+                        <table style='padding:15px;font-size:12px;' align='center' border='0'>
+
+                                <tr>
+                                    <td style='text-align:center;padding-top:10px;padding-left:75px;font-size:15px;font-weight:bold;'>1830A North Gloster Street</td>
+                                </tr>  
+
+                                <tr>
+                                    <td style='text-align:center;padding-left:90px;font-size:15px;font-weight:bold;'>Tupelo, MS 38804</td>
+                                </tr>  
+                                
+                                <tr>
+                                    <td style='text-align:center;padding-left:90px;font-size:15px;font-weight:bold;'>877-741-1996</td>
+                                </tr>  
+
+                            </table>
+                    </td>
+                    </tr>
+                    </table>";
+
+        return $list;
+    }
+
+    function get_transcript_officials_block() {
+        $list = "";
+        $list.="<table align='right'>";
+        $list.="<tr><td>";
+        $list.="<p style='font-size:20px;font-weight:bold;'>Shahid</p>";
+        $list.="<p style='font-size:20px;font-weight:bold;'>Malik</p>";
+        $list.="<p>Medical2 Career College President</p>";
+        $list.="<br><p style='font-size:20px;font-weight:bold;'>Donna</p>";
+        $list.="<p style='font-size:20x;font-weight:bold;'>Steele</p>";
+        $list.="<p>Medical2 Career College Director</p>";
+        $list.="</td></tr>";
+        $list.="</table>";
+        return $list;
+    }
+
+    function get_student_birth_date($userid) {
+        $query = "select * from mdl_demographic where userid=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $db_birth = $row['birth'];
+        }
+        $birthdate = ($db_birth == '') ? 'N/A' : $db_birth;
+        return $birthdate;
+    }
+
+    function get_student_address_block($userid) {
+        $list = "";
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $address = $row['address'];
+            $city = $row['city'];
+            $state = $row['state'];
+            $zip = $row['zip'];
+        }
+        $list.="<p>$address</p>";
+        $list.="<p>$city, $state $zip</p>";
+        return $list;
+    }
+
+    function get_transcript_user_block($userid) {
+        $list = "";
+        $userdata = $this->get_user_details($userid);
+        $address = $this->get_student_address_block($userid);
+        $fname = $userdata->firstname;
+        $lname = $userdata->lastname;
+        $birthdate = $this->get_student_birth_date($userid);
+        $list.="<p>Student name: $fname $lname</p>";
+        $list.="<br><p>Year of Birth: $birthdate</p>";
+        $list.="<br><p>Address: $address</p>";
+        return $list;
+    }
+
+    function print_script_grades_pdf_report($userid) {
+        $list = "";
+
+        $logoblock = $this->get_transcript_report_logo_part();
+        $officialblock = $this->get_transcript_officials_block();
+        $userblock = $this->get_transcript_user_block($userid);
+        $cna = $this->get_cna_student_block($userid);
+
+        $list.="<html>";
+        $list.="<head>";
+
+        $list.="</head>";
+        $list.="<body>";
+
+        $list.="<table align='center' width='100%' border='0'>";
+
+        $list.="<tr valign='top'>";
+        $list.="<td>$userblock</td>";
+        $list.="<td align='left'>$logoblock</td>";
+        $list.="<td align='right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$officialblock</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='3'>$cna</td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+
+        $list.="";
+
+
+
+        $list.="</body>";
+        $list.="</html>";
+
+        $dir = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/my';
+        $file = $userid . "_script_grades.pdf";
+        $file2 = $userid . "_script_grades.html";
+        $path = $dir . "/$file";
+        $path2 = $dir . "/$file2";
+
+        $pdf = new mPDF('utf-8', 'A4-L');
+        $pdf->WriteHTML($list);
+        $pdf->Output($path, 'F');
+
+
+        file_put_contents($path2, $list);
+        return $file;
     }
 
 }

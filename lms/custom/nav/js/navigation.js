@@ -6994,10 +6994,21 @@ $(document).ready(function () {
             var userid = $('#userid').val();
             var url = "/lms/custom/my/print_grades.php";
             $.post(url, {userid: userid}).done(function (filename) {
-                var url2 = "http://medical2.com/lms/custom/grades/" + userid + '/' + filename;
+                var url2 = "https://medical2.com/lms/custom/grades/" + userid + '/' + filename;
                 var oWindow = window.open(url2, "print");
             });
         }
+
+        if (event.target.id == 'print_transctipt_grades') {
+            var userid = $('#userid').val();
+            var url = "/lms/custom/my/print_script_grades.php";
+            $.post(url, {userid: userid}).done(function (filename) {
+                console.log('Filename: '+filename);
+                var url2 = "https://medical2.com/lms/custom/my/" + filename;
+                var oWindow = window.open(url2, "print");
+            });
+        }
+
 
         if (event.target.id == 'print_att') {
             var userid = $('#userid').val();
@@ -7039,7 +7050,7 @@ $(document).ready(function () {
         if (event.target.id == 'insert_demographic_info') {
             var userid = $('#profile_userid').val();
             var marital = $('#mstatus').val();
-            var birth=$('#birth').val();
+            var birth = $('#birth').val();
             var sex = $('#sexbox').val();
             var race = $('#racebox').val();
             var education = $('#edu_box').val();
@@ -7098,7 +7109,7 @@ $(document).ready(function () {
             var marital = $('#mstatus').val();
             var sex = $('#sexbox').val();
             var race = $('#racebox').val();
-            var birth=$('#birth').val();
+            var birth = $('#birth').val();
             var education = $('#edu_box').val();
             var income = $('#income_box').val();
             var start_date = $('#start_date').val();
