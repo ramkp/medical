@@ -38,6 +38,7 @@ class Dashboard extends Util {
     public $free_users;
     public $CNA_COURSE = 41;
     public $CNA_HOURS = 96;
+    public $OTHER_COLLEGE_COURSES;
 
     function __construct() {
         parent::__construct();
@@ -59,6 +60,7 @@ class Dashboard extends Util {
             'state');
         $this->free_courses = array(73);
         $this->free_users = array(11772, 11773, 13734);
+        $this->OTHER_COLLEGE_COURSES = array(55, 56, 60, 61, 62, 68, 75);
     }
 
     function is_user_paid() {
@@ -5709,20 +5711,35 @@ class Dashboard extends Util {
         return $num;
     }
 
+    function is_student_has_special_status($userid) {
+        $query = "select * from mdl_demographic where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $status = $row['school_status'];
+            } // end while
+        } // end if $num>0
+        else {
+            $status = 'N';
+        }
+        return $status;
+    }
+
     function get_student_course_average_grades($courseid, $userid) {
         //echo "Course id: " . $courseid . "<br>";
         //echo "User id: " . $userid . "<br>";
         $average = 0;
-        $enrolls_list = $this->get_course_enrollment_methods($courseid);
-        //echo "Enrolls list: ".$enrolls_list."<br>";
-        $query = "select * from mdl_user_enrolments "
-                . "where userid=$userid "
-                . "and enrolid in ($enrolls_list)";
-        $num = $this->db->numrows($query);
-        //echo "Num: ".$num."<br>";
-        if ($num > 0) {
-            $is_certified = $this->is_student_certified($courseid, $userid);
-            if ($is_certified > 0) {
+        $status = $this->is_student_has_special_status($userid);
+        if ($status == 'A' || $status == 'G') {
+            $enrolls_list = $this->get_course_enrollment_methods($courseid);
+            //echo "Enrolls list: ".$enrolls_list."<br>";
+            $query = "select * from mdl_user_enrolments "
+                    . "where userid=$userid "
+                    . "and enrolid in ($enrolls_list)";
+            $num = $this->db->numrows($query);
+            //echo "Num: ".$num."<br>";
+            if ($num > 0) {
                 $total_grade = 0;
                 $total_grade_max = 0;
                 $gr = new Grades;
@@ -5741,8 +5758,8 @@ class Dashboard extends Util {
                     } // end foreach
                     $average = round(($total_grade / $total_grade_max) * 100);
                 } // end if count($grades) > 0
-            } // end if $is_certified>0
-        } // end if $num>0
+            } // end if $num>0
+        } // end if $status=='A' || $status=='G'
         return $average;
     }
 
@@ -5754,6 +5771,9 @@ class Dashboard extends Util {
             $letter = 'B';
         }
         if ($grade >= 80 && $grade <= 87) {
+            $letter = 'C';
+        }
+        if ($grade < 80) {
             $letter = 'C';
         }
         return $letter;
@@ -5774,44 +5794,144 @@ class Dashboard extends Util {
     function get_cna_student_block($userid) {
         $list = "";
         $grade = $this->get_student_course_average_grades($this->CNA_COURSE, $userid);
-        $cnahours = $this->CNA_HOURS;
-        $letter = $this->get_grade_letter($grade);
-        $hours = $this->CNA_HOURS;
-        $data = $this->get_student_demographic_data($userid);
-        $start = $data->startdate;
-        $graduate = $data->graduatedate;
-        $list.="<br><table border='0' width='100%'>";
-        $list.="<tr>";
-        $list.="<td colspan='3' style='text-align:left;font-weight:bold;'>Program of Study: Certified Nurse Assistant</td>";
-        $list.="<td colspan='3' style='text-align:right;font-weight:bold;'>Credential: Certificate</td>";
-        $list.="</tr>";
+        if ($grade != -1 && $grade != 0) {
+            $cdata = $this->get_course_detailes($this->CNA_COURSE);
+            $fullname = $cdata->fullname;
+            $shortname = $cdata->shortname;
+            $code = $cdata->idnumber;
+            $letter = $this->get_grade_letter($grade);
+            $hours = $this->get_course_hours($this->CNA_COURSE);
+            $data = $this->get_student_demographic_data($userid);
+            $start = $data->startdate;
+            $graduate = $data->graduatedate;
+            $list.="<br><table border='0' width='100%'>";
+            $list.="<tr>";
+            $list.="<td colspan='3' style='text-align:left;font-weight:bold;'>Program of Study: Certified Nurse Assistant</td>";
+            $list.="<td colspan='3' style='text-align:right;font-weight:bold;'>Credential: Certificate</td>";
+            $list.="</tr>";
 
-        $list.="<tr style='background-color:#DFDDDD;'>";
-        $list.="<td>Code</td>";
-        $list.="<td>Course</td>";
-        $list.="<td>Title</td>";
-        $list.="<td>Grade</td>";
-        $list.="<td>Letter</td>";
-        $list.="<td>Hours</td>";
-        $list.="</tr>";
+            $list.="<tr style='background-color:#DFDDDD;'>";
+            $list.="<td>Code</td>";
+            $list.="<td>Course</td>";
+            $list.="<td>Title</td>";
+            $list.="<td>Grade</td>";
+            $list.="<td>Letter</td>";
+            $list.="<td>Hours</td>";
+            $list.="</tr>";
 
-        $list.="<tr style='background-color:#FBFBFB;'>";
-        $list.="<td>CNA</td>";
-        $list.="<td>CNA</td>";
-        $list.="<td>Certified Nurse Assistant</td>";
-        $list.="<td>$grade</td>";
-        $list.="<td>$letter</td>";
-        $list.="<td>$hours</td>";
-        $list.="</tr>";
+            $list.="<tr style='background-color:#FBFBFB;'>";
+            $list.="<td>$code</td>";
+            $list.="<td>$shortname</td>";
+            $list.="<td>$fullname</td>";
+            $list.="<td>$grade</td>";
+            $list.="<td>$letter</td>";
+            $list.="<td>$hours</td>";
+            $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td style='font-weight:bold;'>Start: $start</td>";
-        $list.="<td style='font-weight:bold;'>Graduation: $graduate</td>";
-        $list.="<td style='font-weight:bold;'>Total Hours: $cnahours</td>";
-        $list.="<td style='font-weight:bold;'>CGPA: $grade</td>";
-        $list.="</tr>";
+            $list.="<tr>";
+            $list.="<td style='font-weight:bold;'>Start: $start</td>";
+            $list.="<td style='font-weight:bold;'>Graduation: $graduate</td>";
+            $list.="<td style='font-weight:bold;'>Total Hours: $hours</td>";
+            $list.="<td style='font-weight:bold;'>CGPA: $grade</td>";
+            $list.="</tr>";
 
-        $list.="</table>";
+            $list.="</table>";
+        } // end if ($grade !=-1) {
+        return $list;
+    }
+
+    function is_user_enrolled_into_other_college_courses($userid) {
+        foreach ($this->OTHER_COLLEGE_COURSES as $courseid) {
+            $enrolls[] = $this->get_course_enrollment_methods($courseid);
+        }
+        $enrolls_list = implode(',', $enrolls);
+        $query = "select * from mdl_user_enrolments "
+                . "where userid=$userid "
+                . "and enrolid in ($enrolls_list)";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_course_detailes($courseid) {
+        $query = "select * from mdl_course where id=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $course = new stdClass();
+            foreach ($row as $key => $value) {
+                $course->$key = $value;
+            } // end fofeach
+        } // end while
+        return $course;
+    }
+
+    function get_course_hours($courseid) {
+        $query = "select * from mdl_course_hours where courseid=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $hours = $row['hours'];
+        }
+        return $hours;
+    }
+
+    function get_other_student_courses_block($userid) {
+        $list = "";
+        $num = $this->is_user_enrolled_into_other_college_courses($userid);
+        if ($num > 0) {
+            $total_grade = 0;
+            $total_hours = 0;
+            $i = 0;
+            $data = $this->get_student_demographic_data($userid);
+            $start = $data->startdate;
+            $graduate = $data->graduatedate;
+            $list.="<table border='0' width='100%'>";
+            $list.="<tr>";
+            $list.="<td colspan='3' style='text-align:left;font-weight:bold;'>Program of Study: Medical Assistant</td>";
+            $list.="<td colspan='3' style='text-align:right;font-weight:bold;'>Credential: Diploma</td>";
+            $list.="</tr>";
+
+            $list.="<tr style='background-color:#DFDDDD;'>";
+            $list.="<td>Code</td>";
+            $list.="<td>Course</td>";
+            $list.="<td>Title</td>";
+            $list.="<td>Grade</td>";
+            $list.="<td>Letter</td>";
+            $list.="<td>Hours</td>";
+            $list.="</tr>";
+
+            $courses = $this->get_user_courses($userid);
+            foreach ($courses as $courseid) {
+                $cdata = $this->get_course_detailes($courseid);
+                $fullname = $cdata->fullname;
+                $shortname = $cdata->shortname;
+                $code = $cdata->idnumber;
+                $grade = $this->get_student_course_average_grades($courseid, $userid);
+                $total_grade = $total_grade + $grade;
+                if ($grade > 0) {
+                    $i++;
+                    $hours = $this->get_course_hours($courseid);
+                    $total_hours = $total_hours + $hours;
+                    $letter = $this->get_grade_letter($grade);
+                    $list.="<tr style='background-color:#FBFBFB;'>";
+                    $list.="<td>$code</td>";
+                    $list.="<td>$shortname</td>";
+                    $list.="<td>$fullname</td>";
+                    $list.="<td>$grade</td>";
+                    $list.="<td>$letter</td>";
+                    $list.="<td>$hours</td>";
+                    $list.="</tr>";
+                } // end if $grade>0
+            } // end foreach
+
+            $cgpa_grade = round(($total_grade / $i));
+            $list.="<tr>";
+            $list.="<td style='font-weight:bold;'>Start: $start</td>";
+            $list.="<td style='font-weight:bold;'>Graduation: $graduate</td>";
+            $list.="<td style='font-weight:bold;'>Total Hours: $total_hours</td>";
+            $list.="<td style='font-weight:bold;'>CGPA: $cgpa_grade</td>";
+            $list.="</tr>";
+
+            $list.="</table>";
+        } // end if $num>0
 
 
         return $list;
@@ -5907,6 +6027,7 @@ class Dashboard extends Util {
         $officialblock = $this->get_transcript_officials_block();
         $userblock = $this->get_transcript_user_block($userid);
         $cna = $this->get_cna_student_block($userid);
+        $ma = $this->get_other_student_courses_block($userid);
 
         $list.="<html>";
         $list.="<head>";
@@ -5924,6 +6045,14 @@ class Dashboard extends Util {
 
         $list.="<tr>";
         $list.="<td colspan='3'>$cna</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='3'>&nbsp;</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='3'>$ma</td>";
         $list.="</tr>";
 
         $list.="</table>";
@@ -5944,7 +6073,6 @@ class Dashboard extends Util {
         $pdf = new mPDF('utf-8', 'A4-L');
         $pdf->WriteHTML($list);
         $pdf->Output($path, 'F');
-
 
         file_put_contents($path2, $list);
         return $file;
