@@ -146,7 +146,7 @@ class Contact_model extends CI_Model {
         $list.="</div>";
 
         $list.="<div class='form-group' style='text-align:left;'>";
-        $list.="<label for='usr'>Message*:</label>";
+        $list.="<label for='usr'>Message:</label>";
         $list.="<textarea class='form-control' rows='5' id='message' style='width:97%;'></textarea>";
         $list.="</div>";
 
@@ -211,6 +211,29 @@ class Contact_model extends CI_Model {
         $list.="<div class='row-fluid'>";
         $list.="<span class='span9' style=''>877-741-1996</span>";
         $list.="</div>";
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span9' style=''>662-432-4175</span>";
+        $list.="</div>";
+        return $list;
+    }
+
+    function get_fax_icon() {
+        $list = "";
+        $list.="<span class='fa-stack fa-2x'>
+                <i class='fa fa-circle-thin fa-stack-2x'></i>
+                <i class='fa fa-fax fa-stack-1x'></i>
+                </span>";
+        return $list;
+    }
+
+    function get_fax_number_block() {
+        $list = "";
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span9' style='font-weight:bold;'>FAX NUMBER:</span>";
+        $list.="</div>";
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span9' style=''>1-407-233-1192</span>";
+        $list.="</div>";
         return $list;
     }
 
@@ -260,6 +283,9 @@ class Contact_model extends CI_Model {
         $phone = $this->get_phone_number_block();
         $phone_icon = $this->get_phone_icon();
 
+        $fax = $this->get_fax_number_block();
+        $fax_icon = $this->get_fax_icon();
+
         $addess = $this->get_address_block();
         $address_icon = $this->get_address_icon();
 
@@ -275,6 +301,15 @@ class Contact_model extends CI_Model {
         $list.="<div class='row-fluid'>";
         $list.="<span class='span2'>$phone_icon</span>";
         $list.="<span class='span6'>$phone</span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span8'><br>&nbsp;<br></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>$fax_icon</span>";
+        $list.="<span class='span6'>$fax</span>";
         $list.="</div>";
 
         $list.="<div class='row-fluid'>";

@@ -1850,7 +1850,7 @@ $(document).ready(function () {
         var message = $('#message').val();
         var captcha = $('#captcha').val();
         var program = $('#program').val();
-        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && message != '' && captcha != '' && program != 0) {
+        if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && captcha != '' && program != 0) {
             var url = "https://" + domain + "/functionality/php/verify_captcha.php";
             var request = {captcha: captcha};
             $.post(url, request).done(function (data) {
@@ -1875,7 +1875,7 @@ $(document).ready(function () {
             });
         } // end if firstname!='' && lastname!=''
         else {
-            $('#contact_result').html("<span style='color:red;'>Please provide all fields and correct email address and captcha</span>");
+            $('#contact_result').html("<span style='color:red;'>Please provide all required fields, correct email address and captcha</span>");
         }
     }
 
