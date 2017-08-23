@@ -255,7 +255,7 @@ $host = $_SERVER['HTTP_HOST'];
                                 <div class="nav-divider-right"></div>                                
                             </div>                      
                             <ul class="nav pull-right">                                
-                                <li class="dropdown"><a href="https://<?php echo $host ?>/search"><img src="https://<?php echo $host ?>/assets/logo/icon-search.png" style="cursor: pointer;" alt="search" id='search_item' /></a></li>
+                                <!--<li class="dropdown"><a href="https://<?php echo $host ?>/search"><img src="https://<?php echo $host ?>/assets/logo/icon-search.png" style="cursor: pointer;" alt="search" id='search_item' /></a></li>-->
                                 <!--<li class="dropdown"><a href="#">Select Language<span style="color: rgb(155, 155, 155);">▼</span></a></li>-->
 
 
@@ -263,12 +263,10 @@ $host = $_SERVER['HTTP_HOST'];
                                 <!--<li class="dropdown"><a><div id="google_translate_element" style="vertical-align:middle;"></div>-->
                                 <!--<li class="dropdown"><span id="google_translate_element" style="vertical-align:middle;"></span></li>-->        
 
+                                <!--
                                 <script type="text/javascript">
                                     var width = $(window).width();
                                     var height = $(window).height();
-                                    //alert ('Screen width: '+width);
-                                    //alert ('Screen height: '+height);
-
                                     var ua = window.navigator.userAgent;
                                     var msie = ua.indexOf("MSIE ");
 
@@ -282,29 +280,12 @@ $host = $_SERVER['HTTP_HOST'];
                                         new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
                                     }
 
-                                    //} // end if msie == 0
-
-                                    /*
-                                     $(window).on("orientationchange", function () {
-                                     $('#translator_container').remove();
-                                     var width = $(window).width();
-                                     if (width >= 1024) {
-                                     document.write('<li class="dropdown" id="translator_container"><span id="google_translate_element" style="vertical-align:middle;"></span></li>');
-                                     }
-                                     else {
-                                     document.write('<li class="dropdown" id="translator_container"><a><span id="google_translate_element" style="vertical-align:middle;"></span></a><br></li>');
-                                     }
-                                     function googleTranslateElementInit() {
-                                     new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
-                                     }
-                                     
-                                     });
-                                     */
-
                                 </script>                                        
 
                                 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
+                                -->
+                                
+                                
                                 <style>
 
                                     div.skiptranslate.goog-te-gadget {

@@ -8,10 +8,11 @@
             <div class="footnote"  style="display:inline-block;vertical-align: middle;">
                 <p>(c) 2016 | <a href="#" target="_blank">
                         <img src="https://<?php echo $_SERVER['SERVER_NAME']; ?>/assets/icons/heart.gif" alt="heart" width="15" height="15">
-                    </a> Powered  By Z&S &nbsp;&nbsp;                                                                
+                    </a> Powered  By Z&S &nbsp;&nbsp; 
+                    <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/contact/contact">Contact Us</a>&nbsp;
                     <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/about">About Us</a>&nbsp;
                     <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/map">Site Map</a>&nbsp;
-                    <a href="https://<?php echo $_SERVER['SERVER_NAME']; ?>/index.php/contact/contact">Contact</a>&nbsp;
+                    
 
                     <!-- Social sharing buttons -->
                     <span class='st_facebook_large' displayText='Facebook'></span>
@@ -23,6 +24,17 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.bbb.org/mississippi/business-reviews/schools-business-and-vocational/medical-2-training-institute-in-tupelo-ms-235827408/#bbbonlineclick" target="_blank" rel="nofollow"><img src="https://seal-ms.bbb.org/seals/blue-seal-200-65-bbb-235827408.png" style="border: 0;" alt="Medical 2 Training Institute BBB Business Review" /></a>
 
                     &nbsp;&nbsp; <img id="trustwaveSealImage" src="https://sealserver.trustwave.com/seal_image.php?customerId=w6oj3BWieZxlpWYB1cFEuNc3HPZL5E&amp;size=105x54&amp;style=invert" border="0" style="cursor:pointer;" onclick="javascript:window.open('https://sealserver.trustwave.com/cert.php?customerId=w6oj3BWieZxlpWYB1cFEuNc3HPZL5E&amp;size=105x54&amp;style=invert', 'c_TW', 'location=no, toolbar=no, resizable=yes, scrollbars=yes, directories=no, status=no, width=615, height=720'); return false;" oncontextmenu="javascript:alert('Copying Prohibited by Law - Trusted Commerce is a Service Mark of TrustWave Holdings, Inc.'); return false;" alt="This site is protected by Trustwave's Trusted Commerce program" title="This site is protected by Trustwave's Trusted Commerce program">
+                   
+                    <script type="text/javascript">
+                                    
+                                    document.write('<span id="google_translate_element" style="vertical-align:middle;"></span>');
+                                    function googleTranslateElementInit() {
+                                        new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+                                    }
+
+                                </script>                                        
+
+                                <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
                 </p>
 
