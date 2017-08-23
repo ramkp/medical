@@ -39,6 +39,7 @@ class Dashboard extends Util {
     public $CNA_COURSE = 41;
     public $CNA_HOURS = 96;
     public $OTHER_COLLEGE_COURSES;
+    public $report_path;
 
     function __construct() {
         parent::__construct();
@@ -61,6 +62,7 @@ class Dashboard extends Util {
         $this->free_courses = array(73);
         $this->free_users = array(11772, 11773, 13734);
         $this->OTHER_COLLEGE_COURSES = array(55, 56, 60, 61, 62, 68, 75);
+        $this->report_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/my';
     }
 
     function is_user_paid() {
@@ -5760,6 +5762,9 @@ class Dashboard extends Util {
                 } // end if count($grades) > 0
             } // end if $num>0
         } // end if $status=='A' || $status=='G'
+        else {
+            $average = -1;
+        }
         return $average;
     }
 
@@ -5774,7 +5779,7 @@ class Dashboard extends Util {
             $letter = 'C';
         }
         if ($grade < 80) {
-            $letter = 'C';
+            $letter = 'F';
         }
         return $letter;
     }
@@ -5793,8 +5798,9 @@ class Dashboard extends Util {
 
     function get_cna_student_block($userid) {
         $list = "";
-        $grade = $this->get_student_course_average_grades($this->CNA_COURSE, $userid);
-        if ($grade != -1 && $grade != 0) {
+        $status = $this->is_student_has_special_status($userid);
+        if ($status == 'A' || $status == 'G') {
+            $grade = $this->get_student_course_average_grades($this->CNA_COURSE, $userid);
             $cdata = $this->get_course_detailes($this->CNA_COURSE);
             $fullname = $cdata->fullname;
             $shortname = $cdata->shortname;
@@ -5804,6 +5810,7 @@ class Dashboard extends Util {
             $data = $this->get_student_demographic_data($userid);
             $start = $data->startdate;
             $graduate = $data->graduatedate;
+
             $list.="<br><table border='0' width='100%'>";
             $list.="<tr>";
             $list.="<td colspan='3' style='text-align:left;font-weight:bold;'>Program of Study: Certified Nurse Assistant</td>";
@@ -5829,14 +5836,54 @@ class Dashboard extends Util {
             $list.="</tr>";
 
             $list.="<tr>";
-            $list.="<td style='font-weight:bold;'>Start: $start</td>";
-            $list.="<td style='font-weight:bold;'>Graduation: $graduate</td>";
+            $list.="<td style='font-weight:bold;'>Start:<br> $start</td>";
+            $list.="<td style='font-weight:bold;'>Graduation:<br> $graduate</td>";
             $list.="<td style='font-weight:bold;'>Total Hours: $hours</td>";
             $list.="<td style='font-weight:bold;'>CGPA: $grade</td>";
             $list.="</tr>";
 
             $list.="</table>";
-        } // end if ($grade !=-1) {
+        } // end if $status == 'A' || $status == 'G'
+        else {
+            $cdata = $this->get_course_detailes($this->CNA_COURSE);
+            $fullname = $cdata->fullname;
+            $shortname = $cdata->shortname;
+            $code = $cdata->idnumber;
+            $data = $this->get_student_demographic_data($userid);
+            $start = $data->startdate;
+            $list.="<br><table border='0' width='100%'>";
+            $list.="<tr>";
+            $list.="<td colspan='3' style='text-align:left;font-weight:bold;'>Program of Study: Certified Nurse Assistant</td>";
+            $list.="<td colspan='3' style='text-align:right;font-weight:bold;'>Credential: Certificate</td>";
+            $list.="</tr>";
+
+            $list.="<tr style='background-color:#DFDDDD;'>";
+            $list.="<td>Code</td>";
+            $list.="<td>Course</td>";
+            $list.="<td>Title</td>";
+            $list.="<td>Grade</td>";
+            $list.="<td>Letter</td>";
+            $list.="<td>Hours</td>";
+            $list.="</tr>";
+
+            $list.="<tr style='background-color:#FBFBFB;'>";
+            $list.="<td>$code</td>";
+            $list.="<td>$shortname</td>";
+            $list.="<td>$fullname</td>";
+            $list.="<td></td>";
+            $list.="<td>$status</td>";
+            $list.="<td></td>";
+            $list.="</tr>";
+
+            $list.="<tr>";
+            $list.="<td style='font-weight:bold;'>Start:<br> $start</td>";
+            $list.="<td style='font-weight:bold;'>Graduation:<br> </td>";
+            $list.="<td style='font-weight:bold;'>Total Hours: </td>";
+            $list.="<td style='font-weight:bold;'>CGPA: </td>";
+            $list.="</tr>";
+
+            $list.="</table>";
+        } // end else
         return $list;
     }
 
@@ -5924,8 +5971,8 @@ class Dashboard extends Util {
 
             $cgpa_grade = round(($total_grade / $i));
             $list.="<tr>";
-            $list.="<td style='font-weight:bold;'>Start: $start</td>";
-            $list.="<td style='font-weight:bold;'>Graduation: $graduate</td>";
+            $list.="<td style='font-weight:bold;'>Start:<br> $start</td>";
+            $list.="<td style='font-weight:bold;'>Graduation:<br> $graduate</td>";
             $list.="<td style='font-weight:bold;'>Total Hours: $total_hours</td>";
             $list.="<td style='font-weight:bold;'>CGPA: $cgpa_grade</td>";
             $list.="</tr>";
@@ -5971,11 +6018,9 @@ class Dashboard extends Util {
         $list = "";
         $list.="<table align='right'>";
         $list.="<tr><td>";
-        $list.="<p style='font-size:20px;font-weight:bold;'>Shahid</p>";
-        $list.="<p style='font-size:20px;font-weight:bold;'>Malik</p>";
+        $list.="<p style='font-size:20px;font-weight:bold;font-family:king;'>Shahid Malik</p>";
         $list.="<p>Medical2 Career College President</p>";
-        $list.="<br><p style='font-size:20px;font-weight:bold;'>Donna</p>";
-        $list.="<p style='font-size:20x;font-weight:bold;'>Steele</p>";
+        $list.="<br><p style='font-size:20px;font-weight:bold;font-family:king;'>Donna Steele</p>";
         $list.="<p>Medical2 Career College Director</p>";
         $list.="</td></tr>";
         $list.="</table>";
@@ -6014,10 +6059,87 @@ class Dashboard extends Util {
         $fname = $userdata->firstname;
         $lname = $userdata->lastname;
         $birthdate = $this->get_student_birth_date($userid);
-        $list.="<p>Student name: $fname $lname</p>";
+        $list.="<p>Student name:<br> $fname $lname</p>";
         $list.="<br><p>Year of Birth: $birthdate</p>";
         $list.="<br><p>Address: $address</p>";
         return $list;
+    }
+
+    function get_grading_scale() {
+        $list = "";
+
+        $list.="<table align='right'>";
+        $list.="<tr>";
+        $list.="<td colspan='3' style='font-weight:bold;'>Medical2 Career College Grading Scale</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>95 to 100</td>";
+        $list.="<td>A</td>";
+        $list.="<td>4.0 GPA</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>88 to 94</td>";
+        $list.="<td>B</td>";
+        $list.="<td>3.0 GPA</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>80 to 87</td>";
+        $list.="<td>C</td>";
+        $list.="<td>2.0 GPA</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Below 80</td>";
+        $list.="<td>F</td>";
+        $list.="<td></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Withdrawal</td>";
+        $list.="<td>W</td>";
+        $list.="<td></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Termination</td>";
+        $list.="<td>X</td>";
+        $list.="<td></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Transfer</td>";
+        $list.="<td>T</td>";
+        $list.="<td></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='3'>&nbsp;</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td colspan='3'>* The grade transferred will be according to the M2CC scale.</td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+
+        return $list;
+    }
+
+    function is_cna_enrolled($courseid, $userid) {
+        $enrolls_list = $this->get_course_enrollment_methods($courseid);
+        $query = "select * from mdl_user_enrolments "
+                . "where userid=$userid "
+                . "and enrolid in ($enrolls_list)";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function is_ma_enrolled($userid) {
+        $num = $this->is_user_enrolled_into_other_college_courses($userid);
+        return $num;
     }
 
     function print_script_grades_pdf_report($userid) {
@@ -6026,9 +6148,9 @@ class Dashboard extends Util {
         $logoblock = $this->get_transcript_report_logo_part();
         $officialblock = $this->get_transcript_officials_block();
         $userblock = $this->get_transcript_user_block($userid);
-        $cna = $this->get_cna_student_block($userid);
-        $ma = $this->get_other_student_courses_block($userid);
-
+        $cna_status = $this->is_cna_enrolled($this->CNA_COURSE, $userid);
+        $ma_status = $this->is_ma_enrolled($userid);
+        $gscale = $this->get_grading_scale();
         $list.="<html>";
         $list.="<head>";
 
@@ -6043,23 +6165,34 @@ class Dashboard extends Util {
         $list.="<td align='right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$officialblock</td>";
         $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td colspan='3'>$cna</td>";
-        $list.="</tr>";
+        if ($cna_status > 0) {
+            $cna = $this->get_cna_student_block($userid);
+            $list.="<tr>";
+            $list.="<td colspan='2'>$cna</td>";
+            if ($ma_status == 0) {
+                $list.="<td>$gscale</td>";
+            } // end if
+            else {
+                $list.="<td>&nbsp;</td>";
+            }
+            $list.="</tr>";
+        } // end if $cna_status > 0
 
         $list.="<tr>";
         $list.="<td colspan='3'>&nbsp;</td>";
         $list.="</tr>";
 
-        $list.="<tr>";
-        $list.="<td colspan='3'>$ma</td>";
-        $list.="</tr>";
+        if ($ma_status > 0) {
+            $ma = $this->get_other_student_courses_block($userid);
+            $list.="<tr>";
+            $list.="<td colspan='2'>$ma</td>";
+            $list.="<td>$gscale</td>";
+            $list.="</tr>";
+        } // end if $ma_status > 0
 
         $list.="</table>";
 
         $list.="";
-
-
 
         $list.="</body>";
         $list.="</html>";
@@ -6071,7 +6204,9 @@ class Dashboard extends Util {
         $path2 = $dir . "/$file2";
 
         $pdf = new mPDF('utf-8', 'A4-L');
-        $pdf->WriteHTML($list);
+        $stylesheet = file_get_contents($this->report_path . '/report.css');
+        $pdf->WriteHTML($stylesheet, 1);
+        $pdf->WriteHTML($list, 2);
         $pdf->Output($path, 'F');
 
         file_put_contents($path2, $list);
