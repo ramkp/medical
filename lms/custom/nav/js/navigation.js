@@ -4611,8 +4611,6 @@ $(document).ready(function () {
             } // end else
         }
 
-
-
         if ($(event.target).attr('class') == 'at_calendar hasDatepicker') {
             console.log('Attendance calendar clicked ...');
             var courseid = $('.at_calendar').data('courseid');
@@ -6058,6 +6056,29 @@ $(document).ready(function () {
 
         console.log('Event ID: ' + event.target.id);
 
+        if (event.target.id.indexOf('payment_details_') >= 0) {
+            var trans_id = event.target.id.replace("payment_details_", "");
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                        .done(function () {
+                            console.log('Script bootstrap.min.js is loaded ...');
+                            var url = "/lms/custom/my/get_payment_details.php";
+                            var request = {trans_id: trans_id};
+                            $.post(url, request).done(function (data) {
+                                $("body").append(data);
+                                $("#myModal").modal('show');
+                                $('#pdate').datepicker();
+                            });
+                        })
+                        .fail(function () {
+                            console.log('Failed to load bootstrap.min.js');
+                        });
+            }
+        }
+
         if (event.target.id == 'show_filer_bar') {
             if ($('#filer_bar1').is(":visible")) {
                 $('#filer_bar1').hide();
@@ -7003,7 +7024,7 @@ $(document).ready(function () {
             var userid = $('#userid').val();
             var url = "/lms/custom/my/print_script_grades.php";
             $.post(url, {userid: userid}).done(function (filename) {
-                console.log('Filename: '+filename);
+                console.log('Filename: ' + filename);
                 var url2 = "https://medical2.com/lms/custom/my/" + filename;
                 var oWindow = window.open(url2, "print");
             });

@@ -569,10 +569,10 @@ class Dashboard extends Util {
                 $transactionid = $row['trans_id'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if ($certificate_date != null && $certificate_date < $row['pdate'] && $expired == 1) {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(Authorize.net TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(Authorize.net&nbsp;" . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) &nbsp; <a class='payment_details' id='payment_details_$transactionid' href='#' style='cursor:pointer;' onClick='return false;' data-transactionid='$transactionid'>Details</a></span>";
                 } // end if 
                 else {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(Authorize.net TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(Authorize.net&nbsp;" . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; $coursename &nbsp; <a class='payment_details' id='payment_details_$transactionid' href='#' onClick='return false;' style='cursor:pointer;' data-transactionid='$transactionid'>Details</a></span>";
                 }
                 if ($status == 0) {
                     $prohibit = $this->get_user_roles($userid);
@@ -608,15 +608,15 @@ class Dashboard extends Util {
                 $transactionid = $row['trans_id'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if (!in_array($row['psum'], $this->renew_payments)) {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree Date: " . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; $coursename &nbsp; <a class='payment_details' href='#' onClick='return false;' style='cursor:pointer;' data-transactionid='$transactionid'>Details</a></span>";
                 } // end if $row['psum']!=$renew_amount
                 else {
                     // Payments are similar to renew, we need to make additional checks
                     if ($certificate_date != null && $certificate_date < $row['pdate'] && $expired == 1) {
-                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) </span>";
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree Date: " . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) &nbsp; <a class='payment_details' href='#' style='cursor:pointer;' onClick='return false;' data-transactionid='$transactionid'>Details</a></span>";
                     } // end if 
                     else {
-                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree TransactionID: $transactionid Date: " . date('m-d-Y h:i:s', $row['pdate']) . ") &nbsp; $coursename </span>";
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree Date: " . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; $coursename &nbsp; <a class='payment_details' href='#' onClick='return false;' style='cursor:pointer;' data-transactionid='$transactionid'>Details</a></span>";
                     }
                 } // end else
                 if ($status == 0) {
@@ -6211,6 +6211,74 @@ class Dashboard extends Util {
 
         file_put_contents($path2, $list);
         return $file;
+    }
+
+    function get_payment_billing_info($trans_id) {
+        $query = "select * from mdl_billing_data "
+                . "where transaction_id='$trans_id'";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $data = new stdClass();
+            foreach ($row as $key => $value) {
+                $data->$key = $value;
+            } // end foreach
+        } // end while
+        return $data;
+    }
+
+    function get_payment_details($trans_id) {
+        $list = "";
+
+        $data = $this->get_payment_billing_info($trans_id); // object
+
+        $list.="<div id='myModal' class='modal fade'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Payment details</h4>
+                </div>
+                <div class='modal-body' style='text-align:center;'>
+                
+                    
+                <div class='container-fluid' style='text-align:left;'>
+                <span class='span2'>Card Holder:</span>
+                <span class='span2'>$data->cardholder</span>
+                </div>
+                
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span2'>Transaction ID:</span>
+                 <span class='span2'>$data->transaction_id</span>
+                 </div>
+                 
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span2'>Address:</span>
+                 <span class='span2'>$data->address</span>
+                 </div>
+                 
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span2'>State:</span>
+                 <span class='span2'>$data->state</span>
+                 </div>
+                 
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span2'>City:</span>
+                 <span class='span2'>$data->city</span>
+                 </div>
+                 
+                 <div class='container-fluid' style='text-align:left;'>
+                 <span class='span2'>Zip:</span>
+                 <span class='span2'>$data->zip</span>
+                 </div>
+               
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+
+        return $list;
     }
 
 }
