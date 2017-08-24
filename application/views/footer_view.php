@@ -27,11 +27,11 @@
                    
                     <script type="text/javascript">
                                     
-                                    document.write('<span id="google_translate_element" style="vertical-align:middle;"></span>');
+                                    document.write('<div id="google_translate_element" style="vertical-align:middle;"></div>');
                                     function googleTranslateElementInit() {
-                                        new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
+                                        //new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: true}, 'google_translate_element');
                                     }
-
+                                   
                                 </script>                                        
 
                                 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
