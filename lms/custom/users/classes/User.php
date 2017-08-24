@@ -179,7 +179,7 @@ class User extends Util {
         $list = "";
         //$users = array();
 
-        /*****************************************************************
+        /*         * ***************************************************************
          * 
          * Function argument could be email, phone, user firstname and
          * user lastname, user firstname, middlename and lastname  and
@@ -281,7 +281,10 @@ class User extends Util {
                 foreach ($row as $key => $value) {
                     $user->$key = $value;
                 }
-                $users[] = $user;
+                $is_deleted = $this->is_user_deleted($row['id']);
+                if ($is_deleted == 0) {
+                    $users[] = $user;
+                } // end if
             } // end while
         } // end if $num > 0
         return $users;
