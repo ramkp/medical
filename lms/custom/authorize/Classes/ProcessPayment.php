@@ -1,6 +1,8 @@
 <?php
 
 ini_set('display_errors', '1');
+ini_set('memory_limit', '1024M'); // or you could use 1G
+set_time_limit(3600);
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/custom/authorize/Api/vendor/autoload.php');
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php';
 require_once ('/home/cnausa/public_html/lms/class.pdo.database.php');
@@ -1236,6 +1238,94 @@ class ProcessPayment {
             $state = $row['state'];
         }
         return $state;
+    }
+
+    /*     * **************** Billing migration code *************** */
+
+    function get_user_details($userid) {
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $user = new stdClass();
+            foreach ($row as $key => $value) {
+                $user->$key = $value;
+            }
+        }
+        return $user;
+    }
+
+    function is_billing_data_exists($trans_id) {
+        $query = "select * from mdl_billing_data where transaction_id='$trans_id'";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function migrate_authorize() {
+        $query = "select * from mdl_card_payments";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $item = new stdClass();
+            $userdata = $this->get_user_details($row['userid']);
+            $item->trans_id = $row['trans_id'];
+            $item->cardholder = $userdata->firstname . ' ' . $userdata->lastname;
+            $item->type = 'a';
+            $item->address = $userdata->address;
+            $item->state = $userdata->state;
+            $item->city = $userdata->city;
+            $item->zip = $userdata->zip;
+            $item->pdate = $row['pdate'];
+            $this->add_billing_data($item);
+        }
+        echo "It is done (authorize)....<br>";
+    }
+
+    function migrate_braintree() {
+        $query = "select * from mdl_card_payments2";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $item = new stdClass();
+            $userdata = $this->get_user_details($row['userid']);
+            $item->trans_id = $row['trans_id'];
+            $item->cardholder = $userdata->firstname . ' ' . $userdata->lastname;
+            $item->type = 'b';
+            $item->address = $userdata->address;
+            $item->state = $userdata->state;
+            $item->city = $userdata->city;
+            $item->zip = $userdata->zip;
+            $item->pdate = $row['pdate'];
+            $this->add_billing_data($item);
+        }
+        echo "It is done (braintree)....<br>";
+    }
+
+    function add_billing_data($item) {
+        $exists = $this->is_billing_data_exists($item->trans_id);
+        //$exists=0; // temp workaround
+        if ($exists == 0) {
+            $query = "insert into mdl_billing_data "
+                    . "(transaction_id,"
+                    . "cardholder,"
+                    . "type,"
+                    . "address,"
+                    . "state,"
+                    . "city,"
+                    . "zip,"
+                    . "pdate) "
+                    . "values ('$item->trans_id',"
+                    . "'" . addslashes($item->cardholder) . "',"
+                    . "'$item->type',"
+                    . "'" . addslashes($item->address) . "',"
+                    . "'$item->state',"
+                    . "'" . addslashes($item->city) . "',"
+                    . "'$item->zip',"
+                    . "'$item->pdate')";
+            echo "Query: " . $query . "<br>";
+            $this->db->query($query);
+        } // end if
+        else {
+            $transid = $item->trans_id;
+            echo "Transaction data $transid exists .... <br>";
+        } // end else
     }
 
 }

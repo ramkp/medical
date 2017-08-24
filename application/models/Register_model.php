@@ -1311,6 +1311,7 @@ class register_model extends CI_Model {
         $is_payment_already_exists = $this->is_payment_exists_in_db($transid);
         if ($is_payment_already_exists == 0) {
             $this->add_group_renew_payment($gpayment);
+            $this->add_billing_data($paymentObj);
             $m = new Mailer();
             $m->send_group_renew_payment_confirmation_message($gpayment);
             $email = $paymentObj->billTo->email;
@@ -1370,6 +1371,84 @@ class register_model extends CI_Model {
             $this->db->query($query);
             $cert->renew_certificate($data->courseid, $userid, $data->period);
         } // end foreach
+    }
+
+    function is_billing_data_exists($trans_id) {
+        $query = "select * from mdl_billing_data where transaction_id='$trans_id'";
+        $result = $this->db->query($query);
+        $num = $result->num_rows();
+        return $num;
+    }
+
+    function add_billing_data($billObj) {
+
+        /*
+         * 
+          stdClass Object
+          (
+          [accountType] => MasterCard
+          [accountNumber] => XXXX9182
+          [transId] => 60028516974
+          [responseCode] => 1
+          [authorization] => IH1YZL
+          [billTo] => stdClass Object
+          (
+          [phoneNumber] =>  380972415427
+          [faxNumber] =>  380972415427
+          [email] => sommw@medical2.com
+          [firstName] => Some
+          [lastName] => User
+          [company] => Student
+          [address] => Some Address
+          [city] => Some City
+          [state] => Alabama
+          [zip] => 69000
+          [country] => USA
+          )
+
+          [shipTo] => stdClass Object
+          (
+          [company] => Student
+          )
+
+          [orderDescription] => Phlebotomy With EKG Certification Workshop
+          [totalAmount] => 450.00
+          [dateTime] => 8/24/2017 12:59:21 PM
+          )
+         * 
+         */
+
+        $item = new stdClass();
+        $item->trans_id = $billObj->transId;
+        $item->cardholder = $billObj->billTo->firstName . ' ' . $billObj->billTo->lastName;
+        $item->type = 'a';
+        $item->address = $billObj->billTo->address;
+        $item->state = $billObj->billTo->state;
+        $item->city = $billObj->billTo->city;
+        $item->zip = $billObj->billTo->zip;
+        $item->pdate = time();
+
+        $exists = $this->is_billing_data_exists($item->trans_id);
+        if ($exists == 0) {
+            $query = "insert into mdl_billing_data "
+                    . "(transaction_id,"
+                    . "cardholder,"
+                    . "type,"
+                    . "address,"
+                    . "state,"
+                    . "city,"
+                    . "zip,"
+                    . "pdate) "
+                    . "values ('$item->trans_id',"
+                    . "'" . addslashes($item->cardholder) . "',"
+                    . "'$item->type',"
+                    . "'" . addslashes($item->address) . "',"
+                    . "'$item->state',"
+                    . "'" . addslashes($item->city) . "',"
+                    . "'$item->zip',"
+                    . "'$item->pdate')";
+            $this->db->query($query);
+        } // end if $exists == 0
     }
 
     function process_auth_payment($payment) {
@@ -1444,6 +1523,7 @@ class register_model extends CI_Model {
 
             $p->confirm_user($user->email);
             $p->add_payment_to_db($user); // adds payment result to DB
+            $this->add_billing_data($paymentObj);
             $p->enroll->add_user_to_course_schedule($user->userid, $user);
 
             //$mailer->send_payment_confirmation_message($user);
@@ -1547,6 +1627,7 @@ class register_model extends CI_Model {
 
             $m = new Mailer();
             $this->add_any_payment_to_db($userdata);
+            $this->add_billing_data($paymentObj);
             $m->send_payment_confirmation_message($userdata);
 
             $list.="<br/><div  class='form_div'>";
@@ -1776,6 +1857,7 @@ class register_model extends CI_Model {
             } // end foreach
 
             $m = new Mailer();
+            $this->add_billing_data($paymentObj);
             $m->send_new_group_payment_confirmation_message($buyer, $users);
 
             $list.="<br/><div  class='form_div'>";
