@@ -4100,6 +4100,23 @@ $(document).ready(function () {
             }
         }
 
+        if (event.target.id.indexOf("btn_") >= 0) {
+            var id = event.target.id.replace("btn_", "");
+            var valid = '#value_' + id;
+            var resid = '#update_result_' + id;
+            var value = $(valid).val();
+            if (value != '') {
+                $(resid).html('');
+                var item = {id: id, value: value};
+                var url = '/lms/custom/contact/update_item.php';
+                $.post(url, {item: JSON.stringify(item)}).done(function (data) {
+                    $(resid).html(data);
+                });
+            } // end if
+            else {
+                $(resid).html('Please provide non-empty value');
+            }
+        }
 
         if (event.target.id.indexOf("faq_edit_") >= 0) {
             var id = event.target.id.replace("faq_edit_", "");

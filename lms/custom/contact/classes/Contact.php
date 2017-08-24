@@ -14,23 +14,25 @@ class Contact extends Util {
         $list = "";
 
         if ($this->session->justloggedin == 1) {
-            $query = "select id, content from mdl_contact_page where id=1";
+            $query = "select * from mdl_contact_page order by item";
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $content = $row['content'];
-            }
-            $oFCKeditor = new FCKeditor('editor');
-            $oFCKeditor->BasePath = $this->editor_path;
-            $oFCKeditor->Value = $content;
-            $editor = $oFCKeditor->Create(false);
-            $list = $list . "<table class='table table-hover' border='0'>";
-            $list = $list . "<tr>";
-            $list = $list . "</td >&nbsp;&nbsp;$editor</td>";
-            $list = $list . "</tr>";
-            $list = $list . "<tr>";
-            $list = $list . "<td align='left' style='padding-left:0px'><button type='button' id='save_contact' class='btn btn-primary' style='spacing-left:0px;'>Save</button></td>";
-            $list = $list . "</tr>";
-            $list = $list . "</table>";
+                $list.="<div class='row-fluid'>";
+                $id = $row['id'];
+                $valueid = "value_$id";
+                $btnid = "btn_$id";
+                $list.="<span class='span2'>" . $row['item'] . "</span>";
+                $list.="<span class='span6'><input style='width:100%' type='text' id='$valueid' value='" . $row['value'] . "'></span>";
+                $list.="<span class='span1'><button class='btn btn-primary' id='$btnid'>Update</button></span>";
+                $list.="</div>";
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span2'>&nbsp;</span>";
+                $list.="<span class='span6' id='update_result_$id'></span>";
+                $list.="</div>";
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span9'><hr/></span>";
+                $list.="</div>";
+            } // end while
         } // end if
         else {
             $list.="<p>You are not authenticated. &nbsp; <a href='https://medical2.com/login'><button class='btn btn-primary' id='relogin'>Login</button></a></p>";
@@ -56,6 +58,15 @@ class Contact extends Util {
                 . "set content='$clean_data' where id=1";
         $this->db->query($query);
         $list = "<p align='center'>Data successfully saved. </p>";
+        return $list;
+    }
+
+    function update_item($item) {
+        $id = $item->id;
+        $value = addslashes($item->value);
+        $query = "update mdl_contact_page set value='$value' where id=$id";
+        $this->db->query($query);
+        $list = "Data updated successfully";
         return $list;
     }
 

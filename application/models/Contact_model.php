@@ -174,13 +174,23 @@ class Contact_model extends CI_Model {
         return $list;
     }
 
+    function get_contact_item_value($item) {
+        $query = "select * from mdl_contact_page where item='$item'";
+        $result = $this->db->query($query);
+        foreach ($result->result() as $row) {
+            $value = $row->value;
+        }
+        return $value;
+    }
+
     function get_email_address_block() {
         $list = "";
+        $value = $this->get_contact_item_value('email');
         $list.="<div class='row-fluid'>";
         $list.="<span class='span9' style='font-weight:bold;'>EMAIL ADDRESS:</span>";
         $list.="</div>";
         $list.="<div class='row-fluid'>";
-        $list.="<span class='span9' style=''>info@medical2.com</span>";
+        $list.="<span class='span9' style=''>$value</span>";
         $list.="</div>";
         return $list;
     }
@@ -205,14 +215,16 @@ class Contact_model extends CI_Model {
 
     function get_phone_number_block() {
         $list = "";
+        $value1 = $this->get_contact_item_value('phone1');
+        $value2 = $this->get_contact_item_value('phone2');
         $list.="<div class='row-fluid'>";
         $list.="<span class='span9' style='font-weight:bold;'>PHONE NUMBER:</span>";
         $list.="</div>";
         $list.="<div class='row-fluid'>";
-        $list.="<span class='span9' style=''>877-741-1996</span>";
+        $list.="<span class='span9' style=''>$value1</span>";
         $list.="</div>";
         $list.="<div class='row-fluid'>";
-        $list.="<span class='span9' style=''>662-432-4175</span>";
+        $list.="<span class='span9' style=''>$value2</span>";
         $list.="</div>";
         return $list;
     }
@@ -228,29 +240,35 @@ class Contact_model extends CI_Model {
 
     function get_fax_number_block() {
         $list = "";
+        $value = $this->get_contact_item_value('fax');
         $list.="<div class='row-fluid'>";
         $list.="<span class='span9' style='font-weight:bold;'>FAX NUMBER:</span>";
         $list.="</div>";
         $list.="<div class='row-fluid'>";
-        $list.="<span class='span9' style=''>1-407-233-1192</span>";
+        $list.="<span class='span9' style=''>$value</span>";
         $list.="</div>";
         return $list;
     }
 
     function get_address_block() {
         $list = "";
+        $value = $this->get_contact_item_value('address');
         $list.="<div class='row-fluid'>";
         $list.="<span class='span9' style='font-weight:bold;'>MAILING ADDRESS:</span>";
         $list.="</div>";
         $list.="<div class='row-fluid'>";
-        $list.="<span class='span9' style=''>Medical2 Career College</span>";
+        $list.="<span class='span9' style=''>$value</span>";
         $list.="</div>";
-        $list.="<div class='row-fluid'>";
-        $list.="<span class='span9' style=''>1830A North Gloster St</span>";
-        $list.="</div>";
-        $list.="<div class='row-fluid'>";
-        $list.="<span class='span9' style=''>Tupelo,MS 38804</span>";
-        $list.="</div>";
+
+        /*
+          $list.="<div class='row-fluid'>";
+          $list.="<span class='span9' style=''>1830A North Gloster St</span>";
+          $list.="</div>";
+          $list.="<div class='row-fluid'>";
+          $list.="<span class='span9' style=''>Tupelo,MS 38804</span>";
+          $list.="</div>";
+         */
+
         return $list;
     }
 
