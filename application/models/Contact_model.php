@@ -137,7 +137,7 @@ class Contact_model extends CI_Model {
 
         $list.="<div class='form-group' style='text-align:left;'>";
         $list.=" <label for='phone'>Phone*:</label>";
-        $list.=" <input type='text' class='form-control' id='phone' style='width:97%;'>";
+        $list.=" <input type='text' class='form-control' id='phone' placeholder='(___) ___-____' style='width:97%;'>";
         $list.="</div>";
 
         $list.="<div class='form-group' style='text-align:left;'>";

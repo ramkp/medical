@@ -450,6 +450,7 @@ $(document).ready(function () {
     $('#graduate_date').mask("9999");
     $('#phone1').mask("(999) 999-9999");
     $('#phone2').mask("(999) 999-9999");
+    $('#phone').mask("(999) 999-9999");
 
     // .^\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)*\s*$
     $.mask.definitions['~'] = '.^\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)*\s*$';
@@ -1847,11 +1848,12 @@ $(document).ready(function () {
         var lastname = $('#lastname').val();
         var email = $('#email').val();
         var phone = $('#phone').val();
+        console.log('Phone length: ' + phone.length);
         var message = $('#message').val();
         var captcha = $('#captcha').val();
         var program = $('#program').val();
         if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && captcha != '' && program != 0) {
-            if (phone.length < 10) {
+            if (phone.length < 14) {
                 $('#contact_result').html("<span style='color:red;'>Please provide 10 digits correct phone number</span>");
             } // end if
             else {
@@ -1871,7 +1873,8 @@ $(document).ready(function () {
                         var url = "https://" + domain + "/functionality/php/send_contact_request.php";
                         var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message, program: program};
                         $.post(url, request).done(function (data) {
-                            $('#contact_result').html("<span style='color:red;'>" + data + "</span>");
+                            //$('#contact_result').html("<span style='color:red;'>" + data + "</span>");
+                            $('#program_section').html("<span style='color:red;'>" + data + "</span>");
                         });
                     } // end if data>0
                     else {

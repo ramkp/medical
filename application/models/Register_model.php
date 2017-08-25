@@ -972,7 +972,7 @@ class register_model extends CI_Model {
 
             $list.="<div class='container-fluid' style='text-align:left;'>";
             $list.="<span class='span2'>Phone<span style='color:red;'>*</span></span>";
-            $list.="<span class='span2'><input type='text' required id='phone' name='phone'></span>";
+            $list.="<span class='span2'><input type='text' required id='phone' placeholder='(___) ___-____' name='phone'></span>";
             $list.="<span class='span2'>How did you hear about us?</span>";
             $list.="<span class='span2'>$come_from</span>";
             $list.="</div>";
