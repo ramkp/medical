@@ -3185,6 +3185,35 @@ class Dashboard extends Util {
         $this->db->query($query);
     }
 
+    function get_student_notes($userid) {
+        $list = "";
+        $query = "select * from mdl_post where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $content = $row['content'];
+            } // end while
+        } // end if $num > 0
+        else {
+            $content = '';
+        }
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span6'><textarea id='user_notes' rows='6' style='width:100%'>$content</textarea></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span6' id='notes_result'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'><button id='update_user_notes'>Update</button></span>";
+        $list.="</div>";
+
+        return $list;
+    }
+
     function get_user_profile_custom_sections($id) {
         $list = "";
         $current_user_id = $this->user->id;
@@ -3194,6 +3223,7 @@ class Dashboard extends Util {
         $grades = $this->get_user_grades($id);
         $attend = $this->get_student_attendance($id);
         $info = $this->get_demographic_info($id);
+        $notes = $this->get_student_notes($id);
         $other = $this->get_other_tab($id);
         $system_role = $this->get_system_wide_roles($current_user_id);
         if ($current_user_id == 2 || $current_user_id == 234 || $system_role == 9) {
@@ -3204,6 +3234,7 @@ class Dashboard extends Util {
               <li><a data-toggle='tab' href='#grades'>Grades</a></li>
               <li><a data-toggle='tab' href='#attend'>Attendance</a></li>
               <li><a data-toggle='tab' href='#info'>Info</a></li>
+              <li><a data-toggle='tab' href='#notes'>Notes</a></li>
               <li><a data-toggle='tab' href='#menu3'>Other</a></li>";
 
             $list.="<input type='hidden' id='userid' value='$id'>  
@@ -3234,6 +3265,10 @@ class Dashboard extends Util {
                 <h3>Demographic info</h3>
                 <p>$info</p>
               </div>  
+              <div id='notes' class='tab-pane fade'>
+                <h3>Notes</h3>
+                <p>$notes</p>
+              </div>    
               <div id='menu3' class='tab-pane fade'>
                 <h3>Other</h3>
                 <p>$other</p>
@@ -6276,9 +6311,39 @@ class Dashboard extends Util {
             </div>
         </div>
     </div>";
-
-
         return $list;
+    }
+
+    function update_user_notes($notes) {
+        $content = addslashes($notes->content);
+        $userid = $notes->userid;
+        $query = "select * from mdl_post "
+                . "where module='notes' "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $query = "update mdl_post set content='$content' "
+                    . "where module='notes' "
+                    . "and userid=$userid";
+            $this->db->query($query);
+        } // end if $num > 0
+        else {
+            $now = time();
+            $query = "insert into mdl_post "
+                    . "(module,"
+                    . "userid,"
+                    . "content,"
+                    . "lastmodified,"
+                    . "created,"
+                    . "usermodified) "
+                    . "values ('notes', "
+                    . "'$userid', "
+                    . "'$content', "
+                    . "'$now', "
+                    . "'$now', 2)";
+            //echo "Query: ".$query. "<br>";
+            $this->db->query($query);
+        } // end else
     }
 
 }

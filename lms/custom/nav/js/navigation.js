@@ -6073,6 +6073,18 @@ $(document).ready(function () {
 
         console.log('Event ID: ' + event.target.id);
 
+        if (event.target.id == 'update_user_notes') {
+            var userid = $('#userid').val();
+            var content = $('#user_notes').val();
+            console.log('Content: ' + content);
+            var notes = {userid: userid, content: content};
+            var url = "/lms/custom/my/update_user_notes.php";
+            $.post(url, {notes: JSON.stringify(notes)}).done(function (data) {
+                //$('#notes_result').html(data);
+                document.location.reload();
+            });
+        }
+
         if (event.target.id.indexOf('payment_details_') >= 0) {
             var trans_id = event.target.id.replace("payment_details_", "");
             if (dialog_loaded !== true) {
