@@ -1851,28 +1851,34 @@ $(document).ready(function () {
         var captcha = $('#captcha').val();
         var program = $('#program').val();
         if (firstname != '' && lastname != '' && email != '' && validateEmail(email) == true && phone != '' && captcha != '' && program != 0) {
-            var url = "https://" + domain + "/functionality/php/verify_captcha.php";
-            var request = {captcha: captcha};
-            $.post(url, request).done(function (data) {
-                if (data > 0) {
-                    // Captcha is correct we can submit data
-                    $('#contact_result').html('');
-                    $('#firstname').val('');
-                    $('#lastname').val('');
-                    $('#email').val('');
-                    $('#phone').val('');
-                    $('#message').val('');
-                    $('#captcha').val('');
-                    var url = "https://" + domain + "/functionality/php/send_contact_request.php";
-                    var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message, program: program};
-                    $.post(url, request).done(function (data) {
-                        $('#contact_result').html("<span style='color:red;'>" + data + "</span>");
-                    });
-                } // end if data>0
-                else {
-                    $('#contact_result').html("<span style='color:red;'>Captcha is incorrect</span>");
-                }
-            });
+            if (phone.length < 10) {
+                $('#contact_result').html("<span style='color:red;'>Please provide 10 digits correct phone number</span>");
+            } // end if
+            else {
+                $('#contact_result').html('');
+                var url = "https://" + domain + "/functionality/php/verify_captcha.php";
+                var request = {captcha: captcha};
+                $.post(url, request).done(function (data) {
+                    if (data > 0) {
+                        // Captcha is correct we can submit data
+                        $('#contact_result').html('');
+                        $('#firstname').val('');
+                        $('#lastname').val('');
+                        $('#email').val('');
+                        $('#phone').val('');
+                        $('#message').val('');
+                        $('#captcha').val('');
+                        var url = "https://" + domain + "/functionality/php/send_contact_request.php";
+                        var request = {firstname: firstname, lastname: lastname, email: email, phone: phone, message: message, program: program};
+                        $.post(url, request).done(function (data) {
+                            $('#contact_result').html("<span style='color:red;'>" + data + "</span>");
+                        });
+                    } // end if data>0
+                    else {
+                        $('#contact_result').html("<span style='color:red;'>Captcha is incorrect</span>");
+                    }
+                });
+            } // end else
         } // end if firstname!='' && lastname!=''
         else {
             $('#contact_result').html("<span style='color:red;'>Please provide all required fields, correct email address and captcha</span>");
