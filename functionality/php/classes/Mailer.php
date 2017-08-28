@@ -1626,7 +1626,7 @@ class Mailer {
         }
     }
 
-    function send_contact_request($message) {
+    function send_contact_request($message, $recipient) {
 
         $mail = new PHPMailer;
         $addressA = 'info@medical2.com';
@@ -1645,7 +1645,9 @@ class Mailer {
         $mail->addAddress($addressA);
         $mail->addAddress($addressB);
         $mail->addAddress($addressC);
-        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        //$mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        $mail->addReplyTo($recipient, $name='');
+        
 
         $mail->isHTML(true);
         $mail->Subject = 'Medical2 - Contact Page Request';

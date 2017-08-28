@@ -59,7 +59,7 @@ class Contact {
         $message.="</body>";
 
         $mailer = new Mailer();
-        $mailer->send_contact_request($message);
+        $mailer->send_contact_request($message, $email);
 
         $list = "<span style='color:black;'>Your message is sent. Thank you</span>";
         return $list;
