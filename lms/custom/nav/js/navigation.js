@@ -6073,6 +6073,31 @@ $(document).ready(function () {
 
         console.log('Event ID: ' + event.target.id);
 
+
+
+        if (event.target.id == 'student_top_menu_payment_item') {
+            var userid = $('#userid').val();
+            var url = "/lms/custom/nav/get_student_payment_block.php";
+            $.post(url, {userid: userid}).done(function (data) {
+                $('#region-main').html(data);
+            });
+        }
+
+
+        if (event.target.id == 'open_student_any_payment') {
+            var courseid = $('#user_courses').val();
+            var userid = $('#userid').val();
+            var amount = $('#amount').val();
+            if (courseid > 0 && amount != '' && $.isNumeric(amount)) {
+                $('#payment_err').html('');
+                var url = 'https://medical2.com/index.php/register2/any_auth_pay/' + userid + '/' + courseid + '/0/' + amount + '/0';
+                var oWindow = window.open(url, "print");
+            } // end if
+            else {
+                $('#payment_err').html('Please select program and provide payment amount');
+            } // end else
+        }
+
         if (event.target.id == 'update_user_notes') {
             var userid = $('#userid').val();
             var content = $('#user_notes').val();

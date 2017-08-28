@@ -17,9 +17,63 @@ class navClass extends Util {
     public $prices_feature = 1;
     public $schedule_feature = 2;
     public $course_manage = 4;
+    public $phleb_ekg_courseid = 45;
 
     function __construct() {
         parent::__construct();
+    }
+
+    function is_phlebotomy_ekg_enrolled($userid) {
+        $methods_list = $this->get_course_enrollment_methods_list($this->phleb_ekg_courseid);
+        $query = "select * from mdl_user_enrolments "
+                . "where userid=$userid "
+                . "and enrolid in ($methods_list)";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
+    function get_user_courses_block($userid) {
+        $list = "";
+        $courses = $this->get_user_courses($userid);
+
+        $list.="<select id='user_courses' style='width:220px;'>";
+        if (count($courses) > 0) {
+            $list.="<option value='0'>Please select</option>";
+            foreach ($courses as $courseid) {
+                $coursename = $this->get_course_name($courseid);
+                $list.="<option value='$courseid'>$coursename</option>";
+            } // end foreach
+        } // end if count($courses)>0
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_ekg_payment_block($userid) {
+        $list = "";
+        $courses = $this->get_user_courses_block($userid);
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Program*:</span>";
+        $list.="<span class='span6'>$courses</span>";
+        $list.="</div>";
+
+        $list.="<input type='hidden' id='userid' value='$userid'>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>Amount*:</span>";
+        $list.="<span class='span6'><input type='text' id='amount'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span8' id='payment_err' style='color:red;'></span>";
+        $list.="</div>";
+
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span2'>&nbsp;</span>";
+        $list.="<span class='span6'><button class='btn btn-primary' id='open_student_any_payment'>Next</button></span>";
+        $list.="</div>";
+
+        return $list;
     }
 
     function get_navigation_items($userid) {
@@ -947,12 +1001,19 @@ class navClass extends Util {
             $list.=$phlebotomy_exam_books;
         } // end foreach
         $list.="</ul>
-                            </li>
-                        </ul>
-                        <div class='nav-divider-right'></div>
-                        <ul class='nav pull-right'>
-                            <li></li>
-                        </ul>
+                     </li>
+                        </ul>";
+
+        $list.="<div class='nav-divider-right'></div>
+                        <ul class='nav pull-left'>";
+        $ekg_enrolled = $this->is_phlebotomy_ekg_enrolled($this->user->id);
+        if ($ekg_enrolled > 0) {
+            $list.="<li><a href='#' title='Payment' id='student_top_menu_payment_item'>Payment</a></li>";
+        } // end if
+        else {
+            $list.="<li></li>";
+        } // end else
+        $list.="</ul>
                     </div>";
 
         // Profile section

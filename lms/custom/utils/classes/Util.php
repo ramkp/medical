@@ -647,4 +647,28 @@ class Util {
         return $enabled;
     }
 
+    function get_course_enrollment_methods_list($courseid) {
+        $query = "select * from mdl_enrol where courseid=$courseid";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $ids[] = $row['id'];
+        }
+        $ids_list = implode(',', $ids);
+        return $ids_list;
+    }
+
+    function get_user_courses($id) {
+        $courses = array();
+        $query = "select * from mdl_role_assignments "
+                . "where roleid=5 and userid=$id";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courses[] = $this->get_courseid_by_contextid($row['contextid']);
+            } // end while
+        } // end if $num > 0
+        return $courses;
+    }
+
 }
