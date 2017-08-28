@@ -608,15 +608,15 @@ class Dashboard extends Util {
                 $transactionid = $row['trans_id'];
                 $list.="<div class='container-fluid' style='padding-left:0px;'>";
                 if (!in_array($row['psum'], $this->renew_payments)) {
-                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree Date: " . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; $coursename &nbsp; <a class='payment_details' href='#' onClick='return false;' style='cursor:pointer;font-weight:bold;color:red;' data-transactionid='$transactionid'>Details</a></span>";
+                    $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree Date: " . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; $coursename &nbsp; <a class='payment_details' id='payment_details_$transactionid'  href='#' onClick='return false;' style='cursor:pointer;font-weight:bold;color:red;' data-transactionid='$transactionid'>Details</a></span>";
                 } // end if $row['psum']!=$renew_amount
                 else {
                     // Payments are similar to renew, we need to make additional checks
                     if ($certificate_date != null && $certificate_date < $row['pdate'] && $expired == 1) {
-                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree Date: " . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) &nbsp; <a class='payment_details' href='#' style='cursor:pointer;font-weight:bold;color:red;' onClick='return false;' data-transactionid='$transactionid'>Details</a></span>";
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree Date: " . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; Certificate Renewal Fee ($coursename) &nbsp; <a class='payment_details' id='payment_details_$transactionid' href='#' style='cursor:pointer;font-weight:bold;color:red;' onClick='return false;' data-transactionid='$transactionid'>Details</a></span>";
                     } // end if 
                     else {
-                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree Date: " . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; $coursename &nbsp; <a class='payment_details' href='#' onClick='return false;' style='cursor:pointer;font-weight:bold;color:red;' data-transactionid='$transactionid'>Details</a></span>";
+                        $list.="<span class='span8'>Paid by card $" . round($row['psum']) . "&nbsp;(&nbsp;(Braintree Date: " . date('m-d-Y H:i:s', $row['pdate']) . ") &nbsp; $coursename &nbsp; <a class='payment_details' id='payment_details_$transactionid' href='#' onClick='return false;' style='cursor:pointer;font-weight:bold;color:red;' data-transactionid='$transactionid'>Details</a></span>";
                     }
                 } // end else
                 if ($status == 0) {
