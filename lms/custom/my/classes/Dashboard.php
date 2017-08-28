@@ -3214,6 +3214,12 @@ class Dashboard extends Util {
         return $list;
     }
 
+    function is_student_noted($userid) {
+        $query = "select * from mdl_post where userid=$userid and module='notes'";
+        $num = $this->db->numrows($query);
+        return $num;
+    }
+
     function get_user_profile_custom_sections($id) {
         $list = "";
         $current_user_id = $this->user->id;
@@ -3224,6 +3230,7 @@ class Dashboard extends Util {
         $attend = $this->get_student_attendance($id);
         $info = $this->get_demographic_info($id);
         $notes = $this->get_student_notes($id);
+        $is_noted = $this->is_student_noted($id);
         $other = $this->get_other_tab($id);
         $system_role = $this->get_system_wide_roles($current_user_id);
         if ($current_user_id == 2 || $current_user_id == 234 || $system_role == 9) {
@@ -3233,9 +3240,14 @@ class Dashboard extends Util {
               <li><a data-toggle='tab' href='#menu2'>Certificates</a></li>
               <li><a data-toggle='tab' href='#grades'>Grades</a></li>
               <li><a data-toggle='tab' href='#attend'>Attendance</a></li>
-              <li><a data-toggle='tab' href='#info'>Info</a></li>
-              <li><a data-toggle='tab' href='#notes'>Notes</a></li>
-              <li><a data-toggle='tab' href='#menu3'>Other</a></li>";
+              <li><a data-toggle='tab' href='#info'>Info</a></li>";
+            if ($is_noted == 0) {
+                $list.="<li><a data-toggle='tab' href='#notes'>Notes</a></li>";
+            } // end if
+            else {
+                $list.="<li><a data-toggle='tab' href='#notes' style='font-weight:bold;color:red;'>Notes</a></li>";
+            } // end else
+            $list.="<li><a data-toggle='tab' href='#menu3'>Other</a></li>";
 
             $list.="<input type='hidden' id='userid' value='$id'>  
             </ul>";
