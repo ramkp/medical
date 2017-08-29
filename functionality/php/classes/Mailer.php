@@ -63,7 +63,12 @@ class Mailer {
                 $location_arr = explode("/", $row['appointmentlocation']);
                 $location = $location_arr[1] . "," . $location_arr[0];
             } // end while
-            $list.="<p align='left'>Date: $start<br>Location: $location<br>Venue: $notes</p>";
+            if ($user->courseid == 45) {
+                $list.="<p align='left'>Date: $start 9 A.M<br>Location: $location<br>Venue: $notes</p>";
+            } // end if
+            else {
+                $list.="<p align='left'>Date: $start <br>Location: $location<br>Venue: $notes</p>";
+            } // end else
         } // end if $user->slotid>0
         else {
             $list.="n/a";
@@ -116,7 +121,7 @@ class Mailer {
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
         $userdata = $this->get_user_details($user->userid);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -338,7 +343,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * ***************************************************************
+        /* ****************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -697,7 +702,7 @@ class Mailer {
         $students = $this->get_group_students($groupname);
         $course_name = $this->get_course_name($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -970,7 +975,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1150,7 +1155,7 @@ class Mailer {
         $course_name = $this->get_course_name($user);
         $class_info = $this->get_classs_info($user);
         $course_cost = $this->get_course_cost($user);
-        /*         * *****************************************************************
+        /* ******************************************************************
          *  Apply workaround if slot is not selected - use course cost
          * ****************************************************************** */
         if ($user->slotid > 0) {
@@ -1646,8 +1651,8 @@ class Mailer {
         $mail->addAddress($addressB);
         $mail->addAddress($addressC);
         //$mail->addReplyTo($this->mail_smtp_user, 'Medical2');
-        $mail->addReplyTo($recipient, $name='');
-        
+        $mail->addReplyTo($recipient, $name = '');
+
 
         $mail->isHTML(true);
         $mail->Subject = 'Medical2 - Contact Page Request';
@@ -2304,7 +2309,7 @@ class Mailer {
         $students = $this->get_group_renewal_students($usersarr, $groupname);
         $state = $data->state;
         $recipient = $data->email;
-        $auth_code=$data->auth_code;
+        $auth_code = $data->auth_code;
         $list.= "<!DOCTYPE HTML><html><head><title>Group Certificate Renewal Confirmation</title>";
         $list.="</head>";
         $list.="<body><br/><br/><br/><br/>";
