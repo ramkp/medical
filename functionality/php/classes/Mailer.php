@@ -1514,7 +1514,14 @@ class Mailer {
         $list.="<br/><p>Dear $user->firstname $user->lastname!</p>";
         $list.="<p>Congratulations! You successfully passed selected program!</p>";
         $list.="<p>Please find out certificate attached.</p>";
-        $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
+        $list.="<p><span style='color:red;'>Note:</span> You can always login to your account at "
+                . "<a href='https://medical2.com/' target='_blank'>medical2.com</a> to print or "
+                . "renew your certificate under Certificate tab. Your username is your email "
+                . "address. For password click the Recover Password link at login page. "
+                . "If you need further assistance. Please email at "
+                . "<a href='mailto:help@medical2.com'>help@medical2.com</a>.  </p>";
+        $list.="<p>If you need help, please contact us via email "
+                . "<a htef='mailto:$this->mail_smtp_user'>$this->mail_smtp_user</a></p>";
         $list.="<p>Best regards,</p>";
         $list.="<p>Support team.</p>";
         $list.="</body></html>";
