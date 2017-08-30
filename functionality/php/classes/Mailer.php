@@ -1419,6 +1419,11 @@ class Mailer {
         </tr>
         
         <tr>
+        <td colspan='2' align='left'><span style='color:red;'>Note</span>: You can always login to your account at medical2.com to print or renew your certificate under Certificate tab. Your username is your email address. For password click the Recover Password link at login page. If you need further assistance. Please email at help@medical2.com.  
+        </td>
+        </tr> 
+        
+        <tr>
         <td colspan='2' align='left'>&nbsp;</td>
         </tr> 
         
