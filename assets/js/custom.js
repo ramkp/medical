@@ -2660,6 +2660,60 @@ $(document).ready(function () {
     $("body").click(function (event) {
         console.log('Element clicked: ' + event.target.id);
 
+        if (event.target.id == 'find_jobs') {
+            var what = $('#what').val();
+            console.log('What criteria: ' + what);
+            var where = $('#where').val();
+            if (what != '') {
+                $('#ajax_loader').show();
+                $.getJSON("https://jsonip.com/?callback=?", function (ipdata) {
+                    var agent = navigator.userAgent;
+                    var publisherID = 4796009439301847;
+                    var ip = ipdata.ip;
+                    $.ajax({
+                        url: ' https://indeed-indeed.p.mashape.com/apisearch', // The URL to the API. You can get this by clicking on "Show CURL example" from an API profile
+                        type: 'GET', // The HTTP Method, can be GET POST PUT DELETE etc
+                        data: {q: what,
+                            l: where,
+                            publisher: publisherID,
+                            userip: ip,
+                            useragent: agent,
+                            format: 'json',
+                            callbak: 'process_job_results',
+                            limit: 30000,
+                            v: 2}, // Additional parameters here
+                        dataType: 'json',
+                        success: function (data) {
+                            console.log('We are fine ...');
+                            var url = 'https://medical2.com/jobs/proces_job_search_results/'
+                            $.post(url, {result: JSON.stringify(data)}).done(function (data) {
+                                $('#ajax_loader').hide();
+                                $('#search_resutls').html(data);
+                                $('#job_search_results').DataTable();
+                            }); // end of post
+                        },
+                        error: function (err) {
+                            // Ready state=4 is fine, but consider as error?
+                            console.log(JSON.stringify(err));
+                        },
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("X-Mashape-Authorization", "VVu0E2J8HFmshUHocqv33id56Fdsp1y7fOFjsnNWqPWdeibqYF");
+                        }
+                    }); // end of output ajax request
+
+
+
+                    /*
+                     var request = {q: what, l: where, agent: agent, publisherID: publisherID, ip: ip};
+                     var url = 'https://medical2.com/jobs/get_job_roll_xml_data/' + Base64.encode(JSON.stringify(request));
+                     $.post(url, function (data) {
+                     console.log('Server response: ' + data);
+                     });
+                     */
+                }); // end of get json
+            } // end if what != ''
+        }
+
         if (event.target.id == 'next_group_payment') {
             verify_barintree_group_registration();
         }

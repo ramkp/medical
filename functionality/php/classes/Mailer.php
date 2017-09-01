@@ -1975,14 +1975,16 @@ class Mailer {
         $mail->SMTPSecure = 'tls';
         $mail->Port = $this->mail_smtp_port;
         $mail->setFrom($this->mail_smtp_user, 'Medical2');
-        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+        $mail->addReplyTo('help@medical2.com', 'Medical2');
         $mail->isHTML(true);
         $mail->Subject = $item->title;
         $mail->Body = $item->text;
         $email = $item->email;
         $addrA = 'sirromas@gmail.com';
+        $addrB = 'info@medical2.com';
         $mail->AddAddress($email);
         $mail->addCC($addrA);
+        $mail->addCC($addrB);
         if (!$mail->send()) {
             return false;
         } // end if !$mail->send()
