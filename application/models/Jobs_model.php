@@ -64,7 +64,7 @@ class Jobs_model extends CI_Model {
         $list.="</div><br>";
 
         $list.="<div class='row-fluid' style='text-align:center;'>";
-        $list.="<span class='span12' id='search_resutls'></span>";
+        $list.="<span class='span12' id='search_resutls' style='text-align:left;'></span>";
         $list.="</div>";
 
         $list.="<div  style='width:80%;text-align:center;padding-left:17%;vertical-align: middle;'>";
@@ -124,11 +124,13 @@ class Jobs_model extends CI_Model {
                 $preface = $item->snippet;
                 $posted = $item->date;
                 $ago = $item->formattedRelativeTime;
+                $url=$item->url;
+                $link="<a href='$url' target='_blank'>Lnk</a>";
                 $list.="<tr>";
                 $list.="<td>$title</td>";
                 $list.="<td>$company</td>";
                 $list.="<td>$location</td>";
-                $list.="<td>$preface</td>";
+                $list.="<td>$preface<br>$link</td>";
                 $list.="<td>$posted<br>$ago</td>";
                 $list.="</tr>";
             } // end foreach

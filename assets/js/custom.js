@@ -2680,7 +2680,7 @@ $(document).ready(function () {
                             useragent: agent,
                             format: 'json',
                             callbak: 'process_job_results',
-                            limit: 30000,
+                            limit: 10000,
                             v: 2}, // Additional parameters here
                         dataType: 'json',
                         success: function (data) {
