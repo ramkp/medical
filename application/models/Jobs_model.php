@@ -41,7 +41,7 @@ class Jobs_model extends CI_Model {
 
         $list.="<br><br><div  style='width:80%;text-align:center;padding-left:17%;vertical-align: middle;'>";
 
-        $list.="<div class='row-fluid' style='font-weight:bold;color:#e2a500;text-align:left;'>";
+        $list.="<div class='row-fluid' style='font-weight:bold;color:#966b00;text-align:left;'>";
         $list.="<span class='span4'>what</span>";
         $list.="<span class='span4'>where</span>";
         $list.="</div>";
@@ -125,7 +125,7 @@ class Jobs_model extends CI_Model {
                 $posted = $item->date;
                 $ago = $item->formattedRelativeTime;
                 $url=$item->url;
-                $link="<a href='$url' target='_blank'>Lnk</a>";
+                $link="<a href='$url' target='_blank'>Link</a>";
                 $list.="<tr>";
                 $list.="<td>$title</td>";
                 $list.="<td>$company</td>";
