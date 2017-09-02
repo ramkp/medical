@@ -67,40 +67,20 @@ class Jobs_model extends CI_Model {
         $list.="<span class='span12' id='search_resutls' style='text-align:left;'></span>";
         $list.="</div>";
 
-        $list.="<div  style='width:80%;text-align:center;padding-left:17%;vertical-align: middle;'>";
-        $list.="<div class='row-fluid' style='text-align:left;'>";
-        $list.="<span class='span10'>Notice: Medical2 does not provide or guarantee any job nor we represent any company who post the job at Medical2 website.</span>";
-        $list.="</div>";
-        $list.="</div>";
-
         return $list;
     }
 
     public function get_jobs_student_page2() {
         $list = "";
         $widget = $this->get_jobs_widget();
-        $query = "select * from mdl_jobs where id=2";
-        $result = $this->db->query($query);
-        foreach ($result->result() as $row) {
-            $content = $row->content;
-        }
-
         $list.="<div class='row-fluid' style='text-align:center;width:96%;margin:auto;'>";
         $list.="<span class='span12'>$widget</span>";
         $list.="</div>";
-
-        /*
-          $list.="<div class='container-fluid'>";
-          $list.="<div class='form_div'><br>$content</div>";
-          $list.="</div>";
-         */
-
         return $list;
     }
 
     public function proces_job_search_results($jobs) {
         $list.="";
-        //$total = $jobs->totalResults;
         $results = $jobs->results; // array of objects
 
         $list.="<table id='job_search_results' class='display' cellspacing='0' width='100%'>";
@@ -124,8 +104,8 @@ class Jobs_model extends CI_Model {
                 $preface = $item->snippet;
                 $posted = $item->date;
                 $ago = $item->formattedRelativeTime;
-                $url=$item->url;
-                $link="<a href='$url' target='_blank'>Link</a>";
+                $url = $item->url;
+                $link = "<a href='$url' target='_blank'>Link</a>";
                 $list.="<tr>";
                 $list.="<td>$title</td>";
                 $list.="<td>$company</td>";

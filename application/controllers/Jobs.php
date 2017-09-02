@@ -18,7 +18,7 @@ class Jobs extends CI_Controller {
     }
 
     public function find() {
-        $page = $this->jobs_model->get_jobs_student_page();
+        $page = $this->jobs_model->get_jobs_student_page2();
         $data = array('page' => $page);
         $this->load->view('header_view');
         $this->load->view('jobs_view', $data);
