@@ -2457,4 +2457,120 @@ class Mailer {
         }
     }
 
+    function send_webhook_notification($data) {
+        $list = "";
+        $now = date('m-d-Y H:i:s', time());
+        $subject = "Medical2 Inc - Payment Event Notification";
+
+        $list.="<html>";
+        $list.="<body>";
+
+        $list.="<br><br><table>";
+        $list.="<tr>";
+        $list.="<td colspan='2'><img src='https://medical2.com/assets/logo/5_edited.png'></td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Card Holder</td><td>" . $data['x_first_name'] . " " . $data['x_last_name'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Email</td><td>" . $data['x_email'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Phone</td><td>" . $data['x_phone'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Address</td><td>" . $data['x_address'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>City</td><td>" . $data['x_city'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>State</td><td>" . $data['x_state'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Zip</td><td>" . $data['x_zip'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Item</td><td>" . $data['x_description'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Amount</td><td>$" . $data['x_amount'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Account Number</td><td>" . $data['x_account_number'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Response Reason Text</td><td>" . $data['x_response_reason_text'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Response Code</td><td>" . $data['x_response_code'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Response Code Reason</td><td>" . $data['x_response_reason_code'] . "</td>";
+        $list.="</tr>";
+
+
+        $list.="<tr>";
+        $list.="<td>Auth Code</td><td>" . $data['x_auth_code'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Transaction ID</td><td>" . $data['x_trans_id'] . "</td>";
+        $list.="</tr>";
+
+        $list.="<tr>";
+        $list.="<td>Order date</td><td>$now</td>";
+        $list.="</tr>";
+
+        $list.="</table>";
+
+        $list.="</body>";
+        $list.="</html>";
+
+        $mail = new PHPMailer;
+        $addressA = 'info@medical2.com';
+        $addressB = 'help@medical2.com';
+        $addressC = 'sirromas@gmail.com';
+
+        $mail->isSMTP();
+        $mail->Host = $this->mail_smtp_host;
+        $mail->SMTPAuth = true;
+        $mail->Username = $this->mail_smtp_user;
+        $mail->Password = $this->mail_smtp_pwd;
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = $this->mail_smtp_port;
+
+        $mail->setFrom($this->mail_smtp_user, 'Medical2');
+        $mail->addAddress($addressA);
+        $mail->addCC($addressB);
+        $mail->addCC($addressC);
+
+
+        $mail->addReplyTo($this->mail_smtp_user, 'Medical2');
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $list;
+
+        if (!$mail->send()) {
+            return false;
+        } // end if !$mail->send()
+        else {
+            return true;
+        }
+    }
+
 }
