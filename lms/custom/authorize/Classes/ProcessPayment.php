@@ -130,8 +130,10 @@ class ProcessPayment {
         fwrite($fp, $date . "\n");
         fwrite($fp, print_r($data, TRUE));
         fclose($fp);
-        $m = new Mailer();
-        $m->send_webhook_notification($data);
+        if ($data['x_first_name'] != '') {
+            $m = new Mailer();
+            $m->send_webhook_notification($data);
+        }
     }
 
     function save_log($data, $order) {
