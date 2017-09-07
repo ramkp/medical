@@ -100,7 +100,6 @@ require_once($CFG->dirroot . '/calendar/lib.php');    /// This is after login be
 $PAGE->set_pagelayout('course');
 
 if ($section and $section > 0) {
-
     // Get section details and check it exists.
     $modinfo = get_fast_modinfo($course);
     $coursesections = $modinfo->get_section_info($section, MUST_EXIST);
@@ -239,7 +238,8 @@ if ($section and $section > 0 and course_format_uses_sections($course->format)) 
     $sectionname = get_string('sectionname', "format_$course->format");
     $sectiontitle = get_section_name($course, $section);
     $PAGE->set_title(get_string('coursesectiontitle', 'moodle', array('course' => $course->fullname, 'sectiontitle' => $sectiontitle, 'sectionname' => $sectionname)));
-} else {
+} // end if  
+else {
     $PAGE->set_title(get_string('coursetitle', 'moodle', array('course' => $course->fullname)));
 }
 
@@ -333,19 +333,6 @@ if ($instructor_status) {
         echo $attendance;
     }
 } // end if $status
-
-/* * **********************************************************
-  Code related to skype for business meeting
-
- * ********************************************************** */
-
-if ($COURSE->id == 71) {
-
-    // We do everything inside test course
-    $meeting = $ds->get_meeting_block($COURSE->id);
-    echo $meeting;
-} // end if $COURSE->id==71
-// ************************************************************
 // Course wrapper start.
 echo html_writer::start_tag('div', array('class' => 'course-content'));
 
@@ -386,28 +373,60 @@ include_course_ajax($course, $modnamesused);
 
     $(document).ready(function () {
 
+        var courseid =<?php echo $COURSE->id; ?>;
+        console.log('Course id: ' + courseid);
         // Replace original Moodle player with flowplayer for labels
         var labelurl = '/lms/custom/flowplayer/url.php';
         $(".activity.modtype_label.label").each(function () {
             var id = $(this).attr('id').replace('module-', '');
-            $.post(labelurl, {id: id}).done(function (url) {
-
-                var containerid = '#module-' + id + '> div > div > div:nth-child(2) > div > div > div > p > span';
-                console.log('Container id: ' + containerid);
-                var container = $(containerid);
-                container.empty();
-                container.bind("contextmenu", function (e) {
-                    e.preventDefault();
-                });
-                flowplayer(container, {
-                    share: false,
-                    key: "$599424236128582",
-                    clip: {
-                        sources: [{type: "video/mp4", src: url, engine: "html5"}]
-                    } // end of clip
-                }); // end of player ...
-
-            }); // end of post 
+            if (courseid != 71) {
+                $.post(labelurl, {id: id}).done(function (url) {
+                    var containerid = '#module-' + id + '> div > div > div:nth-child(2) > div > div > div > p > span';
+                    console.log('Container id: ' + containerid);
+                    var container = $(containerid);
+                    container.empty();
+                    
+                    /*
+                    container.bind("contextmenu", function (e) {
+                        e.preventDefault();
+                    });
+                    */
+                    $(containerid).html("<button class='btn btn-primary' id='play_video_"+id+"'>Play Video</button>");
+                    /*
+                    flowplayer(container, {
+                        share: false,
+                        key: "$599424236128582",
+                        clip: {
+                            sources: [{type: "video/mp4", src: url, engine: "html5"}]
+                        } // end of clip
+                    }); // end of player ...
+                    */
+                    
+                }); // end of post 
+            } // end if courseid!=71
+            else {
+                // It is test course where we perform development
+                $.post(labelurl, {id: id}).done(function (url) {
+                    var containerid = "#module-" + id + " > div > div > div:nth-child(2) > div > div > div > span ";
+                    console.log('Container id: ' + containerid);
+                    var container = $(containerid);
+                    container.empty();
+                    $(containerid).html("<br><button class='btn btn-primary' id='play_video_"+id+"'>Play Video</button>");
+                    /*
+                     container.bind("contextmenu", function (e) {
+                     e.preventDefault();
+                     });
+                     
+                     flowplayer(container, {
+                     share: false,
+                     key: "$599424236128582",
+                     clip: {
+                     sources: [{type: "video/mp4", src: url, engine: "html5"}]
+                     } // end of clip
+                     }); // end of player ...
+                     */
+                }); // end of post
+            } // end else
         }); // end of each
 
         var calendarurl = '/lms/custom/calendar/get_user_calendar.php';
@@ -416,25 +435,9 @@ include_course_ajax($course, $modnamesused);
             $('#user_calendar').datepicker({
                 dateFormat: "mm/dd/yy"
             });
-
-            /*
-             $.each(JSON.parse(dates), function (key, value) {
-             console.log('User date: ' + value);
-             $("#user_calendar").datepicker("setDate", value);
-             }); // end of each
-             */
         }); // end of post
 
-        // ******************* Skype meeting block *******************
-<?php
-if ($COURSE->id == 71) {
-    ?>
-
-    <?php
-} // end if course id=71
-?>
         $('#graduate_date').datepicker();
-
     }); // end of document ready
 
 </script>

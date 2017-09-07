@@ -542,7 +542,13 @@ $(document).ready(function () {
         var url = "/lms/custom/hotels/list.php";
         $.post(url, {id: 1}).done(function (data) {
             $('#region-main').html(data);
+        });
+    }
 
+    function get_email_templates_page() {
+        var url = "/lms/custom/etemplates/list.php";
+        $.post(url, {id: 1}).done(function (data) {
+            $('#region-main').html(data);
         });
     }
 
@@ -2057,6 +2063,15 @@ $(document).ready(function () {
         if (event.target.id.indexOf("price_") >= 0) {
             update_item_price(event.target.id);
         }
+
+        if (event.target.id.indexOf("play_video_") >= 0) {
+            var id = event.target.id.replace("play_video_", "");
+            console.log('Item id: ' + id);
+            var url='https://medical2.com/index.php/video/play_video/'+id;
+            window.open(url, '_blank');
+            
+        }
+
 
         if (event.target.id.indexOf("_faq") >= 0) {
             var oEditor = FCKeditorAPI.GetInstance('editor');
@@ -3774,6 +3789,10 @@ $(document).ready(function () {
     $("#hotels").click(function (event) {
         update_navigation_status__menu('Hotels');
         get_hotels_page();
+    });
+    $("#etemplates").click(function (event) {
+        update_navigation_status__menu('Email templates');
+        get_email_templates_page();
     });
     $("#inventory").click(function (event) {
         update_navigation_status__menu('Inventory');
