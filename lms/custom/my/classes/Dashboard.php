@@ -3978,6 +3978,9 @@ class Dashboard extends Util {
         if ($payment->ptype != 'free') {
             $type = ($payment->ptype == 'cash') ? 1 : 2;
             $slotid = $payment->slotid;
+            if ($slotid == '' || $slotid == null) {
+                $slotid = 0;
+            }
             $query = "insert into mdl_partial_payments "
                     . "(courseid,"
                     . "userid, managerid,"
