@@ -31,6 +31,7 @@ echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . 
 echo '<script src="//cdn.ckeditor.com/4.5.11/full/ckeditor.js"></script>';
 echo "<script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.js'></script>";
 echo "<script src='https://code.jquery.com/ui/1.12.1/jquery-ui.js'></script>";
+echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/jquery.simplePagination.js'></script>";
 echo "<script type='text/javascript' src='//releases.flowplayer.org/7.1.1/commercial/flowplayer.min.js'>";
 //echo "<script src='https://releases.flowplayer.org/hlsjs/flowplayer.hlsjs.min.js'></script>";
 echo "<script type='text/javascript' src='https://" . $_SERVER['SERVER_NAME'] . "/assets/pagination/jquery.simplePagination.js'></script>";

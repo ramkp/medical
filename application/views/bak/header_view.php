@@ -160,6 +160,9 @@ $host = $_SERVER['HTTP_HOST'];
         </noscript>
 
         <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        
+        
+        
     </head>
 
     <body  id="page-site-index" class="format-site course path-site safari dir-ltr lang-en yui-skin-sam yui3-skin-sam mycodebusters-com--medical-lms pagelayout-frontpage course-1 context-2 notloggedin two-column has-region-side-pre used-region-side-pre has-region-side-post used-region-side-post has-region-footer-left empty-region-footer-left has-region-footer-middle empty-region-footer-middle has-region-footer-right empty-region-footer-right has-region-hidden-dock empty-region-hidden-dock layout-option-nonavbar">
@@ -170,11 +173,22 @@ $host = $_SERVER['HTTP_HOST'];
         <script type="text/javascript" src="https://<?php echo $host ?>/lms/theme/jquery.php/theme_lambda/jquery.easing.1.3.js"></script>
         <script type="text/javascript" src="https://<?php echo $host ?>/lms/theme/jquery.php/theme_lambda/camera.min.1.11.js"></script>
         <script type="text/javascript" src="https://<?php echo $host ?>/lms/theme/jquery.php/theme_lambda/jquery.bxslider.js"></script>
-        <script type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyA_7yjXzpz9sxQw6Ut0gFa8045N_I4QGXk'></script>        
+        <script type='text/javascript' src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAo9XGd-Ss75Cnfqqu41SdDvlwRu1WYKB0'></script>        
         <script type="text/javascript" src="https://<?php echo $host ?>/assets/js/custom.js"></script>        
         <script type="text/javascript" src="https://<?php echo $host ?>/assets/js/selectbox/jquery.selectBox.js"></script>        
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <script type="text/javascript" src="https://gdc.indeed.com/ads/apiresults.js"></script>
+        
+        <!-- Datatable sources -->
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+        
+        <!-- Flow player -->
+        <script type='text/javascript' src='//releases.flowplayer.org/7.1.1/commercial/flowplayer.min.js'></script>
+        <link rel='stylesheet' href='//releases.flowplayer.org/7.1.1/commercial/skin/skin.css'>
+
+        
         <script type="text/javascript">
             //<![CDATA[
             document.body.className += ' jsenabled';
@@ -255,7 +269,7 @@ $host = $_SERVER['HTTP_HOST'];
                                 <div class="nav-divider-right"></div>                                
                             </div>                      
                             <ul class="nav pull-right">                                
-                                <li class="dropdown"><a href="https://<?php echo $host ?>/search"><img src="https://<?php echo $host ?>/assets/logo/icon-search.png" style="cursor: pointer;" alt="search" id='search_item' /></a></li>
+                                <!--<li class="dropdown"><a href="https://<?php echo $host ?>/search"><img src="https://<?php echo $host ?>/assets/logo/icon-search.png" style="cursor: pointer;" alt="search" id='search_item' /></a></li>-->
                                 <!--<li class="dropdown"><a href="#">Select Language<span style="color: rgb(155, 155, 155);">▼</span></a></li>-->
 
 
@@ -263,12 +277,10 @@ $host = $_SERVER['HTTP_HOST'];
                                 <!--<li class="dropdown"><a><div id="google_translate_element" style="vertical-align:middle;"></div>-->
                                 <!--<li class="dropdown"><span id="google_translate_element" style="vertical-align:middle;"></span></li>-->        
 
+                                <!--
                                 <script type="text/javascript">
                                     var width = $(window).width();
                                     var height = $(window).height();
-                                    //alert ('Screen width: '+width);
-                                    //alert ('Screen height: '+height);
-
                                     var ua = window.navigator.userAgent;
                                     var msie = ua.indexOf("MSIE ");
 
@@ -282,29 +294,12 @@ $host = $_SERVER['HTTP_HOST'];
                                         new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
                                     }
 
-                                    //} // end if msie == 0
-
-                                    /*
-                                     $(window).on("orientationchange", function () {
-                                     $('#translator_container').remove();
-                                     var width = $(window).width();
-                                     if (width >= 1024) {
-                                     document.write('<li class="dropdown" id="translator_container"><span id="google_translate_element" style="vertical-align:middle;"></span></li>');
-                                     }
-                                     else {
-                                     document.write('<li class="dropdown" id="translator_container"><a><span id="google_translate_element" style="vertical-align:middle;"></span></a><br></li>');
-                                     }
-                                     function googleTranslateElementInit() {
-                                     new google.translate.TranslateElement({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false}, 'google_translate_element');
-                                     }
-                                     
-                                     });
-                                     */
-
                                 </script>                                        
 
                                 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
+                                -->
+                                
+                                
                                 <style>
 
                                     div.skiptranslate.goog-te-gadget {

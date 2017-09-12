@@ -185,8 +185,8 @@ $host = $_SERVER['HTTP_HOST'];
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
         
         <!-- Flow player -->
-        <script type='text/javascript' src='//releases.flowplayer.org/7.1.1/commercial/flowplayer.min.js'></script>
-        <link rel='stylesheet' href='//releases.flowplayer.org/7.1.1/commercial/skin/skin.css'>
+        <script type='text/javascript' src='//releases.flowplayer.org/7.0.1/commercial/flowplayer.min.js'></script>
+        <link rel='stylesheet' href='//releases.flowplayer.org/7.0.1/commercial/skin/skin.css'>
 
         
         <script type="text/javascript">

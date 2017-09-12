@@ -28,7 +28,7 @@ class Video_model extends CI_Model {
     function get_player_installation($id) {
         $list = "";
         $url = $this->get_video_url($id);
-        $list.="<div class='flowplayer' data-share='false'>";
+        $list.="<div class='flowplayer' data-share='false' data-key='$599424236128582'>";
         $list.="<video>";
         $list.="<source type='video/mp4' src='$url'>";
         $list.="</video>";
