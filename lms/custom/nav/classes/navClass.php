@@ -383,6 +383,9 @@ class navClass extends Util {
                     case 'promotion codes':
                         $list.=$this->get_promotion_codes_item();
                         break;
+                    case 'templates':
+                        $list.=$this->get_email_templates();
+                        break;
                     case 'late fee':
                         $list.=$this->get_late_fee_item();
                         break;
@@ -433,6 +436,11 @@ class navClass extends Util {
 
     function get_hotels_book_item() {
         $list = "<li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>";
+        return $list;
+    }
+
+    function get_email_templates() {
+        $list = "<li><a href='#' title='Email Templates' id='etemplates'>Email Templates</a></li>";
         return $list;
     }
 
@@ -768,6 +776,7 @@ class navClass extends Util {
                                 <ul class='dropdown-menu'>
                                     <li><a href='#' title='Permissions' id='permissions'>Permissions</a></li>
                                     <li><a href='#' title='Moodle Permissions' id='mpermission' onClick='return false;'>Define Roles</a></li>
+                                    <li><a href='#' title='Email Templates' id='etemplates'>Email Templates</a></li>
                                     <li><a href='#' title='Hotels' id='hotels'>Hotels Book</a></li>
                                     <li><a href='#' title='Hotel Expenses' id='hotel_expenses'>Hotel Expenses</a></li>
                                     <li><a href='#' title='Inventory' id='inventory'>Inventory</a></li>
@@ -994,9 +1003,9 @@ class navClass extends Util {
             $completion_status = $this->is_course_completed($courseid, $this->user->id);
             $phlebotomy_exam_books = $this->get_phlebotomy_exam_book_links($courseid, $this->user->id);
             if ($courseid == 45 && $completion_status > 0) {
-                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/EKG-%20ECG.pdf' target='_blank'>EKG - ECG</a></li>";
-                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/M2%20PhlebBook.pdf' target='_blank'>M2 Phlebotomy Book</a></li>";
-                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/Phlebotomy.pdf' target='_blank'>Phlebotomy</a></li>";
+                $list.="<li><a href='https://www.dropbox.com/s/vzrwrh0q1yhfpg5/EKG-%20ECG.pdf?dl=0' target='_blank'>EKG - ECG</a></li>";
+                $list.="<li><a href='https://www.dropbox.com/s/whkolzn8btwcb4x/M2%20PhlebBook.pdf?dl=0' target='_blank'>M2 Phlebotomy Book</a></li>";
+                $list.="<li><a href='https://www.dropbox.com/s/gwcj4ry0g1oa8kt/Phlebotomy.pdf?dl=0' target='_blank'>Phlebotomy</a></li>";
             } // end if $courseid == 45 && $completion_status > 0
             $list.=$phlebotomy_exam_books;
         } // end foreach
@@ -1048,7 +1057,7 @@ class navClass extends Util {
             $cost = $b->get_course_cost($courseid);
             $paid = $b->get_student_payments($courseid, $userid);
             if ($paid > $cost) {
-                $list.="<li><a href='https://dl.dropboxusercontent.com/u/294900540/books/phlebotomy%20with%20EKG/M2%20PhlebBook.pdf' target='_blank'>M2 Phlebotomy Book</a></li>";
+                $list.="<li><a href='https://www.dropbox.com/s/ah7g6fiwhodwpam/M2%20PhlebBook.pdf?dl=0' target='_blank'>M2 Phlebotomy Book</a></li>";
             } // end if $paid>$cost
         } // end if $courseid==57
         return $list;
