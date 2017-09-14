@@ -928,11 +928,11 @@ class register_model extends CI_Model {
             $list.="</div>"; // end of container-fluid
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span9'>Want to register group? Please click <a href='https://medical2.com/register2/group_register' target='_blank'><span style='font-weight:bold;color:blue;'>here</span></a></span>";
+            $list.="<span class='span9'>Want to register a group? Please click <a href='https://medical2.com/register2/group_register' target='_blank'><span style='font-weight:bold;color:blue;'>here</span></a></span>";
             $list.="</div>"; // end of container-fluid
 
             $list.="<div class='container-fluid' style='text-align:center;'>";
-            $list.="<span class='span9'>Already have an account? Please <a href='/index.php/login' target='_blank'><span style='font-weight:bold;color:blue;'>sign-in</span></a> and apply for course you need.</span>";
+            $list.="<span class='span9'>Already have an account? Please <a href='/index.php/login' target='_blank'><span style='font-weight:bold;color:blue;'>sign-in</span></a></span>";
             $list.="</div>"; // end of container-fluid
 
             $list.="</div>"; // end of panel-body
