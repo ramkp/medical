@@ -4437,10 +4437,8 @@ class Dashboard extends Util {
         $list.="<html><body>";
         $list.="<br/><p>Dear $user->firstname $user->lastname!</p>";
 
-        $list.="<p>Please find out certificate attached.</p>";
-        $list.="<p>If you need help, please contact us via email $this->mail_smtp_user</p>";
-        $list.="<p>Best regards,</p>";
-        $list.="<p>Support team.</p>";
+        $list.="<p>Please find your attached certificate in this email. If you need help? Email: <a href='mailto:help@medical2.com'>help@medical2.com</a> .</p>";
+        $list.="<p>Medical2 support team.</p>";
         $list.="</body></html>";
 
         $m = new Mailer();
