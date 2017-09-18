@@ -1405,6 +1405,7 @@ class Dashboard extends Util {
         $total_grade_max = 0;
         $gr = new Grades;
         $grades = $gr->get_student_grades($courseid, $userid);
+        $attempts = $this->get_user_attempts_average($courseid, $userid);
         if (count($grades) > 0) {
             foreach ($grades as $gradeitem) {
                 $total_grade = $total_grade + $gradeitem->grade;
@@ -1415,6 +1416,9 @@ class Dashboard extends Util {
                 $list.="<span class='span1'>$gradeitem->date</span>";
                 $list.="</div>";
             } // end foreach
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span6'>$attempts</span>";
+            $list.="</div>";
             $list.="<div class='row-fluid'>";
             $list.="<span class='span6'><hr/></span>";
             $list.="</div>";
@@ -1432,6 +1436,26 @@ class Dashboard extends Util {
         else {
             $list.='N/A';
         } // end else
+        return $list;
+    }
+
+    function get_user_attempts_average($courseid, $userid) {
+        $list = "";
+        $query = "select * from mdl_user_attempts "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $date = date('m-d-Y', $row['adate']);
+                $list.="<div class='row-fluid'>";
+                $list.="<span class='span3'>Attempt No " . $row['atn'] . "</span>";
+                $list.="<span class='span2'>Grade " . $row['grade'] . "%</span>";
+                $list.="<span class='span2'>$date</span>";
+                $list.="</div>";
+            } // end while
+        } // end if $num > 0
         return $list;
     }
 
@@ -1459,6 +1483,9 @@ class Dashboard extends Util {
                 $list.="</div>";
                 $list.="<div class='row-fluid'>";
                 $list.="<span class='span12'>$grades</span>";
+                $list.="</div>";
+                $list.="<div class='row-fluid' style='font-weight:bold;'>";
+                $list.="<span class='span6'><hr/></span>";
                 $list.="</div>";
             } // end foreach
         } // end if count($courses)>0
@@ -3266,7 +3293,7 @@ class Dashboard extends Util {
                 <p>$certficates</p>
               </div>
               <div id='grades' class='tab-pane fade'>
-                <h3>Grades &nbsp;&nbsp;<button id='print_grades'>Print</button><button id='print_transctipt_grades'>Print Transcript</button></h3>
+                <h3>Grades &nbsp;&nbsp;<button id='print_grades'>Print</button><button id='print_transctipt_grades'>Print Transcript</button><button id='add_attempt'>Add Attempts</button></h3>
                 <p>$grades</p>
               </div>
              <div id='attend' class='tab-pane fade'>
@@ -3801,6 +3828,103 @@ class Dashboard extends Util {
     </div>";
 
         return $list;
+    }
+
+    function get_college_programs_categories() {
+        $list = "";
+        $list.="<select id='college_categories' style='width:275px;'>";
+        $list.="<option value='0' selected>Please select</option>";
+
+        $query = "select * from mdl_course_categories where id>=5";
+        $result = $this->db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $list.="<option value='" . $row['id'] . "'>" . $row['name'] . "</option>";
+        }
+        $list.="</select>";
+
+        return $list;
+    }
+
+    function get_college_programs_list($userid) {
+        $list = "";
+        $list.="<select id='college_courses' style='width:290px;'>";
+        $list.="<option value='0' selected>Please select</option>";
+        $courses = $this->get_user_courses($userid);
+        if (count($courses) > 0) {
+            foreach ($courses as $courseid) {
+                $name = $this->get_course_name($courseid);
+                $list.="<option value='$courseid'>$name</option>";
+            } // end foreach
+        } // end if count($courses)>0
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_attempt_dropdown() {
+        $list = "";
+        $list.="<select id='attempt_box' style='width:75px;'>";
+        for ($i = 1; $i <= 3; $i++) {
+            $list.="<option value='$i'>$i</option>";
+        }
+        $list.="</select>";
+        return $list;
+    }
+
+    function get_add_attempt_modal_dialog($userid) {
+        $list = "";
+        $courses = $this->get_college_programs_list($userid);
+        $attempts = $this->get_attempt_dropdown();
+        $list.="<div id='myModal' class='modal fade' style='width:675px;'>
+        <div class='modal-dialog'>
+            <div class='modal-content'>
+            
+                <div class='modal-header'>
+                    <h4 class='modal-title'>Add Attempt</h4>
+                </div>
+                <div class='modal-body'>
+                <input type='hidden' id='userid' value='$userid'>
+                   
+                <div class='container-fluid'>
+                <span class='span1'>Program</span>
+                <span class='span3'>$courses</span>
+                </div>
+                
+                <div class='container-fluid'>
+                <span class='span1'>Attempt</span>
+                <span class='span1'>$attempts</span>
+                <span class='span1'><input type='text' id='adate' style='width:75px;' placeholder='Date'></span>    
+                <span class='span1'><input type='text' id='grade' style='width:75px;' placeholder='Grade'></span>
+                </div>
+                
+                <div class='container-fluid' style=''>
+                <span class='span6' style='color:red;' id='attempt_err'></span>
+                </div>
+             
+                <div class='modal-footer' style='text-align:center;'>
+                    <span align='center'><button type='button' class='btn btn-primary' data-dismiss='modal' id='cancel'>Cancel</button></span>
+                    <span align='center'><button type='button' class='btn btn-primary' id='add_new_attempt_to_db'>OK</button></span>
+                </div>
+            </div>
+        </div>
+    </div>";
+
+        return $list;
+    }
+
+    function add_new_student_attempt($item) {
+        $adate = strtotime($item->date);
+        $query = "insert into mdl_user_attempts "
+                . "(courseid,"
+                . "userid,"
+                . "atn,"
+                . "adate,"
+                . "grade) "
+                . "values ($item->courseid,"
+                . "$item->userid,"
+                . "$item->atn,"
+                . "'$adate',"
+                . "'$item->grade')";
+        $this->db->query($query);
     }
 
     function get_delete_user_dialog($userid) {
@@ -5859,7 +5983,7 @@ class Dashboard extends Util {
             $start = $data->startdate;
             $graduate = $data->graduatedate;
 
-            $list.="<br><table border='0' width='100%'>";
+            $list.="<table border='0' width='100%'>";
             $list.="<tr>";
             $list.="<td colspan='3' style='text-align:left;font-weight:bold;'>Program of Study: Certified Nurse Assistant</td>";
             $list.="<td colspan='3' style='text-align:right;font-weight:bold;'>Credential: Certificate</td>";
@@ -5878,9 +6002,9 @@ class Dashboard extends Util {
             $list.="<td>$code</td>";
             $list.="<td>$shortname</td>";
             $list.="<td>$fullname</td>";
-            $list.="<td>$grade</td>";
-            $list.="<td>$letter</td>";
-            $list.="<td>$hours</td>";
+            $list.="<td style='text-align:center;'>$grade</td>";
+            $list.="<td style='text-align:center;'>$letter</td>";
+            $list.="<td style='text-align:center;'>$hours</td>";
             $list.="</tr>";
 
             $list.="<tr>";
@@ -5899,7 +6023,7 @@ class Dashboard extends Util {
             $code = $cdata->idnumber;
             $data = $this->get_student_demographic_data($userid);
             $start = $data->startdate;
-            $list.="<br><table border='0' width='100%'>";
+            $list.="<table border='0' width='100%'>";
             $list.="<tr>";
             $list.="<td colspan='3' style='text-align:left;font-weight:bold;'>Program of Study: Certified Nurse Assistant</td>";
             $list.="<td colspan='3' style='text-align:right;font-weight:bold;'>Credential: Certificate</td>";
@@ -6010,9 +6134,9 @@ class Dashboard extends Util {
                     $list.="<td>$code</td>";
                     $list.="<td>$shortname</td>";
                     $list.="<td>$fullname</td>";
-                    $list.="<td>$grade</td>";
-                    $list.="<td>$letter</td>";
-                    $list.="<td>$hours</td>";
+                    $list.="<td style='text-align:center;'>$grade</td>";
+                    $list.="<td style='text-align:center;'>$letter</td>";
+                    $list.="<td style='text-align:center;'>$hours</td>";
                     $list.="</tr>";
                 } // end if $grade>0
             } // end foreach
@@ -6190,9 +6314,37 @@ class Dashboard extends Util {
         return $num;
     }
 
+    function get_attempts_block($userid) {
+        $list = "";
+        $query = "select * from mdl_user_attempts where userid=$userid";
+        $num = $this->db->numrows($query);
+        if ($num > 0) {
+            $list.="<table>";
+            $list.="<tr >";
+            $list.="<th colspan='3' style='text-align:left;'>Student attempts</th>";
+            $list.="</tr>";
+            $list.="<tr style='background-color:#DFDDDD;'>";
+            $list.="<td style='text-align:left;'>Title</td><td style='text-align:left;'>Attempt No</td><td style='text-align:left;'>Grade</td><td style='text-align:left;'>Date</td>";
+            $list.="</tr>";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $name = $this->get_course_name($row['courseid']);
+                $date = date('m-d-Y', $row['adate']);
+                $list.="<tr style='text-align:left;'>";
+                $list.="<td>$name</td>";
+                $list.="<td style='text-align:center;'>" . $row['atn'] . "</td>";
+                $list.="<td style='text-align:center;'>" . $row['grade'] . "</td>";
+                $list.="<td>$date</td>";
+                $list.="</tr>";
+            } // end while
+            $list.="</table>";
+        } // end if $num > 0
+        return $list;
+    }
+
     function print_script_grades_pdf_report($userid) {
         $list = "";
-
+        $attempts = $this->get_attempts_block($userid);
         $logoblock = $this->get_transcript_report_logo_part();
         $officialblock = $this->get_transcript_officials_block();
         $userblock = $this->get_transcript_user_block($userid);
@@ -6226,10 +6378,6 @@ class Dashboard extends Util {
             $list.="</tr>";
         } // end if $cna_status > 0
 
-        $list.="<tr>";
-        $list.="<td colspan='3'>&nbsp;</td>";
-        $list.="</tr>";
-
         if ($ma_status > 0) {
             $ma = $this->get_other_student_courses_block($userid);
             $list.="<tr>";
@@ -6238,9 +6386,11 @@ class Dashboard extends Util {
             $list.="</tr>";
         } // end if $ma_status > 0
 
-        $list.="</table>";
+        $list.="<tr>";
+        $list.="<td colspan='3' style='text-align:left;'>$attempts</td>";
+        $list.="</tr>";
 
-        $list.="";
+        $list.="</table>";
 
         $list.="</body>";
         $list.="</html>";
