@@ -10,7 +10,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php';
   echo "Unix time: ".$unix_time."<br>";
  */
 
-$date_string = '08/29/2017 05:22:35';
+$date_string = '09/08/2017 03:38:29';
 $date_u_string = strtotime($date_string);
 echo "Date string: " . $date_string."<br>";
 echo "Date unixtime string: " . $date_u_string . "<br>";

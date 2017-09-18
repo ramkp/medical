@@ -38,6 +38,7 @@ error_reporting('E_ALL');
 require_once(dirname(__FILE__) . '/../config.php');
 require_once($CFG->dirroot . '/my/lib.php');
 require_once($CFG->dirroot . '/custom/my/classes/Dashboard.php');
+require_once ($CFG->dirroot . '/custom/crm/classes/Crm.php');
 
 redirect_if_major_upgrade_required();
 
@@ -165,6 +166,7 @@ echo $OUTPUT->header();
 
 
 $ds = new Dashboard();
+$crm = new Crm();
 $roleid = $ds->get_user_role($USER->id);
 // Show available programs panel
 if ($USER->id != 2 && ($roleid == 5 || $roleid == '')) {
@@ -177,6 +179,10 @@ if ($USER->id != 2 && ($roleid == 5 || $roleid == '')) {
     else {
         $list = $ds->get_programs_panel();
         echo $list;
+        if ($USER->id == 13734) {
+            $btn = $crm->get_support_button($USER->id);
+            echo $btn;
+        }
     } // end else
 } // end if $USER->id != 2 && ($roleid == 5 || $roleid == '')
 

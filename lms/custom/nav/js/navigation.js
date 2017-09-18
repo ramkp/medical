@@ -2067,9 +2067,9 @@ $(document).ready(function () {
         if (event.target.id.indexOf("play_video_") >= 0) {
             var id = event.target.id.replace("play_video_", "");
             console.log('Item id: ' + id);
-            var url='https://medical2.com/index.php/video/play_video/'+id;
+            var url = 'https://medical2.com/index.php/video/play_video/' + id;
             window.open(url, '_blank');
-            
+
         }
 
 
@@ -6092,7 +6092,88 @@ $(document).ready(function () {
 
         console.log('Event ID: ' + event.target.id);
 
+        if (event.target.id == 'add_attempt') {
+            var userid = $('#userid').val();
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "/lms/custom/my/get_add_attempt_modal_dialog.php";
+                        var request = {userid: userid};
+                        $.post(url, request).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                            $('#adate').datepicker();
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
+        }
 
+        if (event.target.id == 'add_new_attempt_to_db') {
+            var userid = $('#userid').val();
+            var courseid = $('#college_courses').val();
+            var atn = $('#attempt_box').val();
+            var date = $('#adate').val();
+            var grade = $('#grade').val();
+            var item = {userid: userid,
+                courseid: courseid,
+                atn: atn,
+                date: date,
+                grade: grade};
+            console.log('Item: ' + JSON.stringify(item));
+            if (courseid > 0 && date != '' && grade != '') {
+                $('#attempt_err').html('');
+                var url = '/lms/custom/my/add_new_student_attempt.php';
+                $.post(url, {item: JSON.stringify(item)}).done(function (data) {
+                    console.log(data);
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                    document.location.reload();
+                });
+            } // end if
+            else {
+                $('#attempt_err').html('Please select program and provide grade with date');
+            } // end else
+        }
+
+        if (event.target.id.indexOf('new_case_') >= 0) {
+            var userid = event.target.id.replace("new_case_", "");
+            console.log('User ID: ' + userid);
+            var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+            $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "/lms/custom/crm/get_new_case_modal_dialog.php";
+                        var request = {userid: userid};
+                        $.post(url, request).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
+
+        }
+
+        if (event.target.id == 'add_new_support_case') {
+            var userid = $('#userid').val();
+            var subject = $('#case_subject').val();
+            var message = $('#case_desc').val();
+            if (subject != '' && message != '') {
+                $('#case_err').html();
+                var scase = {userid: userid, subject: subject, message: message};
+                var url = "/lms/custom/crm/add_new_support_case.php";
+                $.post(url, {scase: JSON.stringify(scase)}).done(function (data) {
+                    console.log(data);
+                    $("[data-dismiss=modal]").trigger({type: "click"});
+                });
+            } // end if
+            else {
+                $('#case_err').html('Please provide both subject and description');
+            }
+        }
 
         if (event.target.id == 'student_top_menu_payment_item') {
             var userid = $('#userid').val();

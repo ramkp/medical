@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <?php
 require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php');
 
@@ -28,8 +29,8 @@ $categories = $menu->get_categories_menu();
 $host = $_SERVER['HTTP_HOST'];
 //echo "Host: ".$host."<br>";
 ?>
-<!DOCTYPE html>
-<html  dir="ltr" lang="en" xml:lang="en">
+
+<html>
     <head>
 
         <?php
@@ -106,6 +107,13 @@ $host = $_SERVER['HTTP_HOST'];
                 $title = "Photo Gallery";
                 $meta = "Photo Gallery, Workshops";
                 break;
+            default:
+                $title = "Phlebotomy Certification Exam Online | Medical2 Career College";
+                $meta = "Register For Medical2 Phlebotomy Technician Certification Exam Online. 
+                    It covers all aspects of phlebotomy (basic and advance). Phlebotomist Only.";
+                $desc = "Register For Medical2 Phlebotomy Technician Certification Exam Online. It
+                       covers all aspects of phlebotomy (basic and advance). Phlebotomist Only.";
+                break;
         }
 
         //echo "Title: ".$title."<br>";
@@ -113,11 +121,13 @@ $host = $_SERVER['HTTP_HOST'];
         ?>
 
         <title><?php echo $title; ?></title>
-        <!--<link rel="shortcut icon" href="https://<?php echo $host ?>/lms/theme/image.php/lambda/theme/1451892772/favicon" />-->
-        <link rel="shortcut icon" href="https://<?php echo $host ?>/assets/icons/logo3.png" />
         <meta https-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="keywords" content="<?php echo $meta; ?>" />
         <meta name="description" content="<?php echo $desc; ?>" />
+        
+        <!--<link rel="shortcut icon" href="https://<?php echo $host ?>/lms/theme/image.php/lambda/theme/1451892772/favicon" />-->
+        <link rel="shortcut icon" href="https://<?php echo $host ?>/assets/icons/logo3.png" />
+
         <link rel="stylesheet" type="text/css" href="https://<?php echo $host ?>/lms/theme/yui_combo.php?rollup/3.17.2/yui-moodlesimple-min.css" /><script id="firstthemesheet" type="text/css">/** Required in order to fix style inclusion problems in IE with YUI **/</script><link rel="stylesheet" type="text/css" href="https://<?php echo $host ?>/lms/theme/styles.php/lambda/1451892772/all" />
         <link href="https://<?php echo $host ?>/assets/css/full-slider.css" rel="stylesheet">
         <script type="text/javascript">
@@ -160,9 +170,9 @@ $host = $_SERVER['HTTP_HOST'];
         </noscript>
 
         <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-        
-        
-        
+
+
+
     </head>
 
     <body  id="page-site-index" class="format-site course path-site safari dir-ltr lang-en yui-skin-sam yui3-skin-sam mycodebusters-com--medical-lms pagelayout-frontpage course-1 context-2 notloggedin two-column has-region-side-pre used-region-side-pre has-region-side-post used-region-side-post has-region-footer-left empty-region-footer-left has-region-footer-middle empty-region-footer-middle has-region-footer-right empty-region-footer-right has-region-hidden-dock empty-region-hidden-dock layout-option-nonavbar">
@@ -179,16 +189,16 @@ $host = $_SERVER['HTTP_HOST'];
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <script type="text/javascript" src="https://gdc.indeed.com/ads/apiresults.js"></script>
-        
+
         <!-- Datatable sources -->
         <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
-        
+
         <!-- Flow player -->
         <script type='text/javascript' src='//releases.flowplayer.org/7.0.1/commercial/flowplayer.min.js'></script>
         <link rel='stylesheet' href='//releases.flowplayer.org/7.0.1/commercial/skin/skin.css'>
 
-        
+
         <script type="text/javascript">
             //<![CDATA[
             document.body.className += ' jsenabled';
@@ -233,7 +243,7 @@ $host = $_SERVER['HTTP_HOST'];
                                     <li><a href="https://<?php echo $host ?>/register2/brain_register"  id="register_item" title="Register">Register</a></li> 
                                     <li><a href="https://<?php echo $host ?>/clients"  id="testimonial" title="Clients">Clients</a></li>
                                     <li>
-                                    
+
                                     <li class="dropdown"><a title="Financial Aid"  class="dropdown-toggle" href="#">Financial Aid<b class="caret"></b></a>
                                         <ul class="dropdown-menu" data-parent=".nav-collapse" data-toggle="collapse">
                                             <li><a href="https://<?php echo $host ?>/index.php/aid/workshop" id="aid_workshop" title="Workshop">For Workshops</a></li>                                            
@@ -248,23 +258,23 @@ $host = $_SERVER['HTTP_HOST'];
                                             <li><a href="https://<?php echo $host ?>/index.php/register2/campus" id="campus" title="School Campus Locations">School Campus Locations</a></li>                                            
                                         </ul>
                                     </li>                                    
-                                    
-                                     
+
+
                                     <li><a href="https://<?php echo $host ?>/gallery/photo_gallery"  id="gallery" title="Photo Gallery">Gallery</a></li>
-                                  
-                                    
-                                    
+
+
+
                                     <li class="dropdown"><a title="Jobs" class="dropdown-toggle" href="#cm_submenu_2">Jobs<b class="caret"></b></a>
                                         <ul class="dropdown-menu">                                            
                                             <li><a href="https://<?php echo $host ?>/jobs/instructor"  id="jobs_instructor" title="Instructor Opportunity">Instructor Opportunity</a></li>
                                             <li><a href="https://<?php echo $host ?>/jobs/find"  id="jobs_student" title="Find Job">Find Job</a></li>
-                                                                                     
+
                                         </ul>
                                     </li>
-                                     
-                                     <li><a href="https://<?php echo $host ?>/faq"  id="faq_item" title="FAQ’s">Help</a></li>
-                                     <li id='login_link'><a href="https://<?php echo $host ?>/login" title="Login">Login</a></li>
-                                     
+
+                                    <li><a href="https://<?php echo $host ?>/faq"  id="faq_item" title="FAQ’s">Help</a></li>
+                                    <li id='login_link'><a href="https://<?php echo $host ?>/login" title="Login">Login</a></li>
+
                                 </ul>
                                 <div class="nav-divider-right"></div>                                
                             </div>                      
@@ -298,8 +308,8 @@ $host = $_SERVER['HTTP_HOST'];
 
                                 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
                                 -->
-                                
-                                
+
+
                                 <style>
 
                                     div.skiptranslate.goog-te-gadget {
