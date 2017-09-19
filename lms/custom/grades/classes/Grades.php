@@ -34,6 +34,13 @@ class Grades extends Util {
         return $name;
     }
 
+    function truncate($val, $f = "0") {
+        if (($p = strpos($val, '.')) !== false) {
+            $val = floatval(substr($val, 0, $p + 1 + $f));
+        }
+        return $val;
+    }
+
     function get_item_grade($item, $userid) {
         $query = "select * from mdl_grade_grades "
                 . "where itemid=$item "
@@ -46,12 +53,16 @@ class Grades extends Util {
                 $pr = new stdClass();
                 $name = $this->get_quiz_item_name($item);
                 $date = date('m-d-Y', $row['timemodified']);
-                if ($row['finalgrade'] < 100) {
-                    $grade = round($row['finalgrade']);
-                } // end if 
-                else {
-                    $grade = round(($row['finalgrade'] / $row['rawgrademax']) * 100);
-                } // end else 
+                /*
+                  if ($row['finalgrade'] < 100) {
+                  $grade = round($row['finalgrade']);
+                  } // end if
+                  else {
+                  $grade = round(($row['finalgrade'] / $row['rawgrademax']) * 100);
+                  } // end else
+                 */
+
+                $grade = $row['finalgrade'];
                 $pr->id = $item;
                 $pr->name = $name;
                 $pr->grade = $grade;

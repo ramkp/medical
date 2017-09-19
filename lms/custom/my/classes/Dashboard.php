@@ -1412,7 +1412,7 @@ class Dashboard extends Util {
                 $total_grade_max = $total_grade_max + $gradeitem->max;
                 $list.="<div class='row-fluid'>";
                 $list.="<span class='span4'>$gradeitem->name</span>";
-                $list.="<span class='span1'>$gradeitem->grade %</span>";
+                $list.="<span class='span1'>$gradeitem->grade </span>";
                 $list.="<span class='span1'>$gradeitem->date</span>";
                 $list.="</div>";
             } // end foreach
