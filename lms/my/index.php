@@ -177,12 +177,10 @@ if ($USER->id != 2 && ($roleid == 5 || $roleid == '')) {
         die();
     } // end if
     else {
+        $btn = $crm->get_support_button($USER->id);
+        echo $btn;
         $list = $ds->get_programs_panel();
         echo $list;
-        if ($USER->id == 13734) {
-            $btn = $crm->get_support_button($USER->id);
-            echo $btn;
-        }
     } // end else
 } // end if $USER->id != 2 && ($roleid == 5 || $roleid == '')
 

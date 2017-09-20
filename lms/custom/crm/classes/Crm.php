@@ -1,24 +1,17 @@
 <?php
 
-require_once ('/home/cnausa/public_html/lms/class.pdo.database.php');
-require_once ('/home/cnausa/public_html/lms/class.pdo.database2.php');
-
-//require_once ('/home/cnausa/public_html/suit/crm/include/utils.php');
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database.php');
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/lms/class.pdo.database2.php');
 
 class Crm {
 
     public $moodle_db;
     public $crm_db;
-    public $user;
-    public $course;
     public $signup_url;
 
     function __construct() {
-        global $USER, $COURSE;
         $this->moodle_db = new pdo_db();
         $this->crm_db = new pdo_db2();
-        $this->user = $USER;
-        $this->course = $COURSE;
         $this->signup_url = 'https://' . $_SERVER['SERVER_NAME'] . '/lms/login/my_signup2.php';
     }
 
@@ -87,17 +80,59 @@ class Crm {
         return $list;
     }
 
+    function get_user_moodle_email($userid) {
+        $query = "select * from mdl_user where id=$userid";
+        $result = $this->moodle_db->query($query);
+        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+            $email = $row['email'];
+        }
+        return $email;
+    }
+
+    function get_crm_email_id($email) {
+        $query = "select * from email_addresses where email_address='$email'";
+        $num = $this->crm_db->numrows($query);
+        if ($num > 0) {
+            $result = $this->crm_db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $email_id = $row['id'];
+            } // end while
+        } // end if $num > 0
+        else {
+            $email_id = '';
+        } // end else
+        return $email_id;
+    }
+
+    function is_user_has_crm_account($userid) {
+        $email = $this->get_user_moodle_email($userid);
+        $email_id = $this->get_crm_email_id($email);
+        if ($email_id != '') {
+            $query = "select * from email_addr_bean_rel where email_address_id='$email_id'";
+            $result = $this->crm_db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $crm_account_id = $row['bean_id'];
+            }
+        } // end if
+        else {
+            $crm_account_id = '';
+        } // end else
+        return $crm_account_id;
+    }
+
     function get_support_button($userid) {
         $list = "";
-        $list.="<div class='row-fluid'>";
-        $list.="<span class='span4'><button class='btn btn-primary' id='new_case_$userid'>Add Support Case</button></span>";
-        $list.="</div>";
+        $crm_account_id = $this->is_user_has_crm_account($userid);
+        if ($crm_account_id != '') {
+            $list.="<div class='row-fluid'>";
+            $list.="<span class='span4'><button class='btn btn-primary' id='new_case_$userid' data-crmid='$crm_account_id'>Support Request</button></span>";
+            $list.="</div>";
+        }
         return $list;
     }
 
     function get_new_case_modal_dialog($userid) {
         $list = "";
-        //$userid = $this->user->id;
         $list.="<div id='myModal' class='modal fade' style='width:675px;'>
         <div class='modal-dialog'>
         
@@ -106,7 +141,7 @@ class Crm {
                     <h4 class='modal-title'>Add Support Case</h4>
                 </div>
                 <div class='modal-body'>
-                <input type='hidden' id='userid' value='$userid'>
+                <input type='hidden' id='crm_userid' value='$userid'>
                 <div class='container-fluid'>
                 <span class='span1'>Subject:</span>
                 <span class='span3'><input type='text' id='case_subject' style='width:475px;'></span>
@@ -119,7 +154,8 @@ class Crm {
                 </div>
                 
                 <div class='container-fluid' style=''>
-                <span class='span6' style='color:red;' id='case_err'></span>
+                <span class='span1'>&nbsp;</span>
+                <span class='span3' style='color:red;' id='case_err'></span>
                 </div>
              
                 <div class='modal-footer' style='text-align:center;'>
@@ -143,7 +179,7 @@ class Crm {
     }
 
     function add_new_support_case($item) {
-        $user_crm_id = $this->get_crm_user_id($item->userid);
+        $user_crm_id = $item->userid;
         $guid = $this->create_guid();
         $name = $item->subject;
         $message = $item->message;
@@ -213,10 +249,20 @@ class Crm {
         return $email;
     }
 
-    function add_user_crm_id($crm_user_id, $email) {
-        $query = "update mdl_user set crm_uid='$crm_user_id' "
+    function add_user_crm_id($crm_user_id, $email, $pwd) {
+        $query = "update mdl_user set crm_uid='$crm_user_id', purepwd='$pwd' "
                 . "where username='$email'";
         $this->moodle_db->query($query);
+    }
+
+    function update_new_moodle_user_pwd($email, $pwd) {
+        $query = "update mdl_user set purepwd='$pwd' "
+                . "where username='$email'";
+        $this->moodle_db->query($query);
+    }
+
+    function generateRandomString($length = 25) {
+        return substr(str_shuffle("0123456789abcde*fghijk*lmnopqrstuvwxyzABCDEF*GHIJKLMNOPQRSTUVWXYZ*"), 0, $length);
     }
 
     function create_moodle_account($crm_user_id) {
@@ -228,11 +274,12 @@ class Crm {
             $names_arr = explode(' ', $userdata->name);
             $fname = $names_arr[0];
             $lname = $names_arr[1];
-            $pwd = 'strange12';
+            $pwd = $this->generateRandomString(8);
 
             $user = new stdClass();
             $user->username = $email;
             $user->password = $pwd;
+            $user->pwd = $pwd;
             $user->first_name = $fname;
             $user->last_name = $lname;
             $user->email = $email;
@@ -259,9 +306,8 @@ class Crm {
 
             $context = stream_context_create($options);
             $response = file_get_contents($this->signup_url, false, $context);
-            print_r($response);
             if ($response !== false) {
-                $this->add_user_crm_id($crm_user_id, $email);
+                $this->update_new_moodle_user_pwd($email, $pwd);
             }  // end if $response !== false        
             else {
                 return false;

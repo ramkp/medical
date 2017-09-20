@@ -3,14 +3,13 @@
 header("Access-Control-Allow-Origin: *");
 require('../config.php');
 require_once($CFG->dirroot . '/user/editlib.php');
+require_once ($_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/crmMailer.php');
 
 $authplugin = get_auth_plugin($CFG->registerauth);
 
 if (!$authplugin->can_signup()) {
     print_error('notlocalisederrormessage', 'error', '', 'Sorry, you may not use this page.');
 }
-
-//print_r($_REQUEST);
 
 if ($_REQUEST) {
 
@@ -39,16 +38,6 @@ if ($_REQUEST) {
     $user->secret = random_string(15);
     $user->auth = $CFG->registerauth;
 
-    /*
-     * 
-      echo "<br>----------------<br>";
-      print_r($user);
-      echo "<br>----------------<br>";
-      die();
-     * 
-     */
-
-
     // Initialize alternate name fields to empty strings.
     $namefields = array_diff(get_all_user_name_fields(), useredit_get_required_name_fields());
     foreach ($namefields as $namefield) {
@@ -57,6 +46,8 @@ if ($_REQUEST) {
 
     // Perform signup process
     $authplugin->user_signup($user, false);
+    $m = new crmMailer();
+    $m->send_moodle_account_info($posted_user);
 } // end if $_POST
 else {
     echo "There is no post ...";

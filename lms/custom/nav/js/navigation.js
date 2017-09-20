@@ -6139,13 +6139,16 @@ $(document).ready(function () {
 
         if (event.target.id.indexOf('new_case_') >= 0) {
             var userid = event.target.id.replace("new_case_", "");
-            console.log('User ID: ' + userid);
+            var elid = '#' + event.target.id;
+            var crmid = $(elid).data('crmid');
+            //console.log('Account CRM ID: ' + crmid);
+            //console.log('User ID: ' + userid);
             var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
             $.getScript(js_url)
                     .done(function () {
                         console.log('Script bootstrap.min.js is loaded ...');
                         var url = "/lms/custom/crm/get_new_case_modal_dialog.php";
-                        var request = {userid: userid};
+                        var request = {userid: crmid};
                         $.post(url, request).done(function (data) {
                             $("body").append(data);
                             $("#myModal").modal('show');
@@ -6158,12 +6161,13 @@ $(document).ready(function () {
         }
 
         if (event.target.id == 'add_new_support_case') {
-            var userid = $('#userid').val();
+            var userid = $('#crm_userid').val();
             var subject = $('#case_subject').val();
             var message = $('#case_desc').val();
             if (subject != '' && message != '') {
                 $('#case_err').html();
                 var scase = {userid: userid, subject: subject, message: message};
+                console.log('Case: ' + JSON.stringify(scase));
                 var url = "/lms/custom/crm/add_new_support_case.php";
                 $.post(url, {scase: JSON.stringify(scase)}).done(function (data) {
                     console.log(data);
