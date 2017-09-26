@@ -7,6 +7,10 @@ namespace Composer\Autoload;
 class ComposerStaticInitbd90785e7bb66b45cfae3d370033a1bc
 {
     public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
+            'Psr\\Log\\' => 8,
+        ),
         'B' => 
         array (
             'Braintree\\' => 10,
@@ -14,6 +18,10 @@ class ComposerStaticInitbd90785e7bb66b45cfae3d370033a1bc
     );
 
     public static $prefixDirsPsr4 = array (
+        'Psr\\Log\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
+        ),
         'Braintree\\' => 
         array (
             0 => __DIR__ . '/..' . '/braintree/braintree_php/lib/Braintree',
@@ -21,6 +29,13 @@ class ComposerStaticInitbd90785e7bb66b45cfae3d370033a1bc
     );
 
     public static $prefixesPsr0 = array (
+        'P' => 
+        array (
+            'PayPal' => 
+            array (
+                0 => __DIR__ . '/..' . '/paypal/rest-api-sdk-php/lib',
+            ),
+        ),
         'B' => 
         array (
             'Braintree' => 

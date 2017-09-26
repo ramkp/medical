@@ -2577,6 +2577,34 @@ $(document).ready(function () {
 
         console.log('Class element clicked: ' + $(event.target).attr('class'));
 
+        if ($(event.target).attr('class') == 'paypal_refund') {
+            var transid=$('.paypal_refund').data('transid');
+            if (dialog_loaded !== true) {
+                console.log('Script is not yet loaded starting loading ...');
+                dialog_loaded = true;
+                var js_url = "https://" + domain + "/assets/js/bootstrap.min.js";
+                $.getScript(js_url)
+                    .done(function () {
+                        console.log('Script bootstrap.min.js is loaded ...');
+                        var url = "/lms/custom/paypal/get_refund_modal_dialog.php";
+                        $.post(url, {transid: transid}).done(function (data) {
+                            $("body").append(data);
+                            $("#myModal").modal('show');
+                        });
+                    })
+                    .fail(function () {
+                        console.log('Failed to load bootstrap.min.js');
+                    });
+            } // dialog_loaded!=true
+            else {
+                console.log('Script already loaded');
+                $("body").append(data);
+                $("#myModal").modal('show');
+            }
+
+        }
+
+
         if ($(event.target).attr('class') == 'profile_user_suspend') {
             var userid = $(this).data('userid');
             var state = $(this).data('status');
@@ -6091,6 +6119,11 @@ $(document).ready(function () {
         }
 
         console.log('Event ID: ' + event.target.id);
+
+
+        if (event.target.id == 'make_paypal_refund') {
+                
+        }
 
         if (event.target.id == 'add_attempt') {
             var userid = $('#userid').val();

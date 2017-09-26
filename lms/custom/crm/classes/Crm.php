@@ -143,13 +143,13 @@ class Crm {
                 <div class='modal-body'>
                 <input type='hidden' id='crm_userid' value='$userid'>
                 <div class='container-fluid'>
-                <span class='span1'>Subject:</span>
+                <span class='span1'>Subject*:</span>
                 <span class='span3'><input type='text' id='case_subject' style='width:475px;'></span>
                 <br><br>
                 </div>
                 
                 <div class='container-fluid'>
-                <span class='span1'>Description:</span>
+                <span class='span1'>Description*:</span>
                 <span class='span3'><textarea style='width:475px;' id='case_desc'></textarea></span>
                 </div>
                 
