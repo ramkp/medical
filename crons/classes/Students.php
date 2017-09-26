@@ -1098,7 +1098,7 @@ class Students {
         $mail->Port = $this->mail_smtp_port;
         $mail->setFrom($this->mail_smtp_user, 'Medical2 Career College');
         $mail->addAddress($addressA);
-        $mail->addAddress($addressB);
+        //$mail->addAddress($addressB);
         $mail->addAddress($user_details->email);
         $mail->addReplyTo($this->mail_smtp_user, 'Medical2 Career College');
         $mail->isHTML(true);

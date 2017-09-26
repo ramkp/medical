@@ -1984,7 +1984,7 @@ class Mailer {
         $addrB = 'info@medical2.com';
         $mail->AddAddress($email);
         $mail->addCC($addrA);
-        $mail->addCC($addrB);
+        //$mail->addCC($addrB);
         if (!$mail->send()) {
             return false;
         } // end if !$mail->send()
