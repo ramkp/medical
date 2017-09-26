@@ -592,10 +592,13 @@ class Dashboard extends Util
 
     function is_certificate_expired($courseid)
     {
-        $query = "select * from mdl_course where id=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $expired = $row['expired'];
+        $expired='';
+        if ($courseid>0) {
+            $query = "select * from mdl_course where id=$courseid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $expired = $row['expired'];
+            }
         }
         return $expired;
     }
@@ -1158,10 +1161,12 @@ class Dashboard extends Util
 
     function get_pure_course_cost($courseid)
     {
-        $query = "select * from mdl_course where id=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $cost = $row['cost'];
+        if ($courseid>0) {
+            $query = "select * from mdl_course where id=$courseid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $cost = $row['cost'];
+            }
         }
         return $cost;
     }
@@ -1191,10 +1196,12 @@ class Dashboard extends Util
 
     function get_course_category($courseid)
     {
-        $query = "select * from mdl_course where id=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $category = $row['category'];
+        if ($courseid>0) {
+            $query = "select * from mdl_course where id=$courseid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $category = $row['category'];
+            }
         }
         return $category;
     }
@@ -1521,21 +1528,23 @@ class Dashboard extends Util
     function get_user_attempts_average($courseid, $userid)
     {
         $list = "";
-        $query = "select * from mdl_user_attempts "
-            . "where courseid=$courseid "
-            . "and userid=$userid";
-        $num = $this->db->numrows($query);
-        if ($num > 0) {
-            $result = $this->db->query($query);
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $date = date('m-d-Y', $row['adate']);
-                $list .= "<div class='row-fluid'>";
-                $list .= "<span class='span3'>Attempt No " . $row['atn'] . "</span>";
-                $list .= "<span class='span2'>Grade " . $row['grade'] . "%</span>";
-                $list .= "<span class='span2'>$date</span>";
-                $list .= "</div>";
-            } // end while
-        } // end if $num > 0
+        if ($courseid > 0) {
+            $query = "select * from mdl_user_attempts "
+                . "where courseid=$courseid "
+                . "and userid=$userid";
+            $num = $this->db->numrows($query);
+            if ($num > 0) {
+                $result = $this->db->query($query);
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    $date = date('m-d-Y', $row['adate']);
+                    $list .= "<div class='row-fluid'>";
+                    $list .= "<span class='span3'>Attempt No " . $row['atn'] . "</span>";
+                    $list .= "<span class='span2'>Grade " . $row['grade'] . "%</span>";
+                    $list .= "<span class='span2'>$date</span>";
+                    $list .= "</div>";
+                } // end while
+            } // end if $num > 0
+        } // end if $courseid>0
         return $list;
     }
 
@@ -3561,9 +3570,19 @@ class Dashboard extends Util
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $courses[] = $this->get_courseid_by_contextid($row['contextid']);
+                $courseid=$this->get_courseid_by_contextid($row['contextid']);
+                if ($courseid>0) {
+                    $courses[] = $courseid;
+                }
             } // end while
         } // end if $num > 0
+
+        /*
+        echo '------------------------<br>';
+        print_r($courses);
+        echo '------------------------<br>';
+        */
+
         return $courses;
     }
 
@@ -3604,12 +3623,14 @@ class Dashboard extends Util
 
     function is_exam_attempt($courseid)
     {
-        $query = "select * from mdl_course where id=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $category = $row['category'];
+        if ($courseid>0) {
+            $query = "select * from mdl_course where id=$courseid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $category = $row['category'];
+            }
+            $status = ($category == 4) ? true : false;
         }
-        $status = ($category == 4) ? true : false;
         return $status;
     }
 
@@ -3823,10 +3844,12 @@ class Dashboard extends Util
 
     function is_course_expired($id)
     {
-        $query = "select * from mdl_course where id=$id";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $expire = $row['expired'];
+        if ($id>0) {
+            $query = "select * from mdl_course where id=$id";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $expire = $row['expired'];
+            }
         }
         return $expire;
     }
@@ -6301,14 +6324,16 @@ class Dashboard extends Util
 
     function get_course_detailes($courseid)
     {
-        $query = "select * from mdl_course where id=$courseid";
-        $result = $this->db->query($query);
-        while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-            $course = new stdClass();
-            foreach ($row as $key => $value) {
-                $course->$key = $value;
-            } // end fofeach
-        } // end while
+        if ($courseid>0) {
+            $query = "select * from mdl_course where id=$courseid";
+            $result = $this->db->query($query);
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $course = new stdClass();
+                foreach ($row as $key => $value) {
+                    $course->$key = $value;
+                } // end fofeach
+            } // end while
+        }
         return $course;
     }
 
