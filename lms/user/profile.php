@@ -221,6 +221,21 @@ echo '</div>';  // Userprofile class.
 
     $(document).ready(function () {
 
+        var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+        };
+
         $('.at_calendar').datepicker({
             dateFormat: "mm/dd/yy"
         });
@@ -249,6 +264,19 @@ echo '</div>';  // Userprofile class.
             dateFormat: "mm/dd/yy"
         });
 
+
+        var userid = getUrlParameter('id');
+        console.log('User ID:: ' + userid);
+        var url = "/lms/custom/grades/get_user_courses.php";
+        $.post(url, {userid:userid}).done(function (data) {
+            console.log('Server response: '+data);
+            $.each(jQuery.parseJSON(data), function (index, value) {
+               console.log('Course id: '+value);
+               var elid='#att_table_'+value;
+               $(elid).DataTable();
+            });
+
+        });
 
     }); // end of document ready
 

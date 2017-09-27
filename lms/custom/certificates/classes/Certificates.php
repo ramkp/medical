@@ -989,7 +989,7 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Mrs. Vicky Gunter<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>P. Nicole Morrison<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -1017,7 +1017,7 @@ class Certificates extends Util {
                     $list.="EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Mrs. Vicky Gunter<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
+                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>P. Nicole Morrison<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
                 $list.="</div>";
 
                 $list.="</body>";
@@ -1646,7 +1646,7 @@ class Certificates extends Util {
     }
 
     function create_new_certificate($cert, $issue, $expire) {
-
+        $list="";
         $coursename = $this->get_course_name($cert->courseid); // string
         $userdetails = $this->get_user_details($cert->userid); // object
         $courseid = $cert->courseid;
@@ -1853,57 +1853,57 @@ class Certificates extends Util {
 
             case 55:
 
-                $list.="<!DOCTYPE HTML SYSTEM>";
-                $list.="<head>";
-                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
-                $list.="</head>";
-                $list.="<body>";
-                $list.="<div>";
-                $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
-                $list.="<span style='align:center;font-size:16pt;'><br><br>Presents in recognition on this the $day of $month, $year</span><br>";
-                $list.="<br><span style='align:center;font-size:16pt;'>this <span style='align:center;font-weight:bold;font-size:30pt;'>Diploma</span> to</span><br>";
-                $list.="<span style='align:center;font-size:35pt;'>$firstname $lastname</span>";
-                $list.="<span style='align:center;font-size:16pt;'><br>for successfully completion of the requirements in the program of</span><br>";
-                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Medical Assistant</span><br>";
-                $list.="<span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'><br>DIPLOMA # $code</span><br>";
+                $list .= "<!DOCTYPE HTML SYSTEM>";
+                $list .= "<head>";
+                $list .= "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list .= "</head>";
+                $list .= "<body>";
+                $list .= "<div>";
+                $list .= "<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
+                $list .= "<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
+                $list .= "<span style='align:center;font-size:16pt;'><br><br>Presents in recognition on this the $day of $month, $year</span><br>";
+                $list .= "<br><span style='align:center;font-size:16pt;'>this <span style='align:center;font-weight:bold;font-size:30pt;'>Diploma</span> to</span><br>";
+                $list .= "<span style='align:center;font-size:35pt;'>$firstname $lastname</span>";
+                $list .= "<span style='align:center;font-size:16pt;'><br>for successfully completion of the requirements in the program of</span><br>";
+                $list .= "<span style='align:center;font-size:40pt;font-weight:bold;'>Medical Assistant</span><br>";
+                $list .= "<span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'><br>DIPLOMA # $code</span><br>";
                 if ($renew_status == true) {
-                    $list.="EXPIRATION DATE $expiration_date</p>";
+                    $list .= "EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Mrs. Vicky Gunter<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
-                $list.="</div>";
+                $list .= "<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>P. Nicole Morrison<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
+                $list .= "</div>";
 
-                $list.="</body>";
-                $list.="</html>";
+                $list .= "</body>";
+                $list .= "</html>";
 
                 break;
 
             case 56:
 
-                $list.="<!DOCTYPE HTML SYSTEM>";
-                $list.="<head>";
-                $list.="<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
-                $list.="</head>";
-                $list.="<body>";
-                $list.="<div>";
-                $list.="<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
-                $list.="<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
-                $list.="<span style='align:center;font-size:16pt;'><br><br>Presents in recognition on this the $day of $month, $year</span><br>";
-                $list.="<br><span style='align:center;font-size:16pt;'>this <span style='align:center;font-weight:bold;font-size:30pt;'>Certificate</span> to</span><br>";
-                $list.="<span style='align:center;font-size:35pt;'>$firstname $lastname</span>";
-                $list.="<span style='align:center;font-size:16pt;'><br>for successfully completion of the requirements in the program of</span><br>";
-                $list.="<span style='align:center;font-size:40pt;font-weight:bold;'>Medical Administrative Assistant</span><br>";
-                $list.="<span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'><br>CERTIFICATE # $code</span><br>";
+                $list .= "<!DOCTYPE HTML SYSTEM>";
+                $list .= "<head>";
+                $list .= "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>";
+                $list .= "</head>";
+                $list .= "<body>";
+                $list .= "<div>";
+                $list .= "<p style='text-align:center'><span style='text-align:center'><img src='/assets/logo/5.png' width='55%' height='15%'></span><br>";
+                $list .= "<span style='align:center;font-weight:bold;font-size:8pt;'>Licensed by the Mississippi Commission on Proprietary School and College Registration, License No. C675</span>";
+                $list .= "<span style='align:center;font-size:16pt;'><br><br>Presents in recognition on this the $day of $month, $year</span><br>";
+                $list .= "<br><span style='align:center;font-size:16pt;'>this <span style='align:center;font-weight:bold;font-size:30pt;'>Certificate</span> to</span><br>";
+                $list .= "<span style='align:center;font-size:35pt;'>$firstname $lastname</span>";
+                $list .= "<span style='align:center;font-size:16pt;'><br>for successfully completion of the requirements in the program of</span><br>";
+                $list .= "<span style='align:center;font-size:40pt;font-weight:bold;'>Medical Administrative Assistant</span><br>";
+                $list .= "<span style='align:center;text-decoration:underline;font-size:15pt;font-weight:normal;'><br>CERTIFICATE # $code</span><br>";
                 if ($renew_status == true) {
-                    $list.="EXPIRATION DATE $expiration_date</p>";
+                    $list .= "EXPIRATION DATE $expiration_date</p>";
                 } // end if $renew_status == true                                 
                 // President signature
-                $list.="<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>Mrs. Vicky Gunter<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
-                $list.="</div>";
+                $list .= "<br><br><p align='center'><table border='0' width='675px;'><tr><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'> Mrs. Donna Steele<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Director</span></td><td align='right' style='font-family:king;text-decoration:underline;border-bottom:thick;font-size:10pt;'>P. Nicole Morrison<br/><span style='float:left;font-size:12pt;font-family: Geneva, Arial, Helvetica, sans-serif;text-decoration:none; '>Program Instructional Director</span></td></tr></table></p";
+                $list .= "</div>";
 
-                $list.="</body>";
-                $list.="</html>";
+                $list .= "</body>";
+                $list .= "</html>";
 
                 break;
 

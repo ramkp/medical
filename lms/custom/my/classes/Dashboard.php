@@ -19,6 +19,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/Mailer.php'
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/mpdf/mpdf.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/functionality/php/classes/pdf/dompdf/autoload.inc.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/paypal/classes/Cards.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/attendance/classes/Attendance.php';
+
 
 use Dompdf\Dompdf;
 
@@ -1782,22 +1784,21 @@ class Dashboard extends Util
         if (count($courses) > 0) {
             foreach ($courses as $courseid) {
                 $categoryid = $this->get_course_category($courseid);
-                if ($categoryid == 5) {
+                if ($categoryid >= 5) {
                     // Career College programs
+                    $attClass=new Attendance();
+                    $att_table=$attClass->get_user_attendance_logs($courseid, $userid);
                     $coursename = $this->get_course_name($courseid);
-                    $at = $this->student_at_block($courseid, $userid);
-                    $list .= "<br><div class='row-fluid' style='font-weight:bold;'>";
-                    $list .= "<span class='span9'>$coursename</span>";
+                    //$at = $this->student_at_block($courseid, $userid);
+                 
+                    $list .= "<div class='row-fluid'>";
+                    $list .= "<span class='span9'>$att_table</span>";
                     $list .= "</div>";
 
                     $list .= "<div class='row-fluid'>";
-                    $list .= "<span class='span4'><hr/></span>";
+                    $list .= "<span class='span9'><br><hr/></span>";
                     $list .= "</div>";
-
-                    $list .= "<div class='row-fluid'>";
-                    $list .= "<span class='span9'>$at</span>";
-                    $list .= "</div>";
-                } // end if $categoryid==5
+                } // end if $categoryid>=5
             } // end foreach
         } // end if count($courses)>0
         return $list;
