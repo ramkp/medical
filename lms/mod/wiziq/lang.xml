@@ -1,0 +1,78 @@
+<wiziq>
+    <virtual_classroom>
+        <languages>
+            <language>
+                <language_culture_name>en-US</language_culture_name>
+                <display_name>English - United States</display_name>
+            </language>
+            <language>
+                <language_culture_name>es-ES</language_culture_name>
+                <display_name>Spanish - Spain</display_name>
+            </language>
+            <language>
+                <language_culture_name>pt-PT</language_culture_name>
+                <display_name>Portuguese - Portugal</display_name>
+            </language>
+            <language>
+                <language_culture_name>he-IL</language_culture_name>
+                <display_name>Hebrew - Israel</display_name>
+            </language>
+            <language>
+                <language_culture_name>th-TH</language_culture_name>
+                <display_name>Thai - Thailand</display_name>
+            </language>
+            <language>
+                <language_culture_name>zh-HK</language_culture_name>
+                <display_name>Chinese - Hong Kong SAR</display_name>
+            </language>
+            <language>
+                <language_culture_name>ru-RU</language_culture_name>
+                <display_name>Russian - Russia</display_name>
+            </language>
+            <language>
+                <language_culture_name>ar-SA</language_culture_name>
+                <display_name>Arabic - Saudi Arabia</display_name>
+            </language>
+            <language>
+                <language_culture_name>fr-FR</language_culture_name>
+                <display_name>French - France</display_name>
+            </language>
+            <language>
+                <language_culture_name>pl-PL</language_culture_name>
+                <display_name>Polish - Poland</display_name>
+            </language>
+            <language>
+                <language_culture_name>cs-CZ</language_culture_name>
+                <display_name>Czech - Czech Republic</display_name>
+            </language>
+            <language>
+                <language_culture_name>fa-IR</language_culture_name>
+                <display_name>Farsi / Persian - Iran</display_name>
+            </language>
+            <language>
+                <language_culture_name>nl-NL</language_culture_name>
+                <display_name>Dutch</display_name>
+            </language>
+            <language>
+                <language_culture_name>tr-TR</language_culture_name>
+                <display_name>Turkish</display_name>
+            </language>
+            <language>
+                <language_culture_name>it-IT</language_culture_name>
+                <display_name>Italian - Italy</display_name>
+            </language>
+            <language>
+                <language_culture_name>de-DE</language_culture_name>
+                <display_name>German - Germany</display_name>
+            </language>
+            <language>
+                <language_culture_name>ms-MY</language_culture_name>
+                <display_name>Malay - Malaysia</display_name>
+            </language>
+            <language>
+                <language_culture_name>el-GR</language_culture_name>
+                <display_name>Greek - Greece</display_name>
+            </language>
+        </languages>
+    </virtual_classroom>
+</wiziq>

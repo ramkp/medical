@@ -1,0 +1,1 @@
+[30-May-2017 05:27:32 America/New_York] PHP Notice:  A session had already been started - ignoring session_start() in /home/cnausa/public_html/functionality/php/classes/Upload.php on line 8
