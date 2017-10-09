@@ -12,7 +12,6 @@ class Attendance extends Util
 {
 
 
-
     function __construct()
     {
         parent::__construct();
@@ -154,14 +153,19 @@ class Attendance extends Util
         if (count($items) > 0) {
             foreach ($items as $item) {
                 $date = date('m-d-Y H:i:s', $item->timecreated);
-                $coursename = $this->get_course_name($courseid);
+                if ($system == false) {
+                    $coursename = $this->get_course_name($courseid);
+                } // end if
+                else {
+                    $coursename = 'System';
+                }
                 $itemcourseid = $this->get_log_item_course_id($item);
                 if ($itemcourseid == 0) {
                     $component = 'system';
                 } // end if
                 else {
                     //$component = ($item->component == 'core') ? 'program content' : $item->component;
-                    $component=$this->get_component_name($item->component);
+                    $component = $this->get_component_name($item->component);
                 }
                 $list .= "<tr>";
                 $list .= "<td>$coursename</td>";
