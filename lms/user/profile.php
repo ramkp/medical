@@ -272,8 +272,10 @@ echo '</div>';  // Userprofile class.
             console.log('Server response: '+data);
             $.each(jQuery.parseJSON(data), function (index, value) {
                console.log('Course id: '+value);
+               var systemelid='#system_att_table_'+value;
                var elid='#att_table_'+value;
                $(elid).DataTable();
+               $(systemelid).DataTable();
             });
 
         });

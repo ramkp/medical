@@ -27,21 +27,69 @@ use Dompdf\Dompdf;
 class Dashboard extends Util
 {
 
+    /**
+     * @var string
+     */
     public $resolution_path;
+    /**
+     * @var
+     */
     public $resolution_path2;
+    /**
+     * @var int
+     */
     public $assignment_module;
+    /**
+     * @var string
+     */
     public $assesment_path;
+    /**
+     * @var int
+     */
     public $student_role = 5;
+    /**
+     * @var int
+     */
     public $workshop_category = 2;
+    /**
+     * @var array
+     */
     public $renew_payments;
+    /**
+     * @var array
+     */
     public $required_fields;
+    /**
+     * @var int
+     */
     public $one_year;
+    /**
+     * @var int
+     */
     public $three_year;
+    /**
+     * @var array
+     */
     public $free_courses;
+    /**
+     * @var array
+     */
     public $free_users;
+    /**
+     * @var int
+     */
     public $CNA_COURSE = 41;
+    /**
+     * @var int
+     */
     public $CNA_HOURS = 96;
+    /**
+     * @var array
+     */
     public $OTHER_COLLEGE_COURSES;
+    /**
+     * @var string
+     */
     public $report_path;
 
     function __construct()
@@ -69,6 +117,9 @@ class Dashboard extends Util
         $this->report_path = $_SERVER['DOCUMENT_ROOT'] . '/lms/custom/my';
     }
 
+    /**
+     * @return int
+     */
     function is_user_paid()
     {
         $currencourse = $this->course->id;
@@ -167,6 +218,9 @@ class Dashboard extends Util
         return $status;
     }
 
+    /**
+     * @return int
+     */
     function get_user_status()
     {
 
@@ -190,6 +244,11 @@ class Dashboard extends Util
         return $status;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return int
+     */
     function get_user_course_slot($courseid, $userid)
     {
         $query = "select * from mdl_slots "
@@ -207,6 +266,10 @@ class Dashboard extends Util
         return $slotid;
     }
 
+    /**
+     * @param $courseid
+     * @return mixed
+     */
     function get_renew_fee($courseid)
     {
         $renew = new Renew();
@@ -214,6 +277,9 @@ class Dashboard extends Util
         return $amount;
     }
 
+    /**
+     * @return string
+     */
     function get_user_warning_message()
     {
         $list = "";
@@ -233,6 +299,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $send
+     * @return string
+     */
     function get_course_categories($send = NULL)
     {
         $drop_down = "";
@@ -247,6 +317,10 @@ class Dashboard extends Util
         return $drop_down;
     }
 
+    /**
+     * @param null $cat_id
+     * @return string
+     */
     public function get_courses_by_category($cat_id = null)
     {
         $drop_down = "";
@@ -267,6 +341,10 @@ class Dashboard extends Util
         return $drop_down;
     }
 
+    /**
+     * @param null $courseid
+     * @return string
+     */
     public function get_register_course_states_list($courseid = null)
     {
         $drop_down = "";
@@ -283,6 +361,10 @@ class Dashboard extends Util
         return $drop_down;
     }
 
+    /**
+     * @param null $courseid
+     * @return string
+     */
     public function get_register_course_cities_list($courseid = null)
     {
         $drop_down = "";
@@ -300,6 +382,9 @@ class Dashboard extends Util
         return $drop_down;
     }
 
+    /**
+     * @return string
+     */
     function get_programs_panel()
     {
         $userid = $this->user->id;
@@ -357,6 +442,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $stateid
+     * @return mixed
+     */
     function get_state_name($stateid)
     {
         $query = "select * from mdl_states where id=$stateid";
@@ -367,6 +456,11 @@ class Dashboard extends Util
         return $state;
     }
 
+    /**
+     * @param $courseid
+     * @param null $stateid
+     * @return int
+     */
     function is_course_has_schedule($courseid, $stateid = null)
     {
         $num = 0;
@@ -396,6 +490,11 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return int
+     */
     function is_user_already_enrolled($courseid, $userid)
     {
         $contextid = $this->get_course_context($courseid);
@@ -409,6 +508,10 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     */
     function enroll_user($courseid, $userid)
     {
         $contextid = $this->get_course_context($courseid);
@@ -443,6 +546,10 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $userid
+     * @param $slotid
+     */
     function add_user_to_slot($userid, $slotid)
     {
         $query = "insert into mdl_scheduler_appointment "
@@ -455,6 +562,11 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $courseid
+     * @param $slotid
+     * @param $userid
+     */
     function add_user_slots($courseid, $slotid, $userid)
     {
         $query = "insert into mdl_slots "
@@ -467,6 +579,12 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $courseid
+     * @param $slotid
+     * @param $userid
+     * @return string
+     */
     function enrol_user_to_course($courseid, $slotid, $userid)
     {
         $enrolled = $this->is_user_already_enrolled($courseid, $userid);
@@ -481,6 +599,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return array
+     */
     function get_user_slots($userid)
     {
         $slotid = array();
@@ -496,6 +618,10 @@ class Dashboard extends Util
         return $slotid;
     }
 
+    /**
+     * @param $courseid
+     * @return array
+     */
     function get_course_slots($courseid)
     {
         $slotids = array();
@@ -516,6 +642,11 @@ class Dashboard extends Util
         return $slotids;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return int
+     */
     function get_user_course_completion_status($userid, $courseid)
     {
         $query = "select * from mdl_course_completions "
@@ -524,6 +655,11 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return mixed
+     */
     function get_paypal_transaction_id($courseid, $userid)
     {
         $query = "select * from mdl_paypal_payments 
@@ -535,6 +671,11 @@ class Dashboard extends Util
         return $trans_id;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return string
+     */
     function get_paypal_refund_button($courseid, $userid)
     {
         $list = "";
@@ -548,6 +689,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return string
+     */
     function get_user_paypal_payments($userid, $courseid)
     {
         $list = "";
@@ -592,6 +738,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @return string
+     */
     function is_certificate_expired($courseid)
     {
         $expired='';
@@ -605,6 +755,11 @@ class Dashboard extends Util
         return $expired;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return string
+     */
     function get_user_card_payments($userid, $courseid)
     {
         $list = "";
@@ -645,6 +800,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return string
+     */
     function get_braintree_user_card_payments($userid, $courseid)
     {
         $list = "";
@@ -689,6 +849,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return string
+     */
     function get_user_invoice_payments($userid, $courseid)
     {
         $list = "";
@@ -727,6 +892,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return string
+     */
     function get_user_partial_payments($userid, $courseid)
     {
         $list = "";
@@ -765,6 +935,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return string
+     */
     function get_user_free_payments($userid, $courseid)
     {
         $list = "";
@@ -801,6 +976,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return string
+     */
     function get_refund_payments($userid, $courseid)
     {
 
@@ -857,6 +1037,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return stdClass
+     */
     function get_original_payment_info($courseid, $userid)
     {
         $query = "select * from mdl_card_payments "
@@ -872,6 +1057,10 @@ class Dashboard extends Util
         return $p;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_user_all_refund_payments($userid)
     {
         $list = "";
@@ -978,6 +1167,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return string
+     */
     function get_user_payments($userid, $courseid)
     {
         $list = "";
@@ -989,6 +1183,12 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @param $userslots
+     * @param $courseid
+     * @return string
+     */
     function get_course_schedule_data($userid, $userslots, $courseid)
     {
         $list = "";
@@ -1025,6 +1225,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return int
+     */
     function get_user_roles($userid)
     {
         $prohibit = 0;
@@ -1041,6 +1245,10 @@ class Dashboard extends Util
         return $prohibit;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_address_block($userid)
     {
         $list = "";
@@ -1070,6 +1278,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return array
+     */
     function get_exam_courses()
     {
         $courses = array();
@@ -1084,6 +1295,10 @@ class Dashboard extends Util
         return $courses;
     }
 
+    /**
+     * @param $contextid
+     * @return mixed
+     */
     function get_course_questions_category($contextid)
     {
 //mdl_question_categories
@@ -1095,6 +1310,10 @@ class Dashboard extends Util
         return $id;
     }
 
+    /**
+     * @param $category
+     * @return mixed
+     */
     function get_category_name($category)
     {
         $query = "select * from mdl_question_categories where id=$category";
@@ -1105,6 +1324,10 @@ class Dashboard extends Util
         return $name;
     }
 
+    /**
+     * @param $category
+     * @return int
+     */
     function is_category_has_items($category)
     {
         $query = "select * from mdl_question where category=$category";
@@ -1112,6 +1335,10 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $contextid
+     * @return string
+     */
     function get_course_option_value($contextid)
     {
         $list = "";
@@ -1128,6 +1355,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_courses_questions_banks()
     {
         $list = "";
@@ -1149,6 +1379,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return array
+     */
     function get_courses_questions_context()
     {
         $courses = $this->get_exam_courses();
@@ -1161,6 +1394,10 @@ class Dashboard extends Util
         return $contexts;
     }
 
+    /**
+     * @param $courseid
+     * @return mixed
+     */
     function get_pure_course_cost($courseid)
     {
         if ($courseid>0) {
@@ -1173,6 +1410,10 @@ class Dashboard extends Util
         return $cost;
     }
 
+    /**
+     * @param $slotid
+     * @return mixed
+     */
     function get_course_worshop_cost($slotid)
     {
         $query = "select * from mdl_scheduler_slots where id=$slotid";
@@ -1183,6 +1424,11 @@ class Dashboard extends Util
         return $wscost;
     }
 
+    /**
+     * @param $courseid
+     * @param null $slotid
+     * @return mixed
+     */
     function get_course_cost($courseid, $slotid = null)
     {
         $coursecost = $this->get_pure_course_cost($courseid);
@@ -1196,6 +1442,10 @@ class Dashboard extends Util
         return $cost;
     }
 
+    /**
+     * @param $courseid
+     * @return mixed
+     */
     function get_course_category($courseid)
     {
         if ($courseid>0) {
@@ -1208,6 +1458,10 @@ class Dashboard extends Util
         return $category;
     }
 
+    /**
+     * @param $userid
+     * @return int
+     */
     function check_free_access($userid)
     {
         $query = "select * from mdl_free where userid=$userid";
@@ -1215,6 +1469,11 @@ class Dashboard extends Util
         return $free_num;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return string
+     */
     function get_payments_history_block($courseid, $userid)
     {
         $list = "";
@@ -1429,6 +1688,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return int
+     */
     function is_assignment_page()
     {
         $querystring = $_SERVER['REQUEST_URI'];
@@ -1439,6 +1701,9 @@ class Dashboard extends Util
         }
     }
 
+    /**
+     * @return mixed
+     */
     function get_module_id()
     {
         $querystring = $_SERVER['REQUEST_URI'];
@@ -1447,6 +1712,10 @@ class Dashboard extends Util
         return $id;
     }
 
+    /**
+     * @param $moduleid
+     * @return string
+     */
     function create_assignment_pdf($moduleid)
     {
         $query = "select * from mdl_course_modules where id=$moduleid";
@@ -1479,6 +1748,10 @@ class Dashboard extends Util
         return $path;
     }
 
+    /**
+     * @param $userid
+     * @return int
+     */
     function get_notes_status($userid)
     {
         $query = "select * from mdl_post where module='notes' and userid=$userid";
@@ -1486,6 +1759,11 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return string
+     */
     function get_grades_block($courseid, $userid)
     {
         $list = "";
@@ -1527,6 +1805,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return string
+     */
     function get_user_attempts_average($courseid, $userid)
     {
         $list = "";
@@ -1550,6 +1833,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_user_grades($userid)
     {
         $list = "";
@@ -1587,6 +1874,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_students_status_box()
     {
         $list = "";
@@ -1598,6 +1888,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $at
+     * @return string
+     */
     function get_presence_modal_dialog($at)
     {
         $list = "";
@@ -1635,6 +1929,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $item
+     * @return string
+     */
     function get_send_sms_dialog($item)
     {
         $list = "";
@@ -1670,6 +1968,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $at
+     * @return int
+     */
     function is_at_date_exists($at)
     {
         $udate = strtotime($at->date);
@@ -1681,6 +1983,9 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $at
+     */
     function delete_calendar_entry($at)
     {
         $udate = strtotime($at->date);
@@ -1691,6 +1996,9 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $at
+     */
     function insert_calendar_entry($at)
     {
         $udate = strtotime($at->date);
@@ -1707,6 +2015,9 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $at
+     */
     function update_student_attendance($at)
     {
         $exists = $this->is_at_date_exists($at);
@@ -1718,6 +2029,11 @@ class Dashboard extends Util
         }
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return string
+     */
     function get_student_calendar_dates($courseid, $userid)
     {
         $list = "";
@@ -1742,6 +2058,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return string
+     */
     function student_at_block($courseid, $userid)
     {
         $list = "";
@@ -1769,12 +2090,16 @@ class Dashboard extends Util
         $list .= "</div>";
 
         $list .= "<div class='row-fluid'>";
-        $list .= "<span class='span8'><hr/></span>";
+        $list .= "<span class='span12'><hr/></span>";
         $list .= "</div>";
 
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_student_attendance($userid)
     {
         $list = "";
@@ -1789,8 +2114,12 @@ class Dashboard extends Util
                     $attClass=new Attendance();
                     $att_table=$attClass->get_user_attendance_logs($courseid, $userid);
                     $coursename = $this->get_course_name($courseid);
-                    //$at = $this->student_at_block($courseid, $userid);
-                 
+                    $at = $this->student_at_block($courseid, $userid);
+
+                    $list .="<div class='row-fluid'>";
+                    $list .="<span class='span9'>$at</span>";
+                    $list .="</div>";
+
                     $list .= "<div class='row-fluid'>";
                     $list .= "<span class='span9'>$att_table</span>";
                     $list .= "</div>";
@@ -1804,6 +2133,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_att_report($userid)
     {
         $list = "";
@@ -1925,6 +2258,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function create_attendance_report($userid)
     {
         $list = $this->get_att_report($userid);
@@ -1936,6 +2273,10 @@ class Dashboard extends Util
         return $filename;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_payment_report($userid)
     {
         $list = "";
@@ -2068,6 +2409,10 @@ class Dashboard extends Util
 
     // ************* Code related to custom profile section  ************** /
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_marital_status_box($sel = null)
     {
         $list = "";
@@ -2100,6 +2445,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_race_box($sel = null)
     {
         $list = "";
@@ -2182,6 +2531,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_sex_box($sel = null)
     {
         $list = "";
@@ -2214,6 +2567,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_edu_box($sel = null)
     {
         $list = "";
@@ -2304,6 +2661,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_income_box($sel = null)
     {
         $list = "";
@@ -2362,6 +2723,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_medical2_start_date($sel = null)
     {
         $list = "";
@@ -2374,6 +2739,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_medical2_late_time_box($sel = null)
     {
         $list = "";
@@ -2386,6 +2755,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_user_birth_date($sel = null)
     {
         $list = "";
@@ -2398,6 +2771,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_job_type_box($sel = null)
     {
         $list = "";
@@ -2432,6 +2809,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $sel
+     * @return string
+     */
     function get_medical_graduation_date($sel)
     {
         $list = "";
@@ -2444,6 +2825,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $sel
+     * @return string
+     */
     function get_status_box($sel)
     {
         //echo "Param: ".$sel."<br>";
@@ -2539,6 +2924,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param null $sel
+     * @return string
+     */
     function get_attempted_exam_box($sel = null)
     {
         $list = "";
@@ -2573,6 +2962,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $sel
+     * @return string
+     */
     function get_passed_box($sel)
     {
         $list = "";
@@ -2607,6 +3000,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $sel
+     * @return string
+     */
     function get_work_box($sel)
     {
         $list = "";
@@ -2641,6 +3038,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_empty_demographic_form($userid)
     {
         $list = "";
@@ -2780,6 +3181,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_filled_demographic_form($userid)
     {
         $list = "";
@@ -2936,6 +3341,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     function get_race_report_data($id)
     {
         $list = "";
@@ -2962,6 +3371,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     function get_education_report_data($id)
     {
         $list = "";
@@ -2991,6 +3404,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     function get_income_report_data($id)
     {
         $list = "";
@@ -3014,6 +3431,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     function get_status_report_data($id)
     {
         $list = "";
@@ -3040,6 +3461,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function print_demographic_data($userid)
     {
         $list = "";
@@ -3245,6 +3670,10 @@ class Dashboard extends Util
         return $file;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_demographic_info($userid)
     {
         $list = "";
@@ -3263,6 +3692,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $data
+     */
     function insert_demographic_data($data)
     {
         $query = "insert into mdl_demographic "
@@ -3312,6 +3744,9 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $data
+     */
     function update_demographic_data($data)
     {
         $query = "update mdl_demographic "
@@ -3339,6 +3774,10 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_student_notes($userid)
     {
         $list = "";
@@ -3369,6 +3808,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return int
+     */
     function is_student_noted($userid)
     {
         $query = "select * from mdl_post where userid=$userid and module='notes'";
@@ -3376,6 +3819,10 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     function get_user_profile_custom_sections($id)
     {
         $list = "";
@@ -3464,6 +3911,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return int
+     */
     function is_student_only_career_college($userid)
     {
         $status = 1;
@@ -3483,6 +3934,10 @@ class Dashboard extends Util
         return $status;
     }
 
+    /**
+     * @param $userid
+     * @return mixed
+     */
     function is_user_suspended($userid)
     {
         $query = "select * from mdl_user where id=$userid";
@@ -3493,6 +3948,10 @@ class Dashboard extends Util
         return $suspended;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     function get_other_tab($id)
     {
         $list = "";
@@ -3516,6 +3975,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @param $state
+     */
     function suspend_user($userid, $state)
     {
         $status = ($state == 0) ? 1 : 0;
@@ -3523,6 +3986,11 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $coursename
+     * @param string $wsname
+     * @return string
+     */
     function get_courseid_by_name($coursename, $wsname = '')
     {
         $query = "select * from mdl_course where fullname='$coursename'";
@@ -3542,6 +4010,9 @@ class Dashboard extends Util
         return json_encode($program);
     }
 
+    /**
+     *
+     */
     function create_programs_data()
     {
         $query = "select * from mdl_course where cost>0 and visible=1";
@@ -3552,6 +4023,10 @@ class Dashboard extends Util
         file_put_contents('/home/cnausa/public_html/lms/custom/utils/programs.json', json_encode($fullname));
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     function get_courseid_by_contextid($id)
     {
         $query = "select * from mdl_context where id=$id";
@@ -3562,6 +4037,10 @@ class Dashboard extends Util
         return $courseid;
     }
 
+    /**
+     * @param $id
+     * @return array
+     */
     function get_user_courses($id)
     {
         $courses = array();
@@ -3587,6 +4066,10 @@ class Dashboard extends Util
         return $courses;
     }
 
+    /**
+     * @param $slotid
+     * @return mixed
+     */
     function get_course_id_by_slot_id($slotid)
     {
         $query = "select * from mdl_scheduler_slots where id=$slotid";
@@ -3602,6 +4085,11 @@ class Dashboard extends Util
         return $courseid;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @return null
+     */
     function get_profile_course_slotid($userid, $courseid)
     {
         $query = "SELECT * FROM `mdl_scheduler_appointment` WHERE studentid=$userid";
@@ -3622,6 +4110,10 @@ class Dashboard extends Util
         return $slotid;
     }
 
+    /**
+     * @param $courseid
+     * @return bool
+     */
     function is_exam_attempt($courseid)
     {
         if ($courseid>0) {
@@ -3635,6 +4127,12 @@ class Dashboard extends Util
         return $status;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     * @param bool $report
+     * @return string
+     */
     function get_user_course_balance($userid, $courseid, $report = false)
     {
         $list = "";
@@ -3695,6 +4193,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @param $currentuser
+     * @return int
+     */
     function is_cna_instructor($courseid, $currentuser)
     {
         $contextid = $this->get_course_context($courseid);
@@ -3706,6 +4209,10 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     function get_user_payments_block($id)
     {
         $list = "";
@@ -3752,6 +4259,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $slotid
+     * @return mixed
+     */
     function get_worshop_course($slotid)
     {
         $query = "select * from mdl_scheduler_slots where id=$slotid";
@@ -3768,6 +4279,10 @@ class Dashboard extends Util
         return $courseid;
     }
 
+    /**
+     * @param $slotid
+     * @return int
+     */
     function is_workshop_slot_exists($slotid)
     {
         $query = "select * from mdl_scheduler_slots where id=$slotid";
@@ -3775,6 +4290,10 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     function get_user_workshops($id)
     {
         $list = "";
@@ -3843,6 +4362,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     function is_course_expired($id)
     {
         if ($id>0) {
@@ -3855,6 +4378,21 @@ class Dashboard extends Util
         return $expire;
     }
 
+    function get_user_certificate_copy_block ($courseid, $userid) {
+        $list="";
+        $coursename = $this->get_course_name($courseid);
+        $link='https://'.$_SERVER['SERVER_NAME']."/lms/custom/certificates/$userid/$courseid/copy/certificate.pdf";
+        $list.="<div class='row-fluid'>";
+        $list.="<span class='span3'>Previous certificate copy: </span>";
+        $list.="<span class='span4'><a href='$link' target='_blank'>$coursename</a></span>";
+        $list.="</div>";
+        return $list;
+    }
+
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_user_certificates($userid)
     {
         $list = "";
@@ -3869,6 +4407,15 @@ class Dashboard extends Util
         if ($num > 0) {
             $result = $this->db->query($query);
             while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $courseid = $row['courseid'];
+                $id = $row['id'];
+
+                $certificate_copy=$this->get_user_certificate_copy_block($courseid, $userid);
+
+                $list .= "<div class='container-fluid' style=''>";
+                $list.="<span class='span12'>$certificate_copy</span>";
+                $list .="</div>";
+
                 $list .= "<div class='container-fluid' style=''>";
                 $start = date('m-d-Y', $row['issue_date']);
                 if ($row['expiration_date'] != '') {
@@ -3877,8 +4424,7 @@ class Dashboard extends Util
                 else {
                     $exp = 'N/A';
                 } // end else
-                $courseid = $row['courseid'];
-                $id = $row['id'];
+
                 $coursename = $this->get_course_name($courseid);
                 $list .= "<span class='span4'><a href='https://" . $_SERVER['SERVER_NAME'] . "/lms/custom/certificates/$userid/$courseid/certificate.pdf' target='_blank'>$coursename</a></span>";
                 $list .= "<span class='span2'>$start</span>";
@@ -3901,6 +4447,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_add_payment_dialog($userid)
     {
         $list = "";
@@ -3959,6 +4509,12 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @param $paymentid
+     * @return string
+     */
     function get_payment_move_dialog($courseid, $userid, $paymentid)
     {
         $list = "";
@@ -3995,6 +4551,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_college_programs_categories()
     {
         $list = "";
@@ -4011,6 +4570,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_college_programs_list($userid)
     {
         $list = "";
@@ -4027,6 +4590,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_attempt_dropdown()
     {
         $list = "";
@@ -4038,6 +4604,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_add_attempt_modal_dialog($userid)
     {
         $list = "";
@@ -4080,6 +4650,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $item
+     */
     function add_new_student_attempt($item)
     {
         $adate = strtotime($item->date);
@@ -4097,6 +4670,10 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_delete_user_dialog($userid)
     {
         $list = "";
@@ -4139,6 +4716,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     */
     function delete_profile_user($userid)
     {
         // 1. Delete user payments
@@ -4164,6 +4744,10 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $payment
+     * @return string
+     */
     function move_payment($payment)
     {
         $payments_data = explode('_', $payment->id);
@@ -4198,6 +4782,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @return mixed
+     */
     function getCourseContext($courseid)
     {
         $query = "select id from mdl_context
@@ -4210,6 +4798,10 @@ class Dashboard extends Util
         return $contextid;
     }
 
+    /**
+     * @param $courseid
+     * @return mixed
+     */
     function getEnrolId($courseid)
     {
         $query = "select id from mdl_enrol
@@ -4221,6 +4813,10 @@ class Dashboard extends Util
         return $enrolid;
     }
 
+    /**
+     * @param $userid
+     * @param $courseid
+     */
     function assign_roles($userid, $courseid)
     {
         $roleid = $this->student_role;
@@ -4270,6 +4866,9 @@ class Dashboard extends Util
         }
     }
 
+    /**
+     * @param $payment
+     */
     function add_other_payment($payment)
     {
         $date = time();
@@ -4329,6 +4928,11 @@ class Dashboard extends Util
         }
     }
 
+    /**
+     * @param $slotid
+     * @param $userid
+     * @return int
+     */
     function is_user_scheduled($slotid, $userid)
     {
         $query = "select * from mdl_scheduler_appointment "
@@ -4338,6 +4942,10 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $payment
+     * @return string
+     */
     function refund_braintree_payment($payment)
     {
         $list = "";
@@ -4376,6 +4984,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $payment
+     */
     function make_braintree_refund($payment)
     {
 
@@ -4420,6 +5031,10 @@ class Dashboard extends Util
         } // end if $status
     }
 
+    /**
+     * @param $payment
+     * @return string
+     */
     function refund_payment($payment)
     {
         $list = "";
@@ -4458,6 +5073,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $payment
+     */
     function make_authorize_refund($payment)
     {
 
@@ -4553,6 +5171,10 @@ class Dashboard extends Util
         } //  end of switch
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_add_to_workshop_dialog($userid)
     {
         $list = "";
@@ -4586,6 +5208,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $ws
+     */
     function add_user_to_workshop($ws)
     {
 
@@ -4610,6 +5235,12 @@ class Dashboard extends Util
         }
     }
 
+    /**
+     * @param $courseid
+     * @param $slotid
+     * @param $appid
+     * @return string
+     */
     function get_move_to_workshop_dialog($courseid, $slotid, $appid)
     {
         $list = "";
@@ -4646,6 +5277,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $ws
+     */
     function move_user_to_workshop($ws)
     {
 
@@ -4659,6 +5293,10 @@ class Dashboard extends Util
         }
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_add_create_cert_dialog($userid)
     {
         $list = "";
@@ -4703,6 +5341,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $cert
+     * @return string
+     */
     function get_send_cert_dialog($cert)
     {
         $list = "";
@@ -4740,6 +5382,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $cert
+     */
     function send_user_cetificate($cert)
     {
 
@@ -4758,6 +5403,9 @@ class Dashboard extends Util
         $m->send_email($subject, $list, $cert->email, $path, 1);
     }
 
+    /**
+     * @param $user
+     */
     function pass_user_at_the_course($user)
     {
         $date = time();
@@ -4773,6 +5421,9 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $certificate
+     */
     function create_user_certificate($certificate)
     {
         $start_arr = explode('/', $certificate->date1);
@@ -4784,6 +5435,10 @@ class Dashboard extends Util
         $cert->create_certificate($certificate->courseid, $certificate->userid, $start_date, $end_date);
     }
 
+    /**
+     * @param $cert
+     * @return string
+     */
     function get_renew_cert_dialog($cert)
     {
         $list = "";
@@ -4895,6 +5550,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $join_url
+     * @return string
+     */
     function get_add_participants_dialog($join_url)
     {
         $list = "";
@@ -4932,6 +5591,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $inv
+     * @return string
+     */
     function send_meeting_invitation($inv)
     {
         $m = new Mailer();
@@ -4948,6 +5611,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $certificate
+     */
     function renew_user_certificate($certificate)
     {
         $certstr = $certificate->id . ",";
@@ -4955,6 +5621,10 @@ class Dashboard extends Util
         $cert->recertificate($certstr, $certificate->date1, $certificate->date2);
     }
 
+    /**
+     * @param $certificate
+     * @return int|string
+     */
     function renew_user_certificate_manager($certificate)
     {
         $query = "select * from mdl_certificates where id=$certificate->id";
@@ -5000,6 +5670,9 @@ class Dashboard extends Util
         } // end else
     }
 
+    /**
+     * @param $cert
+     */
     function renew_user_certificate_manager_cash($cert)
     {
         $c = json_decode($this->renew_user_certificate_manager($cert));
@@ -5032,6 +5705,11 @@ class Dashboard extends Util
 
     // ******************* Code related to students survey ********************
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return int
+     */
     function is_course_completed($courseid, $userid)
     {
         $query = "select * from mdl_course_completions "
@@ -5041,6 +5719,11 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return int
+     */
     function is_ws_survey_was_completed($courseid, $userid)
     {
         $query = "select * from mdl_ws_survey "
@@ -5051,6 +5734,9 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @return string
+     */
     function get_attend_box()
     {
         $list = "";
@@ -5063,6 +5749,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_brochure_box()
     {
         $list = "";
@@ -5075,6 +5764,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_register_box()
     {
         $list = "";
@@ -5087,6 +5779,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_recommend_box()
     {
         $list = "";
@@ -5099,6 +5794,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $input_id
+     * @return string
+     */
     function get_rate_box($input_id)
     {
         $list = "";
@@ -5120,6 +5819,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return string
+     */
     function get_workshop_survey($courseid, $userid)
     {
         $list = "";
@@ -5217,6 +5921,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_workshop_courses()
     {
         $query = "select * from mdl_course "
@@ -5229,6 +5936,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return int
+     */
     function is_survey_exists($courseid, $userid)
     {
         $query = "select * from mdl_ws_survey "
@@ -5237,6 +5949,9 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @return array
+     */
     function get_workshop_completed_users()
     {
         $list = $this->get_workshop_courses();
@@ -5252,6 +5967,9 @@ class Dashboard extends Util
         return $users;
     }
 
+    /**
+     *
+     */
     function create_users_survey()
     {
         $i = 0;
@@ -5268,6 +5986,10 @@ class Dashboard extends Util
         } // end foreach
     }
 
+    /**
+     * @param $score
+     * @return string
+     */
     function get_ws_item_score($score)
     {
         switch ($score) {
@@ -5287,6 +6009,10 @@ class Dashboard extends Util
         return $item;
     }
 
+    /**
+     * @param $survey
+     * @return string
+     */
     function get_survey_message($survey)
     {
         $list = "";
@@ -5381,6 +6107,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $survey
+     * @return string
+     */
     function send_survey_results($survey)
     {
 
@@ -5428,12 +6158,19 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $id
+     */
     function remove_from_ws($id)
     {
         $query = "delete from mdl_scheduler_appointment where id=$id ";
         $this->db->query($query);
     }
 
+    /**
+     * @param $coursename
+     * @return int
+     */
     function get_program_slots($coursename)
     {
 
@@ -5475,6 +6212,10 @@ class Dashboard extends Util
         return $coursenum;
     }
 
+    /**
+     * @param $userid
+     * @return int
+     */
     function is_user_has_survey_applicagtion($userid)
     {
         $query = "select * from mdl_ws_survey where userid=$userid";
@@ -5482,6 +6223,11 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return int
+     */
     function has_completion_status($courseid, $userid)
     {
         $query = "select * from mdl_course_completions "
@@ -5490,6 +6236,10 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     */
     function make_user_passed($courseid, $userid)
     {
         $date = time();
@@ -5505,6 +6255,9 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     *
+     */
     function complete_users()
     {
         $cert_users = array();
@@ -5538,6 +6291,11 @@ class Dashboard extends Util
 
     // ***************** Skype Meeting Integration ************************
 
+    /**
+     * @param $courseid
+     * @param $roleid
+     * @return string
+     */
     function get_meeting_block($courseid, $roleid)
     {
         $list = "";
@@ -5560,11 +6318,19 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param int $length
+     * @return bool|string
+     */
     function createRandomString($length = 25)
     {
         return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length);
     }
 
+    /**
+     * @param $courseid
+     * @return string
+     */
     function get_start_meeting_button($courseid)
     {
         $list = "";
@@ -5579,6 +6345,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_meeting_toolbar()
     {
         $list = "";
@@ -5591,6 +6360,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $roomid
+     * @param $courseid
+     * @return string
+     */
     function get_join_button($roomid, $courseid)
     {
         $list = "";
@@ -5604,6 +6378,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $roomid
+     * @param $courseid
+     * @return string
+     */
     function get_start_button($roomid, $courseid)
     {
         $list = "";
@@ -5617,6 +6396,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $items
+     * @return string
+     */
     function create_meetings_block($items)
     {
         $list = "";
@@ -5666,6 +6449,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $selected
+     * @return string
+     */
     function get_webinar_hours_block($selected)
     {
         $list = "";
@@ -5683,6 +6470,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $selected
+     * @return string
+     */
     function get_webinar_minutes_block($selected)
     {
         $list = "";
@@ -5700,6 +6491,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @return string
+     */
     function get_add_webinar($courseid)
     {
         $list = "";
@@ -5744,6 +6539,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $id
+     * @return string
+     */
     function get_edit_webinar_dialog($id)
     {
         $list = "";
@@ -5797,6 +6596,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $w
+     */
     function add_new_webinar($w)
     {
         $date = strtotime($w->date);
@@ -5814,6 +6616,9 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $w
+     */
     function update_webinar($w)
     {
         $date = strtotime($w->date);
@@ -5826,6 +6631,10 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_user_group_name($userid)
     {
         $groupname = 'N/A';
@@ -5847,6 +6656,9 @@ class Dashboard extends Util
 
     /* Code related to profile completness status */
 
+    /**
+     * @return string
+     */
     function get_profile_complete_form()
     {
         $list = "";
@@ -5858,6 +6670,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return array
+     */
     function get_user_profile_status($userid)
     {
         $failed_fields = array();
@@ -5871,6 +6687,11 @@ class Dashboard extends Util
         return $failed_fields;
     }
 
+    /**
+     * @param $userid
+     * @param $field
+     * @return mixed
+     */
     function get_user_field_status($userid, $field)
     {
         $query = "select * from mdl_user where id=$userid";
@@ -5881,6 +6702,11 @@ class Dashboard extends Util
         return $status;
     }
 
+    /**
+     * @param $userid
+     * @param $failed_fields
+     * @return string
+     */
     function profile_form_to_complete($userid, $failed_fields)
     {
         $list = "";
@@ -5909,6 +6735,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $p
+     */
     function update_profile_missed_fields($p)
     {
         $query = "";
@@ -5930,6 +6759,10 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $courseid
+     * @return string
+     */
     function get_course_payment_stats_data($courseid)
     {
         $list = "";
@@ -5988,6 +6821,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $coursename
+     * @return int
+     */
     function get_course_category_by_name($coursename)
     {
         $categoryid = 0;
@@ -6001,6 +6838,10 @@ class Dashboard extends Util
 
     /* Code related to college demographic info */
 
+    /**
+     * @param $courseid
+     * @return string
+     */
     function get_course_enroll_ids($courseid)
     {
         $query = "select * from mdl_enrol where courseid=$courseid";
@@ -6012,6 +6853,11 @@ class Dashboard extends Util
         return $enrolls_list;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return false|string
+     */
     function get_user_enrollment_date($courseid, $userid)
     {
         $enrolls_list = $this->get_course_enroll_ids($courseid);
@@ -6024,6 +6870,10 @@ class Dashboard extends Util
         return $start_date;
     }
 
+    /**
+     * @param $userid
+     * @return int
+     */
     function demo_info_applicable($userid)
     {
         $query = "select * from mdl_demographic where userid=$userid";
@@ -6031,6 +6881,11 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return string
+     */
     function get_college_student_demographic_questionare($courseid, $userid)
     {
         $list = "";
@@ -6089,6 +6944,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $data
+     */
     function add_college_student_basic_data($data)
     {
         $query = "insert into mdl_demographic "
@@ -6111,6 +6969,10 @@ class Dashboard extends Util
         $this->db->query($query);
     }
 
+    /**
+     * @param $courseid
+     * @return string
+     */
     function get_course_enrollment_methods($courseid)
     {
         $query = "select * from mdl_enrol where courseid=$courseid";
@@ -6122,6 +6984,11 @@ class Dashboard extends Util
         return $enrols_list;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return int
+     */
     function is_student_certified($courseid, $userid)
     {
         $query = "select * from mdl_certificates "
@@ -6131,6 +6998,10 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function is_student_has_special_status($userid)
     {
         $query = "select * from mdl_demographic where userid=$userid";
@@ -6147,6 +7018,11 @@ class Dashboard extends Util
         return $status;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return float|int
+     */
     function get_student_course_average_grades($courseid, $userid)
     {
         //echo "Course id: " . $courseid . "<br>";
@@ -6188,6 +7064,10 @@ class Dashboard extends Util
         return $average;
     }
 
+    /**
+     * @param $grade
+     * @return string
+     */
     function get_grade_letter($grade)
     {
         if ($grade >= 95 && $grade <= 100) {
@@ -6205,6 +7085,10 @@ class Dashboard extends Util
         return $letter;
     }
 
+    /**
+     * @param $userid
+     * @return stdClass
+     */
     function get_student_demographic_data($userid)
     {
         $query = "select * from mdl_demographic where userid=$userid";
@@ -6218,6 +7102,10 @@ class Dashboard extends Util
         return $user;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_cna_student_block($userid)
     {
         $list = "";
@@ -6310,6 +7198,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return int
+     */
     function is_user_enrolled_into_other_college_courses($userid)
     {
         foreach ($this->OTHER_COLLEGE_COURSES as $courseid) {
@@ -6323,6 +7215,10 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $courseid
+     * @return stdClass
+     */
     function get_course_detailes($courseid)
     {
         if ($courseid>0) {
@@ -6338,6 +7234,10 @@ class Dashboard extends Util
         return $course;
     }
 
+    /**
+     * @param $courseid
+     * @return mixed
+     */
     function get_course_hours($courseid)
     {
         $query = "select * from mdl_course_hours where courseid=$courseid";
@@ -6348,6 +7248,10 @@ class Dashboard extends Util
         return $hours;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_other_student_courses_block($userid)
     {
         $list = "";
@@ -6413,6 +7317,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_transcript_report_logo_part()
     {
         $list = "";
@@ -6444,6 +7351,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_transcript_officials_block()
     {
         $list = "";
@@ -6458,6 +7368,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_student_birth_date($userid)
     {
         $query = "select * from mdl_demographic where userid=$userid";
@@ -6469,6 +7383,10 @@ class Dashboard extends Util
         return $birthdate;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_student_address_block($userid)
     {
         $list = "";
@@ -6485,6 +7403,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_transcript_user_block($userid)
     {
         $list = "";
@@ -6499,6 +7421,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @return string
+     */
     function get_grading_scale()
     {
         $list = "";
@@ -6563,6 +7488,11 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $courseid
+     * @param $userid
+     * @return int
+     */
     function is_cna_enrolled($courseid, $userid)
     {
         $enrolls_list = $this->get_course_enrollment_methods($courseid);
@@ -6573,12 +7503,20 @@ class Dashboard extends Util
         return $num;
     }
 
+    /**
+     * @param $userid
+     * @return int
+     */
     function is_ma_enrolled($userid)
     {
         $num = $this->is_user_enrolled_into_other_college_courses($userid);
         return $num;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function get_attempts_block($userid)
     {
         $list = "";
@@ -6608,6 +7546,10 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $userid
+     * @return string
+     */
     function print_script_grades_pdf_report($userid)
     {
         $list = "";
@@ -6678,6 +7620,10 @@ class Dashboard extends Util
         return $file;
     }
 
+    /**
+     * @param $trans_id
+     * @return stdClass
+     */
     function get_payment_billing_info($trans_id)
     {
         $query = "select * from mdl_billing_data "
@@ -6692,6 +7638,10 @@ class Dashboard extends Util
         return $data;
     }
 
+    /**
+     * @param $trans_id
+     * @return string
+     */
     function get_payment_details($trans_id)
     {
         $list = "";
@@ -6746,6 +7696,9 @@ class Dashboard extends Util
         return $list;
     }
 
+    /**
+     * @param $notes
+     */
     function update_user_notes($notes)
     {
         $content = addslashes($notes->content);
